@@ -1,0 +1,3 @@
+- [ ] Set description for thiruvathirakali
+- [ ] Update src/data/schedules.ts with the description
+- [ ] Verify the changes

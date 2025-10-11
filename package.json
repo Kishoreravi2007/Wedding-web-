@@ -1,0 +1,25 @@
+{
+  "name": "wedding-web-main",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kishoreravi2007/Wedding-web-main-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kishoreravi2007/Wedding-web-main-1/issues"
+  },
+  "homepage": "https://github.com/Kishoreravi2007/Wedding-web-main-1#readme",
+  "dependencies": {
+    "@types/node": "^24.7.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1"
+  }
+}
