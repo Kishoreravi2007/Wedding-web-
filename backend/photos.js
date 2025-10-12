@@ -1,24 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-// Firebase is removed, so photo storage and retrieval are disabled.
-// To re-enable, integrate with another cloud storage solution (e.g., AWS S3, Cloudinary)
-// and a persistent database for metadata.
+const admin = require('firebase-admin');
+const db = admin.firestore();
+const bucket = admin.storage().bucket();
 
-// Multer configuration for in-memory storage (files will not be saved persistently)
+// Multer configuration for in-memory storage
 const upload = multer({
-  storage: multer.memoryStorage(), // Store file in memory temporarily
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
 });
 
-// In-memory storage for photo metadata (not persistent across server restarts)
-const photos = [];
-let photoIdCounter = 1;
-
-// GET all photos metadata (returns empty array as storage is disabled)
-router.get('/', (req, res) => {
+// GET all photos metadata from Firestore
+router.get('/', async (req, res) => {
   try {
-    // In a real application, you would fetch metadata from a persistent database
+    const snapshot = await db.collection('photos').orderBy('uploadedAt', 'desc').get();
+    const photos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     res.json(photos);
   } catch (error) {
     console.error('Error getting photos metadata:', error);
@@ -26,27 +23,78 @@ router.get('/', (req, res) => {
   }
 });
 
-// POST a new photo (disabled without Firebase Storage)
-router.post('/', upload.single('photo'), (req, res) => {
+// POST a new photo to Firebase Storage and save metadata to Firestore
+router.post('/', upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
 
   try {
-    // In a real application, you would upload the file to cloud storage
-    // and save its metadata to a persistent database.
-    const newPhoto = {
-      id: String(photoIdCounter++),
-      filename: req.file.originalname,
-      url: `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, // Base64 for demonstration, not for production
-      timestamp: new Date().toISOString(),
-      message: 'Photo upload is disabled as Firebase Storage has been removed. Photos are not persistently stored.',
-    };
-    photos.push(newPhoto);
-    res.status(201).json(newPhoto);
+    const file = req.file;
+    const fileName = `photos/${Date.now()}_${file.originalname}`;
+    const fileUpload = bucket.file(fileName);
+
+    const blobStream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
+
+    blobStream.on('error', (error) => {
+      console.error('Error uploading to Firebase Storage:', error);
+      res.status(500).json({ message: 'Error uploading photo to storage.' });
+    });
+
+    blobStream.on('finish', async () => {
+      // Make the file public
+      await fileUpload.makePublic();
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+      const newPhoto = {
+        filename: file.originalname,
+        filePath: fileName,
+        publicUrl: publicUrl,
+        size: file.size,
+        mimetype: file.mimetype,
+        uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      const docRef = await db.collection('photos').add(newPhoto);
+      res.status(201).json({ id: docRef.id, ...newPhoto });
+    });
+
+    blobStream.end(file.buffer);
+
   } catch (error) {
     console.error('Error uploading photo:', error);
     res.status(500).json({ message: 'Error uploading photo.' });
+  }
+});
+
+// DELETE a photo from Firebase Storage and Firestore
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const docRef = db.collection('photos').doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ message: 'Photo not found.' });
+    }
+
+    const photoData = doc.data();
+    const filePath = photoData.filePath;
+
+    // Delete from Firebase Storage
+    await bucket.file(filePath).delete();
+
+    // Delete metadata from Firestore
+    await docRef.delete();
+
+    res.status(200).json({ message: 'Photo deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting photo:', error);
+    res.status(500).json({ message: 'Error deleting photo.' });
   }
 });
 

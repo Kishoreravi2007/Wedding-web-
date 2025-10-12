@@ -372,7 +372,6 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                     transition={{ delay: 0.6 }}
                   >
                     <span>{photo.event}</span>
-                    <span>{new Date(photo.date).toLocaleDateString()}</span>
                   </motion.div>
 
                   <motion.div 

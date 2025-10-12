@@ -1,8 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { db, storage } from '@/lib/firebase';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // File Upload Service for organizing wedding photos and music
 export interface UploadedFile {
-  id: string;
+  id?: string; // Made optional as Firestore generates it
   originalName: string;
   fileName: string;
   filePath: string;
@@ -86,27 +88,15 @@ export async function uploadFiles(
       const fileName = generateFileName(file.name, eventType);
       const filePath = `${directoryPath}/${fileName}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('wedding-files') // You might need to create a bucket named 'wedding-files' in Supabase
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from('wedding-files')
-        .getPublicUrl(filePath);
+      const storageRef = ref(storage, filePath);
+      const snapshot = await uploadBytes(storageRef, file);
+      const publicUrl = await getDownloadURL(snapshot.ref);
 
       const uploadedFile: UploadedFile = {
-        id: '', // Supabase will generate this
         originalName: file.name,
         fileName: fileName,
         filePath: filePath,
-        publicUrl: publicUrlData.publicUrl,
+        publicUrl: publicUrl,
         size: file.size,
         type: file.type,
         eventType: eventType,
@@ -114,16 +104,9 @@ export async function uploadFiles(
         fileCategory: fileCategory
       };
 
-      // Save metadata to Supabase database
-      const { data: docData, error: docError } = await supabase
-        .from('uploadedFiles') // You might need to create a table named 'uploadedFiles' in Supabase
-        .insert([uploadedFile])
-        .select();
-
-      if (docError) {
-        throw docError;
-      }
-      uploadedFile.id = docData[0].id; // Update with Supabase generated ID
+      // Save metadata to Firestore
+      const docRef = await addDoc(collection(db, 'uploadedFiles'), uploadedFile);
+      uploadedFile.id = docRef.id; // Update with Firestore generated ID
 
       uploadedFiles.push(uploadedFile);
     }
@@ -146,15 +129,13 @@ export async function uploadFiles(
 // Get all uploaded files from Firestore
 export async function getUploadedFiles(): Promise<UploadedFile[]> {
   try {
-    const { data, error } = await supabase
-      .from('uploadedFiles')
-      .select('*');
-
-    if (error) {
-      throw error;
-    }
-
-    return data as UploadedFile[];
+    const q = query(collection(db, 'uploadedFiles'), orderBy('uploadedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    const files: UploadedFile[] = [];
+    querySnapshot.forEach((doc) => {
+      files.push({ id: doc.id, ...doc.data() } as UploadedFile);
+    });
+    return files;
   } catch (error) {
     console.error('Error getting uploaded files:', error);
     return [];
@@ -164,24 +145,12 @@ export async function getUploadedFiles(): Promise<UploadedFile[]> {
 // Delete uploaded file from Firebase Storage and Firestore
 export async function deleteUploadedFile(fileId: string, filePath: string): Promise<boolean> {
   try {
-    // Delete from Supabase Storage
-    const { error: storageError } = await supabase.storage
-      .from('wedding-files')
-      .remove([filePath]);
+    // Delete from Firebase Storage
+    const fileRef = ref(storage, filePath);
+    await deleteObject(fileRef);
 
-    if (storageError) {
-      throw storageError;
-    }
-
-    // Delete metadata from Supabase database
-    const { error: dbError } = await supabase
-      .from('uploadedFiles')
-      .delete()
-      .eq('id', fileId);
-
-    if (dbError) {
-      throw dbError;
-    }
+    // Delete metadata from Firestore
+    await deleteDoc(doc(db, 'uploadedFiles', fileId));
 
     console.log(`Deleting file with ID: ${fileId} and path: ${filePath}`);
     return true;
