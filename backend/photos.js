@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const admin = require('firebase-admin');
 const db = admin.firestore();
-const bucket = admin.storage().bucket();
+const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
 
 // Multer configuration for in-memory storage
 const upload = multer({

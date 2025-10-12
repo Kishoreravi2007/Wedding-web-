@@ -1,16 +1,17 @@
-require('dotenv').config();
+require('dotenv').config({ path: './backend/.env' });
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./wedding-429e4-firebase-adminsdk-fbsvc-1ce2602299.json');
+const serviceAccount = require('./weddingweb-9421e-firebase-adminsdk-fbsvc-184b677d23.json');
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET // Ensure this is set in .env
   });
 }
+console.log('FIREBASE_STORAGE_BUCKET from .env:', process.env.FIREBASE_STORAGE_BUCKET);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
