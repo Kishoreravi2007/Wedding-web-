@@ -14,7 +14,8 @@ export const saveWish = async (name: string, wish: string, recipient: string): P
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || response.statusText}`);
     }
 
     console.log("Wish saved successfully to backend!");
