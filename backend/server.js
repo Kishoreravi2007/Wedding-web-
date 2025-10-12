@@ -1,10 +1,15 @@
-require('dotenv').config({ path: './backend/.env' });
+require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./weddingweb-9421e-firebase-adminsdk-fbsvc-184b677d23.json');
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
+if (!serviceAccountPath) {
+  console.error('Error: FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable not set.');
+  process.exit(1);
+}
+const serviceAccount = require(serviceAccountPath);
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

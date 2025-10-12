@@ -178,7 +178,7 @@ export const sreedeviSchedule = [
         title: "Reception", 
         time: "5 to 8 pm", 
         dresscode:"Cocktail ",
-        venue: "AMMU AUDITORIUM",
+        venue: "Ammu Auditorium",
         locationUrl: "https://maps.app.goo.gl/vMVeHnpiqfVTnUpL6",
         image: "/reception-background.jpg",
         description: "The couple’s first celebration together with the groom’s family and loved ones.This special gathering is a time for family and friends to come together,  to bless the newlyweds, share in their happiness.This tradition symbolizes the bride’s grand welcome into her new family and home, while also giving everyone an opportunity to come together in love, laughter, and celebration.The evening will include a delightful cake-cutting ceremony, followed by a splendid dinner prepared with love to celebrate the occasion in true festive spirit. 💕🍰🍽️",
