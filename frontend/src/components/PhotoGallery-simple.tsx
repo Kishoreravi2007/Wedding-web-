@@ -51,7 +51,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
     const imageNames = [
       '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg',
       '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg',
-      '1000-thirikkal.jpg', 'sreedevi-3.jpg', 'sreedevi-4.jpg'
+      '13.jpeg', '14.jpeg', '15.jpeg'
     ];
 
     return imageNames.map((name, index) => ({
