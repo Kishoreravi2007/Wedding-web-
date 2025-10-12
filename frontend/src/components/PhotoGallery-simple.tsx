@@ -59,7 +59,6 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
       url: `${galleryPath}/${name}`,
       thumbnail: `${galleryPath}/${name}`,
       title: `Photo ${index + 1}`,
-      description: `A beautiful photo from the wedding.`,
       tags: ['wedding', 'celebration'],
       event: 'Wedding',
       date: '2026-01-04',
@@ -77,7 +76,6 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
       url: uploadedPhoto.preview || uploadedPhoto.url || '/couple-frame-placeholder.png',
       thumbnail: uploadedPhoto.preview || uploadedPhoto.thumbnail || '/couple-frame-placeholder.png',
       title: uploadedPhoto.title || uploadedPhoto.file?.name || `Uploaded Photo ${index + 1}`,
-      description: uploadedPhoto.description || `Uploaded photo - ${uploadedPhoto.file?.name || 'Unknown'}`,
       tags: uploadedPhoto.tags || ['uploaded', 'wedding'],
       event: uploadedPhoto.event || 'Wedding Photos',
       date: uploadedPhoto.date || new Date().toISOString(),
@@ -334,16 +332,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                   >
                     {photo.title}
                   </motion.h3>
-                  <motion.p 
-                    className="text-xs text-gray-600 mb-2 line-clamp-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    {photo.description}
-                  </motion.p>
-                  
-                  <motion.div 
+                  <motion.div
                     className="flex flex-wrap gap-1 mb-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

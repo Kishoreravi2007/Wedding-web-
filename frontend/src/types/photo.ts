@@ -10,7 +10,7 @@ export interface Photo {
   url: string;
   thumbnail: string;
   title: string;
-  description: string;
+  description?: string;
   tags: string[];
   event: string;
   date: string;

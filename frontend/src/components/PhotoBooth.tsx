@@ -467,7 +467,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
         <div className="absolute top-4 left-4 w-12 h-12 bg-red-500/20 rounded-full animate-pulse-glow"></div>
         <div className="absolute top-4 right-4 w-8 h-8 bg-green-500/20 rounded-full animate-pulse-glow" style={{animationDelay: '1s'}}></div>
       </div>
-      <div className="flex justify-center gap-4 mb-8 animate-fade-in" style={{animationDelay: '0.5s'}}>
+      <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-4 mb-8 animate-fade-in" style={{animationDelay: '0.5s'}}>
         <Button
           onClick={takePhoto}
           className={`${buttonClass} font-semibold px-8 py-3 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl`}

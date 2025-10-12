@@ -38,8 +38,8 @@ export const parvathySchedule: Schedule[] = [
     date: "January 3, 2026",
     events: [
       { 
-        id: "ayaniyoonu-a",
-        title: "Ayaniyoonu",
+        id: "ganapathykidal-a",
+        title: "Guanapathykidal",
         date: "Saturday, January 3, 2026",
         time: "8:00 to 12:00 pm",
         dresscode: "Ladies: Set Mundu",
@@ -50,15 +50,15 @@ export const parvathySchedule: Schedule[] = [
         mapLink: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA"
       },
       { 
-        id: "thiruvathirakali-a",
-        title: "Thiruvathirakali",
+        id: "kaikottikali-a",
+        title: "Kaikottikali",
         date: "Saturday, January 3, 2026",
         time: "12:00 pm",
         dresscode: "Ladies: Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
         image: "/thiruvathirakali-background.jpg",
-        description: "Staged by the bride’s female relatives and friends as a way of celebrating the occasion with joy and grace.Women,form a circle around a lit lamp and dance in rhythmic steps, clapping hands in unison to the tune of melodious folk songs. The songs usually narrate themes of love, marriage, and devotion.",
+        description: "Staged by the bride’s female relatives and friends as a way of celebrating the occasion with joy and grace.Women,form a circle around a lit lamp and dance in rhythmic steps, clapping hands in unison to the tune of melodious folk songs. The songs usually narrate themes of devotion, love and marriage.",
         mapLink: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA"
       },
       { 
@@ -111,7 +111,7 @@ export const sreedeviSchedule = [
         id: "ayaniyoonu-b",
         title: "Ayaniyoonu",
         time: "8:00 to 12:00 pm",
-        dresscode: "Ladies : Set Mundu",
+        dresscode: "Ladies Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
         image: "/ayinoon-background.jpg",
@@ -119,22 +119,22 @@ export const sreedeviSchedule = [
         mapLink: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA"
       },
       { 
-        id: "thiruvathirakali-b",
-        title: "Thiruvathirakali",
+        id: "kaikottikali-b",
+        title: "Kaikottikali",
         date: "Saturday, January 10, 2026",
         time: "12:00 pm",
-        dresscode: "Ladies : Set Mundu",
+        dresscode: "Ladies Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
         image: "/thiruvathirakali-background.jpg",
-        description: "Staged by the bride’s female relatives and friends as a way of celebrating the occasion with joy and grace.Women,form a circle around a lit lamp and dance in rhythmic steps, clapping hands in unison to the tune of melodious folk songs. The songs usually narrate themes of love, marriage, and devotion.",
+        description: "Staged by the bride’s female relatives and friends as a way of celebrating the occasion with joy and grace.Women,form a circle around a lit lamp and dance in rhythmic steps, clapping hands in unison to the tune of melodious folk songs. The songs usually narrate themes of devotion, love and marriage.",
         mapLink: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA"
       },
       { 
         id: "1000 thiritirikkal-b",
         title: "1000 Thirittirikkal",
         time: "2 pm",
-        dresscode: "Ladies : Set Mundu",
+        dresscode: "Ladies Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
         image: "/1000-thirikkal.jpg",
