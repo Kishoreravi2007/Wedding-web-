@@ -28,10 +28,16 @@ router.post('/', upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
+  
+  const { sister } = req.body; // 'sister-a' or 'sister-b'
+  if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
+    return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
+  }
+
 
   try {
     const file = req.file;
-    const fileName = `photos/${Date.now()}_${file.originalname}`;
+    const fileName = `${sister}/${Date.now()}_${file.originalname}`;
     const fileUpload = bucket.file(fileName);
 
     const blobStream = fileUpload.createWriteStream({
@@ -56,6 +62,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
         publicUrl: publicUrl,
         size: file.size,
         mimetype: file.mimetype,
+        sister: sister,
         uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 

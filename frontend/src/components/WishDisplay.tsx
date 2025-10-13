@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getWishes } from "@/services/wishService";
 import { Wish } from "@/types/wish";
-import { format } from "date-fns";
-
 interface WishDisplayProps {
   recipient: 'parvathy' | 'sreedevi';
 }
@@ -56,9 +54,6 @@ const WishDisplay: React.FC<WishDisplayProps> = ({ recipient }) => {
             <Card key={wishItem.id} className="bg-[#FFFDD0]/50 border border-[#800000] text-[#800000]">
               <CardHeader>
                 <CardTitle className="text-2xl font-display">{wishItem.name}</CardTitle>
-                <p className="text-sm text-[#800000]/70">
-                  {format(new Date(wishItem.timestamp), "MMMM do, yyyy h:mm a")}
-                </p>
               </CardHeader>
               <CardContent>
                 <p className="text-lg">{wishItem.wish}</p>

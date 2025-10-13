@@ -317,37 +317,22 @@ const AdminDashboard = () => {
                   Photo Gallery Management
                 </CardTitle>
               </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
-                <Upload className="w-12 h-12 mx-auto mb-4 text-slate-400" />
-                <h3 className="text-lg font-semibold mb-2">Upload Photos</h3>
-                <p className="text-slate-600 mb-4">Upload multiple photos at once</p>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2">Select Wedding</label>
-                  <Select value={selectedWedding} onValueChange={setSelectedWedding}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Wedding" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A">Sister A ({content.parvathy?.name || 'Sister A'})</SelectItem>
-                      <SelectItem value="B">Sister B ({content.sreedevi?.name || 'Sister B'})</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold mb-2">Upload New Photos</h3>
+                  <p className="text-slate-600 mb-4">Upload JPG, PNG, or other image formats organized by event type</p>
+                  <UniversalUpload 
+                    onFilesUploaded={(uploadedFiles) => {
+                      if (uploadedFiles.length > 0) {
+                        // In a real app, you would handle the uploaded files properly
+                        showSuccess(`${uploadedFiles.length} photo(s) uploaded successfully to ${uploadedFiles[0]?.eventType || 'photo'} directory!`);
+                      }
+                    }}
+                    allowedTypes="images"
+                    title="Upload Photo Files"
+                    sisterName={selectedWedding === 'A' ? 'sister-a' : 'sister-b'}
+                  />
                 </div>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  id="photo-upload"
-                />
-                <Button asChild>
-                  <label htmlFor="photo-upload" className="cursor-pointer">
-                    Choose Photos
-                  </label>
-                </Button>
-              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {photos.map((photo) => (

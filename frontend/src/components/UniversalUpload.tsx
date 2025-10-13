@@ -255,7 +255,10 @@ const UniversalUpload: React.FC<UniversalUploadProps> = ({
 
       // Upload files
       const fileObjects = pendingFiles.map(file => file.file);
-      const result = await uploadFiles(fileObjects, selectedEventType, sisterName); // Pass sisterName
+      if (!sisterName || (sisterName !== 'sister-a' && sisterName !== 'sister-b')) {
+        throw new Error('Invalid sister name provided.');
+      }
+      const result = await uploadFiles(fileObjects, sisterName); // Pass sisterName
 
       if (result.success) {
         // Update files with uploaded file info

@@ -73,55 +73,42 @@ function getFileCategory(file: File): 'image' | 'music' {
   throw new Error('Unsupported file type');
 }
 
-// Upload files to Firebase Storage and save metadata to Firestore
+// Upload files to the backend and save metadata to Firestore
 export async function uploadFiles(
-  files: File[], 
-  eventType: string = 'other',
-  sisterName?: string // Add sisterName parameter
+  files: File[],
+  sister: 'sister-a' | 'sister-b'
 ): Promise<UploadResult> {
   try {
     const uploadedFiles: UploadedFile[] = [];
+    const formData = new FormData();
 
     for (const file of files) {
-      const fileCategory = getFileCategory(file);
-      const directoryPath = getDirectoryPath(eventType, fileCategory, sisterName);
-      const fileName = generateFileName(file.name, eventType);
-      const filePath = `${directoryPath}/${fileName}`;
-
-      const storageRef = ref(storage, filePath);
-      const snapshot = await uploadBytes(storageRef, file);
-      const publicUrl = await getDownloadURL(snapshot.ref);
-
-      const uploadedFile: UploadedFile = {
-        originalName: file.name,
-        fileName: fileName,
-        filePath: filePath,
-        publicUrl: publicUrl,
-        size: file.size,
-        type: file.type,
-        eventType: eventType,
-        uploadedAt: new Date().toISOString(),
-        fileCategory: fileCategory
-      };
-
-      // Save metadata to Firestore
-      const docRef = await addDoc(collection(db, 'uploadedFiles'), uploadedFile);
-      uploadedFile.id = docRef.id; // Update with Firestore generated ID
-
-      uploadedFiles.push(uploadedFile);
+      formData.append('photo', file);
     }
+    formData.append('sister', sister);
+
+    const response = await fetch('/api/photos', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+
+    const result = await response.json();
+    uploadedFiles.push(result);
 
     return {
       success: true,
-      files: uploadedFiles
+      files: uploadedFiles,
     };
-
   } catch (error) {
     console.error('Error uploading files:', error);
     return {
       success: false,
       files: [],
-      error: error instanceof Error ? error.message : 'Upload failed'
+      error: error instanceof Error ? error.message : 'Upload failed',
     };
   }
 }

@@ -11,8 +11,15 @@ router.get('/', async (req, res) => {
     if (recipient) {
       wishesRef = wishesRef.where('recipient', '==', recipient);
     }
-    const snapshot = await wishesRef.orderBy('createdAt', 'desc').get();
-    const wishes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const snapshot = await wishesRef.orderBy('timestamp', 'desc').get();
+    const wishes = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString(),
+      };
+    });
     res.json(wishes);
   } catch (error) {
     console.error('Error getting wishes:', error);
@@ -32,7 +39,7 @@ router.post('/', async (req, res) => {
       name,
       wish,
       recipient: recipient || 'both',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      timestamp: admin.firestore.FieldValue.serverTimestamp(), // Use timestamp to match frontend interface
     };
     const docRef = await db.collection('wishes').add(newWish);
     res.status(201).json({ id: docRef.id, ...newWish });
