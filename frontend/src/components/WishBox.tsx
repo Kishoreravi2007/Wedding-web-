@@ -11,13 +11,13 @@ interface WishBoxProps {
 }
 
 const WishBox: React.FC<WishBoxProps> = ({ recipient }) => {
-  const [name, setName] = useState("Auto Test Name");
-  const [wish, setWish] = useState("Auto Test Wish");
+  const [name, setName] = useState("");
+  const [wish, setWish] = useState("");
 
-  const handleSubmit = async (n: string, w: string) => {
-    if (n.trim() && w.trim()) {
+  const handleSubmit = async () => {
+    if (name.trim() && wish.trim()) {
       try {
-        await saveWish(n, w, recipient);
+        await saveWish(name, wish, recipient);
         alert("Your wish has been sent successfully!");
         setName("");
         setWish("");
@@ -34,10 +34,6 @@ const WishBox: React.FC<WishBoxProps> = ({ recipient }) => {
     }
   };
 
-  useEffect(() => {
-    handleSubmit(name, wish);
-  }, []);
-
   return (
     <Card className="w-full max-w-md mx-auto mt-8">
       <CardHeader>
@@ -50,18 +46,16 @@ const WishBox: React.FC<WishBoxProps> = ({ recipient }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="mb-4"
-          readOnly
         />
         <Textarea
           placeholder="Type your heartfelt wishes here..."
           value={wish}
           onChange={(e) => setWish(e.target.value)}
           className="mb-4"
-          readOnly
         />
         <p className="text-xs text-gray-500 mb-4">Only couples can see the wishes.</p>
-        <Button onClick={() => handleSubmit(name, wish)} className="w-full">
-          Send Wish (Auto-submitted)
+        <Button onClick={handleSubmit} className="w-full">
+          Send Wish
         </Button>
       </CardContent>
     </Card>
