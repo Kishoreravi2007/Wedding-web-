@@ -38,7 +38,7 @@ const defaultContent: WebsiteContent = {
     role: "Bride", 
     description: "Join Sreedevi's special wedding celebration filled with love, joy, and cherished moments"
   },
-  weddingDate: "December 15, 2024",
+  weddingDate: "",
   venue: "Grand Wedding Hall, Kerala",
   totalGuests: 300,
   dressCode: "Traditional Kerala attire preferred",
@@ -64,7 +64,7 @@ export const WebsiteProvider: React.FC<{ children: ReactNode }> = ({ children })
         role: "Bride",
         description: t("sisterBDescription")
       },
-      weddingDate: "December 15, 2024", // These can also be moved to translation files if needed
+      weddingDate: "",
       venue: "Grand Wedding Hall, Kerala",
       totalGuests: 300,
       dressCode: t("dressCodeDescription"),

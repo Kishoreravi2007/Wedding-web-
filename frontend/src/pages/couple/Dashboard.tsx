@@ -92,7 +92,6 @@ const CoupleDashboard = () => {
                 </div>
                 <div>
                   <h2 className="text-4xl font-bold">{coupleData.parvathy.name} & {coupleData.sreedevi.name}</h2>
-                  <p className="text-pink-100 text-lg">December 15, 2024</p>
                 </div>
               </div>
               <p className="text-pink-100 text-lg max-w-2xl mx-auto">
@@ -212,10 +211,6 @@ const CoupleDashboard = () => {
                   <CardTitle className="text-2xl text-rose-800">Wedding Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-rose-800">Wedding Date</h4>
-                    <p className="text-rose-600">{coupleData.weddingDate}</p>
-                  </div>
                   <div>
                     <h4 className="font-semibold text-rose-800">Venue</h4>
                     <p className="text-rose-600">{coupleData.venue}</p>
