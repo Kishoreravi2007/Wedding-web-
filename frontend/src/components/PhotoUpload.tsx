@@ -31,6 +31,7 @@ interface PhotoFile {
   description: string;
   eventType: string;
   tags: string[];
+  destinationGallery: 'sister-a-gallery' | 'sister-b-gallery' | '';
   status: 'pending' | 'uploading' | 'completed' | 'error';
   progress: number;
   id: string;
@@ -51,6 +52,11 @@ const eventTypes = [
   { value: 'haldi', label: 'Haldi' },
   { value: 'sangeet', label: 'Sangeet' },
   { value: 'other', label: 'Other' }
+];
+
+const destinationGalleries = [
+  { value: 'sister-a-gallery', label: "Sister A's Gallery" },
+  { value: 'sister-b-gallery', label: "Sister B's Gallery" },
 ];
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }) => {
@@ -101,6 +107,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
       description: '',
       eventType: '',
       tags: [],
+      destinationGallery: 'sister-a-gallery', // Default to Sister A's Gallery
       status: 'pending',
       progress: 0,
       id: Date.now() + Math.random().toString()
@@ -126,6 +133,13 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
   };
 
   const handleUploadAll = async () => {
+    // Validate that a destination gallery is selected for all photos
+    const photosWithoutGallery = photos.filter(p => !p.destinationGallery);
+    if (photosWithoutGallery.length > 0) {
+      alert('Please select a destination gallery for all photos before uploading.');
+      return;
+    }
+
     setIsUploading(true);
     // Photo upload is disabled as Firebase Storage has been removed.
     // In a real application, you would integrate with another cloud storage solution.
@@ -376,6 +390,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                       {eventTypes.map((event) => (
                         <SelectItem key={event.value} value={event.value}>
                           {event.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Destination Gallery</label>
+                  <Select
+                    value={selectedPhoto.destinationGallery}
+                    onValueChange={(value) => updatePhotoMetadata(selectedPhotoIndex!, { destinationGallery: value as 'sister-a-gallery' | 'sister-b-gallery' })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gallery" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {destinationGalleries.map((gallery) => (
+                        <SelectItem key={gallery.value} value={gallery.value}>
+                          {gallery.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
