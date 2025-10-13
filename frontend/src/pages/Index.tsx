@@ -222,7 +222,6 @@ const Index = () => {
           </motion.div>
       </motion.div>
 
-
       <motion.div 
         className="w-full max-w-4xl pb-8" 
         variants={itemVariants}
@@ -263,7 +262,7 @@ const Index = () => {
                   transition={{ duration: 0.6, delay: 1.1 }}
                   viewport={{ once: true }}
                 >
-                  {t('viewWeddingPhotos')}
+                  {t('')}
                 </motion.h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <motion.div 
