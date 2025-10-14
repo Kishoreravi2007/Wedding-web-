@@ -35,7 +35,7 @@ const WishBox: React.FC<WishBoxProps> = ({ recipient }) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto mt-8">
+        <Card className="w-full sm:max-w-md mx-auto mt-4 sm:mt-8">
       <CardHeader>
         <CardTitle>Send Your Wishes</CardTitle>
       </CardHeader>

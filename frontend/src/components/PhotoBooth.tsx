@@ -404,7 +404,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
       <div className="absolute top-8 right-8 w-20 h-20 bg-gradient-to-r from-stone-300/20 to-transparent rounded-full blur-lg"></div>
       <div className="absolute bottom-16 left-8 w-32 h-32 bg-gradient-to-r from-stone-400/15 to-transparent rounded-full blur-lg"></div>
 
-      <h1 className="font-heading text-5xl my-8 animate-fade-in bg-gradient-to-r from-stone-700 to-stone-500 bg-clip-text text-transparent">
+      <h1 className="font-heading text-4xl sm:text-5xl my-8 animate-fade-in bg-gradient-to-r from-stone-700 to-stone-500 bg-clip-text text-transparent">
         Live Photo Booth
       </h1>
       <div className="relative w-full aspect-video bg-gradient-to-br from-stone-200 to-stone-300 rounded-2xl overflow-hidden shadow-2xl mb-6 animate-bounce-in border-4 border-white/50">
@@ -430,7 +430,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
             <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
             {goodFacePoseStart !== null && !isPhotoBeingTaken && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="relative w-48 h-48">
+                <div className="relative w-32 h-32 sm:w-48 sm:h-48">
                   <svg className="w-full h-full" viewBox="0 0 100 100">
                     <circle
                       className="text-gray-200/50"
@@ -466,7 +466,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
 
         <div className="absolute top-4 left-4 w-12 h-12 bg-red-500/20 rounded-full animate-pulse-glow"></div>
         <div className="absolute top-4 right-4 w-8 h-8 bg-green-500/20 rounded-full animate-pulse-glow" style={{animationDelay: '1s'}}></div>
-      </div>
+      </div> {/* Closing tag for the aspect-video div */}
       <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-4 mb-8 animate-fade-in" style={{animationDelay: '0.5s'}}>
         <Button
           onClick={takePhoto}
@@ -600,7 +600,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
 
       <div className="animate-fade-in" style={{animationDelay: '0.8s'}}>
         <div className="flex items-center justify-between mb-6">
-          <div className="text-center flex-1">
+          <div className="text-center sm:text-left flex-1 mb-4 sm:mb-0">
             <h2 className="text-3xl font-heading mb-2" style={{ color: primaryColor }}>
               Photos with You
             </h2>
