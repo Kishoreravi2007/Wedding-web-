@@ -1,6 +1,7 @@
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
 // File Upload Service for organizing wedding photos and music
 export interface UploadedFile {
@@ -80,24 +81,47 @@ export async function uploadFiles(
 ): Promise<UploadResult> {
   try {
     const uploadedFiles: UploadedFile[] = [];
-    const formData = new FormData();
-
+    
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required. Please login to upload photos.');
+    }
+    
+    // Upload files one by one
     for (const file of files) {
+      const formData = new FormData();
       formData.append('photo', file);
+      formData.append('sister', sister);
+
+      console.log('Uploading file:', file.name, 'to sister:', sister);
+      console.log('Using token:', token ? 'Token present' : 'No token');
+
+      const response = await fetch(`${API_BASE_URL}/api/photos`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      console.log('Upload response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Upload error:', errorData);
+        
+        if (response.status === 401 || response.status === 403) {
+          throw new Error('Authentication failed. Please login again.');
+        }
+        
+        throw new Error(errorData.message || `Upload failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Upload successful:', result);
+      uploadedFiles.push(result);
     }
-    formData.append('sister', sister);
-
-    const response = await fetch('/api/photos', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('Upload failed');
-    }
-
-    const result = await response.json();
-    uploadedFiles.push(result);
 
     return {
       success: true,

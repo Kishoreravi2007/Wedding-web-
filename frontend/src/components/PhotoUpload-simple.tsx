@@ -5,12 +5,14 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Upload, X, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { uploadFiles } from '@/services/fileUploadService'; // Import the uploadFiles service
 
 interface PhotoUploadSimpleProps {
   weddingId: string;
+  onUploadSuccess?: (photoId: string) => void; // Callback for successful upload
 }
 
-export function PhotoUploadSimple({ weddingId }: PhotoUploadSimpleProps) {
+export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSimpleProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
@@ -30,43 +32,83 @@ export function PhotoUploadSimple({ weddingId }: PhotoUploadSimpleProps) {
       return;
     }
 
+    // Check authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Please login to upload photos. Redirecting to login page...');
+      setTimeout(() => {
+        window.location.href = '/photographer-login';
+      }, 2000);
+      return;
+    }
+
     setUploading(true);
-    const uploadPromises = selectedFiles.map(async (file, index) => {
+    setUploadProgress({}); // Reset progress for new upload batch
+
+    const filesToUpload = selectedFiles.map((file, index) => ({ file, index }));
+    const uploadResults: { success: boolean; file: string; id?: string; error?: any }[] = [];
+
+    for (const { file, index } of filesToUpload) {
       try {
         setUploadProgress(prev => ({ ...prev, [index]: 0 }));
+
+        // Show initial progress
+        setUploadProgress(prev => ({ ...prev, [index]: 10 }));
+
+        const result = await uploadFiles([file], weddingId === 'sister-a' ? 'sister-a' : 'sister-b');
         
-        // Simulate upload delay
-        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        // Update progress during upload
+        setUploadProgress(prev => ({ ...prev, [index]: 50 }));
         
-        // Simulate success
-        setUploadProgress(prev => ({ ...prev, [index]: 100 }));
-        return { success: true, file: file.name };
-      } catch (error) {
-        console.error('Upload error:', error);
-        return { success: false, file: file.name, error };
+        if (result.success && result.files.length > 0) {
+          setUploadProgress(prev => ({ ...prev, [index]: 100 }));
+          uploadResults.push({ success: true, file: file.name, id: result.files[0].id });
+          if (onUploadSuccess) {
+            onUploadSuccess(result.files[0].id!);
+          }
+        } else {
+          throw new Error(result.error || 'Upload failed');
+        }
+      } catch (error: any) {
+        console.error('Upload error for', file.name, ':', error);
+        setUploadProgress(prev => ({ ...prev, [index]: 0 }));
+        
+        // Show specific error message
+        const errorMessage = error.message || 'Unknown error';
+        if (errorMessage.includes('Authentication')) {
+          toast.error('Session expired. Please login again.');
+          setTimeout(() => {
+            window.location.href = '/photographer-login';
+          }, 2000);
+          break; // Stop uploading if auth fails
+        }
+        
+        uploadResults.push({ success: false, file: file.name, error: errorMessage });
       }
-    });
-
-    try {
-      const results = await Promise.all(uploadPromises);
-      const successfulUploads = results.filter(result => result.success);
-      const failedUploads = results.filter(result => !result.success);
-
-      if (successfulUploads.length > 0) {
-        toast.success(`${successfulUploads.length} photo(s) uploaded successfully to ${weddingId}!`);
-      }
-      if (failedUploads.length > 0) {
-        toast.error(`${failedUploads.length} photo(s) failed to upload.`);
-      }
-
-      setSelectedFiles([]);
-    } catch (error) {
-      console.error("Error during batch upload:", error);
-      toast.error("An error occurred during photo upload.");
-    } finally {
-      setUploading(false);
-      setUploadProgress({});
     }
+
+    const successfulUploads = uploadResults.filter(result => result.success);
+    const failedUploads = uploadResults.filter(result => !result.success);
+
+    if (successfulUploads.length > 0) {
+      toast.success(`✓ ${successfulUploads.length} photo(s) uploaded successfully!`);
+    }
+    if (failedUploads.length > 0) {
+      const errorMessages = failedUploads.map(f => `${f.file}: ${f.error}`).join('\n');
+      toast.error(`✗ ${failedUploads.length} photo(s) failed:\n${errorMessages}`);
+    }
+
+    // Only clear successful uploads
+    if (failedUploads.length === 0) {
+      setSelectedFiles([]);
+    } else {
+      // Keep failed files for retry
+      const failedFileNames = failedUploads.map(f => f.file);
+      setSelectedFiles(prev => prev.filter(f => failedFileNames.includes(f.name)));
+    }
+    
+    setUploading(false);
+    setUploadProgress({});
   };
 
   return (

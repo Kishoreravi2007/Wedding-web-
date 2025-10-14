@@ -10,14 +10,14 @@ export interface Photo {
   url: string;
   thumbnail: string;
   title: string;
-  description?: string;
-  tags: string[];
-  event: string;
+  description?: string; // Made optional
+  tags?: string[]; // Made optional
+  event?: string; // Made optional
   date: string;
   views: number;
   downloads: number;
   isUploaded?: boolean;
   faces?: Face[]; // Optional: array of detected faces in the photo
   photographer?: string; // Optional: name of the photographer
-  timestamp?: Date; // Optional: when the photo was taken/uploaded, `date` is already a string.
+  timestamp: Date; // Made required, as it's derived from backend data
 }
