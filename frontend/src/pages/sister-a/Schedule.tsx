@@ -81,18 +81,18 @@ const SisterASchedule = () => {
     <div className="text-white py-12 px-4 sm:px-6 lg:px-8 relative">
 
       <div className="max-w-7xl mx-auto z-10">
-        <h1 className="font-heading text-6xl text-center mb-12 text-[#800000] font-bold">
+        <h1 className="font-heading text-4xl text-center mb-8 sm:mb-12 text-[#800000] font-bold">
           {t('Schedule of Events')}
         </h1>
 
-        <div className="flex flex-wrap justify-center gap-8 pb-16">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 pb-16">
           {parvathySchedule.map((day) => (
             <React.Fragment key={day.date}>
               {day.events.map((event) => (
                 <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
                   <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
                   <CardHeader className="p-4">
-                    <CardTitle className="text-3xl font-semibold text-[#800000] mb-2 font-display">
+                    <CardTitle className="text-xl font-semibold text-[#800000] mb-2 font-display">
                       {t(event.title)}
                     </CardTitle>
                     <CardDescription className="text-[#800000] text-sm mb-4">

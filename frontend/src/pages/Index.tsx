@@ -108,7 +108,7 @@ const Index = () => {
             <Heart className="w-8 h-8 text-[#8C3B3B]" />
         </motion.div>
         <motion.h1 
-          className="font-heading text-5xl md:text-7xl text-[#5D4037] bg-gradient-to-r from-[#5D4037] to-[#8C3B3B] bg-clip-text text-transparent mx-4"
+          className="font-heading text-4xl md:text-7xl text-[#5D4037] bg-gradient-to-r from-[#5D4037] to-[#8C3B3B] bg-clip-text text-transparent mx-4"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
