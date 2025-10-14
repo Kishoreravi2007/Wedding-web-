@@ -84,7 +84,7 @@ export const parvathySchedule: Schedule[] = [
         dresscode: "Elegant Festive",
         venue: "Thiruvanchikuzhi Mahadeva Kshetram",
         locationUrl: "https://maps.app.goo.gl/ZPL5QhMWg58t33h2A",
-        image: "/muhurtham.jpg",
+        image: "/wedding.jpg",
         description: "The groom is welcomed to the venue by the bride's family, the bride's brother wash the groom's feet.Thalikettu: The groom ties the thaali around the bride's neck.The couple exchanges flower garlands after the Thalikettu, symbolizing their mutual acceptance and respect.Kanyadaanam: The bride's Parents place her right hand into the groom's right hand, formally giving her away to him.Enappudava: The groom gives the bride a new saree called an Enappudava. By accepting the saree, the bride agrees to be his wife.Circumambulation: The couple walks around a sacred lamp (Vilakku) three times to formalize their vows.Blessings and feasting: After the main rituals, the couple takes photos with family members, followed by a vegetarian feast (sadya) for all guests.",
         mapLink: "https://maps.app.goo.gl/ZPL5QhMWg58t33h2A"
       },
@@ -164,7 +164,7 @@ export const sreedeviSchedule = [
         dresscode:" Elegant Festive",
         venue: "The Gazebo Heritage",
         locationUrl: "https://maps.app.goo.gl/tAf9PTfD3WhUrRgNA",
-        image: "/muhurtham.jpg",
+        image: "/wedding.jpg",
         description: "The groom is welcomed to the venue by the bride's family, the bride's brother wash the groom's feet.Thalikettu: The groom ties the thaali around the bride's neck.The couple exchanges flower garlands after the Thalikettu, symbolizing their mutual acceptance and respect.Kanyadaanam: The bride's Parents place her right hand into the groom's right hand, formally giving her away to him.Enappudava: The groom gives the bride a new saree called an Enappudava. By accepting the saree, the bride agrees to be his wife.Circumambulation: The couple walks around a sacred lamp (Vilakku) three times to formalize their vows.Blessings and feasting: After the main rituals, the couple takes photos with family members, followed by a vegetarian feast (sadya) for all guests.",
         mapLink: "https://maps.app.goo.gl/tAf9PTfD3WhUrRgNA"
       },
