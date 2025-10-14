@@ -53,7 +53,7 @@ const WishBox: React.FC<WishBoxProps> = ({ recipient }) => {
           onChange={(e) => setWish(e.target.value)}
           className="mb-4"
         />
-        <p className="text-xs text-gray-500 mb-4">Only couples can see the wishes.</p>
+        <p className="text-xs text-gray-500 mb-4">Your wishes will be shared privately with the bride and groom.</p>
         <Button onClick={handleSubmit} className="w-full">
           Send Wish
         </Button>
