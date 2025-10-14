@@ -20,7 +20,15 @@ export async function loadFaceDetectionModels() {
   }
 }
 
-export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElement): Promise<Array<faceapi.FaceDetection & { landmarks: faceapi.FaceLandmarks68; expressions: faceapi.FaceExpressions; descriptor: Float32Array; }>> {
+export interface FaceDetectionResult {
+  detection: faceapi.FaceDetection;
+  landmarks: faceapi.FaceLandmarks68;
+  expressions: faceapi.FaceExpressions;
+  descriptor: Float32Array;
+  box: { x: number; y: number; width: number; height: number };
+}
+
+export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElement): Promise<FaceDetectionResult[]> {
   if (!modelsLoaded) {
     console.warn('Face detection models not loaded. Loading now...');
     await loadFaceDetectionModels();
@@ -31,5 +39,17 @@ export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElem
     new faceapi.TinyFaceDetectorOptions()
   ).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
 
-  return detections;
+  // Map to our custom interface
+  return detections.map(detection => ({
+    detection: detection.detection,
+    landmarks: detection.landmarks,
+    expressions: detection.expressions,
+    descriptor: detection.descriptor,
+    box: {
+      x: detection.detection.box.x,
+      y: detection.detection.box.y,
+      width: detection.detection.box.width,
+      height: detection.detection.box.height
+    }
+  }));
 }

@@ -32,6 +32,7 @@ interface PhotoFile {
   eventType: string;
   tags: string[];
   destinationGallery: 'sister-a-gallery' | 'sister-b-gallery' | '';
+  storageProvider: 'firebase' | 'supabase'; // Add storage provider
   status: 'pending' | 'uploading' | 'completed' | 'error';
   progress: number;
   id: string;
@@ -59,8 +60,14 @@ const destinationGalleries = [
   { value: 'sister-b-gallery', label: "Sister B's Gallery" },
 ];
 
+const storageProviders = [
+  { value: 'firebase', label: 'Firebase Storage' },
+  { value: 'supabase', label: 'Supabase Storage' },
+];
+
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }) => {
   const [photos, setPhotos] = useState<PhotoFile[]>([]);
+  const [storageProvider, setStorageProvider] = useState<'firebase' | 'supabase'>('firebase');
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showMetadataDialog, setShowMetadataDialog] = useState(false);
@@ -108,6 +115,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
       eventType: '',
       tags: [],
       destinationGallery: 'sister-a-gallery', // Default to Sister A's Gallery
+      storageProvider: storageProvider, // Set storage provider
       status: 'pending',
       progress: 0,
       id: Date.now() + Math.random().toString()
@@ -141,24 +149,94 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
     }
 
     setIsUploading(true);
-    // Photo upload is disabled as Firebase Storage has been removed.
-    // In a real application, you would integrate with another cloud storage solution.
-    console.warn('Photo upload is currently disabled.');
 
-    // Simulate completion for UI purposes, but no actual upload occurs
-    setPhotos(prev => prev.map(photo => ({ ...photo, status: 'completed', progress: 100 })));
+    const filesToUpload = photos.filter(p => p.status === 'pending');
 
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate a short delay
+    if (filesToUpload.length === 0) {
+      setIsUploading(false);
+      return;
+    }
+
+    const uploadPromises = filesToUpload.map(async (photo, index) => {
+      try {
+        // Update status to uploading
+        setPhotos(prev => prev.map(p =>
+          p.id === photo.id ? { ...p, status: 'uploading', progress: 0 } : p
+        ));
+
+        // Simulate progress updates (can be replaced with actual progress from upload service)
+        for (let progress = 0; progress <= 100; progress += 10) {
+          setPhotos(prev => prev.map(p =>
+            p.id === photo.id ? { ...p, progress } : p
+          ));
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        // Call the actual upload service
+        const token = localStorage.getItem('accessToken');
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const result = await fetch('/api/photos', {
+          method: 'POST',
+          headers: headers,
+          body: (() => {
+            const formData = new FormData();
+            formData.append('photo', photo.file);
+            formData.append('sister', photo.destinationGallery === 'sister-a-gallery' ? 'sister-a' : 'sister-b');
+            formData.append('title', photo.title);
+            formData.append('description', photo.description);
+            formData.append('storageProvider', photo.storageProvider);
+                        formData.append('storageProvider', photo.storageProvider);
+            formData.append('storageProvider', photo.storageProvider);
+            formData.append('storageProvider', photo.storageProvider);
+            formData.append('storageProvider', photo.storageProvider);
+            formData.append('storageProvider', photo.storageProvider); // Add storage provider to form data
+            formData.append('eventType', photo.eventType);
+            formData.append('tags', JSON.stringify(photo.tags));
+            return formData;
+          })(),
+        });
+
+        if (!result.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const uploadedPhoto = await result.json();
+
+        setPhotos(prev => prev.map(p =>
+          p.id === photo.id ? { ...p, status: 'completed', progress: 100, id: uploadedPhoto.id } : p
+        ));
+        return uploadedPhoto;
+      } catch (error) {
+        console.error('Error uploading photo:', photo.file.name, error);
+        setPhotos(prev => prev.map(p =>
+          p.id === photo.id ? { ...p, status: 'error', progress: 0 } : p
+        ));
+        return null;
+      }
+    });
+
+    const uploadedResults = await Promise.all(uploadPromises);
+    const successfulUploads = uploadedResults.filter(Boolean);
 
     setIsUploading(false);
 
-    // Notify parent component (if any) that photos are "processed"
     if (onPhotosUploaded) {
-      onPhotosUploaded(photos.map(p => ({ ...p, status: 'completed' })));
+      onPhotosUploaded(successfulUploads);
     }
 
-    // Clean up object URLs
-    photos.forEach(photo => URL.revokeObjectURL(photo.preview));
+    // Clean up object URLs for successfully uploaded photos
+    photos.forEach(photo => {
+      if (photo.status === 'completed' || photo.status === 'error') {
+        URL.revokeObjectURL(photo.preview);
+      }
+    });
+
+    // Remove successfully uploaded photos from the list
+    setPhotos(prev => prev.filter(p => p.status !== 'completed'));
   };
 
   const openMetadataDialog = (index: number) => {
@@ -216,6 +294,35 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
             />
           </div>
 
+          {/* Storage Provider Selector */}
+          <div className="mt-4">
+            <label className="text-sm font-medium">Storage Provider</label>
+            <Select value={storageProvider} onValueChange={(value) => setStorageProvider(value as 'firebase' | 'supabase')}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select storage provider" />
+              </SelectTrigger>
+              <SelectContent>
+                {storageProviders.map((provider) => (
+                  <SelectItem key={provider.value} value={provider.value}>
+                    {provider.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Storage Provider Selector */}
+          <div className="mt-4">
+            <label className="text-sm font-medium">Storage Provider</label>
+            <Select value={storageProvider} onValueChange={(value) => setStorageProvider(value as 'firebase' | 'supabase')}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select storage provider" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="firebase">Firebase Storage</SelectItem>
+                <SelectItem value="supabase">Supabase Storage</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           {/* Upload Stats */}
           {photos.length > 0 && (
             <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
@@ -314,7 +421,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
         <div className="flex justify-center">
           <Button
             onClick={handleUploadAll}
-            disabled={isUploading || photos.every(p => p.status === 'completed')}
+            disabled={isUploading || photos.filter(p => p.status === 'pending').length === 0}
             size="lg"
             className="px-8"
           >
@@ -326,15 +433,10 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
             ) : (
               <>
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Photos (Disabled)
+                Upload Photos
               </>
             )}
           </Button>
-        </div>
-      )}
-      {photos.length > 0 && !isUploading && photos.every(p => p.status === 'completed') && (
-        <div className="text-center text-sm text-red-500 mt-4">
-          Photo upload functionality is disabled as Firebase Storage has been removed. Photos are not persistently stored.
         </div>
       )}
 
@@ -406,11 +508,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                       <SelectValue placeholder="Select gallery" />
                     </SelectTrigger>
                     <SelectContent>
-                      {destinationGalleries.map((gallery) => (
-                        <SelectItem key={gallery.value} value={gallery.value}>
-                          {gallery.label}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="sister-a-gallery">Sister A's Gallery</SelectItem>
+                      <SelectItem value="sister-b-gallery">Sister B's Gallery</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

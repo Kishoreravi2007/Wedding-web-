@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const admin = require('firebase-admin');
+const { supabase } = require('./server'); // Import supabase client
 const db = admin.firestore();
 const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
 
@@ -23,62 +24,81 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new photo to Firebase Storage and save metadata to Firestore
+// POST a new photo to Supabase Storage and save metadata to Firestore
 router.post('/', upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
   
-  const { sister } = req.body; // 'sister-a' or 'sister-b'
+  const { sister, title, description, eventType, tags } = req.body;
   if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
     return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
   }
 
+  let parsedTags = [];
+  if (tags) {
+    try {
+      parsedTags = JSON.parse(tags);
+      if (!Array.isArray(parsedTags)) {
+        throw new Error('Tags must be an array.');
+      }
+    } catch (parseError) {
+      console.error('Error parsing tags:', parseError);
+      return res.status(400).json({ message: 'Invalid tags format.' });
+    }
+  }
 
   try {
     const file = req.file;
     const fileName = `${sister}/${Date.now()}_${file.originalname}`;
-    const fileUpload = bucket.file(fileName);
-
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
+    
+    const { data, error } = await supabase.storage
+      .from('wedding-photos') // Replace with your Supabase bucket name
+      .upload(fileName, file.buffer, {
         contentType: file.mimetype,
-      },
-    });
+        upsert: false,
+        metadata: {
+          title: title || '',
+          description: description || '',
+          eventType: eventType || '',
+          tags: JSON.stringify(parsedTags),
+        }
+      });
 
-    blobStream.on('error', (error) => {
-      console.error('Error uploading to Firebase Storage:', error);
-      res.status(500).json({ message: 'Error uploading photo to storage.' });
-    });
+    if (error) {
+      console.error('Error uploading to Supabase Storage:', error);
+      return res.status(500).json({ message: 'Error uploading photo to Supabase storage.' });
+    }
 
-    blobStream.on('finish', async () => {
-      // Make the file public
-      await fileUpload.makePublic();
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/wedding-photos/${fileName}`; // Construct public URL
 
-      const newPhoto = {
-        filename: file.originalname,
-        filePath: fileName,
-        publicUrl: publicUrl,
-        size: file.size,
-        mimetype: file.mimetype,
-        sister: sister,
-        uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
+    const newPhoto = {
+      filename: file.originalname,
+      filePath: fileName,
+      publicUrl: publicUrl,
+      size: file.size,
+      mimetype: file.mimetype,
+      sister: sister,
+      title: title || '',
+      description: description || '',
+      eventType: eventType || '',
+      tags: parsedTags,
+      storageProvider: 'supabase', // Store provider
+      uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
 
-      const docRef = await db.collection('photos').add(newPhoto);
-      res.status(201).json({ id: docRef.id, ...newPhoto });
-    });
-
-    blobStream.end(file.buffer);
+    const docRef = await db.collection('photos').add(newPhoto);
+    res.status(201).json({ id: docRef.id, ...newPhoto });
 
   } catch (error) {
     console.error('Error uploading photo:', error);
-    res.status(500).json({ message: 'Error uploading photo.' });
+    if (!res.headersSent) { // Prevent sending headers multiple times
+      res.status(500).json({ message: 'Error uploading photo.' });
+    }
   }
 });
 
-// DELETE a photo from Firebase Storage and Firestore
+// DELETE a photo from Supabase Storage and Firestore
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -92,8 +112,14 @@ router.delete('/:id', async (req, res) => {
     const photoData = doc.data();
     const filePath = photoData.filePath;
 
-    // Delete from Firebase Storage
-    await bucket.file(filePath).delete();
+    const { error } = await supabase.storage
+      .from('wedding-photos') // Replace with your Supabase bucket name
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Error deleting from Supabase Storage:', error);
+      return res.status(500).json({ message: 'Error deleting photo from Supabase storage.' });
+    }
 
     // Delete metadata from Firestore
     await docRef.delete();

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import axios from 'axios'; // Import axios
 
 const PhotographerLogin = () => {
   const navigate = useNavigate();
@@ -20,22 +21,24 @@ const PhotographerLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate a more realistic API call
     try {
-      // In a real application, you would make an API call to your backend for authentication
-      // For demonstration, we'''ll simulate a delay and check against environment variables
-      // or a more secure client-side storage, but for now, we'''ll keep the logic simple.
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        username: credentials.username,
+        password: credentials.password,
+      });
 
-      // IMPORTANT: Replace this with a real authentication mechanism
-      if (credentials.username === 'photographer' && credentials.password === 'qwerty') {
+      if (response.data.accessToken) {
+        localStorage.setItem('token', response.data.accessToken);
+        localStorage.setItem('role', response.data.role);
         showSuccess('Login successful! Welcome to the Photographer Portal.');
         navigate('/photographer');
       } else {
-        throw new Error('Invalid credentials. Please try again.');
+        throw new Error('Authentication failed. No token received.');
       }
     } catch (error: any) {
-      showError(error.message || 'An unexpected error occurred. Please try again.');
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred. Please try again.';
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -2,8 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import PhotoGallery from '@/components/PhotoGallery-simple';
+import PhotoGallery from '@/components/PhotoGallery'; // Use the full PhotoGallery component
 import PeopleManager from '@/components/PeopleManager';
+import PhotoUpload from '@/components/PhotoUpload'; // Import PhotoUpload
 import { PhotoUploadSimple } from '@/components/PhotoUpload-simple'; // Import PhotoUploadSimple
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,6 +13,8 @@ import { showSuccess } from '@/utils/toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
 import { Label } from '@/components/ui/label'; // Import Label
 import { useWebsite } from '@/contexts/WebsiteContext';
+import { Photo as PhotoType } from '@/types/photo'; // Import PhotoType
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 const PhotographerDashboard = () => {
   const navigate = useNavigate();
   const { content } = useWebsite();
@@ -58,27 +61,69 @@ const PhotographerDashboard = () => {
   // Recent uploads - starts empty, populated when photos are uploaded
   const [recentUploads, setRecentUploads] = useState<any[]>([]);
 
-  const [uploadedPhotos, setUploadedPhotos] = useState<any[]>([]);
+  const [uploadedPhotos, setUploadedPhotos] = useState<PhotoType[]>([]);
 
   const handleSignOut = async () => {
     navigate('/');
   };
 
-  const handlePhotosUploaded = (photoId: string) => { // PhotoUploadFirebase returns a single photoId
-    console.log('Photo uploaded with ID:', photoId);
-    
-    // For now, we'll just update stats. A full implementation would fetch the photo details by ID.
+  const handlePhotosUploaded = (newlyUploadedPhotos: PhotoType[]) => {
+    setUploadedPhotos(prev => [...prev, ...newlyUploadedPhotos]);
+    setRecentUploads(prev => [...newlyUploadedPhotos, ...prev].slice(0, 5)); // Keep it to 5 recent uploads
+
     setStats(prev => ({
       ...prev,
-      totalPhotos: prev.totalPhotos + 1,
-      uploadedToday: prev.uploadedToday + 1
+      totalPhotos: prev.totalPhotos + newlyUploadedPhotos.length,
+      uploadedToday: prev.uploadedToday + newlyUploadedPhotos.length
     }));
-    
-    // We can't easily add to recentUploads or uploadedPhotos without fetching the full photo object.
-    // For a real app, you'd fetch the photo details using photoId and then update state.
-    // For now, we'll just show a success message.
-    const weddingName = photographerWeddingOptions.find(option => option.value === selectedWeddingId)?.label || 'Unknown Wedding';
-    showSuccess(`Photo uploaded successfully! ID: ${photoId} for ${weddingName}`);
+
+    showSuccess(`${newlyUploadedPhotos.length} photo(s) uploaded successfully!`);
+  };
+
+  const handlePhotoUploadSuccess = (photoId: string) => {
+    // Fetch the newly uploaded photo and add it to the state
+    fetch(`${API_BASE_URL}/api/photos`, {
+      headers: getAuthHeaders()
+    })
+      .then(response => response.json())
+      .then(photos => {
+        const newPhoto = photos.find((p: any) => p.id === photoId);
+        if (newPhoto) {
+          const mappedPhoto: PhotoType = {
+            id: newPhoto.id,
+            url: newPhoto.publicUrl,
+            thumbnail: newPhoto.publicUrl,
+            title: newPhoto.filename,
+            description: '',
+            tags: [],
+            event: newPhoto.sister,
+            date: newPhoto.uploadedAt._seconds ? new Date(newPhoto.uploadedAt._seconds * 1000).toISOString() : new Date().toISOString(),
+            views: 0,
+            downloads: 0,
+            photographer: 'Photographer',
+            faces: [],
+            timestamp: newPhoto.uploadedAt._seconds ? new Date(newPhoto.uploadedAt._seconds * 1000) : new Date(),
+          };
+          setUploadedPhotos(prev => [mappedPhoto, ...prev]);
+          setRecentUploads(prev => [{
+            id: mappedPhoto.id,
+            name: mappedPhoto.title,
+            size: '2.5 MB',
+            uploadTime: 'Just now',
+            event: mappedPhoto.event
+          }, ...prev].slice(0, 5));
+          setStats(prev => ({
+            ...prev,
+            totalPhotos: prev.totalPhotos + 1,
+            uploadedToday: prev.uploadedToday + 1
+          }));
+        }
+      })
+      .catch(error => console.error('Error fetching uploaded photo:', error));
+  };
+
+  const handleUpdatePhoto = (photoId: string, updates: Partial<PhotoType>) => {
+    setUploadedPhotos(prev => prev.map(p => p.id === photoId ? { ...p, ...updates } : p));
   };
 
   if (isLoading) {
@@ -218,7 +263,7 @@ const PhotographerDashboard = () => {
                     </Select>
                   </div>
                   {selectedWeddingId ? (
-                    <PhotoUploadSimple weddingId={selectedWeddingId} />
+                    <PhotoUploadSimple weddingId={selectedWeddingId} onUploadSuccess={handlePhotoUploadSuccess} />
                   ) : (
                     <p className="text-gray-500 text-center mt-4">Please select a wedding to upload photos.</p>
                   )}
@@ -234,7 +279,12 @@ const PhotographerDashboard = () => {
                 </p>
               
               <div className="space-y-4">
-                {recentUploads.map((upload) => (
+                {recentUploads.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No recent uploads yet. Upload some photos to see them here!</p>
+                  </div>
+                ) : (
+                  recentUploads.map((upload) => (
                   <Card key={upload.id} className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -259,7 +309,8 @@ const PhotographerDashboard = () => {
                       </div>
                     </div>
                   </Card>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </TabsContent>

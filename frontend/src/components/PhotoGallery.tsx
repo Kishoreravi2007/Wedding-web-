@@ -9,9 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Calendar, Users, Camera, X, ChevronLeft, ChevronRight, ZoomIn, UserPlus, Tag, Eye, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { loadFaceDetectionModels, detectFaces } from '@/utils/faceDetection'; // Import from our utility
+import { loadFaceDetectionModels, detectFaces, FaceDetectionResult } from '@/utils/faceDetection'; // Import from our utility
 import * as faceapi from 'face-api.js';
 import { Photo as PhotoType } from '@/types/photo'; // Import Photo interface from types
+import { getUploadedFiles, UploadedFile } from '@/services/fileUploadService'; // Import getUploadedFiles
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
 interface Person {
   id: string;
@@ -21,7 +23,7 @@ interface Person {
   descriptor?: Float32Array; // Use Float32Array for descriptor
 }
 
-// Mock people data for face tagging
+// Mock people data for face tagging (can be replaced with real data from backend)
 const mockPeople: Person[] = [
   { id: '1', name: 'Parvathy C', role: 'Bride', avatar: '', descriptor: new Float32Array(Array(128).fill(0.1)) }, // Example descriptor
   { id: '2', name: 'Sreedevi C', role: 'Bride', avatar: '', descriptor: new Float32Array(Array(128).fill(0.2)) }, // Example descriptor
@@ -32,50 +34,6 @@ const mockPeople: Person[] = [
   { id: '7', name: 'Photographer', role: 'Vendor', avatar: '', descriptor: new Float32Array(Array(128).fill(0.7)) }, // Example descriptor
 ];
 
-const mockPhotos: PhotoType[] = [
-  {
-    id: 'photo-1',
-    url: 'https://images.unsplash.com/photo-1519741497674-6114d186b2b8?w=800',
-    thumbnail: 'https://images.unsplash.com/photo-1519741497674-6114d186b2b8?w=400',
-    title: 'Ceremony Kiss',
-    description: 'A beautiful moment captured during the ceremony.',
-    tags: ['ceremony', 'kiss', 'couple'],
-    event: 'wedding',
-    date: new Date('2023-10-26T14:00:00Z').toISOString(),
-    views: 120,
-    downloads: 15,
-    photographer: 'Jane Doe',
-    faces: [],
-  },
-  {
-    id: 'photo-2',
-    url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800',
-    thumbnail: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=400',
-    title: 'Reception Fun',
-    description: 'Guests enjoying the reception party.',
-    tags: ['reception', 'party', 'guests'],
-    event: 'reception',
-    date: new Date('2023-10-26T19:30:00Z').toISOString(),
-    views: 250,
-    downloads: 30,
-    photographer: 'Jane Doe',
-    faces: [],
-  },
-  {
-    id: 'photo-3',
-    url: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800',
-    thumbnail: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=400',
-    title: 'Bridal Party',
-    description: 'The bride with her bridesmaids.',
-    tags: ['bride', 'bridesmaids', 'group'],
-    event: 'pre-ceremony',
-    date: new Date('2023-10-26T12:00:00Z').toISOString(),
-    views: 180,
-    downloads: 22,
-    photographer: 'John Smith',
-  },
-];
-
 interface PhotoViewerProps {
   photos: PhotoType[]; // Use PhotoType
   currentIndex: number;
@@ -83,12 +41,7 @@ interface PhotoViewerProps {
   onNext: () => void;
   onPrev: () => void;
   onFacesDetected: (photoId: string, faces: PhotoType['faces']) => void; // Use PhotoType['faces']
-}
-
-interface FaceDetectionResult extends faceapi.FaceDetection {
-  landmarks: faceapi.FaceLandmarks68;
-  expressions: faceapi.FaceExpressions;
-  descriptor: Float32Array;
+  onUpdatePhoto: (photoId: string, updates: Partial<PhotoType>) => void; // New prop to update photo in parent
 }
 
 const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose, onNext, onPrev, onFacesDetected }) => {
@@ -148,7 +101,7 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
           setDetectedFaces(detections);
 
           const newFaces: PhotoType['faces'] = detections.map(detection => {
-            const box = detection.box;
+            const box = detection.detection.box;
             let personName = 'Unknown';
 
             if (faceMatcherRef.current && detection.descriptor) {
@@ -248,7 +201,7 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
 
         {/* AI Detected Face overlays */}
         {!isZoomed && detectedFaces.map((detection, index) => {
-          const box = detection.box; // Corrected to access box directly
+          const box = detection.detection.box;
           // Scale box coordinates to percentage relative to image natural size
           const imgWidth = imgRef.current?.naturalWidth || 1;
           const imgHeight = imgRef.current?.naturalHeight || 1;
@@ -334,7 +287,7 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
           </div>
           <div className="flex items-center justify-between text-sm text-gray-400">
             <span>Photo {currentIndex + 1} of {photos.length}</span>
-            <span>{currentPhoto.timestamp.toLocaleDateString()}</span>
+            <span>{new Date(currentPhoto.date).toLocaleDateString()}</span>
           </div>
         </div>
       </div>
@@ -343,34 +296,84 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
 };
 
 interface PhotoGalleryProps {
-  photos: PhotoType[]; // Added photos prop
   isPhotographerView?: boolean;
   weddingId?: string; // Use weddingId instead of sister
+  uploadedPhotos: PhotoType[]; // Prop to receive photos from parent
+  onUpdatePhoto?: (photoId: string, updates: Partial<PhotoType>) => void; // Callback to update photo in parent
 }
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView = false, weddingId }) => {
-  // Removed useState for photos and filteredPhotos, as photos will be passed as a prop
-  // const [photos, setPhotos] = useState<PhotoType[]>([]);
-  const [filteredPhotos, setFilteredPhotos] = useState<PhotoType[]>(photos); // Initialize with prop
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false, weddingId, uploadedPhotos, onUpdatePhoto }) => {
+  const [photos, setPhotos] = useState<PhotoType[]>([]); // Internal state for photos
+  const [filteredPhotos, setFilteredPhotos] = useState<PhotoType[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('');
   const [selectedPerson, setSelectedPerson] = useState<string>('');
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // New loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [people, setPeople] = useState<Person[]>(mockPeople);
   const [showFaceTagger, setShowFaceTagger] = useState(false);
-  const [taggingPhoto, setTaggingPhoto] = useState<PhotoType | null>(null); // Use PhotoType
+  const [taggingPhoto, setTaggingPhoto] = useState<PhotoType | null>(null);
 
-  // Removed the useEffect that fetches mock data, as photos are now passed as a prop.
-  // The parent component is responsible for fetching and providing the photos.
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/photos`, {
+          headers: getAuthHeaders()
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch photos');
+        }
+        const fetchedBackendPhotos = await response.json();
 
-  // Get all unique tags and people from the provided photos prop
+        // Map backend photos to PhotoType
+        const mappedPhotos: PhotoType[] = fetchedBackendPhotos.map((file: any) => ({
+          id: file.id,
+          url: file.publicUrl,
+          thumbnail: file.publicUrl, // Assuming thumbnail is same as full image for now
+          title: file.filename,
+          description: '', // No description in backend, can be added later
+          tags: [], // No tags in backend, can be added later
+          event: file.sister, // Using 'sister' as event for now, can be refined
+          date: file.uploadedAt._seconds ? new Date(file.uploadedAt._seconds * 1000).toISOString() : new Date().toISOString(), // Convert Firestore timestamp
+          views: 0,
+          downloads: 0,
+          photographer: 'Photographer', // Default photographer
+          faces: [], // No faces in backend, can be added later
+          timestamp: file.uploadedAt._seconds ? new Date(file.uploadedAt._seconds * 1000) : new Date(),
+        }));
+        setPhotos(mappedPhotos);
+      } catch (error) {
+        console.error('Error fetching photos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPhotos();
+  }, []); // Fetch photos only once on component mount
+
+  // Update internal photos state when uploadedPhotos prop changes (e.g., after a new upload)
+  useEffect(() => {
+    setPhotos(prevPhotos => {
+      const newPhotos = [...prevPhotos];
+      uploadedPhotos.forEach(uploadedPhoto => {
+        if (!newPhotos.some(p => p.id === uploadedPhoto.id)) {
+          newPhotos.push(uploadedPhoto);
+        }
+      });
+      return newPhotos;
+    });
+  }, [uploadedPhotos]);
+
+
+  // Get all unique tags and people from the internal photos state
   const allTags = Array.from(new Set(photos.flatMap(photo => photo.tags)));
   const allPeople = Array.from(new Set(photos.flatMap(photo => photo.faces?.map(face => face.personName) || [])));
 
   // Filter photos based on search, tags, and people
   useEffect(() => {
-    let filtered = photos; // Use the prop directly
+    let filtered = photos;
 
     if (searchQuery) {
       filtered = filtered.filter(photo =>
@@ -417,7 +420,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // This function is no longer directly used as PhotoUploadFirebase handles uploads
     // Keeping it as a placeholder or for future use if needed for a different upload mechanism
-    console.warn("handleFileUpload in PhotoGallery is deprecated. Use PhotoUploadFirebase instead.");
+    console.warn("handleFileUpload in PhotoGallery is deprecated. Use PhotoUploadSimple instead.");
   };
 
   const themeColors = weddingId === 'parvathy-wedding'
@@ -427,17 +430,25 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
       : { primary: '#6B7280', accent: '#9CA3AF', bg: 'bg-gray-50' }; // Default colors
 
   const handleFacesDetected = (photoId: string, newFaces: PhotoType['faces']) => {
-    // This function needs to update the photos state in the parent component.
-    // Since PhotoGallery now receives photos as a prop, it cannot directly update them.
-    // A callback prop would be needed here to pass the updated faces back up.
-    // For now, this part might not work as intended without a parent managing state.
-    console.warn("handleFacesDetected in PhotoGallery needs a callback to update parent state.");
-    // If photos were managed internally:
-    // setPhotos(prevPhotos =>
-    //   prevPhotos.map(photo =>
-    //     photo.id === photoId ? { ...photo, faces: newFaces } : photo
-    //   )
-    // );
+    setPhotos(prevPhotos =>
+      prevPhotos.map(photo =>
+        photo.id === photoId ? { ...photo, faces: newFaces } : photo
+      )
+    );
+    if (onUpdatePhoto) {
+      onUpdatePhoto(photoId, { faces: newFaces });
+    }
+  };
+
+  const handleUpdatePhoto = (photoId: string, updates: Partial<PhotoType>) => {
+    setPhotos(prevPhotos =>
+      prevPhotos.map(photo =>
+        photo.id === photoId ? { ...photo, ...updates } : photo
+      )
+    );
+    if (onUpdatePhoto) {
+      onUpdatePhoto(photoId, updates);
+    }
   };
 
   return (
@@ -599,7 +610,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {photo.timestamp.toLocaleDateString()}
+                      {new Date(photo.date).toLocaleDateString()}
                     </div>
                     <div className="flex items-center">
                       <Eye className="w-4 h-4 mr-1" />
@@ -648,6 +659,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
           onNext={handleNextPhoto}
           onPrev={handlePrevPhoto}
           onFacesDetected={handleFacesDetected}
+          onUpdatePhoto={handleUpdatePhoto}
         />
       )}
 
@@ -686,8 +698,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
                               ...taggingPhoto,
                               faces: taggingPhoto.faces?.filter((_, i) => i !== index)
                             };
-                            console.warn("Updating photos state (removing face) requires a callback prop from the parent component.");
-                            // setPhotos(prev => prev.map(p => p.id === taggingPhoto.id ? updatedPhoto : p)); // This line is commented out due to state management changes
+                            handleUpdatePhoto(taggingPhoto.id, { faces: updatedPhoto.faces });
                             setTaggingPhoto(updatedPhoto);
                           }
                         }}
@@ -714,8 +725,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos, isPhotographerView 
                         ...taggingPhoto,
                         faces: [...(taggingPhoto.faces || []), newFace]
                       };
-                      console.warn("Updating photos state (adding person) requires a callback prop from the parent component.");
-                      // setPhotos(prev => prev.map(p => p.id === taggingPhoto.id ? updatedPhoto : p)); // This line is commented out due to state management changes
+                      handleUpdatePhoto(taggingPhoto.id, { faces: updatedPhoto.faces });
                       setTaggingPhoto(updatedPhoto);
                     }
                   }}
