@@ -46,7 +46,7 @@ export const parvathySchedule: Schedule[] = [
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
         image: "/ganapathy.jpg",
-        description: "The formal beginning of the wedding celebrations.It is a joyous and festive event that reinforces the bonds of family and community as they prepare for the wedding.Ayaniyoonu is a process of having traditional bathing and lunch, at an auspicious time.",
+        description: "A traditional ritual dedicated to Lord Ganesha, performed to invoke His blessings before the wedding. This ceremony marks an auspicious beginning, seeking the removal of all obstacles and the smooth conduct of the marriage celebrations. With offerings of flowers, coconuts, and sweets, the families come together in prayer for prosperity, harmony, and a blessed union.",
         mapLink: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA"
       },
       {
