@@ -3,9 +3,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Eye, Download, Check } from 'lucide-react';
+import { Search, Eye, Download, Check, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence, Easing } from 'framer-motion';
 import { Photo, Face } from '@/types/photo'; // Import Photo and Face interfaces from types
+import { cn } from '@/lib/utils';
 
 // Mock data for demonstration
 // Note: Real face descriptors would be Float32Array of length 128.
@@ -28,6 +29,138 @@ const mockFaceDescriptor: Float32Array = new Float32Array(Array(128).fill(0.1));
 //   faces?: Face[]; // Add faces property
 // }
 
+interface PhotoViewerProps {
+  photos: Photo[];
+  currentIndex: number;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+}
+
+const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose, onNext, onPrev }) => {
+  const [isZoomed, setIsZoomed] = useState(false);
+  const currentPhoto = photos[currentIndex];
+
+  const handleKeyPress = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'Escape':
+        onClose();
+        break;
+      case 'ArrowLeft':
+        onPrev();
+        break;
+      case 'ArrowRight':
+        onNext();
+        break;
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'unset';
+    };
+  }, [currentIndex, onClose, onNext, onPrev]);
+
+  return (
+    <motion.div 
+      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Close button */}
+      <Button
+        onClick={onClose}
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
+      >
+        <X className="w-6 h-6" />
+      </Button>
+
+      {/* Navigation buttons */}
+      {currentIndex > 0 && (
+        <Button
+          onClick={onPrev}
+          variant="ghost"
+          size="sm"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 text-white hover:bg-white/20"
+        >
+          <ChevronLeft className="w-8 h-8" />
+        </Button>
+      )}
+
+      {currentIndex < photos.length - 1 && (
+        <Button
+          onClick={onNext}
+          variant="ghost"
+          size="sm"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 text-white hover:bg-white/20"
+        >
+          <ChevronRight className="w-8 h-8" />
+        </Button>
+      )}
+
+      {/* Main image */}
+      <motion.div 
+        className="relative max-w-7xl max-h-[90vh] p-4"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <img
+          src={currentPhoto.url}
+          alt={currentPhoto.title}
+          className={cn(
+            "max-w-full max-h-[80vh] object-contain transition-transform duration-300 cursor-pointer rounded-lg",
+            isZoomed ? "scale-150" : "scale-100"
+          )}
+          onClick={() => setIsZoomed(!isZoomed)}
+        />
+
+        {/* Zoom indicator */}
+        <Button
+          onClick={() => setIsZoomed(!isZoomed)}
+          variant="ghost"
+          size="sm"
+          className="absolute bottom-4 right-4 text-white hover:bg-white/20"
+          title={isZoomed ? "Click to zoom out" : "Click to zoom in"}
+        >
+          <ZoomIn className="w-5 h-5" />
+        </Button>
+      </motion.div>
+
+      {/* Photo info */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white p-6">
+        <div className="max-w-full px-4 mx-auto">
+          <h3 className="text-xl font-semibold mb-2">{currentPhoto.title}</h3>
+          {currentPhoto.description && (
+            <p className="text-gray-300 mb-3">{currentPhoto.description}</p>
+          )}
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            {currentPhoto.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <div className="flex items-center justify-between text-sm text-gray-400">
+            <span>Photo {currentIndex + 1} of {photos.length}</span>
+            <span>{currentPhoto.event}</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 interface PhotoGallerySimpleProps {
   isPhotographerView?: boolean;
   uploadedPhotos?: any[];
@@ -44,6 +177,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [downloadingPhotos, setDownloadingPhotos] = useState<Set<string>>(new Set());
   const [downloadedPhotos, setDownloadedPhotos] = useState<Set<string>>(new Set());
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   // Memoize the initial photos based on galleryPath
   const initialPhotos = useMemo(() => {
@@ -108,9 +242,24 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
     setFilteredPhotos(filtered);
   }, [photos, searchQuery]);
 
-  const handleViewPhoto = (photo: Photo) => {
-    console.log('Viewing photo:', photo);
-    // In a real app, this would open a modal or navigate to photo view
+  const handleViewPhoto = (index: number) => {
+    setSelectedPhotoIndex(index);
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedPhotoIndex(null);
+  };
+
+  const handleNextPhoto = () => {
+    if (selectedPhotoIndex !== null && selectedPhotoIndex < filteredPhotos.length - 1) {
+      setSelectedPhotoIndex(selectedPhotoIndex + 1);
+    }
+  };
+
+  const handlePrevPhoto = () => {
+    if (selectedPhotoIndex !== null && selectedPhotoIndex > 0) {
+      setSelectedPhotoIndex(selectedPhotoIndex - 1);
+    }
   };
 
   const handleDownloadPhoto = async (photo: Photo) => {
@@ -286,7 +435,10 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
               }}
               whileTap={{ scale: 0.95 }}
             >
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+              <Card 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => handleViewPhoto(index)}
+              >
                 <motion.div 
                   className="aspect-square relative"
                   whileHover={{ scale: 1.1 }}
@@ -408,7 +560,10 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleViewPhoto(photo)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewPhoto(index);
+                            }}
                             className="h-6 px-2 text-xs"
                           >
                             View
@@ -419,7 +574,10 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleDownloadPhoto(photo)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadPhoto(photo);
+                          }}
                           className="h-6 px-2 text-xs"
                           disabled={downloadingPhotos.has(photo.id)}
                         >
@@ -510,6 +668,19 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
           <p>Search query: "{searchQuery}"</p>
         </motion.div>
       )}
+
+      {/* Photo Viewer Modal */}
+      <AnimatePresence>
+        {selectedPhotoIndex !== null && (
+          <PhotoViewer
+            photos={filteredPhotos}
+            currentIndex={selectedPhotoIndex}
+            onClose={handleCloseViewer}
+            onNext={handleNextPhoto}
+            onPrev={handlePrevPhoto}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

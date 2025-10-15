@@ -2,16 +2,15 @@
  * Supabase User Database Helper
  * 
  * Provides a clean interface for database operations related to users.
+ * This module is designed to be initialized with a Supabase client instance.
  */
 
-const { supabase } = require('../server'); // Assuming supabase client is exported from server.js
-
-const UserDB = {
+module.exports = (supabaseClient) => ({
   /**
    * Create a new user record
    */
   async create(userData) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .insert([userData])
       .select()
@@ -25,7 +24,7 @@ const UserDB = {
    * Find a user by username
    */
   async findByUsername(username) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('username', username)
@@ -39,7 +38,7 @@ const UserDB = {
    * Find a user by ID
    */
   async findById(id) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('id', id)
@@ -53,7 +52,7 @@ const UserDB = {
    * Update a user's record
    */
   async update(id, updates) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .update(updates)
       .eq('id', id)
@@ -68,7 +67,7 @@ const UserDB = {
    * Delete a user
    */
   async delete(id) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('users')
       .delete()
       .eq('id', id);
@@ -76,6 +75,4 @@ const UserDB = {
     if (error) throw error;
     return true;
   }
-};
-
-module.exports = UserDB;
+});
