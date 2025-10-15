@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const UserDB = require('./lib/user-db'); // Import the new UserDB helper
+const { supabase } = require('./server'); // Import the Supabase client
+const UserDB = require('./lib/user-db')(supabase); // Initialize UserDB with the Supabase client
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
