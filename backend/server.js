@@ -42,6 +42,14 @@ app.use('/api/auth', authRouter);
 const photosRouter = require('./photos');
 app.use('/api/photos', authenticateToken, photosRouter);
 
+// Enhanced photos API with face detection
+const photosEnhancedRouter = require('./photos-enhanced');
+app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
+
+// Face recognition API
+const facesRouter = require('./faces');
+app.use('/api/faces', facesRouter);
+
 // Export supabase client for use in other modules
 module.exports.supabase = supabase;
 
