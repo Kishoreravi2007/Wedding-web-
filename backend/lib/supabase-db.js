@@ -38,10 +38,16 @@ const PhotoDB = {
           bounding_box,
           confidence,
           is_verified,
-          person:people (
+          person_id,
+          face_descriptor_id,
+          people (
             id,
             name,
             role
+          ),
+          face_descriptors (
+            id,
+            descriptor
           )
         )
       `)
@@ -91,10 +97,16 @@ const PhotoDB = {
           bounding_box,
           confidence,
           is_verified,
-          person:people (
+          person_id,
+          face_descriptor_id,
+          people (
             id,
             name,
             role
+          ),
+          face_descriptors (
+            id,
+            descriptor
           )
         )
       `)
@@ -395,4 +407,3 @@ module.exports = {
   FaceDescriptorDB,
   PhotoFaceDB
 };
-

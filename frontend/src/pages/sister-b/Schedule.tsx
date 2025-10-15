@@ -176,7 +176,7 @@ const SisterBSchedule = () => {
                       {t(event.title)}
                     </CardTitle>
                     <CardDescription className="text-[#800000] text-sm mb-4">
-                      {event.description}
+                      <div dangerouslySetInnerHTML={{ __html: event.description }} />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 space-y-3">

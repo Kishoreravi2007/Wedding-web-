@@ -6,6 +6,8 @@ import { parvathySchedule, sreedeviSchedule } from "@/data/schedules";
 import NotFound from "./NotFound";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Event {
   id: string;
@@ -14,6 +16,7 @@ interface Event {
   venue: string;
   locationUrl: string;
   image?: string;
+  description: string;
 }
 
 interface EventInvitationProps {
@@ -102,6 +105,9 @@ const EventInvitation = ({ sister }: EventInvitationProps) => {
                   Location
                 </a>
               </div>
+            </div>
+            <div className="text-left text-base leading-relaxed animate-fade-in" style={{ color: hasBackgroundImage ? "white" : colors.primary, animationDelay: '0.7s' }}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{event.description}</ReactMarkdown>
             </div>
             <div className="pt-4 animate-fade-in" style={{animationDelay: '0.8s'}}>
               <Button

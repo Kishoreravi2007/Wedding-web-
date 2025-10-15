@@ -297,12 +297,12 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
 
 interface PhotoGalleryProps {
   isPhotographerView?: boolean;
-  weddingId?: string; // Use weddingId instead of sister
+  sister?: 'sister-a' | 'sister-b'; // Use sister prop for filtering
   uploadedPhotos: PhotoType[]; // Prop to receive photos from parent
   onUpdatePhoto?: (photoId: string, updates: Partial<PhotoType>) => void; // Callback to update photo in parent
 }
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false, weddingId, uploadedPhotos, onUpdatePhoto }) => {
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false, sister, uploadedPhotos, onUpdatePhoto }) => {
   const [photos, setPhotos] = useState<PhotoType[]>([]); // Internal state for photos
   const [filteredPhotos, setFilteredPhotos] = useState<PhotoType[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -318,7 +318,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
     const fetchPhotos = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/photos`, {
+        const queryParams = new URLSearchParams();
+        if (sister) {
+          queryParams.append('sister', sister);
+        }
+        const url = `${API_BASE_URL}/api/photos?${queryParams.toString()}`;
+
+        const response = await fetch(url, {
           headers: getAuthHeaders()
         });
         if (!response.ok) {
@@ -335,12 +341,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
           description: '', // No description in backend, can be added later
           tags: [], // No tags in backend, can be added later
           event: file.sister, // Using 'sister' as event for now, can be refined
-          date: file.uploadedAt._seconds ? new Date(file.uploadedAt._seconds * 1000).toISOString() : new Date().toISOString(), // Convert Firestore timestamp
+          date: new Date(file.uploaded_at).toISOString(), // Use uploaded_at from Supabase
           views: 0,
           downloads: 0,
           photographer: 'Photographer', // Default photographer
-          faces: [], // No faces in backend, can be added later
-          timestamp: file.uploadedAt._seconds ? new Date(file.uploadedAt._seconds * 1000) : new Date(),
+          faces: file.photo_faces || [], // Include faces from backend
+          timestamp: new Date(file.uploaded_at), // Use uploaded_at from Supabase
         }));
         setPhotos(mappedPhotos);
       } catch (error) {
@@ -423,9 +429,9 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
     console.warn("handleFileUpload in PhotoGallery is deprecated. Use PhotoUploadSimple instead.");
   };
 
-  const themeColors = weddingId === 'parvathy-wedding'
+  const themeColors = sister === 'sister-a'
     ? { primary: '#8C3B3B', accent: '#D4AF37', bg: 'bg-red-50' }
-    : weddingId === 'sreedevi-wedding'
+    : sister === 'sister-b'
       ? { primary: '#1B5E20', accent: '#B8860B', bg: 'bg-green-50' }
       : { primary: '#6B7280', accent: '#9CA3AF', bg: 'bg-gray-50' }; // Default colors
 

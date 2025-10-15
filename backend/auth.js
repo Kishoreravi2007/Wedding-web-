@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-// In-memory storage for users (not persistent across server restarts)
-const users = [];
-let userIdCounter = 1;
+const UserDB = require('./lib/user-db'); // Import the new UserDB helper
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
@@ -30,7 +27,7 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    const existingUser = users.find(user => user.username === username);
+    const existingUser = await UserDB.findByUsername(username);
 
     if (existingUser) {
       return res.status(409).json({ message: 'Username already exists.' });
@@ -38,15 +35,11 @@ router.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = {
-      id: String(userIdCounter++),
+    const newUser = await UserDB.create({
       username,
       password: hashedPassword,
       role,
-      createdAt: new Date().toISOString(),
-    };
-
-    users.push(newUser);
+    });
     res.status(201).json({ id: newUser.id, username, role });
 
   } catch (error) {
@@ -64,7 +57,7 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = users.find(user => user.username === username);
+    const user = await UserDB.findByUsername(username);
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials.' });
@@ -82,6 +75,32 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ message: 'Error logging in.' });
+  }
+});
+
+// Password reset endpoint (for administrative use or a simplified flow)
+router.post('/reset-password', async (req, res) => {
+  const { username, newPassword } = req.body;
+
+  if (!username || !newPassword) {
+    return res.status(400).json({ message: 'Username and new password are required.' });
+  }
+
+  try {
+    const user = await UserDB.findByUsername(username);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await UserDB.update(user.id, { password: hashedPassword });
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'Error resetting password.' });
   }
 });
 

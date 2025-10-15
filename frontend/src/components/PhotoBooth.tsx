@@ -56,6 +56,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
           personName: 'John Doe',
         },
       ],
+      timestamp: new Date(), // Added missing timestamp property
     },
     {
       id: 'local-photo-2',
@@ -75,6 +76,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
           personName: 'Jane Doe',
         },
       ],
+      timestamp: new Date(), // Added missing timestamp property
     },
   ]);
 
@@ -168,7 +170,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
         if (videoRef.current && !videoRef.current.paused && !isPhotoBeingTaken) {
             const detections = await faceapi.detectAllFaces(
                 videoRef.current,
-                new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.5 })
+                new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 }) // Lowered threshold for increased sensitivity
             ).withFaceLandmarks().withFaceExpressions(); // Add .withFaceExpressions()
 
             if (canvasRef.current && videoRef.current) {
@@ -271,7 +273,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
       if (isFaceApiLoaded) {
         const detections = await faceapi.detectAllFaces(
           videoRef.current, 
-          new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.3 }) // Lower scoreThreshold
+          new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 }) // Lowered threshold for increased sensitivity
         ).withFaceLandmarks().withFaceExpressions(); // Add .withFaceExpressions()
 
         console.log('Face API detections:', detections);
