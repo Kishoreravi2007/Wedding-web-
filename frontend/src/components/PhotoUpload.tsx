@@ -188,11 +188,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
             formData.append('sister', photo.destinationGallery === 'sister-a-gallery' ? 'sister-a' : 'sister-b');
             formData.append('title', photo.title);
             formData.append('description', photo.description);
-            formData.append('storageProvider', photo.storageProvider);
-                        formData.append('storageProvider', photo.storageProvider);
-            formData.append('storageProvider', photo.storageProvider);
-            formData.append('storageProvider', photo.storageProvider);
-            formData.append('storageProvider', photo.storageProvider);
             formData.append('storageProvider', photo.storageProvider); // Add storage provider to form data
             formData.append('eventType', photo.eventType);
             formData.append('tags', JSON.stringify(photo.tags));
@@ -307,19 +302,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                     {provider.label}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {/* Storage Provider Selector */}
-          <div className="mt-4">
-            <label className="text-sm font-medium">Storage Provider</label>
-            <Select value={storageProvider} onValueChange={(value) => setStorageProvider(value as 'firebase' | 'supabase')}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select storage provider" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="firebase">Firebase Storage</SelectItem>
-                <SelectItem value="supabase">Supabase Storage</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const admin = require('firebase-admin');
 const { supabase } = require('./server'); // Import supabase client
-const db = admin.firestore();
-const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
+const { PhotoDB } = require('./lib/supabase-db'); // Import PhotoDB
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -12,11 +10,15 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
 });
 
-// GET all photos metadata from Firestore
+// GET all photos metadata from Supabase
 router.get('/', async (req, res) => {
   try {
-    const snapshot = await db.collection('photos').orderBy('uploadedAt', 'desc').get();
-    const photos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const { sister } = req.query;
+    const filters = {};
+    if (sister && (sister === 'sister-a' || sister === 'sister-b')) {
+      filters.sister = sister;
+    }
+    const photos = await PhotoDB.findAll(filters);
     res.json(photos);
   } catch (error) {
     console.error('Error getting photos metadata:', error);
@@ -74,21 +76,20 @@ router.post('/', upload.single('photo'), async (req, res) => {
 
     const newPhoto = {
       filename: file.originalname,
-      filePath: fileName,
-      publicUrl: publicUrl,
+      file_path: fileName, // Use file_path to match Supabase schema
+      public_url: publicUrl, // Use public_url to match Supabase schema
       size: file.size,
       mimetype: file.mimetype,
       sister: sister,
       title: title || '',
       description: description || '',
-      eventType: eventType || '',
+      event_type: eventType || '', // Use event_type to match Supabase schema
       tags: parsedTags,
-      storageProvider: 'supabase', // Store provider
-      uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
+      storage_provider: 'supabase', // Use storage_provider to match Supabase schema
     };
 
-    const docRef = await db.collection('photos').add(newPhoto);
-    res.status(201).json({ id: docRef.id, ...newPhoto });
+    const createdPhoto = await PhotoDB.create(newPhoto);
+    res.status(201).json(createdPhoto);
 
   } catch (error) {
     console.error('Error uploading photo:', error);
@@ -98,31 +99,29 @@ router.post('/', upload.single('photo'), async (req, res) => {
   }
 });
 
-// DELETE a photo from Supabase Storage and Firestore
+// DELETE a photo from Supabase Storage and Database
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const docRef = db.collection('photos').doc(id);
-    const doc = await docRef.get();
+    const photo = await PhotoDB.findById(id);
 
-    if (!doc.exists) {
+    if (!photo) {
       return res.status(404).json({ message: 'Photo not found.' });
     }
 
-    const photoData = doc.data();
-    const filePath = photoData.filePath;
+    const filePath = photo.file_path;
 
-    const { error } = await supabase.storage
+    const { error: storageError } = await supabase.storage
       .from('wedding-photos') // Replace with your Supabase bucket name
       .remove([filePath]);
 
-    if (error) {
-      console.error('Error deleting from Supabase Storage:', error);
+    if (storageError) {
+      console.error('Error deleting from Supabase Storage:', storageError);
       return res.status(500).json({ message: 'Error deleting photo from Supabase storage.' });
     }
 
-    // Delete metadata from Firestore
-    await docRef.delete();
+    // Delete metadata from Supabase DB
+    await PhotoDB.delete(id);
 
     res.status(200).json({ message: 'Photo deleted successfully.' });
   } catch (error) {

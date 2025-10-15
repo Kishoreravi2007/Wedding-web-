@@ -36,7 +36,7 @@ export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElem
 
   const detections = await faceapi.detectAllFaces(
     imageElement,
-    new faceapi.TinyFaceDetectorOptions()
+    new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 }) // Lowered threshold for increased sensitivity
   ).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
 
   // Map to our custom interface
