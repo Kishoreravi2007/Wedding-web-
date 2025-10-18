@@ -33,7 +33,7 @@ const Wishes = () => {
       setWishes(fetchedWishes);
     } catch (error) {
       console.error("Error fetching wishes:", error);
-      alert("Could not load wishes.");
+      alert(t('couldNotLoadWishesAlert'));
     }
     setLoading(false);
   };
@@ -44,7 +44,7 @@ const Wishes = () => {
     if (password === correctPassword) {
       setIsAuthenticated(true);
     } else {
-      alert("Incorrect password");
+      alert(t('incorrectPasswordAlert'));
     }
   };
 

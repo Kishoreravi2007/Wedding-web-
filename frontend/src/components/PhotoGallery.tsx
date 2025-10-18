@@ -14,6 +14,7 @@ import * as faceapi from 'face-api.js';
 import { Photo as PhotoType } from '@/types/photo'; // Import Photo interface from types
 import { getUploadedFiles, UploadedFile } from '@/services/fileUploadService'; // Import getUploadedFiles
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
 
 interface Person {
   id: string;
@@ -45,6 +46,7 @@ interface PhotoViewerProps {
 }
 
 const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose, onNext, onPrev, onFacesDetected }) => {
+  const { t } = useTranslation();
   const [isZoomed, setIsZoomed] = useState(false);
   const [detectedFaces, setDetectedFaces] = useState<FaceDetectionResult[]>([]);
   const [isDetecting, setIsDetecting] = useState(false);
@@ -255,11 +257,11 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
             <div className="mb-3">
               <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
                 <Users className="w-4 h-4" />
-                Detected Faces: {detectedFaces.length}
+                {t('detectedFaces')}: {detectedFaces.length}
               </div>
               <div className="flex flex-wrap gap-2">
                 {detectedFaces.map((detection, index) => {
-                  let personName = 'Unknown';
+                  let personName = t('unknown');
                   if (faceMatcherRef.current && detection.descriptor) {
                     const bestMatch = faceMatcherRef.current.findBestMatch(detection.descriptor);
                     if (bestMatch.distance < 0.6) {
@@ -268,9 +270,9 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
                   }
                   return (
                     <Badge key={index} variant="outline" className="text-xs border-white/30 text-white">
-                      {personName !== 'Unknown' ? personName : (detection.expressions && Object.keys(detection.expressions).length > 0
+                      {personName !== t('unknown') ? personName : (detection.expressions && Object.keys(detection.expressions).length > 0
                         ? Object.entries(detection.expressions).reduce((a, b) => a[1] > b[1] ? a : b)[0]
-                        : 'Face')}
+                        : t('face'))}
                     </Badge>
                   );
                 })}
@@ -463,12 +465,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: themeColors.primary }}>
-            {isPhotographerView ? 'Photo Gallery Management' : 'Wedding Photo Gallery'}
+            {isPhotographerView ? t('photoGalleryManagement') : t('weddingPhotoGalleryTitle')}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             {isPhotographerView
-              ? 'Upload and manage photos from the wedding events with AI face detection'
-              : 'Browse and download your favorite moments from the wedding'
+              ? t('uploadAndManagePhotos')
+              : t('browseAndDownloadDescription')
             }
           </p>
         </div>

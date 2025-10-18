@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { CalendarDays, Camera, Image, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface BottomNavProps {
   basePath: string;
@@ -8,11 +9,12 @@ interface BottomNavProps {
 }
 
 const BottomNav = ({ basePath, activeColor }: BottomNavProps) => {
+  const { t } = useTranslation();
   const navItems = [
-    { to: "/schedule", icon: CalendarDays, label: "Schedule" },
-    { to: "/photobooth", icon: Camera, label: "Photo Booth" },
-    { to: "/gallery", icon: Image, label: "Gallery" },
-    { to: "/engagement-video", icon: Video, label: "Video" },
+    { to: "/schedule", icon: CalendarDays, label: t('schedule') },
+    { to: "/photobooth", icon: Camera, label: t('photoBooth') },
+    { to: "/gallery", icon: Image, label: t('gallery') },
+    { to: "/engagement-video", icon: Video, label: t('video') },
   ];
 
   return (

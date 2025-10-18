@@ -118,6 +118,28 @@ const createGoogleCalendarLink = (dayDate: string, event: any) => {
 const SisterBSchedule = () => {
   const { t } = useTranslation();
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const monthName = date.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+    const day = date.getDate();
+    const year = date.getFullYear();
+    
+    return `${t(dayName)}, ${t(monthName)} ${day}${getOrdinalSuffix(day)}, ${year}`;
+  };
+
+  const getOrdinalSuffix = (day: number) => {
+    if (day >= 11 && day <= 13) {
+      return 'th';
+    }
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
   // Map event IDs to their corresponding translation keys for descriptions
   const descriptionKeyMapById: { [key: string]: string } = {
     "engagement-a": "engagementDescription",
@@ -140,21 +162,21 @@ const SisterBSchedule = () => {
       <div className="relative w-full h-64 mb-8 overflow-hidden rounded-lg shadow-lg">
         <img
           src="/sister-b-schedule-banner.jpg"
-          alt="Sister B's Schedule Banner"
+          alt={t('sisterBScheduleBanner')}
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-4">
           <p className="text-white text-sm md:text-base mb-2 font-sans uppercase tracking-widest">
-            WE ARE GETTING MARRIED
+            {t('weAreGettingMarried')}
           </p>
           <h1 className="font-heading text-5xl md:text-7xl text-center text-white font-bold mb-4">
-            Sreedevi & Vaishag
+            {t('sreedeviAndVaishag')}
           </h1>
           <p className="text-white text-sm md:text-base mb-2 font-sans uppercase tracking-widest">
-            SAVE THE DATE
+            {t('saveTheDate')}
           </p>
           <p className="text-white text-lg md:text-xl mb-6 font-serif">
-            January 11th, 2026
+            {t('january11th2026')}
           </p>
           {/* Add to my Calendar button - functionality can be added later if needed */}
         </div>
@@ -176,13 +198,13 @@ const SisterBSchedule = () => {
                       {t(event.title)}
                     </CardTitle>
                     <CardDescription className="text-[#800000] text-sm mb-4">
-                      <div dangerouslySetInnerHTML={{ __html: event.description }} />
+                      <div dangerouslySetInnerHTML={{ __html: t(event.id + 'Description') }} />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 space-y-3">
                     <p className="text-[#800000] text-sm flex items-center">
                       <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
-                      {format(new Date(day.date), 'EEEE, MMMM do, yyyy')}
+                      {formatDate(day.date)}
                     </p>
                     <p className="text-[#800000] text-sm flex items-center justify-between">
                       <span className="flex items-center">
@@ -202,15 +224,15 @@ const SisterBSchedule = () => {
                       </button>
                     </p>
 {event.dresscode ? (
-  <p className="text-[#800000] text-sm flex items-center">👗: {event.dresscode}</p>
+  <p className="text-[#800000] text-sm flex items-center">👗: {t(event.dresscode)}</p>
 ) : null}
                     <p className="text-[#800000] text-sm flex items-center">
                       <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
-                      {event.venue}
+                      {t(event.venue)}
                     </p>
                     <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
                       <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">
-                        Location
+                        {t('location')}
                       </Button>
                     </a>
                   </CardContent>
