@@ -56,7 +56,13 @@ const WishDisplay: React.FC<WishDisplayProps> = ({ recipient }) => {
                 <CardTitle className="text-2xl font-display">{wishItem.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-lg">{wishItem.wish}</p>
+                {wishItem.wish && <p className="text-lg">{wishItem.wish}</p>}
+                {wishItem.audioUrl && (
+                  <audio controls src={wishItem.audioUrl} className="w-full mt-2"></audio>
+                )}
+                {!wishItem.wish && !wishItem.audioUrl && (
+                  <p className="text-lg text-gray-600 italic">No message content.</p>
+                )}
               </CardContent>
             </Card>
           ))}

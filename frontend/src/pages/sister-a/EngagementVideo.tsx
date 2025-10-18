@@ -1,8 +1,10 @@
 import React from 'react';
 import VideoPlayer from '@/components/VideoPlayer';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const EngagementVideo: React.FC = () => {
+  const { t } = useTranslation();
   const genericVideoUrl = "https://youtu.be/egGMIfRgNTg";
 
   return (
@@ -12,13 +14,10 @@ const EngagementVideo: React.FC = () => {
       exit={{ opacity: 0 }}
       className="container mx-auto p-4"
     >
-      <h1 className="text-3xl font-bold text-center mb-8">Engagement Video</h1>
-      <div className="max-w-3xl mx-auto">
-        <VideoPlayer videoUrl={genericVideoUrl} title="Engagement Video" />
+      <h1 className="text-3xl font-bold text-center mb-8">{t('engagementVideo')}</h1>
+      <div className="max-w-3xl mx-auto text-center text-2xl font-semibold text-gray-700">
+        {t('willBeReleasedSoon')}
       </div>
-      <p className="text-center mt-4 text-gray-600">
-        Enjoy this video!
-      </p>
     </motion.div>
   );
 };

@@ -9,6 +9,7 @@ import { showError, showSuccess } from '@/utils/toast';
 import * as faceapi from 'face-api.js';
 import { loadFaceDetectionModels } from '@/utils/faceDetection';
 import { Photo as PhotoType, Face as FaceType } from '@/types/photo';
+import { useTranslation } from 'react-i18next';
 
 // Force TypeScript re-evaluation
 interface PhotoBoothProps {
@@ -20,6 +21,7 @@ interface PhotoBoothProps {
 }
 
 const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, galleryPath }: PhotoBoothProps) => {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLImageElement>(null);
@@ -407,7 +409,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
       <div className="absolute bottom-16 left-8 w-32 h-32 bg-gradient-to-r from-stone-400/15 to-transparent rounded-full blur-lg"></div>
 
       <h1 className="font-heading text-4xl sm:text-5xl my-8 animate-fade-in bg-gradient-to-r from-stone-700 to-stone-500 bg-clip-text text-transparent">
-        Live Photo Booth
+        {t('livePhotoBooth')}
       </h1>
       <div className="relative w-full aspect-video bg-gradient-to-br from-stone-200 to-stone-300 rounded-2xl overflow-hidden shadow-2xl mb-6 animate-bounce-in border-4 border-white/50">
         {cameraAccessDenied ? (
@@ -415,7 +417,7 @@ const PhotoBooth = ({ primaryColor, buttonClass, overlayImageSrc, weddingId, gal
             <div className="flex flex-col items-center gap-4">
               <VideoOff className="w-12 h-12 text-red-400" />
               <p className="text-lg font-semibold">
-                Camera access is denied. Please enable camera permissions in your browser settings to use the Photo Booth.
+                {t('cameraAccessDenied')}
               </p>
             </div>
           </div>

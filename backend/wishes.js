@@ -29,15 +29,16 @@ router.get('/', async (req, res) => {
 
 // POST a new wish
 router.post('/', async (req, res) => {
-  const { name, wish, recipient } = req.body;
-  if (!name || !wish) {
-    return res.status(400).json({ message: 'Name and wish are required.' });
+  const { name, wish, recipient, audioUrl } = req.body; // Include audioUrl
+  if (!name || (!wish && !audioUrl)) { // Ensure either wish or audioUrl is present
+    return res.status(400).json({ message: 'Name and either a wish or an audio message are required.' });
   }
 
   try {
     const newWish = {
       name,
-      wish,
+      wish: wish || null, // Store wish as null if not provided
+      audioUrl: audioUrl || null, // Store audioUrl as null if not provided
       recipient: recipient || 'both',
       timestamp: admin.firestore.FieldValue.serverTimestamp(), // Use timestamp to match frontend interface
     };

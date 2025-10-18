@@ -11,6 +11,28 @@ import WishBox from "@/components/WishBox"; // Import the WishBox component
 const SisterASchedule = () => {
   const { t } = useTranslation();
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const monthName = date.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+    const day = date.getDate();
+    const year = date.getFullYear();
+    
+    return `${t(dayName)}, ${t(monthName)} ${day}${getOrdinalSuffix(day)}, ${year}`;
+  };
+
+  const getOrdinalSuffix = (day: number) => {
+    if (day >= 11 && day <= 13) {
+      return 'th';
+    }
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
   const handleAddToCalendar = (event: any, day: any) => {
     const eventDate = format(new Date(day.date), 'yyyyMMdd');
 
@@ -96,13 +118,13 @@ const SisterASchedule = () => {
                       {t(event.title)}
                     </CardTitle>
                     <CardDescription className="text-[#800000] text-sm mb-4">
-                      <div dangerouslySetInnerHTML={{ __html: event.description }} />
+                      <div dangerouslySetInnerHTML={{ __html: t(event.id + 'Description') }} />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-4 pt-0 space-y-3">
                     <p className="text-[#800000] text-sm flex items-center">
                       <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
-                      {format(new Date(day.date), 'EEEE, MMMM do, yyyy')}
+                      {formatDate(day.date)}
                     </p>
                     <p className="text-[#800000] text-sm flex items-center justify-between">
                       <span className="flex items-center">
@@ -122,12 +144,12 @@ const SisterASchedule = () => {
                     {event.dresscode && (
                       <p className="text-[#800000] text-sm flex items-center">
                         <span className="mr-2 text-lg">👗</span>
-                        {event.dresscode}
+                        {t(event.dresscode)}
                       </p>
                     )}
                     <p className="text-[#800000] text-sm flex items-center">
                       <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
-                      {event.venue}
+                      {t(event.venue)}
                     </p>
                     <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
                       <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">

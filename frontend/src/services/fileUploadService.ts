@@ -40,19 +40,20 @@ const EVENT_DIRECTORY_MAP: Record<string, string> = {
 // File category to base directory mapping
 const CATEGORY_DIRECTORY_MAP: Record<string, string> = {
   'image': 'wedding-photos',
-  'music': 'music'
+  'music': 'music',
+  'audio-wish': 'audio-wishes' // New category for audio wishes
 };
 
 // Generate unique filename
-function generateFileName(originalName: string, eventType: string): string {
+function generateFileName(originalName: string, type: string): string {
   const timestamp = Date.now();
   const randomId = Math.random().toString(36).substring(2, 8);
-  const extension = originalName.split('.').pop() || 'jpg';
-  return `${eventType}_${timestamp}_${randomId}.${extension}`;
+  const extension = originalName.split('.').pop() || 'webm'; // Default to webm for audio
+  return `${type}_${timestamp}_${randomId}.${extension}`;
 }
 
 // Get directory path for event type, file category, and optional sister name
-function getDirectoryPath(eventType: string, fileCategory: 'image' | 'music', sisterName?: string): string {
+function getDirectoryPath(eventType: string, fileCategory: 'image' | 'music' | 'audio-wish', sisterName?: string): string {
   let directory = EVENT_DIRECTORY_MAP[eventType] || 'other';
   const baseDirectory = CATEGORY_DIRECTORY_MAP[fileCategory] || 'wedding-photos'; // Default to wedding-photos
 
@@ -65,11 +66,11 @@ function getDirectoryPath(eventType: string, fileCategory: 'image' | 'music', si
 }
 
 // Determine file category from file type
-function getFileCategory(file: File): 'image' | 'music' {
+function getFileCategory(file: File): 'image' | 'music' | 'audio-wish' {
   if (file.type.startsWith('image/')) {
     return 'image';
   } else if (file.type.startsWith('audio/')) {
-    return 'music';
+    return 'music'; // For general audio, but we'll use 'audio-wish' specifically
   }
   throw new Error('Unsupported file type');
 }
@@ -134,6 +135,24 @@ export async function uploadFiles(
       files: [],
       error: error instanceof Error ? error.message : 'Upload failed',
     };
+  }
+}
+
+// New function to upload audio blobs for wishes
+export async function uploadAudioWish(audioBlob: Blob, recipient: string): Promise<string> {
+  try {
+    const fileExtension = audioBlob.type.split('/').pop() || 'webm';
+    const fileName = generateFileName(`audio_wish.${fileExtension}`, recipient);
+    const storagePath = getDirectoryPath(recipient, 'audio-wish'); // Use recipient as eventType for directory
+    const fileRef = ref(storage, `${storagePath}/${fileName}`);
+
+    await uploadBytes(fileRef, audioBlob);
+    const audioUrl = await getDownloadURL(fileRef);
+    console.log("Audio wish uploaded successfully:", audioUrl);
+    return audioUrl;
+  } catch (error) {
+    console.error("Error uploading audio wish:", error);
+    throw error;
   }
 }
 
