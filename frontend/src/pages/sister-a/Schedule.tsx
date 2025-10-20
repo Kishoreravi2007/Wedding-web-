@@ -3,13 +3,99 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Calendar, Home, Clock, MapPin, Plus } from "lucide-react";
 import { parvathySchedule } from "@/data/schedules";
-import { format } from "date-fns";
-import React from "react";
+import { format, parse, isPast } from "date-fns";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import WishBox from "@/components/WishBox"; // Import the WishBox component
+import { EventService } from "@/services/eventService";
+import { ScheduleConverter } from "@/utils/scheduleConverter";
+import { Event } from "@/types/event";
 
 const SisterASchedule = () => {
   const { t } = useTranslation();
+  const [categorizedEvents, setCategorizedEvents] = useState<{
+    upcoming: Event[];
+    past: Event[];
+  }>({ upcoming: [], past: [] });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize EventService and load events
+  useEffect(() => {
+    const eventService = EventService.getInstance();
+    
+    // Convert and load parvathy schedule events
+    const events = ScheduleConverter.convertParvathySchedule();
+    events.forEach(event => eventService.addEvent(event));
+    
+    // Get categorized events for parvathy schedule only
+    const categorized = eventService.getCategorizedEventsBySchedule('parvathy');
+    setCategorizedEvents(categorized);
+    setIsLoading(false);
+    
+    // Set up auto-update
+    const updateInterval = setInterval(() => {
+      const updatedCategorized = eventService.getCategorizedEventsBySchedule('parvathy');
+      setCategorizedEvents(updatedCategorized);
+    }, 60000); // Update every minute
+    
+    return () => clearInterval(updateInterval);
+  }, []);
+
+  const parseEventDateTime = (dateString: string, timeString: string): Date => {
+    let startTimeStr;
+    if (timeString.includes('to')) {
+      startTimeStr = timeString.split('to')[0].trim();
+    } else {
+      startTimeStr = timeString;
+    }
+
+    let time = startTimeStr;
+    let ampm = '';
+
+    // Check if ampm is attached to the time, e.g., "10pm"
+    if (time.toLowerCase().includes('pm')) {
+      ampm = 'PM';
+      time = time.toLowerCase().replace('pm', '');
+    } else if (time.toLowerCase().includes('am')) {
+      ampm = 'AM';
+      time = time.toLowerCase().replace('am', '');
+    } else {
+      // If ampm is not attached, try to find it as a separate part
+      const timeParts = startTimeStr.split(' ');
+      if (timeParts.length > 1) {
+        time = timeParts[0];
+        ampm = timeParts[1];
+      }
+    }
+
+    // Normalize ampm to uppercase
+    if (ampm) {
+      ampm = ampm.toUpperCase();
+    }
+
+    // Construct a parsable string for date-fns
+    const dateTimeString = `${dateString} ${time} ${ampm}`;
+    // Use a format string that matches the constructed string
+    // Example: "October 19, 2025 10:00 AM" -> "MMMM d, yyyy h:mm a"
+    // Example: "January 3, 2026 8:00 PM" -> "MMMM d, yyyy h:mm a"
+    // Example: "January 3, 2026 6 PM" -> "MMMM d, yyyy h a"
+    let formatString = "MMMM d, yyyy";
+    if (time.includes(':')) {
+      formatString += " h:mm";
+    } else {
+      formatString += " h";
+    }
+    if (ampm) {
+      formatString += " a";
+    }
+
+    return parse(dateTimeString, formatString, new Date());
+  };
+
+  const isEventPast = (event: any, dayDate: string): boolean => {
+    const eventDateTime = parseEventDateTime(dayDate, event.time);
+    return isPast(eventDateTime);
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -99,6 +185,71 @@ const SisterASchedule = () => {
     window.open(googleCalendarUrl, '_blank');
   };
 
+  // Use the new categorized events from EventService
+  const upcomingEvents = categorizedEvents.upcoming;
+  const pastEvents = categorizedEvents.past;
+
+  const renderEventCard = (event: Event) => (
+    <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
+      <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
+      <CardHeader className="p-4">
+        <CardTitle className="text-xl font-semibold text-[#800000] mb-2 font-display">
+          {t(event.title)}
+        </CardTitle>
+        <CardDescription className="text-[#800000] text-sm mb-4">
+          <div dangerouslySetInnerHTML={{ __html: event.description }} />
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4 pt-0 space-y-3">
+        <p className="text-[#800000] text-sm flex items-center">
+          <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
+          {formatDate(event.startDateTime.toISOString())}
+        </p>
+        <p className="text-[#800000] text-sm flex items-center justify-between">
+          <span className="flex items-center">
+            <Clock className="w-4 h-4 mr-2 text-[#800000]" />
+            {event.startDateTime.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })}
+            {event.endDateTime && (
+              <span> - {event.endDateTime.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+              })}</span>
+            )}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleAddToCalendar(event, { date: event.startDateTime.toISOString() })}
+            className="text-[#800000] hover:bg-[#800000]/10"
+            title={t('addToGoogleCalendar')}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+        </p>
+        {event.dresscode && (
+          <p className="text-[#800000] text-sm flex items-center">
+            <span className="mr-2 text-lg">👗</span>
+            {t(event.dresscode)}
+          </p>
+        )}
+        <p className="text-[#800000] text-sm flex items-center">
+          <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
+          {t(event.venue)}
+        </p>
+        <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
+          <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">
+            {t('location')}
+          </Button>
+        </a>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="text-white py-12 px-4 sm:px-6 lg:px-8 relative">
 
@@ -107,61 +258,29 @@ const SisterASchedule = () => {
           {t('Schedule of Events')}
         </h1>
 
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 pb-16">
-          {parvathySchedule.map((day) => (
-            <React.Fragment key={day.date}>
-              {day.events.map((event) => (
-                <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
-                  <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-xl font-semibold text-[#800000] mb-2 font-display">
-                      {t(event.title)}
-                    </CardTitle>
-                    <CardDescription className="text-[#800000] text-sm mb-4">
-                      <div dangerouslySetInnerHTML={{ __html: t(event.id + 'Description') }} />
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0 space-y-3">
-                    <p className="text-[#800000] text-sm flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
-                      {formatDate(day.date)}
-                    </p>
-                    <p className="text-[#800000] text-sm flex items-center justify-between">
-                      <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-2 text-[#800000]" />
-                        {event.time}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleAddToCalendar(event, day)}
-                        className="text-[#800000] hover:bg-[#800000]/10"
-                        title={t('addToGoogleCalendar')}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </p>
-                    {event.dresscode && (
-                      <p className="text-[#800000] text-sm flex items-center">
-                        <span className="mr-2 text-lg">👗</span>
-                        {t(event.dresscode)}
-                      </p>
-                    )}
-                    <p className="text-[#800000] text-sm flex items-center">
-                      <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
-                      {t(event.venue)}
-                    </p>
-                    <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
-                      <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">
-                        {t('location')}
-                      </Button>
-                    </a>
-                  </CardContent>
-                </Card>
-              ))}
-            </React.Fragment>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#800000]"></div>
+            <span className="ml-3 text-[#800000]">Loading events...</span>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-8 pb-16">
+              {upcomingEvents.map(event => renderEventCard(event))}
+            </div>
+
+            {pastEvents.length > 0 && (
+              <>
+                <h2 className="font-heading text-3xl text-center mb-8 sm:mb-12 text-[#800000] font-bold mt-16">
+                  {t('Out of date Events')}
+                </h2>
+                <div className="flex flex-wrap justify-center gap-4 sm:gap-8 pb-16">
+                  {pastEvents.map(event => renderEventCard(event))}
+                </div>
+              </>
+            )}
+          </>
+        )}
         <WishBox recipient="parvathy" /> {/* Add the WishBox component here */}
       </div>
     </div>
