@@ -13,7 +13,7 @@ const SisterALayout = () => {
         <main className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="relative w-full h-64 mb-8 overflow-hidden rounded-lg shadow-lg">
             <img
-              src="/WhatsApp Image 2025-10-20 at 10.00.56.jpeg"
+              src="/sister-a-schedule-banner.jpg"
               alt={t('sisterAScheduleBanner')}
               className="w-full h-full object-cover object-center"
             />
