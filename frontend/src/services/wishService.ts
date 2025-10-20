@@ -1,23 +1,16 @@
 import { Wish } from "@/types/wish";
-import { uploadAudioWish } from "./fileUploadService"; // Import the new upload function
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 const API_URL = `${BASE_URL}/api/wishes`;
 
-export const saveWish = async (name: string, recipient: string, wish?: string, audioBlob?: Blob): Promise<void> => {
+export const saveWish = async (name: string, wish: string, recipient: string): Promise<void> => {
   try {
-    let audioUrl: string | undefined;
-
-    if (audioBlob) {
-      audioUrl = await uploadAudioWish(audioBlob, recipient);
-    }
-
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, wish, recipient, audioUrl }), // Include audioUrl in the payload
+      body: JSON.stringify({ name, wish, recipient }),
     });
 
     if (!response.ok) {
