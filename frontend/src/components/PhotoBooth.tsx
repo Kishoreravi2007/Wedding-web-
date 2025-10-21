@@ -12,12 +12,13 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench } from 'lucide-react';
+import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon } from 'lucide-react';
 
 // Import face-api.js
 import * as faceapi from 'face-api.js';
 import { faceDetectionDiagnostic } from '../utils/faceDetectionDiagnostic';
 import PhotoBoothDiagnostic from './PhotoBoothDiagnostic';
+import FaceSearchResults from './FaceSearchResults';
 
 interface PhotoBoothProps {
   className?: string;
@@ -49,6 +50,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [detectionStatus, setDetectionStatus] = useState<'idle' | 'detecting' | 'success' | 'error'>('idle');
   const [diagnosticInfo, setDiagnosticInfo] = useState<string>('');
   const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [showFaceSearch, setShowFaceSearch] = useState(false);
+  const [capturedFaceDescriptor, setCapturedFaceDescriptor] = useState<Float32Array | null>(null);
 
   // Run diagnostic when models fail to load
   const runDiagnostic = useCallback(async () => {
@@ -237,14 +240,17 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (!video) return;
 
       video.srcObject = stream;
-      video.play();
+      await video.play();
       setIsWebcamActive(true);
       setUserGuidance('Camera started! Position your face in the center of the frame.');
 
+      // Use a ref to track if detection should continue
+      let continueDetection = true;
+
       // Start continuous detection with better timing
       const detectLoop = async () => {
-        if (!isWebcamActive || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
-          if (isWebcamActive) {
+        if (!continueDetection || !video || video.readyState !== video.HAVE_ENOUGH_DATA) {
+          if (continueDetection) {
             requestAnimationFrame(detectLoop);
           }
           return;
@@ -253,17 +259,29 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         try {
           // Set canvas dimensions to match video
           const canvas = canvasRef.current;
-          if (!canvas) return;
+          if (!canvas) {
+            requestAnimationFrame(detectLoop);
+            return;
+          }
 
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
 
-          // Detect faces with optimized settings
-          const detections = await faceapi
+          // Detect faces with multiple attempts for better accuracy
+          let detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
               inputSize: 320,
               scoreThreshold: 0.3
             }));
+
+          // If no faces, try with lower threshold
+          if (detections.length === 0) {
+            detections = await faceapi
+              .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
+                inputSize: 416,
+                scoreThreshold: 0.2
+              }));
+          }
 
           setDetectionResults(detections);
           
@@ -274,6 +292,12 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           } else {
             setDetectionStatus('error');
             setUserGuidance('No face detected. Please position your face in the center and ensure good lighting.');
+            
+            // Clear canvas if no detections
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
           }
 
         } catch (error) {
@@ -281,50 +305,103 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         }
 
         // Continue detection loop with reduced frequency
-        if (isWebcamActive) {
-          setTimeout(() => requestAnimationFrame(detectLoop), 100); // Reduced frequency
-        }
+        setTimeout(() => {
+          if (continueDetection) {
+            requestAnimationFrame(detectLoop);
+          }
+        }, 100);
+      };
+
+      // Store cleanup function
+      (video as any).stopDetection = () => {
+        continueDetection = false;
       };
 
       // Start detection after a short delay
-      setTimeout(detectLoop, 1000);
+      setTimeout(() => {
+        if (video.readyState >= video.HAVE_CURRENT_DATA) {
+          detectLoop();
+        } else {
+          video.addEventListener('loadeddata', () => detectLoop(), { once: true });
+        }
+      }, 500);
 
     } catch (error) {
       console.error('Webcam access error:', error);
       setUserGuidance('Failed to access camera. Please check permissions and try again.');
       setDetectionStatus('error');
     }
-  }, [isWebcamActive, drawDetections]);
+  }, [drawDetections]);
 
   // Stop webcam
   const stopWebcam = useCallback(() => {
     const video = videoRef.current;
-    if (video && video.srcObject) {
-      const stream = video.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-      video.srcObject = null;
+    if (video) {
+      // Stop detection loop
+      if ((video as any).stopDetection) {
+        (video as any).stopDetection();
+      }
+      
+      // Stop video stream
+      if (video.srcObject) {
+        const stream = video.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+      }
     }
+    
+    // Clear canvas
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    
     setIsWebcamActive(false);
     setDetectionResults([]);
     setDetectionStatus('idle');
     setUserGuidance('Camera stopped. Click "Start Camera" to begin again.');
   }, []);
 
+  // Capture face for searching
+  const captureFaceForSearch = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video) {
+      setUserGuidance('Camera not available. Please start the camera first.');
+      return;
+    }
+
+    if (!isModelLoaded) {
+      setUserGuidance('Face detection models are still loading. Please wait...');
+      return;
+    }
+
+    try {
+      setUserGuidance('Capturing your face for search...');
+      
+      // Detect face and extract descriptor
+      const detection = await faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (detection) {
+        setCapturedFaceDescriptor(detection.descriptor);
+        setShowFaceSearch(true);
+        setUserGuidance('Face captured! Searching for your photos in the gallery...');
+      } else {
+        setUserGuidance('No face detected. Please ensure your face is clearly visible and try again.');
+      }
+    } catch (error) {
+      console.error('❌ Error capturing face:', error);
+      setUserGuidance('Failed to capture face. Please try again.');
+    }
+  }, [isModelLoaded]);
+
   // Take photo
   const takePhoto = useCallback(() => {
-    if (detectionResults.length === 0) {
-      setUserGuidance('No faces detected. Please ensure your face is visible and try again.');
-      setDetectionStatus('error');
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      setUserGuidance('Canvas not available. Please refresh the page and try again.');
-      setDetectionStatus('error');
-      return;
-    }
-
     const video = videoRef.current;
     if (!video) {
       setUserGuidance('Camera not available. Please start the camera first.');
@@ -349,29 +426,36 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       // Draw video frame
       photoCtx.drawImage(video, 0, 0);
 
-      // Draw detections on photo
-      const detections = detectionResults;
-      detections.forEach((detection, index) => {
-        const { x, y, width, height } = detection.box;
-        const confidence = detection.score;
+      // Draw detections on photo if any faces were detected
+      if (detectionResults.length > 0) {
+        const detections = detectionResults;
+        detections.forEach((detection, index) => {
+          const { x, y, width, height } = detection.box;
+          const confidence = detection.score;
 
-        // Draw bounding box
-        photoCtx.strokeStyle = '#00ff00';
-        photoCtx.lineWidth = 3;
-        photoCtx.strokeRect(x, y, width, height);
+          // Draw bounding box
+          photoCtx.strokeStyle = '#00ff00';
+          photoCtx.lineWidth = 3;
+          photoCtx.strokeRect(x, y, width, height);
 
-        // Draw confidence
-        photoCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-        photoCtx.fillRect(x, y - 25, 120, 20);
+          // Draw confidence
+          photoCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+          photoCtx.fillRect(x, y - 25, 120, 20);
+          
+          photoCtx.fillStyle = '#ffffff';
+          photoCtx.font = 'bold 14px Arial';
+          photoCtx.fillText(
+            `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
+            x + 5,
+            y - 8
+          );
+        });
         
-        photoCtx.fillStyle = '#ffffff';
-        photoCtx.font = 'bold 14px Arial';
-        photoCtx.fillText(
-          `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
-          x + 5,
-          y - 8
-        );
-      });
+        setUserGuidance(`Photo saved successfully! Found ${detections.length} face(s). You can take another photo.`);
+      } else {
+        // No faces detected, but still save the photo
+        setUserGuidance('Photo saved! No faces detected, but photo captured successfully.');
+      }
 
       // Download photo
       const link = document.createElement('a');
@@ -379,8 +463,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       link.href = photoCanvas.toDataURL();
       link.click();
 
-      setUserGuidance(`Photo saved successfully! Found ${detections.length} face(s). You can take another photo.`);
       setDetectionStatus('success');
+      
+      console.log(`✅ Photo saved with ${detectionResults.length} face(s) detected`);
       
     } catch (error) {
       console.error('❌ Error taking photo:', error);
@@ -396,7 +481,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setDetectionStatus('idle');
     setUserGuidance('Detection reset. Position your face and try again.');
     
-    const canvas = canvasRef.current;
+      const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
@@ -416,6 +501,21 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Important Notice */}
+          {isWebcamActive && (
+            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-blue-900">Camera is Active</p>
+                  <p className="text-sm text-blue-700 mt-1">
+                    You can now take photos! Face detection is optional - the "Take Photo" button works with or without detected faces.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Status and Guidance */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
@@ -478,11 +578,20 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
               <>
                 <Button
                   onClick={takePhoto}
-                  disabled={detectionResults.length === 0}
+                  disabled={false}
                   className={buttonClass}
                 >
                   <Camera className="w-4 h-4 mr-2" />
-                  Take Photo
+                  Take Photo {detectionResults.length === 0 && '(No Face Detected)'}
+                </Button>
+                
+                <Button
+                  onClick={captureFaceForSearch}
+                  disabled={!isModelLoaded}
+                  className="bg-purple-500 hover:bg-purple-600 text-white"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Find My Photos
                 </Button>
                 
                 <Button
@@ -501,9 +610,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                   🔍 Run Diagnostic
                 </Button>
                 
-                <Button
+              <Button
                   onClick={() => setShowDiagnostic(!showDiagnostic)}
-                  variant="outline"
+                variant="outline"
                   className="text-sm"
                 >
                   <Wrench className="w-4 h-4 mr-1" />
@@ -515,7 +624,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                   variant="destructive"
                 >
                   Stop Camera
-                </Button>
+              </Button>
               </>
             )}
           </div>
@@ -527,36 +636,36 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 <Users className="w-5 h-5 text-green-600" />
                 <span className="font-medium text-green-800">
                   {detectionResults.length} Face(s) Detected
-                </span>
-              </div>
+            </span>
+          </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 {detectionResults.map((detection, index) => (
                   <div key={index} className="bg-white p-3 rounded">
                     <div className="font-medium">Face {index + 1}</div>
                     <div className="text-gray-600">
                       Confidence: {(detection.score * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                ))}
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
+      )}
 
           {/* Diagnostic Information */}
           {diagnosticInfo && (
             <div className="bg-yellow-50 p-4 rounded-lg">
               <h4 className="font-medium text-yellow-900 mb-2">System Status:</h4>
               <p className="text-sm text-yellow-800">{diagnosticInfo}</p>
-            </div>
-          )}
-
+                    </div>
+                  )}
+                  
           {/* Diagnostic Component */}
           {showDiagnostic && (
             <div className="mt-6">
               <PhotoBoothDiagnostic />
-            </div>
-          )}
-
+                    </div>
+                  )}
+                  
           {/* Tips for Better Detection */}
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">Tips for Better Face Detection:</h4>
@@ -567,9 +676,22 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
               <li>• Avoid backlighting or shadows</li>
               <li>• Keep your face at a reasonable distance (not too close or far)</li>
             </ul>
-          </div>
+                  </div>
         </CardContent>
       </Card>
+
+      {/* Face Search Results Modal */}
+      {showFaceSearch && capturedFaceDescriptor && (
+        <FaceSearchResults
+          faceDescriptor={capturedFaceDescriptor}
+          onClose={() => {
+            setShowFaceSearch(false);
+            setCapturedFaceDescriptor(null);
+            setUserGuidance('Face search closed. You can search again anytime!');
+          }}
+          eventId={weddingId}
+        />
+      )}
     </div>
   );
 };
