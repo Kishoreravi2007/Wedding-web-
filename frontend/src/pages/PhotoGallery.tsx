@@ -61,10 +61,10 @@ const PhotoGalleryPage = ({ sister }: PhotoGalleryPageProps) => {
         <motion.div className="text-center" variants={itemVariants}>
           <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: themeColors.primary }} />
           <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: themeColors.primary }}>
-            Gallery Not Available
+            {t('galleryNotAvailable')}
           </h1>
           <p className="text-lg text-gray-600 max-w-md mx-auto">
-            Sister A's photo gallery is currently not available. Please check back later.
+            {t('sisterAGalleryUnavailable')}
           </p>
         </motion.div>
       </motion.div>

@@ -185,76 +185,131 @@ const SisterASchedule = () => {
     window.open(googleCalendarUrl, '_blank');
   };
 
+  // Map event IDs to their corresponding translation keys for descriptions
+  const getDescriptionKey = (eventId: string): string => {
+    // Try specific event description first (e.g., "ayaniyoonu-a" -> "ayaniyoonu-aDescription")
+    const specificKey = `${eventId}Description`;
+    
+    // Fallback mapping for common descriptions
+    const fallbackMap: { [key: string]: string } = {
+      "engagement-a": "engagement-aDescription",
+      "engagement-b": "engagementDescription",
+      "ayaniyoonu-a": "ayaniyoonuDescription",
+      "ayaniyoonu-b": "ayaniyoonu-bDescription",
+      "kaikottikali-a": "kaikottikali-aDescription",
+      "kaikottikali-b": "kaikottikali-bDescription",
+      "sangeeth-a": "sangeet-aDescription",
+      "sangeeth-b": "sangeet-bDescription",
+      "muhurtham-a": "wedding-aDescription",
+      "muhurtham-b": "wedding-bDescription",
+      "reception-a": "reception-aDescription",
+      "reception-b": "reception-bDescription",
+      "1000 thiritirikkal-b": "1000 thiritirikkal-bDescription",
+      "ganapathykidal-a": "ganapathykidal-aDescription",
+    };
+    
+    return fallbackMap[eventId] || specificKey;
+  };
+
   // Use the new categorized events from EventService
   const upcomingEvents = categorizedEvents.upcoming;
   const pastEvents = categorizedEvents.past;
 
-  const renderEventCard = (event: Event) => (
-    <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
-      <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
-      <CardHeader className="p-4">
-        <CardTitle className="text-xl font-semibold text-[#800000] mb-2 font-display">
-          {t(event.title)}
-        </CardTitle>
-        <CardDescription className="text-[#800000] text-sm mb-4">
-          <div dangerouslySetInnerHTML={{ __html: event.description }} />
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-3">
-        <p className="text-[#800000] text-sm flex items-center">
-          <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
-          {formatDate(event.startDateTime.toISOString())}
-        </p>
-        <p className="text-[#800000] text-sm flex items-center justify-between">
-          <span className="flex items-center">
-            <Clock className="w-4 h-4 mr-2 text-[#800000]" />
-            {event.startDateTime.toLocaleTimeString('en-US', { 
-              hour: 'numeric', 
-              minute: '2-digit',
-              hour12: true 
-            })}
-            {event.endDateTime && (
-              <span> - {event.endDateTime.toLocaleTimeString('en-US', { 
+  const renderEventCard = (event: Event) => {
+    const descriptionKey = getDescriptionKey(event.id);
+    const translatedDescription = t(descriptionKey);
+    
+    return (
+      <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
+        <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
+        <CardHeader className="p-4">
+          <CardTitle className="text-xl font-semibold text-[#800000] mb-2 font-display">
+            {t(event.title)}
+          </CardTitle>
+          <CardDescription className="text-[#800000] text-sm mb-4">
+            <div dangerouslySetInnerHTML={{ __html: translatedDescription }} />
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 pt-0 space-y-3">
+          <p className="text-[#800000] text-sm flex items-center">
+            <Calendar className="w-4 h-4 mr-2 text-[#800000]" />
+            {formatDate(event.startDateTime.toISOString())}
+          </p>
+          <p className="text-[#800000] text-sm flex items-center justify-between">
+            <span className="flex items-center">
+              <Clock className="w-4 h-4 mr-2 text-[#800000]" />
+              {event.startDateTime.toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
                 minute: '2-digit',
                 hour12: true 
-              })}</span>
-            )}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleAddToCalendar(event, { date: event.startDateTime.toISOString() })}
-            className="text-[#800000] hover:bg-[#800000]/10"
-            title={t('addToGoogleCalendar')}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </p>
-        {event.dresscode && (
-          <p className="text-[#800000] text-sm flex items-center">
-            <span className="mr-2 text-lg">👗</span>
-            {t(event.dresscode)}
+              })}
+              {event.endDateTime && (
+                <span> - {event.endDateTime.toLocaleTimeString('en-US', { 
+                  hour: 'numeric', 
+                  minute: '2-digit',
+                  hour12: true 
+                })}</span>
+              )}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleAddToCalendar(event, { date: event.startDateTime.toISOString() })}
+              className="text-[#800000] hover:bg-[#800000]/10"
+              title={t('addToGoogleCalendar')}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </p>
-        )}
-        <p className="text-[#800000] text-sm flex items-center">
-          <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
-          {t(event.venue)}
-        </p>
-        <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
-          <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">
-            {t('location')}
-          </Button>
-        </a>
-      </CardContent>
-    </Card>
-  );
+          {event.dresscode && (
+            <p className="text-[#800000] text-sm flex items-center">
+              <span className="mr-2 text-lg">👗</span>
+              {t(event.dresscode)}
+            </p>
+          )}
+          <p className="text-[#800000] text-sm flex items-center">
+            <MapPin className="w-4 h-4 mr-2 text-[#800000]" />
+            {t(event.venue)}
+          </p>
+          <a href={event.mapLink} target="_blank" rel="noopener noreferrer">
+            <Button className="w-full bg-[#FFFDD0] hover:bg-[#B8860B] text-[#800000] font-bold py-2 px-4 rounded transition-all duration-300">
+              {t('location')}
+            </Button>
+          </a>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
-    <div className="text-white py-12 px-4 sm:px-6 lg:px-8 relative">
+    <div className="text-white relative">
 
-      <div className="max-w-7xl mx-auto z-10">
-        <h1 className="font-heading text-4xl text-center mb-8 sm:mb-12 text-[#800000] font-bold">
+      <div className="relative w-full h-64 mb-8 overflow-hidden rounded-lg shadow-lg">
+        <img
+          src="/sister-a-schedule-banner.jpg"
+          alt={t('sisterAScheduleBanner')}
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-4">
+          <p className="text-white text-sm md:text-base mb-2 font-sans uppercase tracking-widest">
+            {t('weAreGettingMarried')}
+          </p>
+          <h1 className="font-heading text-5xl md:text-7xl text-center text-white font-bold mb-4">
+            {t('sisterAAndPartner')}
+          </h1>
+          <p className="text-white text-sm md:text-base mb-2 font-sans uppercase tracking-widest">
+            {t('saveTheDate')}
+          </p>
+          <p className="text-white text-lg md:text-xl mb-6 font-serif">
+            {t('sisterADate')}
+          </p>
+          {/* Add to my Calendar button - functionality can be added later if needed */}
+        </div>
+      </div>
+
+      <div className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto z-10">
+        <h1 className="font-heading text-6xl text-center mb-12 text-[#800000] font-bold">
           {t('Schedule of Events')}
         </h1>
 
@@ -282,6 +337,7 @@ const SisterASchedule = () => {
           </>
         )}
         <WishBox recipient="parvathy" /> {/* Add the WishBox component here */}
+        </div>
       </div>
     </div>
   );
