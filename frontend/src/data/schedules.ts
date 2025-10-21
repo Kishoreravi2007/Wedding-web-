@@ -41,7 +41,7 @@ export const parvathySchedule: Schedule[] = [
         id: "ganapathykidal-a",
         title: "Ganapathykidal",
         date: "Saturday, January 3, 2026",
-        time: "8:00 to 12:00 pm",
+        time: "8:00 am to 12:00 pm",
         dresscode: "Ladies: Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",
@@ -115,7 +115,7 @@ export const sreedeviSchedule = [
       {
         id: "ayaniyoonu-b",
         title: "Ayaniyoonu",
-        time: "8:00 to 12:00 pm",
+        time: "8:00 am to 12:00 pm",
         dresscode: "Ladies Set Mundu",
         venue: "At Home",
         locationUrl: "https://maps.app.goo.gl/eHCvqFew9ZZBjwFTA",

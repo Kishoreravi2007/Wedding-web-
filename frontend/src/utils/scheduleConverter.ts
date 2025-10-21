@@ -105,17 +105,44 @@ export class ScheduleConverter {
     let time = startTimeStr;
     let ampm = '';
 
-    if (time.toLowerCase().includes('pm')) {
+    // Check if the start time specifically contains pm/am to determine the period
+    const startTimeLower = startTimeStr.toLowerCase();
+    if (startTimeLower.includes('pm')) {
       ampm = 'PM';
+    } else if (startTimeLower.includes('am')) {
+      ampm = 'AM';
+    } else {
+      // If start time doesn't have am/pm, check if the full time string has pm/am
+      // This handles cases like "6 to 10pm" where we need to infer the period
+      const originalTimeLower = timeString.toLowerCase();
+      if (originalTimeLower.includes('pm')) {
+        ampm = 'PM';
+      } else if (originalTimeLower.includes('am')) {
+        ampm = 'AM';
+      } else {
+        // If no am/pm is specified anywhere, assume PM for evening events (6pm+)
+        const hour = parseInt(time.split(':')[0]);
+        if (hour >= 6) {
+          ampm = 'PM';
+        } else {
+          ampm = 'AM';
+        }
+      }
+    }
+
+    // Clean the time string
+    if (time.toLowerCase().includes('pm')) {
       time = time.toLowerCase().replace('pm', '');
     } else if (time.toLowerCase().includes('am')) {
-      ampm = 'AM';
       time = time.toLowerCase().replace('am', '');
     } else {
       const timeParts = startTimeStr.split(' ');
       if (timeParts.length > 1) {
         time = timeParts[0];
-        ampm = timeParts[1];
+        // Only use the ampm from timeParts if we haven't already determined it from the full string
+        if (!ampm) {
+          ampm = timeParts[1];
+        }
       }
     }
 
