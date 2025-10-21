@@ -353,6 +353,44 @@
     overflow: hidden; /* Hide overflowing text */
     text-overflow: ellipsis; /* Add ellipsis for overflowing text */
   }
+
+  /* Malayalam language specific styling */
+  html[lang="ml"] {
+    font-size: 98%; /* Slightly reduce overall font size for Malayalam */
+  }
+
+  html[lang="ml"] body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  }
+
+  /* Adjust specific text elements for Malayalam */
+  html[lang="ml"] h1,
+  html[lang="ml"] h2,
+  html[lang="ml"] h3,
+  html[lang="ml"] h4,
+  html[lang="ml"] h5,
+  html[lang="ml"] h6 {
+    font-size: 0.97em; /* Slightly reduce heading sizes */
+    letter-spacing: 0; /* Remove extra letter spacing for Malayalam */
+  }
+
+  html[lang="ml"] p,
+  html[lang="ml"] span,
+  html[lang="ml"] div,
+  html[lang="ml"] button,
+  html[lang="ml"] a {
+    font-size: 0.98em; /* Minimal reduction in text size */
+  }
+
+  /* Override decorative fonts for Malayalam */
+  html[lang="ml"] .font-heading {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-weight: 600;
+  }
+
+  html[lang="ml"] .font-sans {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  }
 }
 @layer utilities {
   @keyframes move-gradient {

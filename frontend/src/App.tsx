@@ -7,7 +7,7 @@ import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
 import { WebsiteProvider } from "./contexts/WebsiteContext";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "./components/ui/button";
 import { X, Music } from "lucide-react";
 import CountdownTimer from "./components/CountdownTimer";
@@ -52,8 +52,13 @@ const itemVariants = {
 
 const App = () => {
   const [showMusicPlayer, setShowMusicPlayer] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
+
+  // Set language attribute on document root
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', i18n.language);
+  }, [i18n.language]);
 
   const initialMusicTrack = useMemo(() => {
     if (location.pathname.startsWith('/sreedevi')) {
