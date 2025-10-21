@@ -12,11 +12,12 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Camera, RotateCcw, AlertCircle, CheckCircle, Users } from 'lucide-react';
+import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench } from 'lucide-react';
 
 // Import face-api.js
 import * as faceapi from 'face-api.js';
 import { faceDetectionDiagnostic } from '../utils/faceDetectionDiagnostic';
+import PhotoBoothDiagnostic from './PhotoBoothDiagnostic';
 
 interface PhotoBoothProps {
   className?: string;
@@ -47,6 +48,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [userGuidance, setUserGuidance] = useState('');
   const [detectionStatus, setDetectionStatus] = useState<'idle' | 'detecting' | 'success' | 'error'>('idle');
   const [diagnosticInfo, setDiagnosticInfo] = useState<string>('');
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
 
   // Run diagnostic when models fail to load
   const runDiagnostic = useCallback(async () => {
@@ -312,58 +314,79 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const takePhoto = useCallback(() => {
     if (detectionResults.length === 0) {
       setUserGuidance('No faces detected. Please ensure your face is visible and try again.');
+      setDetectionStatus('error');
       return;
     }
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Create a new canvas for the final photo
-    const photoCanvas = document.createElement('canvas');
-    const photoCtx = photoCanvas.getContext('2d');
-    if (!photoCtx) return;
+    if (!canvas) {
+      setUserGuidance('Canvas not available. Please refresh the page and try again.');
+      setDetectionStatus('error');
+      return;
+    }
 
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      setUserGuidance('Camera not available. Please start the camera first.');
+      setDetectionStatus('error');
+      return;
+    }
 
-    // Set photo canvas size
-    photoCanvas.width = video.videoWidth;
-    photoCanvas.height = video.videoHeight;
+    try {
+      // Create a new canvas for the final photo
+      const photoCanvas = document.createElement('canvas');
+      const photoCtx = photoCanvas.getContext('2d');
+      if (!photoCtx) {
+        setUserGuidance('Unable to create photo canvas. Please try again.');
+        setDetectionStatus('error');
+        return;
+      }
 
-    // Draw video frame
-    photoCtx.drawImage(video, 0, 0);
+      // Set photo canvas size
+      photoCanvas.width = video.videoWidth;
+      photoCanvas.height = video.videoHeight;
 
-    // Draw detections on photo
-    const detections = detectionResults;
-    detections.forEach((detection, index) => {
-      const { x, y, width, height } = detection.box;
-      const confidence = detection.score;
+      // Draw video frame
+      photoCtx.drawImage(video, 0, 0);
 
-      // Draw bounding box
-      photoCtx.strokeStyle = '#00ff00';
-      photoCtx.lineWidth = 3;
-      photoCtx.strokeRect(x, y, width, height);
+      // Draw detections on photo
+      const detections = detectionResults;
+      detections.forEach((detection, index) => {
+        const { x, y, width, height } = detection.box;
+        const confidence = detection.score;
 
-      // Draw confidence
-      photoCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-      photoCtx.fillRect(x, y - 25, 120, 20);
+        // Draw bounding box
+        photoCtx.strokeStyle = '#00ff00';
+        photoCtx.lineWidth = 3;
+        photoCtx.strokeRect(x, y, width, height);
+
+        // Draw confidence
+        photoCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+        photoCtx.fillRect(x, y - 25, 120, 20);
+        
+        photoCtx.fillStyle = '#ffffff';
+        photoCtx.font = 'bold 14px Arial';
+        photoCtx.fillText(
+          `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
+          x + 5,
+          y - 8
+        );
+      });
+
+      // Download photo
+      const link = document.createElement('a');
+      link.download = `photo-booth-${Date.now()}.png`;
+      link.href = photoCanvas.toDataURL();
+      link.click();
+
+      setUserGuidance(`Photo saved successfully! Found ${detections.length} face(s). You can take another photo.`);
+      setDetectionStatus('success');
       
-      photoCtx.fillStyle = '#ffffff';
-      photoCtx.font = 'bold 14px Arial';
-      photoCtx.fillText(
-        `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
-        x + 5,
-        y - 8
-      );
-    });
-
-    // Download photo
-    const link = document.createElement('a');
-    link.download = `photo-booth-${Date.now()}.png`;
-    link.href = photoCanvas.toDataURL();
-    link.click();
-
-    setUserGuidance('Photo saved! You can take another photo or restart the camera.');
+    } catch (error) {
+      console.error('❌ Error taking photo:', error);
+      setUserGuidance('Failed to take photo. Please try again.');
+      setDetectionStatus('error');
+    }
   }, [detectionResults]);
 
   // Reset detection
@@ -479,6 +502,15 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 </Button>
                 
                 <Button
+                  onClick={() => setShowDiagnostic(!showDiagnostic)}
+                  variant="outline"
+                  className="text-sm"
+                >
+                  <Wrench className="w-4 h-4 mr-1" />
+                  {showDiagnostic ? 'Hide' : 'Show'} Diagnostic
+                </Button>
+                
+                <Button
                   onClick={stopWebcam}
                   variant="destructive"
                 >
@@ -515,6 +547,13 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             <div className="bg-yellow-50 p-4 rounded-lg">
               <h4 className="font-medium text-yellow-900 mb-2">System Status:</h4>
               <p className="text-sm text-yellow-800">{diagnosticInfo}</p>
+            </div>
+          )}
+
+          {/* Diagnostic Component */}
+          {showDiagnostic && (
+            <div className="mt-6">
+              <PhotoBoothDiagnostic />
             </div>
           )}
 
