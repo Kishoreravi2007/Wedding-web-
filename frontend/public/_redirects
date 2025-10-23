@@ -1,0 +1,4 @@
+# Netlify redirects for React Router
+# This ensures that all routes work properly in production
+/*    /index.html   200
+
