@@ -117,8 +117,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     try {
       // Use more sensitive detection options
       const options = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 320, // Smaller input size for faster detection
-        scoreThreshold: 0.3 // Lower threshold for better detection
+        inputSize: 512,
+        scoreThreshold: 0.5
       });
 
       // Try multiple detection methods
@@ -128,8 +128,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (detections.length === 0) {
         console.log('No faces detected, trying with different settings...');
         const alternativeOptions = new faceapi.TinyFaceDetectorOptions({
-          inputSize: 416, // Larger input size
-          scoreThreshold: 0.2 // Even lower threshold
+          inputSize: 512,
+          scoreThreshold: 0.5
         });
         detections = await faceapi.detectAllFaces(imageElement, alternativeOptions);
       }
@@ -225,6 +225,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
   // Start webcam with enhanced error handling
   const startWebcam = useCallback(async () => {
+    console.log('startWebcam called');
     try {
       setUserGuidance('Starting camera... Please allow camera access.');
       
@@ -235,6 +236,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           facingMode: 'user'
         } 
       });
+      console.log('getUserMedia success');
 
       const video = videoRef.current;
       if (!video) return;
@@ -270,16 +272,16 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           // Detect faces with multiple attempts for better accuracy
           let detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-              inputSize: 320,
-              scoreThreshold: 0.3
+              inputSize: 512,
+              scoreThreshold: 0.5
             }));
 
           // If no faces, try with lower threshold
           if (detections.length === 0) {
             detections = await faceapi
               .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-                inputSize: 416,
-                scoreThreshold: 0.2
+                inputSize: 512,
+                scoreThreshold: 0.5
               }));
           }
 
