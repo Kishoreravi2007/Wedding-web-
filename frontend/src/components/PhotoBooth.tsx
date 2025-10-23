@@ -13,6 +13,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'; // Import Select components
 
 // Import face-api.js
 import * as faceapi from 'face-api.js';
@@ -25,7 +26,7 @@ interface PhotoBoothProps {
   primaryColor?: string;
   buttonClass?: string;
   overlayImageSrc?: string;
-  weddingId?: string;
+  // weddingId?: string; // This prop will now be managed internally
 }
 
 const PhotoBooth: React.FC<PhotoBoothProps> = ({ 
@@ -33,7 +34,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   primaryColor = '#3B82F6',
   buttonClass = 'bg-blue-500 hover:bg-blue-600 text-white',
   overlayImageSrc,
-  weddingId
+  // weddingId // Remove from destructuring
 }) => {
   // Refs for canvas and video elements
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -51,7 +52,11 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [diagnosticInfo, setDiagnosticInfo] = useState<string>('');
   const [showDiagnostic, setShowDiagnostic] = useState(false);
   const [showFaceSearch, setShowFaceSearch] = useState(false);
-  const [capturedFaceDescriptor, setCapturedFaceDescriptor] = useState<Float32Array | null>(null);
+  const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null); // Store base64 image
+  const [selectedWedding, setSelectedWedding] = useState<'sister_a' | 'sister_b'>('sister_a'); // New state for wedding selection
+  const [isSearching, setIsSearching] = useState(false); // New state for search loader
+  const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
+  const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
 
   // Run diagnostic when models fail to load
   const runDiagnostic = useCallback(async () => {
@@ -301,7 +306,6 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
               ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
           }
-
         } catch (error) {
           console.error('Detection loop error:', error);
         }
@@ -367,7 +371,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Camera stopped. Click "Start Camera" to begin again.');
   }, []);
 
-  // Capture face for searching
+  // Capture face for searching and send to backend
   const captureFaceForSearch = useCallback(async () => {
     const video = videoRef.current;
     if (!video) {
@@ -380,27 +384,79 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       return;
     }
 
-    try {
-      setUserGuidance('Capturing your face for search...');
-      
-      // Detect face and extract descriptor
-      const detection = await faceapi
-        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-      if (detection) {
-        setCapturedFaceDescriptor(detection.descriptor);
-        setShowFaceSearch(true);
-        setUserGuidance('Face captured! Searching for your photos in the gallery...');
-      } else {
-        setUserGuidance('No face detected. Please ensure your face is clearly visible and try again.');
-      }
-    } catch (error) {
-      console.error('❌ Error capturing face:', error);
-      setUserGuidance('Failed to capture face. Please try again.');
+    if (detectionResults.length === 0) {
+      setUserGuidance('No face detected. Please ensure your face is clearly visible before searching.');
+      return;
     }
-  }, [isModelLoaded]);
+
+    setIsSearching(true);
+    setSearchResults([]);
+    setSearchError(null);
+    setUserGuidance('Searching your wedding memories...');
+
+    try {
+      // Create a temporary canvas to draw the detected face
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('Could not create canvas context.');
+      }
+
+      // Get the bounding box of the first detected face
+      const { x, y, width, height } = detectionResults[0].box;
+
+      // Set canvas dimensions to the detected face
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+
+      // Draw the detected face from the video onto the temporary canvas
+      ctx.drawImage(video, x, y, width, height, 0, 0, width, height);
+
+      // Get the image data as a base64 string
+      const imageData = tempCanvas.toDataURL('image/jpeg');
+      setCapturedFaceImage(imageData); // Store for potential display in search results modal
+
+      // Convert base64 to Blob for FormData
+      const byteString = atob(imageData.split(',')[1]);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: 'image/jpeg' });
+
+      const formData = new FormData();
+      formData.append('file', blob, 'face.jpg');
+      formData.append('wedding_name', selectedWedding); // Send selected wedding name
+
+      const response = await fetch('/api/recognize', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to find matching photos.');
+      }
+
+      const data = await response.json();
+      if (data.matches && data.matches.length > 0) {
+        setSearchResults(data.matches);
+        setShowFaceSearch(true);
+        setUserGuidance(`Found ${data.matches.length} matching photos!`);
+      } else {
+        setSearchError('No matching photos found for this face in the selected wedding.');
+        setUserGuidance('No matching photos found.');
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error during face search:', error);
+      setSearchError(error.message || 'An unexpected error occurred during search.');
+      setUserGuidance('Face search failed. Please try again.');
+    } finally {
+      setIsSearching(false);
+    }
+  }, [isModelLoaded, detectionResults, selectedWedding]);
 
   // Take photo
   const takePhoto = useCallback(() => {
@@ -503,6 +559,22 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Wedding Selection */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="wedding-select" className="text-sm font-medium text-gray-700">
+              Select Wedding:
+            </label>
+            <Select value={selectedWedding} onValueChange={(value: 'sister_a' | 'sister_b') => setSelectedWedding(value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a wedding" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sister_a">Sister A's Wedding</SelectItem>
+                <SelectItem value="sister_b">Sister B's Wedding</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Important Notice */}
           {isWebcamActive && (
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
@@ -683,15 +755,19 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       </Card>
 
       {/* Face Search Results Modal */}
-      {showFaceSearch && capturedFaceDescriptor && (
+      {showFaceSearch && (
         <FaceSearchResults
-          faceDescriptor={capturedFaceDescriptor}
+          capturedFaceImage={capturedFaceImage} // Pass captured image
+          searchResults={searchResults} // Pass search results
           onClose={() => {
             setShowFaceSearch(false);
-            setCapturedFaceDescriptor(null);
+            setCapturedFaceImage(null);
+            setSearchResults([]);
+            setSearchError(null);
             setUserGuidance('Face search closed. You can search again anytime!');
           }}
-          eventId={weddingId}
+          weddingName={selectedWedding} // Pass selected wedding name
+          searchError={searchError} // Pass search error
         />
       )}
     </div>
