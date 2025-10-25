@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Find My Photos - Wedding Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🔍 Test Find My Photos API</h1>
+        
+        <!-- Status -->
+        <div class="bg-white p-4 rounded-lg shadow mb-6">
+            <h2 class="font-semibold mb-2">Server Status:</h2>
+            <div id="server-status" class="space-y-2">
+                <div id="backend-status">Backend: <span class="text-yellow-600">Checking...</span></div>
+                <div id="frontend-status">Frontend: <span class="text-yellow-600">Checking...</span></div>
+            </div>
+        </div>
+
+        <!-- API Test -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="font-semibold mb-4">Find My Photos API Test</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Wedding Selection:</label>
+                    <select id="wedding-select" class="border rounded px-3 py-2 w-full">
+                        <option value="sister_a">Sister A's Wedding</option>
+                        <option value="sister_b">Sister B's Wedding</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Upload Test Image:</label>
+                    <input type="file" id="file-input" accept="image/*" class="border rounded px-3 py-2 w-full">
+                </div>
+                
+                <button id="test-api" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
+                    Test Find My Photos API
+                </button>
+            </div>
+        </div>
+
+        <!-- Create Test Image -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="font-semibold mb-4">Generate Test Face Image</h2>
+            <button id="create-test-image" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                Create Test Face Image
+            </button>
+            <canvas id="test-canvas" width="200" height="200" class="border mt-4 hidden"></canvas>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="bg-white p-6 rounded-lg shadow hidden">
+            <h2 class="font-semibold mb-4">API Response:</h2>
+            <pre id="api-response" class="bg-gray-100 p-4 rounded text-sm overflow-auto"></pre>
+        </div>
+
+        <!-- Console -->
+        <div class="bg-gray-900 text-green-400 p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-white">Console Output:</h3>
+            <div id="console" class="font-mono text-xs h-32 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // Console logging
+        const consoleEl = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'text-red-400' : 'text-green-400';
+            consoleEl.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+        
+        console.log = (...args) => {
+            originalLog(...args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = (...args) => {
+            originalError(...args);
+            addToConsole(args.join(' '), 'error');
+        };
+
+        // Test servers
+        async function testServers() {
+            console.log('🔍 Testing server connectivity...');
+            
+            // Test backend
+            try {
+                const backendResponse = await fetch('http://localhost:5001');
+                if (backendResponse.ok) {
+                    document.getElementById('backend-status').innerHTML = 'Backend: <span class="text-green-600">✅ Running on port 5001</span>';
+                    console.log('✅ Backend server is running');
+                } else {
+                    throw new Error(`HTTP ${backendResponse.status}`);
+                }
+            } catch (error) {
+                document.getElementById('backend-status').innerHTML = 'Backend: <span class="text-red-600">❌ Not responding</span>';
+                console.error('❌ Backend server not responding:', error.message);
+            }
+            
+            // Test frontend (try multiple ports including newer ones)
+            let frontendWorking = false;
+            const frontendPorts = [3000, 3001, 3002, 3003, 5173];
+            
+            for (const port of frontendPorts) {
+                try {
+                    const frontendResponse = await fetch(`http://localhost:${port}`);
+                    if (frontendResponse.ok) {
+                        document.getElementById('frontend-status').innerHTML = `Frontend: <span class="text-green-600">✅ Running on port ${port}</span>`;
+                        console.log(`✅ Frontend server is running on port ${port}`);
+                        frontendWorking = true;
+                        break;
+                    }
+                } catch (error) {
+                    // Try next port
+                }
+            }
+            
+            if (!frontendWorking) {
+                document.getElementById('frontend-status').innerHTML = 'Frontend: <span class="text-red-600">❌ Not responding on any port</span>';
+                console.error('❌ Frontend server not responding on ports:', frontendPorts.join(', '));
+            }
+        }
+
+        // Create test face image
+        function createTestImage() {
+            const canvas = document.getElementById('test-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Draw a simple face
+            ctx.fillStyle = '#ffdbac';
+            ctx.fillRect(50, 50, 100, 120);
+            
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.fillRect(70, 80, 10, 10);
+            ctx.fillRect(120, 80, 10, 10);
+            
+            // Nose
+            ctx.fillRect(95, 100, 10, 15);
+            
+            // Mouth
+            ctx.fillRect(85, 130, 30, 5);
+            
+            canvas.classList.remove('hidden');
+            console.log('✅ Test face image created');
+            
+            // Convert to blob and set as file input
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'test-face.png', { type: 'image/png' });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById('file-input').files = dt.files;
+                console.log('✅ Test image loaded into file input');
+            });
+        }
+
+        // Test Find My Photos API
+        async function testFindMyPhotosAPI() {
+            const fileInput = document.getElementById('file-input');
+            const weddingSelect = document.getElementById('wedding-select');
+            const resultsDiv = document.getElementById('results');
+            const responseEl = document.getElementById('api-response');
+            
+            if (!fileInput.files[0]) {
+                console.error('❌ No file selected. Use "Create Test Face Image" first.');
+                return;
+            }
+            
+            console.log('🔍 Testing Find My Photos API...');
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('wedding_name', weddingSelect.value);
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/recognize', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                console.log(`✅ API Response (${response.status}):`, data);
+                
+                responseEl.textContent = JSON.stringify(data, null, 2);
+                resultsDiv.classList.remove('hidden');
+                
+                if (response.ok && data.matches && data.matches.length > 0) {
+                    console.log(`🎉 SUCCESS! Found ${data.matches.length} matching photos`);
+                } else if (response.ok) {
+                    console.log('ℹ️  API working but no matches found');
+                } else {
+                    console.error('❌ API returned error:', data.message);
+                }
+                
+            } catch (error) {
+                console.error('❌ API call failed:', error.message);
+                responseEl.textContent = `Error: ${error.message}`;
+                resultsDiv.classList.remove('hidden');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('create-test-image').addEventListener('click', createTestImage);
+        document.getElementById('test-api').addEventListener('click', testFindMyPhotosAPI);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Find My Photos API Tester loaded');
+            testServers();
+        });
+    </script>
+</body>
+</html>

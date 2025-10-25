@@ -15,7 +15,8 @@ export default defineConfig(async ({ mode }) => {
     publicDir: 'public',
     server: {
       host: "::",
-      port: 8080,
+      port: 3000, // Use standard port 3000
+      strictPort: false, // Allow fallback to another port if needed
     },
     plugins: [
       dyadComponentTagger(),
@@ -53,9 +54,10 @@ export default defineConfig(async ({ mode }) => {
     },
     // Define environment variables with fallbacks to prevent blank screens
     define: {
-      'process.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || 'http://localhost:5000'),
+      'process.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || 'http://localhost:5001'),
       'process.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL || ''),
       'process.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY || ''),
+      'process.env.VITE_FRONTEND_URL': JSON.stringify(env.VITE_FRONTEND_URL || 'http://localhost:3000'),
     },
   };
 });

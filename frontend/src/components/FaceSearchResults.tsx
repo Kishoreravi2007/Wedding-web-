@@ -149,8 +149,14 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                               src={photoUrl}
                               alt={`Match ${index + 1}`}
                               className="w-full h-48 object-cover"
+                              onLoad={() => {
+                                console.log('✅ Image loaded successfully:', photoUrl);
+                              }}
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Not+Available';
+                                console.error('❌ Failed to load image:', photoUrl);
+                                const isHEIC = photoUrl.toLowerCase().includes('.heic');
+                                const fallbackText = isHEIC ? 'HEIC+Format+Not+Supported' : 'Image+Not+Available';
+                                (e.target as HTMLImageElement).src = `https://via.placeholder.com/400x300?text=${fallbackText}`;
                               }}
                             />
                           </div>

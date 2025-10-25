@@ -57,6 +57,13 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [isSearching, setIsSearching] = useState(false); // New state for search loader
   const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
   const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
+  
+  // Add state for ultra-smooth detection
+  const [lastDetectionTime, setLastDetectionTime] = useState(0);
+  const [detectionHistory, setDetectionHistory] = useState<any[][]>([]);
+  const [stableDetections, setStableDetections] = useState<any[]>([]);
+  const [persistentDetection, setPersistentDetection] = useState<any[]>([]);
+  const [detectionConfirmed, setDetectionConfirmed] = useState(false);
 
   // Run diagnostic when models fail to load
   const runDiagnostic = useCallback(async () => {
@@ -81,24 +88,46 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     const loadModels = async () => {
       try {
         console.log('🔄 Loading face-api.js models for Photo Booth...');
+        setUserGuidance('Loading face detection models...');
         
-        // Load all required models with better error handling
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-          faceapi.nets.faceExpressionNet.loadFromUri('/models')
-        ]);
+        // Load models sequentially with progress feedback
+        console.log('Loading TinyFaceDetector...');
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
         
-        console.log('✅ Photo Booth models loaded successfully');
-        setIsModelLoaded(true);
-        setUserGuidance('Models loaded! Click "Start Camera" to begin.');
-        setDiagnosticInfo('Models loaded successfully');
+        console.log('Loading FaceLandmark68Net...');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+        
+        console.log('Loading FaceRecognitionNet...');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+        
+        console.log('Loading FaceExpressionNet...');
+        await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+        
+        // Verify models are loaded
+        const modelsLoaded = {
+          tinyFaceDetector: faceapi.nets.tinyFaceDetector.isLoaded,
+          faceLandmark68Net: faceapi.nets.faceLandmark68Net.isLoaded,
+          faceRecognitionNet: faceapi.nets.faceRecognitionNet.isLoaded,
+          faceExpressionNet: faceapi.nets.faceExpressionNet.isLoaded
+        };
+        
+        console.log('Model loading status:', modelsLoaded);
+        
+        const allLoaded = Object.values(modelsLoaded).every(loaded => loaded);
+        
+        if (allLoaded) {
+          console.log('✅ Photo Booth models loaded successfully');
+          setIsModelLoaded(true);
+          setUserGuidance('Models loaded! Click "Start Camera" to begin.');
+          setDiagnosticInfo('All models loaded successfully');
+        } else {
+          throw new Error('Some models failed to load: ' + JSON.stringify(modelsLoaded));
+        }
       } catch (error) {
         console.error('❌ Error loading Photo Booth models:', error);
-        setUserGuidance('Failed to load face detection models. Please refresh the page.');
+        setUserGuidance('Failed to load face detection models. Check console for details.');
         setDetectionStatus('error');
-        setDiagnosticInfo('Model loading failed');
+        setDiagnosticInfo(`Model loading failed: ${error.message}`);
         
         // Run diagnostic to get more details
         setTimeout(runDiagnostic, 1000);
@@ -120,23 +149,23 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Detecting faces... Please hold still.');
 
     try {
-      // Use more sensitive detection options
+      // Use optimized detection options for better accuracy
       const options = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 512,
-        scoreThreshold: 0.5
+        inputSize: 416,
+        scoreThreshold: 0.3
       });
 
       // Try multiple detection methods
       let detections = await faceapi.detectAllFaces(imageElement, options);
       
-      // If no faces detected, try with different settings
+      // If no faces detected, try with more sensitive settings
       if (detections.length === 0) {
-        console.log('No faces detected, trying with different settings...');
-        const alternativeOptions = new faceapi.TinyFaceDetectorOptions({
-          inputSize: 512,
-          scoreThreshold: 0.5
+        console.log('No faces detected, trying with more sensitive settings...');
+        const sensitiveOptions = new faceapi.TinyFaceDetectorOptions({
+          inputSize: 320,
+          scoreThreshold: 0.2
         });
-        detections = await faceapi.detectAllFaces(imageElement, alternativeOptions);
+        detections = await faceapi.detectAllFaces(imageElement, sensitiveOptions);
       }
 
       // If still no faces, try with landmarks for better detection
@@ -174,7 +203,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     }
   }, [isModelLoaded, detectionAttempts, maxAttempts]);
 
-  // Draw detections with enhanced visualization
+  // Draw detections with enhanced visualization and reduced flickering
   const drawDetections = useCallback((detections: any[]) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -182,50 +211,68 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
+    // Clear canvas with slight fade effect to reduce harsh flickering
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw each detection with enhanced styling
+    // Draw each detection with smooth, stable styling
     detections.forEach((detection, index) => {
       const { x, y, width, height } = detection.box;
       const confidence = detection.score;
 
-      // Draw bounding box with gradient
+      // Only draw detections with ultra-high confidence to eliminate flickering
+      if (confidence < 0.85) return;
+
+      // Draw bounding box with smooth gradient
       const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
       gradient.addColorStop(0, '#00ff00');
-      gradient.addColorStop(1, '#00cc00');
+      gradient.addColorStop(1, '#00aa00');
       
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2; // Slightly thinner for less visual noise
       ctx.strokeRect(x, y, width, height);
-
-      // Draw confidence score with background
-      ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-      ctx.fillRect(x, y - 25, 120, 20);
       
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(
-        `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
-        x + 5,
-        y - 8
-      );
+      // Add subtle shadow for better visibility
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
 
-      // Draw face number with circle
-      ctx.fillStyle = '#00ff00';
+      // Draw confidence score with background (only for very high confidence)
+      if (confidence > 0.8) {
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.9)';
+        ctx.fillRect(x, y - 22, 90, 18);
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(
+          `${(confidence * 100).toFixed(0)}%`,
+          x + 4,
+          y - 8
+        );
+      }
+
+      // Draw face number with subtle circle (less prominent)
+      ctx.shadowColor = 'transparent'; // Reset shadow
+      ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
       ctx.beginPath();
-      ctx.arc(x + width / 2, y + height / 2, 15, 0, 2 * Math.PI);
+      ctx.arc(x + width / 2, y + height / 2, 12, 0, 2 * Math.PI);
       ctx.fill();
       
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px Arial';
+      ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
       ctx.fillText(
         `${index + 1}`,
         x + width / 2,
-        y + height / 2 + 6
+        y + height / 2 + 4
       );
     });
+    
+    // Reset text alignment for other canvas operations
+    ctx.textAlign = 'left';
   }, []);
 
   // Start webcam with enhanced error handling
@@ -274,48 +321,83 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
 
-          // Detect faces with multiple attempts for better accuracy
+          // Skip detection if too soon (prevent excessive processing) 
+          const now = Date.now();
+          if (now - lastDetectionTime < 750) { // Minimum 750ms between detections for ultra-stability
+            requestAnimationFrame(detectLoop);
+            return;
+          }
+          setLastDetectionTime(now);
+
+          // Detect faces with ultra-stable settings for video stream
           let detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-              inputSize: 512,
-              scoreThreshold: 0.5
+              inputSize: 416,
+              scoreThreshold: 0.7 // Ultra-high threshold for maximum stability
             }));
 
-          // If no faces, try with lower threshold
-          if (detections.length === 0) {
-            detections = await faceapi
-              .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-                inputSize: 512,
-                scoreThreshold: 0.5
-              }));
-          }
+          // Filter detections by very high confidence to eliminate flickering
+          detections = detections.filter(detection => detection.score > 0.8);
 
-          setDetectionResults(detections);
+          // Add to detection history for smoothing
+          setDetectionHistory(prev => {
+            const newHistory = [...prev, detections].slice(-5); // Keep last 5 detections
+            
+            // Calculate ultra-stable detections (faces that appear very consistently)
+            const stableCount = Math.max(3, Math.floor(newHistory.length * 0.8)); // Require 80% consistency
+            const faceCountHistory = newHistory.map(dets => dets.length);
+            const avgFaceCount = Math.round(faceCountHistory.reduce((a, b) => a + b, 0) / faceCountHistory.length);
+            
+            // Use ultra-stable detection count to completely eliminate flickering
+            const stable = avgFaceCount > 0 && faceCountHistory.filter(count => count > 0).length >= stableCount
+              ? detections.slice(0, Math.min(avgFaceCount, 1)) // Limit to max 1 face for maximum stability
+              : [];
+            
+            setStableDetections(stable);
+            return newHistory;
+          });
+
+          // Use ultra-stable detections with persistence for UI updates
+          const displayDetections = stableDetections.length > 0 ? stableDetections : detections;
           
-          if (detections.length > 0) {
+          // Apply persistence - keep showing last good detection for stability
+          if (displayDetections.length > 0) {
+            setPersistentDetection(displayDetections);
+            setDetectionConfirmed(true);
+            setDetectionResults(displayDetections);
             setDetectionStatus('success');
-            setUserGuidance(`Perfect! ${detections.length} face(s) detected. Ready to take photo!`);
-            drawDetections(detections);
+            setUserGuidance(`Perfect! Face detected and locked. Ready to take photo!`);
+            drawDetections(displayDetections);
+          } else if (detectionConfirmed && persistentDetection.length > 0) {
+            // Keep showing the last confirmed detection for stability
+            setDetectionResults(persistentDetection);
+            setDetectionStatus('success');
+            setUserGuidance(`Face locked and stable. Ready to take photo!`);
+            drawDetections(persistentDetection);
           } else {
             setDetectionStatus('error');
             setUserGuidance('No face detected. Please position your face in the center and ensure good lighting.');
             
-            // Clear canvas if no detections
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Only clear after a longer period of no detections
+            if (detectionHistory.length > 5 && detectionHistory.slice(-5).every(dets => dets.length === 0)) {
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+              }
+              setPersistentDetection([]);
+              setDetectionConfirmed(false);
             }
           }
         } catch (error) {
           console.error('Detection loop error:', error);
         }
 
-        // Continue detection loop with reduced frequency
+        // Continue detection loop with ultra-stable frequency (eliminate flickering)
         setTimeout(() => {
           if (continueDetection) {
             requestAnimationFrame(detectLoop);
           }
-        }, 100);
+        }, 500); // Increased to 500ms for ultra-maximum stability
       };
 
       // Store cleanup function
@@ -429,30 +511,45 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       formData.append('file', blob, 'face.jpg');
       formData.append('wedding_name', selectedWedding); // Send selected wedding name
 
-      const response = await fetch('/api/recognize', {
+      console.log('🔍 Calling Find My Photos API...');
+      console.log('Wedding:', selectedWedding);
+      console.log('Image size:', blob.size, 'bytes');
+      
+      const response = await fetch('http://localhost:5001/api/recognize', {
         method: 'POST',
         body: formData,
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to find matching photos.');
+        const errorText = await response.text();
+        console.error('❌ API Error:', response.status, errorText);
+        throw new Error(`API Error (${response.status}): ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ API Response:', data);
+      
       if (data.matches && data.matches.length > 0) {
+        console.log('📸 Found photos:', data.matches);
         setSearchResults(data.matches);
         setShowFaceSearch(true);
         setUserGuidance(`Found ${data.matches.length} matching photos!`);
       } else {
+        console.log('❌ No photos found in response');
         setSearchError('No matching photos found for this face in the selected wedding.');
         setUserGuidance('No matching photos found.');
       }
 
     } catch (error: any) {
-      console.error('❌ Error during face search:', error);
-      setSearchError(error.message || 'An unexpected error occurred during search.');
-      setUserGuidance('Face search failed. Please try again.');
+      console.error('❌ Face search error:', error);
+      console.error('❌ Error type:', typeof error);
+      console.error('❌ Error message:', error?.message);
+      
+      const errorMsg = error?.message || 'Network error or API unavailable';
+      setSearchError(errorMsg);
+      setUserGuidance(`Search failed: ${errorMsg}`);
     } finally {
       setIsSearching(false);
     }
