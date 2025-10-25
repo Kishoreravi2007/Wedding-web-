@@ -31,9 +31,21 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const app = express();
 const PORT = process.env.PORT || 5001; // Changed from 5000 to avoid macOS AirPlay conflict
 
-// Configure CORS for frontend-backend communication
+// Configure CORS for frontend-backend communication (local + deployed)
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:5173'],
+  origin: [
+    // Local development URLs
+    'http://localhost:3000', 
+    'http://localhost:3001', 
+    'http://localhost:3002', 
+    'http://localhost:3003', 
+    'http://localhost:5173',
+    // Deployed frontend URLs (add your deployed domain)
+    'https://weddingweb.co.in',
+    'https://www.weddingweb.co.in',
+    // Add any other deployed URLs you use
+    process.env.FRONTEND_URL, // Environment variable for dynamic URLs
+  ].filter(Boolean), // Remove undefined values
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -83,7 +95,8 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
     // For now, return sample matching photos based on wedding selection
     // This is a placeholder - in production you'd use face recognition
     // Convert file paths to full URLs that the frontend can access
-    const baseUrl = `http://localhost:${PORT}`;
+    // Use environment variable for deployed URL or fallback to localhost
+    const baseUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
     const samplePhotos = wedding_name === 'sister_a' 
       ? [
           `${baseUrl}/uploads/wedding_gallery/sister_a/IMG_0309_Original.heic`,
