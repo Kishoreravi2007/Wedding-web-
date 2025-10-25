@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { supabase } = require('./server'); // Import supabase client
+// Import supabase client (fix circular dependency)
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+  process.env.SUPABASE_URL || '', 
+  process.env.SUPABASE_ANON_KEY || ''
+);
 const { PhotoDB } = require('./lib/supabase-db'); // Import PhotoDB
 
 // Multer configuration for in-memory storage
