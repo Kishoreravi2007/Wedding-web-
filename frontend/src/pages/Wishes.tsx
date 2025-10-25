@@ -52,8 +52,8 @@ const Wishes = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-red-100 p-4">
         <div className="text-center text-red-800">
-          <h1 className="text-2xl font-bold">Configuration Error</h1>
-          <p>The password for the wishes page is not set. Please contact the developer.</p>
+          <h1 className="text-2xl font-bold">{t('configurationError')}</h1>
+          <p>{t('passwordNotSet')}</p>
         </div>
       </div>
     );
@@ -66,19 +66,19 @@ const Wishes = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-center font-heading text-3xl text-[#5D4037]">
-                View Wishes
+                {t('viewWishes')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Input
                 id="password-input"
                 type="password"
-                placeholder="Enter password"
+                placeholder={t('enterPassword')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               <Button type="submit" className="w-full bg-[#5D4037] hover:bg-[#4E342E] text-white">
-                Unlock
+                {t('unlock')}
               </Button>
             </CardContent>
           </Card>
@@ -93,35 +93,35 @@ const Wishes = () => {
 
   return (
     <div className="min-h-screen bg-[#FFF8E1] p-4 md:p-8">
-      <h1 className="font-heading text-5xl text-center my-8 text-[#5D4037]">Guest Wishes</h1>
+      <h1 className="font-heading text-5xl text-center my-8 text-[#5D4037]">{t('guestWishes')}</h1>
       {loading ? (
-        <p className="text-center">Loading wishes...</p>
+        <p className="text-center">{t('loadingWishes')}</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <div>
-            <h2 className="font-heading text-4xl text-center mb-4 text-[#8C3B3B]">For Parvathy C</h2>
+            <h2 className="font-heading text-4xl text-center mb-4 text-[#8C3B3B]">{t('forParvathyC')}</h2>
             <div className="space-y-4">
               {parvathyWishes.length > 0 ? parvathyWishes.map(wish => (
                 <Card key={wish.id} className="bg-white/80">
                   <CardContent className="p-4">
                     <p className="text-stone-700">"{wish.wish}"</p>
-                    <p className="text-right text-stone-500 mt-2">- {wish.name || 'Anonymous'}</p>
+                    <p className="text-right text-stone-500 mt-2">- {wish.name || t('anonymous')}</p>
                   </CardContent>
                 </Card>
-              )) : <p className="text-center text-stone-500">No wishes yet.</p>}
+              )) : <p className="text-center text-stone-500">{t('noWishesYet')}</p>}
             </div>
           </div>
           <div>
-            <h2 className="font-heading text-4xl text-center mb-4 text-[#1B5E20]">For Sreedevi C</h2>
+            <h2 className="font-heading text-4xl text-center mb-4 text-[#1B5E20]">{t('forSreedeviC')}</h2>
             <div className="space-y-4">
               {sreedeviWishes.length > 0 ? sreedeviWishes.map(wish => (
                 <Card key={wish.id} className="bg-white/80">
                   <CardContent className="p-4">
                     <p className="text-stone-700">"{wish.wish}"</p>
-                    <p className="text-right text-stone-500 mt-2">- {wish.name || 'Anonymous'}</p>
+                    <p className="text-right text-stone-500 mt-2">- {wish.name || t('anonymous')}</p>
                   </CardContent>
                 </Card>
-              )) : <p className="text-center text-stone-500">No wishes yet.</p>}
+              )) : <p className="text-center text-stone-500">{t('noWishesYet')}</p>}
             </div>
           </div>
         </div>
