@@ -515,7 +515,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       console.log('Wedding:', selectedWedding);
       console.log('Image size:', blob.size, 'bytes');
       
-      const response = await fetch('http://localhost:5001/api/recognize', {
+      // Use environment variable for API URL (works in both local and deployed)
+      const apiUrl = process.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      const response = await fetch(`${apiUrl}/api/recognize`, {
         method: 'POST',
         body: formData,
       });
