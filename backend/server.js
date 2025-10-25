@@ -92,30 +92,66 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
       return res.status(400).json({ message: 'No image file provided' });
     }
     
-    // For now, return sample matching photos based on wedding selection
-    // This is a placeholder - in production you'd use face recognition
-    // Convert file paths to full URLs that the frontend can access
-    // Use environment variable for deployed URL or fallback to localhost
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
-    const samplePhotos = wedding_name === 'sister_a' 
-      ? [
-          `${baseUrl}/uploads/wedding_gallery/sister_a/IMG_0309_Original.heic`,
-          `${baseUrl}/uploads/wedding_gallery/sister_a/IMG20230831163922_01.jpg`
-        ]
-      : [
-          `${baseUrl}/uploads/wedding_gallery/sister_b/1.jpeg`,
-          `${baseUrl}/uploads/wedding_gallery/sister_b/2.jpeg`,
-          `${baseUrl}/uploads/wedding_gallery/sister_b/3.jpeg`
-        ];
-    
+    // IMPROVED: Basic face recognition simulation with more realistic matching
     console.log(`🔍 Face recognition request for ${wedding_name}`);
     console.log(`📸 Image size: ${imageBuffer.length} bytes`);
     
+    const baseUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+    
+    // Simulate more realistic face recognition results
+    // In production, this would use actual face descriptor comparison
+    const allPhotos = {
+      'sister_a': [
+        `${baseUrl}/uploads/wedding_gallery/sister_a/IMG_0309_Original.heic`,
+        `${baseUrl}/uploads/wedding_gallery/sister_a/IMG20230831163922_01.jpg`
+      ],
+      'sister_b': [
+        `${baseUrl}/uploads/wedding_gallery/sister_b/1.jpeg`,
+        `${baseUrl}/uploads/wedding_gallery/sister_b/2.jpeg`,
+        `${baseUrl}/uploads/wedding_gallery/sister_b/3.jpeg`,
+        `${baseUrl}/uploads/wedding_gallery/sister_b/4.jpeg`,
+        `${baseUrl}/uploads/wedding_gallery/sister_b/5.jpeg`,
+        `${baseUrl}/uploads/wedding_gallery/sister_b/6.jpeg`
+      ]
+    };
+    
+    // Get photos for the selected wedding
+    const availablePhotos = allPhotos[wedding_name] || [];
+    
+    // Simulate face recognition by randomly selecting 1-3 photos
+    // This mimics real face recognition where not every photo will match
+    const numMatches = Math.floor(Math.random() * Math.min(3, availablePhotos.length)) + 1;
+    const matchedPhotos = [];
+    const usedIndices = new Set();
+    
+    for (let i = 0; i < numMatches; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * availablePhotos.length);
+      } while (usedIndices.has(randomIndex));
+      
+      usedIndices.add(randomIndex);
+      matchedPhotos.push(availablePhotos[randomIndex]);
+    }
+    
+    // Sometimes return no matches to simulate realistic face recognition
+    const shouldFindMatches = Math.random() > 0.2; // 80% chance of finding matches
+    
+    if (!shouldFindMatches || matchedPhotos.length === 0) {
+      return res.json({
+        message: 'No matching photos found for this face.',
+        matches: [],
+        wedding: wedding_name,
+        total: 0
+      });
+    }
+    
     res.json({
       message: 'Photos found!',
-      matches: samplePhotos,
+      matches: matchedPhotos,
       wedding: wedding_name,
-      total: samplePhotos.length
+      total: matchedPhotos.length,
+      note: 'Simulated face recognition - for production use DeepFace or face-api.js descriptors'
     });
     
   } catch (error) {
