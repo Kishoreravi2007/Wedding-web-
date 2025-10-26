@@ -8,7 +8,7 @@ const data = JSON.stringify({
 
 const options = {
   hostname: 'localhost',
-  port: 5000,
+  port: 5001,
   path: '/api/auth/register',
   method: 'POST',
   headers: {

@@ -180,49 +180,56 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   const [downloadedPhotos, setDownloadedPhotos] = useState<Set<string>>(new Set());
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-  // Memoize the initial photos based on galleryPath
-  const initialPhotos = useMemo(() => {
-    if (!galleryPath) return [];
+  // Fetch photos from backend API
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      if (!galleryPath) return;
+      
+      try {
+        // Determine sister parameter from gallery path
+        const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
+        
+        // Fetch photos from backend
+        const response = await fetch(`${API_BASE_URL}/api/photos-local?sister=${sister}`);
+        
+        if (!response.ok) {
+          console.error('Failed to fetch photos:', response.status);
+          return;
+        }
+        
+        const photosData = await response.json();
+        
+        // Map backend response to Photo format
+        const mappedPhotos = photosData.map((photo: any, index: number) => ({
+          id: photo.id || `photo-${index}`,
+          url: photo.public_url || photo.url,
+          thumbnail: photo.thumbnail || photo.public_url || photo.url,
+          title: photo.filename || `Photo ${index + 1}`,
+          description: photo.description || '',
+          tags: photo.tags || ['wedding', 'celebration'],
+          event: photo.sister === 'sister-a' ? 'Wedding' : 'Engagement',
+          date: photo.uploadedAt || new Date().toISOString(),
+          views: Math.floor(Math.random() * 200) + 50,
+          downloads: Math.floor(Math.random() * 50) + 10,
+          photographer: 'Wedding Photographer',
+          faces: [],
+          timestamp: photo.uploadedAt ? new Date(photo.uploadedAt) : new Date(),
+        }));
+        
+        setPhotos(mappedPhotos);
+      } catch (error) {
+        console.error('Error fetching photos:', error);
+      }
+    };
     
-    // Map gallery path to actual backend folder path
-    let actualPath = '';
-    let imageNames: string[] = [];
-    let eventType = 'Wedding';
-    let tags = ['wedding', 'celebration'];
+    // Initial fetch
+    fetchPhotos();
     
-    if (galleryPath === '/sister-a-gallery') {
-      actualPath = `${API_BASE_URL}/uploads/wedding_gallery/sister_a`;
-      imageNames = ['IMG_0309_Original.heic', 'IMG20230831163922_01.jpg'];
-      eventType = 'Wedding';
-      tags = ['wedding', 'celebration'];
-    } else if (galleryPath === '/sister-b-gallery') {
-      actualPath = `${API_BASE_URL}/uploads/wedding_gallery/sister_b`;
-      imageNames = [
-        '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg',
-        '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg',
-        '13.jpeg', '14.jpeg', '15.jpeg'
-      ];
-      eventType = 'Engagement';
-      tags = ['engagement', 'celebration'];
-    } else {
-      return [];
-    }
-
-    return imageNames.map((name, index) => ({
-      id: `${index + 1}`,
-      url: `${actualPath}/${name}`,
-      thumbnail: `${actualPath}/${name}`,
-      title: `Photo ${index + 1}`,
-      description: '',
-      tags: tags,
-      event: eventType,
-      date: '2026-01-04',
-      views: Math.floor(Math.random() * 200) + 50,
-      downloads: Math.floor(Math.random() * 50) + 10,
-      photographer: 'Wedding Photographer',
-      faces: [],
-      timestamp: new Date('2026-01-04'),
-    }));
+    // Auto-refresh every 30 seconds to check for new photos
+    const intervalId = setInterval(fetchPhotos, 30000);
+    
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, [galleryPath]);
 
   // Memoize uploaded photo objects based on uploadedPhotos
@@ -246,13 +253,12 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
     }));
   }, [uploadedPhotos]);
 
+  // Add uploaded photos to the existing photos
   useEffect(() => {
-    const combinedPhotos = [...uploadedPhotoObjects, ...initialPhotos];
-    // Deep comparison to prevent infinite re-renders if content is the same but reference changes
-    if (JSON.stringify(combinedPhotos) !== JSON.stringify(photos)) {
-      setPhotos(combinedPhotos);
+    if (uploadedPhotoObjects.length > 0) {
+      setPhotos(prev => [...uploadedPhotoObjects, ...prev]);
     }
-  }, [initialPhotos, uploadedPhotoObjects, photos]); // Keep photos in dependency array for deep comparison
+  }, [uploadedPhotoObjects]);
 
   // Filter photos based on search
   useEffect(() => {

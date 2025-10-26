@@ -6,9 +6,10 @@ import PhotoGallery from '@/components/PhotoGallery'; // Use the full PhotoGalle
 import PeopleManager from '@/components/PeopleManager';
 import PhotoUpload from '@/components/PhotoUpload'; // Import PhotoUpload
 import { PhotoUploadSimple } from '@/components/PhotoUpload-simple'; // Import PhotoUploadSimple
+import PhotoManager from './PhotoManager'; // Import PhotoManager
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star } from 'lucide-react';
+import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star, Trash2 } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
 import { Label } from '@/components/ui/label'; // Import Label
@@ -48,6 +49,95 @@ const PhotographerDashboard = () => {
     }
   }, [content]);
 
+  // Load all existing photos on component mount
+  useEffect(() => {
+    const loadAllPhotos = async () => {
+      try {
+        console.log('Loading all photos from API...');
+        
+        // Fetch photos from both galleries
+        const [sisterAResponse, sisterBResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/photos-local?sister=sister-a`),
+          fetch(`${API_BASE_URL}/api/photos-local?sister=sister-b`)
+        ]);
+
+        if (!sisterAResponse.ok || !sisterBResponse.ok) {
+          console.error('Failed to fetch photos');
+          return;
+        }
+
+        const sisterAPhotos = await sisterAResponse.json();
+        const sisterBPhotos = await sisterBResponse.json();
+        const allPhotos = [...sisterAPhotos, ...sisterBPhotos];
+
+        console.log(`Loaded ${allPhotos.length} total photos (${sisterAPhotos.length} Sister A, ${sisterBPhotos.length} Sister B)`);
+
+        // Map to PhotoType format
+        const mappedPhotos: PhotoType[] = allPhotos.map((photo: any) => ({
+          id: photo.id,
+          url: photo.public_url || photo.url,
+          thumbnail: photo.thumbnail || photo.public_url || photo.url,
+          title: photo.filename,
+          description: '',
+          tags: [],
+          event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B',
+          date: photo.uploadedAt || new Date().toISOString(),
+          views: 0,
+          downloads: 0,
+          photographer: 'Photographer',
+          faces: [],
+          timestamp: photo.uploadedAt ? new Date(photo.uploadedAt) : new Date(),
+        }));
+
+        setUploadedPhotos(mappedPhotos);
+
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          totalPhotos: allPhotos.length,
+          uploadedToday: allPhotos.filter((p: any) => {
+            const uploadDate = new Date(p.uploadedAt);
+            const today = new Date();
+            return uploadDate.toDateString() === today.toDateString();
+          }).length
+        }));
+
+        // Set recent uploads (last 5 photos sorted by date)
+        const sortedPhotos = [...allPhotos].sort((a: any, b: any) => 
+          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        ).slice(0, 5);
+
+        setRecentUploads(sortedPhotos.map((photo: any) => ({
+          id: photo.id,
+          name: photo.filename,
+          size: formatFileSize(photo.size || 0),
+          uploadTime: getTimeAgo(photo.uploadedAt),
+          event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B'
+        })));
+
+      } catch (error) {
+        console.error('Error loading photos:', error);
+      }
+    };
+
+    loadAllPhotos();
+  }, []);
+
+  // Helper function to get time ago
+  const getTimeAgo = (date: string | Date): string => {
+    const now = new Date();
+    const uploadDate = new Date(date);
+    const diffMs = now.getTime() - uploadDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
+
   // Photography statistics
   const [stats, setStats] = useState({
     totalPhotos: 0,
@@ -82,33 +172,38 @@ const PhotographerDashboard = () => {
 
   const handlePhotoUploadSuccess = (photoId: string) => {
     // Fetch the newly uploaded photo and add it to the state
-    fetch(`${API_BASE_URL}/api/photos`, {
+    fetch(`${API_BASE_URL}/api/photos-local`, {
       headers: getAuthHeaders()
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch photos');
+        }
+        return response.json();
+      })
       .then(photos => {
         const newPhoto = photos.find((p: any) => p.id === photoId);
         if (newPhoto) {
           const mappedPhoto: PhotoType = {
             id: newPhoto.id,
-            url: newPhoto.publicUrl,
-            thumbnail: newPhoto.publicUrl,
+            url: newPhoto.public_url || newPhoto.url,
+            thumbnail: newPhoto.thumbnail || newPhoto.public_url || newPhoto.url,
             title: newPhoto.filename,
             description: '',
             tags: [],
-            event: newPhoto.sister,
-            date: newPhoto.uploadedAt._seconds ? new Date(newPhoto.uploadedAt._seconds * 1000).toISOString() : new Date().toISOString(),
+            event: newPhoto.sister === 'sister-a' ? 'Sister A' : 'Sister B',
+            date: newPhoto.uploadedAt || new Date().toISOString(),
             views: 0,
             downloads: 0,
             photographer: 'Photographer',
             faces: [],
-            timestamp: newPhoto.uploadedAt._seconds ? new Date(newPhoto.uploadedAt._seconds * 1000) : new Date(),
+            timestamp: newPhoto.uploadedAt ? new Date(newPhoto.uploadedAt) : new Date(),
           };
           setUploadedPhotos(prev => [mappedPhoto, ...prev]);
           setRecentUploads(prev => [{
             id: mappedPhoto.id,
             name: mappedPhoto.title,
-            size: '2.5 MB',
+            size: formatFileSize(newPhoto.size || 0),
             uploadTime: 'Just now',
             event: mappedPhoto.event
           }, ...prev].slice(0, 5));
@@ -119,11 +214,60 @@ const PhotographerDashboard = () => {
           }));
         }
       })
-      .catch(error => console.error('Error fetching uploaded photo:', error));
+      .catch(error => {
+        console.error('Error fetching uploaded photo:', error);
+        // Don't break the app if fetch fails
+      });
+  };
+  
+  // Helper function to format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const handleUpdatePhoto = (photoId: string, updates: Partial<PhotoType>) => {
     setUploadedPhotos(prev => prev.map(p => p.id === photoId ? { ...p, ...updates } : p));
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    if (!confirm('Are you sure you want to delete this photo? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/photos-local/${photoId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete photo');
+      }
+
+      // Remove from uploadedPhotos state
+      setUploadedPhotos(prev => prev.filter(p => p.id !== photoId));
+      
+      // Remove from recentUploads state
+      setRecentUploads(prev => prev.filter(u => u.id !== photoId));
+
+      // Update statistics
+      setStats(prev => ({
+        ...prev,
+        totalPhotos: Math.max(0, prev.totalPhotos - 1),
+        uploadedToday: Math.max(0, prev.uploadedToday - 1)
+      }));
+
+      showSuccess('Photo deleted successfully!');
+      console.log(`✅ Photo ${photoId} deleted successfully`);
+
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      alert('Failed to delete photo. Please try again.');
+    }
   };
 
   if (isLoading) {
@@ -224,7 +368,7 @@ const PhotographerDashboard = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Upload Photos
@@ -233,9 +377,13 @@ const PhotographerDashboard = () => {
               <Eye className="w-4 h-4" />
               Recent Uploads
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="flex items-center gap-2">
+            <TabsTrigger value="manage" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
-              Photo Gallery
+              Manage Photos
+            </TabsTrigger>
+            <TabsTrigger value="gallery" className="flex items-center gap-2">
+              <Camera className="w-4 h-4" />
+              Gallery View
             </TabsTrigger>
           </TabsList>
 
@@ -284,35 +432,88 @@ const PhotographerDashboard = () => {
                     <p>No recent uploads yet. Upload some photos to see them here!</p>
                   </div>
                 ) : (
-                  recentUploads.map((upload) => (
-                  <Card key={upload.id} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <Image className="w-6 h-6 text-gray-500" />
+                  recentUploads.map((upload) => {
+                    // Find the full photo object for this upload
+                    const fullPhoto = uploadedPhotos.find(p => p.id === upload.id);
+                    
+                    return (
+                      <Card key={upload.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            {fullPhoto && fullPhoto.thumbnail ? (
+                              <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                                <img 
+                                  src={fullPhoto.thumbnail} 
+                                  alt={upload.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <Image className="w-6 h-6 text-gray-500" />
+                              </div>
+                            )}
+                            <div>
+                              <h3 className="font-medium text-gray-900">{upload.name}</h3>
+                              <p className="text-sm text-gray-600">{upload.size} • {upload.uploadTime}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline">{upload.event}</Badge>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  if (fullPhoto?.url) {
+                                    window.open(fullPhoto.url, '_blank');
+                                  }
+                                }}
+                                title="View photo"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  if (fullPhoto?.url) {
+                                    const link = document.createElement('a');
+                                    link.href = fullPhoto.url;
+                                    link.download = upload.name;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  }
+                                }}
+                                title="Download photo"
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => handleDeletePhoto(upload.id)}
+                                title="Delete photo"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">{upload.name}</h3>
-                          <p className="text-sm text-gray-600">{upload.size} • {upload.uploadTime}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline">{upload.event}</Badge>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Download className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                  ))
+                      </Card>
+                    );
+                  })
                 )}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="manage" className="space-y-6">
+            <PhotoManager />
           </TabsContent>
 
           <TabsContent value="gallery" className="space-y-6">
