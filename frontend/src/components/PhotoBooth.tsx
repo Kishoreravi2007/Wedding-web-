@@ -457,26 +457,38 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
   // Capture face for searching and send to backend
   const captureFaceForSearch = useCallback(async () => {
+    console.log('🔍 captureFaceForSearch called');
+    console.log('Video ref:', videoRef.current ? 'Available' : 'Not available');
+    console.log('Models loaded:', isModelLoaded);
+    console.log('Detection results:', detectionResults.length);
+    
     const video = videoRef.current;
     if (!video) {
-      setUserGuidance('Camera not available. Please start the camera first.');
+      const msg = 'Camera not available. Please start the camera first.';
+      setUserGuidance(msg);
+      alert(msg);
       return;
     }
 
     if (!isModelLoaded) {
-      setUserGuidance('Face detection models are still loading. Please wait...');
+      const msg = 'Face detection models are still loading. Please wait...';
+      setUserGuidance(msg);
+      alert(msg);
       return;
     }
 
     if (detectionResults.length === 0) {
-      setUserGuidance('No face detected. Please ensure your face is clearly visible before searching.');
+      const msg = 'No face detected. Please ensure your face is clearly visible before searching.';
+      setUserGuidance(msg);
+      alert(msg);
       return;
     }
 
+    console.log('✅ All checks passed, proceeding with face capture...');
     setIsSearching(true);
     setSearchResults([]);
     setSearchError(null);
-    setUserGuidance('Searching your wedding memories...');
+    setUserGuidance('Capturing your face...');
 
     try {
       // Create a temporary canvas to draw the detected face
@@ -511,10 +523,12 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       // Get the image data as a base64 string
       const imageData = tempCanvas.toDataURL('image/jpeg', 0.9);
       setCapturedFaceImage(imageData); // Store for display
+      
+      console.log('✅ Face captured - showing preview modal');
+      console.log('Captured face image size:', imageData.length, 'bytes');
+      
       setShowFacePreview(true); // Show preview for user confirmation
       setUserGuidance('Is this your face? Click "Confirm & Search" or "Retry" if wrong.');
-
-      console.log('✅ Face captured - waiting for user confirmation');
       
       // Don't search yet - wait for user to confirm via the preview modal
       
@@ -522,6 +536,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       console.error('❌ Face capture error:', error);
       setSearchError(error instanceof Error ? error.message : 'Failed to capture face');
       setUserGuidance('Failed to capture face. Please try again.');
+      alert('Failed to capture face: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSearching(false);
     }
@@ -946,9 +961,18 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       </Card>
 
       {/* Face Preview Confirmation Modal */}
+      {(() => {
+        console.log('🖼️ Modal render check:', { 
+          showFacePreview, 
+          hasCapturedImage: !!capturedFaceImage,
+          imageLength: capturedFaceImage?.length || 0 
+        });
+        return null;
+      })()}
+      
       {showFacePreview && capturedFaceImage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+          <Card className="w-full max-w-md shadow-2xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-6 h-6" />
@@ -963,6 +987,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                   alt="Captured face" 
                   className="rounded-lg border-4 border-blue-500 max-w-full h-auto"
                   style={{ maxHeight: '300px' }}
+                  onError={() => console.error('Image failed to render')}
+                  onLoad={() => console.log('✅ Preview image loaded successfully')}
                 />
               </div>
               
