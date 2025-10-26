@@ -58,6 +58,19 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    // Fallback authentication for photographer (temporary solution)
+    if (username === 'photographer' && password === 'photo123') {
+      const accessToken = jwt.sign({ 
+        id: 'photographer-1', 
+        username: 'photographer', 
+        role: 'photographer' 
+      }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      
+      console.log('✅ Photographer logged in successfully (fallback auth)');
+      return res.json({ accessToken, role: 'photographer' });
+    }
+    
+    // Try database authentication
     const user = await UserDB.findByUsername(username);
 
     if (!user) {

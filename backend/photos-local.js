@@ -5,28 +5,8 @@ const path = require('path');
 const fs = require('fs').promises;
 
 // Configure multer for local file storage
-const storage = multer.diskStorage({
-  destination: async function (req, file, cb) {
-    const sister = req.body.sister;
-    const uploadDir = path.join(__dirname, '../uploads/wedding_gallery', sister.replace('-', '_'));
-    
-    // Ensure directory exists
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-    } catch (error) {
-      console.error('Error creating upload directory:', error);
-    }
-    
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    const basename = path.basename(file.originalname, ext);
-    cb(null, `${basename}_${uniqueSuffix}${ext}`);
-  }
-});
+// Use memory storage first, then save to disk after we know the sister value
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -96,8 +76,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST upload photos to local filesystem
-router.post('/', upload.single('photo'), async (req, res) => {
+// POST upload photos to local filesystem (requires authentication)
+router.post('/', (req, res, next) => {
+  // Import authenticateToken from auth module
+  const { authenticateToken } = require('./auth');
+  authenticateToken(req, res, next);
+}, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No photo file uploaded.' });
@@ -105,19 +89,33 @@ router.post('/', upload.single('photo'), async (req, res) => {
     
     const { sister } = req.body;
     if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
-      // Clean up uploaded file if validation fails
-      await fs.unlink(req.file.path).catch(() => {});
       return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
     }
 
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+    // Now save the file from memory to disk
     const galleryName = sister.replace('-', '_');
-    const publicUrl = `${baseUrl}/uploads/wedding_gallery/${galleryName}/${req.file.filename}`;
+    const uploadDir = path.join(__dirname, '../uploads/wedding_gallery', galleryName);
+    
+    // Ensure directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    // Generate unique filename
+    const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(req.file.originalname);
+    const basename = path.basename(req.file.originalname, ext);
+    const filename = `${basename}_${uniqueSuffix}${ext}`;
+    const filePath = path.join(uploadDir, filename);
+    
+    // Write file to disk
+    await fs.writeFile(filePath, req.file.buffer);
+
+    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+    const publicUrl = `${baseUrl}/uploads/wedding_gallery/${galleryName}/${filename}`;
     
     const photoData = {
-      id: `${galleryName}_${req.file.filename}`,
+      id: `${galleryName}_${filename}`,
       filename: req.file.originalname,
-      file_path: `${galleryName}/${req.file.filename}`,
+      file_path: `${galleryName}/${filename}`,
       public_url: publicUrl,
       url: publicUrl,
       thumbnail: publicUrl,
@@ -128,16 +126,17 @@ router.post('/', upload.single('photo'), async (req, res) => {
       storage_provider: 'local'
     };
     
-    console.log(`✅ Photo uploaded successfully: ${req.file.filename} to ${sister} gallery`);
+    console.log(`✅ Photo uploaded successfully: ${filename} to ${sister} gallery`);
+    
+    // Trigger automatic face detection (non-blocking)
+    const autoFaceDetection = require('./services/auto-face-detection');
+    autoFaceDetection.triggerFaceDetection(sister).catch(error => {
+      console.error('Background face detection error:', error.message);
+    });
     
     res.status(201).json(photoData);
   } catch (error) {
     console.error('Error uploading photo:', error);
-    
-    // Clean up file if there was an error
-    if (req.file && req.file.path) {
-      await fs.unlink(req.file.path).catch(() => {});
-    }
     
     if (!res.headersSent) {
       res.status(500).json({ message: 'Error uploading photo.', error: error.message });
@@ -145,8 +144,11 @@ router.post('/', upload.single('photo'), async (req, res) => {
   }
 });
 
-// POST upload multiple photos at once
-router.post('/batch', upload.array('photos', 50), async (req, res) => {
+// POST upload multiple photos at once (requires authentication)
+router.post('/batch', (req, res, next) => {
+  const { authenticateToken } = require('./auth');
+  authenticateToken(req, res, next);
+}, upload.array('photos', 50), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'No photos uploaded.' });
@@ -154,31 +156,50 @@ router.post('/batch', upload.array('photos', 50), async (req, res) => {
     
     const { sister } = req.body;
     if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
-      // Clean up uploaded files
-      for (const file of req.files) {
-        await fs.unlink(file.path).catch(() => {});
-      }
       return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
     }
 
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
     const galleryName = sister.replace('-', '_');
+    const uploadDir = path.join(__dirname, '../uploads/wedding_gallery', galleryName);
     
-    const uploadedPhotos = req.files.map(file => ({
-      id: `${galleryName}_${file.filename}`,
-      filename: file.originalname,
-      file_path: `${galleryName}/${file.filename}`,
-      public_url: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${file.filename}`,
-      url: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${file.filename}`,
-      thumbnail: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${file.filename}`,
-      size: file.size,
-      mimetype: file.mimetype,
-      sister: sister,
-      uploadedAt: new Date(),
-      storage_provider: 'local'
-    }));
+    // Ensure directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+    const uploadedPhotos = [];
+    
+    // Save each file from memory to disk
+    for (const file of req.files) {
+      const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(file.originalname);
+      const basename = path.basename(file.originalname, ext);
+      const filename = `${basename}_${uniqueSuffix}${ext}`;
+      const filePath = path.join(uploadDir, filename);
+      
+      await fs.writeFile(filePath, file.buffer);
+      
+      uploadedPhotos.push({
+        id: `${galleryName}_${filename}`,
+        filename: file.originalname,
+        file_path: `${galleryName}/${filename}`,
+        public_url: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${filename}`,
+        url: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${filename}`,
+        thumbnail: `${baseUrl}/uploads/wedding_gallery/${galleryName}/${filename}`,
+        size: file.size,
+        mimetype: file.mimetype,
+        sister: sister,
+        uploadedAt: new Date(),
+        storage_provider: 'local'
+      });
+    }
     
     console.log(`✅ ${uploadedPhotos.length} photos uploaded successfully to ${sister} gallery`);
+    
+    // Trigger automatic face detection (non-blocking)
+    const autoFaceDetection = require('./services/auto-face-detection');
+    autoFaceDetection.triggerFaceDetection(sister).catch(error => {
+      console.error('Background face detection error:', error.message);
+    });
     
     res.status(201).json({
       message: `${uploadedPhotos.length} photos uploaded successfully`,
@@ -187,21 +208,17 @@ router.post('/batch', upload.array('photos', 50), async (req, res) => {
   } catch (error) {
     console.error('Error uploading photos:', error);
     
-    // Clean up files if there was an error
-    if (req.files) {
-      for (const file of req.files) {
-        await fs.unlink(file.path).catch(() => {});
-      }
-    }
-    
     if (!res.headersSent) {
       res.status(500).json({ message: 'Error uploading photos.', error: error.message });
     }
   }
 });
 
-// DELETE a photo from local filesystem
-router.delete('/:id', async (req, res) => {
+// DELETE a photo from local filesystem (requires authentication)
+router.delete('/:id', (req, res, next) => {
+  const { authenticateToken } = require('./auth');
+  authenticateToken(req, res, next);
+}, async (req, res) => {
   try {
     const { id } = req.params;
     

@@ -29,7 +29,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const app = express();
-const PORT = process.env.PORT || 5001; // Changed from 5000 to avoid macOS AirPlay conflict
+const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
 
 // Configure CORS for frontend-backend communication (local + deployed)
 app.use(cors({
@@ -70,8 +70,9 @@ const photosRouter = require('./photos');
 app.use('/api/photos', authenticateToken, photosRouter);
 
 // Local filesystem photo uploads (primary upload endpoint)
+// Note: GET requests are public (for gallery), POST/DELETE require authentication
 const photosLocalRouter = require('./photos-local');
-app.use('/api/photos-local', authenticateToken, photosLocalRouter);
+app.use('/api/photos-local', photosLocalRouter);
 
 // Enhanced photos API with face detection
 const photosEnhancedRouter = require('./photos-enhanced');
@@ -80,6 +81,10 @@ app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
 // Face recognition API
 const facesRouter = require('./faces');
 app.use('/api/faces', facesRouter);
+
+// Face detection trigger API (automatic processing)
+const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
+app.use('/api/face-detection', faceDetectionTriggerRouter);
 
 // Face recognition endpoint (for frontend compatibility)
 const multer = require('multer');
@@ -182,5 +187,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Backend server running on http://localhost:${PORT}`);
+  console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos-local`);
+  console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
 });

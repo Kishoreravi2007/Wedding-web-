@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
+import { API_BASE_URL } from '@/lib/api'; // Import API_BASE_URL
 
 const PhotographerLogin = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const PhotographerLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         username: credentials.username,
         password: credentials.password,
       });
