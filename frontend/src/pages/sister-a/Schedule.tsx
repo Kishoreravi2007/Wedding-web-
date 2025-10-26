@@ -120,69 +120,29 @@ const SisterASchedule = () => {
   };
 
   const handleAddToCalendar = (event: any, day: any) => {
-    const eventDate = format(new Date(day.date), 'yyyyMMdd');
+    // Use startDateTime and endDateTime from the event object
+    const startDate = event.startDateTime instanceof Date ? event.startDateTime : new Date(event.startDateTime);
+    const endDate = event.endDateTime instanceof Date ? event.endDateTime : (
+      event.endDateTime ? new Date(event.endDateTime) : new Date(startDate.getTime() + 60 * 60 * 1000)
+    );
 
-    // New time parsing logic
-    let timeString = event.time;
-    let startTimeStr;
+    // Format dates for Google Calendar (YYYYMMDDTHHMMSS)
+    const formatCalendarDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+    };
 
-    if (timeString.includes('to')) {
-        startTimeStr = timeString.split('to')[0].trim();
-    } else {
-        startTimeStr = timeString;
-    }
+    const startTime = formatCalendarDate(startDate);
+    const endTime = formatCalendarDate(endDate);
 
-    const timeParts = startTimeStr.split(' ');
-    let time = timeParts[0];
-    let ampm = timeParts[1]; // This might be undefined if the format is "6pm"
-
-    // Check if ampm is attached to the time, e.g., "10pm"
-    if (!ampm) {
-        if (time.toLowerCase().includes('pm')) {
-            ampm = 'PM';
-            time = time.toLowerCase().replace('pm', '');
-        } else if (time.toLowerCase().includes('am')) {
-            ampm = 'AM';
-            time = time.toLowerCase().replace('am', '');
-        }
-    }
-    
-    // If ampm is still not found, check the end of the original string
-    if (!ampm) {
-        const originalTimeLower = timeString.toLowerCase();
-        if (originalTimeLower.endsWith('pm')) {
-            ampm = 'PM';
-        } else if (originalTimeLower.endsWith('am')) {
-            ampm = 'AM';
-        }
-    }
-
-
-    let [hours, minutes] = time.split(':').map(Number);
-    if (isNaN(minutes)) {
-        minutes = 0;
-    }
-
-    // Normalize ampm to uppercase
-    if (ampm) {
-        ampm = ampm.toUpperCase();
-    }
-
-    if (ampm === 'PM' && hours < 12) {
-      hours += 12;
-    }
-    if (ampm === 'AM' && hours === 12) { // Midnight case (12 AM)
-      hours = 0;
-    }
-
-    const startTime = `${hours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}00`;
-    // Assuming event duration is 1 hour for simplicity, adjust as needed
-    const endHours = (hours + 1) % 24;
-    const endTime = `${endHours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}00`;
-
-    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t(event.title))}&dates=${eventDate}T${startTime}/${eventDate}T${endTime}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.venue)}&sf=true&output=xml`;
+    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t(event.title))}&dates=${startTime}/${endTime}&details=${encodeURIComponent(t(event.description || ''))}&location=${encodeURIComponent(t(event.venue))}&sf=true&output=xml`;
     console.log("Google Calendar URL:", googleCalendarUrl);
-    window.open(googleCalendarUrl, '_blank');
+    window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer');
   };
 
   // Map event IDs to their corresponding translation keys for descriptions
