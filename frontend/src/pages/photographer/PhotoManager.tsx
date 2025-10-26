@@ -44,9 +44,12 @@ const PhotoManager: React.FC = () => {
     try {
       setLoading(true);
       
+      // Use /api/photos for production (Supabase), /api/photos-local for development
+      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      
       const [sisterAResponse, sisterBResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/photos-local?sister=sister-a`),
-        fetch(`${API_BASE_URL}/api/photos-local?sister=sister-b`)
+        fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
+        fetch(`${API_BASE_URL}${endpoint}?sister=sister-b`)
       ]);
 
       if (sisterAResponse.ok) {
@@ -57,7 +60,7 @@ const PhotoManager: React.FC = () => {
           url: p.public_url || p.url,
           thumbnail: p.thumbnail || p.public_url || p.url,
           size: p.size,
-          uploadedAt: p.uploadedAt,
+          uploadedAt: p.uploaded_at || p.uploadedAt || p.created_at,
           sister: 'sister-a'
         })));
       }
@@ -70,7 +73,7 @@ const PhotoManager: React.FC = () => {
           url: p.public_url || p.url,
           thumbnail: p.thumbnail || p.public_url || p.url,
           size: p.size,
-          uploadedAt: p.uploadedAt,
+          uploadedAt: p.uploaded_at || p.uploadedAt || p.created_at,
           sister: 'sister-b'
         })));
       }

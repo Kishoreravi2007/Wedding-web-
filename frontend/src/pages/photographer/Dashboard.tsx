@@ -53,9 +53,12 @@ const PhotographerDashboard = () => {
         console.log('Loading all photos from API...');
         
         // Fetch photos from both galleries
+        // Use /api/photos for production (Supabase), /api/photos-local for development
+        const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+        
         const [sisterAResponse, sisterBResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/photos-local?sister=sister-a`),
-          fetch(`${API_BASE_URL}/api/photos-local?sister=sister-b`)
+          fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
+          fetch(`${API_BASE_URL}${endpoint}?sister=sister-b`)
         ]);
 
         if (!sisterAResponse.ok || !sisterBResponse.ok) {
@@ -78,12 +81,12 @@ const PhotographerDashboard = () => {
           description: '',
           tags: [],
           event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B',
-          date: photo.uploadedAt || new Date().toISOString(),
+          date: photo.uploaded_at || photo.uploadedAt || new Date().toISOString(),
           views: 0,
           downloads: 0,
           photographer: 'Photographer',
           faces: [],
-          timestamp: photo.uploadedAt ? new Date(photo.uploadedAt) : new Date(),
+          timestamp: photo.uploaded_at ? new Date(photo.uploaded_at) : (photo.uploadedAt ? new Date(photo.uploadedAt) : new Date()),
         }));
 
         setUploadedPhotos(mappedPhotos);
@@ -169,7 +172,8 @@ const PhotographerDashboard = () => {
 
   const handlePhotoUploadSuccess = (photoId: string) => {
     // Fetch the newly uploaded photo and add it to the state
-    fetch(`${API_BASE_URL}/api/photos-local`, {
+    const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+    fetch(`${API_BASE_URL}${endpoint}`, {
       headers: getAuthHeaders()
     })
       .then(response => {
@@ -236,7 +240,8 @@ const PhotographerDashboard = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/photos-local/${photoId}`, {
+      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      const response = await fetch(`${API_BASE_URL}${endpoint}/${photoId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
