@@ -145,40 +145,42 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
     // Get photo URLs from database
     const photoUrls = photos.map(photo => photo.public_url);
     
-    // TEMPORARY: Return random selection for face matching simulation
-    // TODO: Replace with actual face descriptor comparison when face detection is fully set up
-    const numMatches = Math.min(Math.floor(Math.random() * 3) + 1, photos.length);
-    const matchedPhotos = [];
-    const usedIndices = new Set();
+    // NOTE: For now, return ALL photos from the gallery
+    // Real face matching requires:
+    // 1. Face descriptors to be extracted from all photos (Python script)
+    // 2. Face descriptor from user's selfie to be compared
+    // 3. Database queries to match descriptors
     
-    for (let i = 0; i < numMatches; i++) {
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * photoUrls.length);
-      } while (usedIndices.has(randomIndex));
-      
-      usedIndices.add(randomIndex);
-      matchedPhotos.push(photoUrls[randomIndex]);
+    // Check if any photos have face descriptors
+    const { PhotoFaceDB } = require('./lib/supabase-db');
+    let photosWithFaces = [];
+    
+    try {
+      // Try to find photos with actual face data
+      for (const photo of photos) {
+        const faces = await PhotoFaceDB.findByPhotoId(photo.id);
+        if (faces && faces.length > 0) {
+          photosWithFaces.push(photo.public_url);
+        }
+      }
+    } catch (error) {
+      console.log('⚠️  Face matching not available yet:', error.message);
     }
     
-    // 80% chance of finding matches
-    const shouldFindMatches = Math.random() > 0.2;
-    
-    if (!shouldFindMatches || matchedPhotos.length === 0) {
-      return res.json({
-        message: 'No matching photos found for this face.',
-        matches: [],
-        wedding: wedding_name,
-        total: 0
-      });
-    }
+    // If we have photos with face data, use those (limited set)
+    // Otherwise show all photos from the gallery
+    const matchedPhotos = photosWithFaces.length > 0 
+      ? photosWithFaces.slice(0, 10) // Limit to first 10 with faces
+      : photoUrls.slice(0, 10); // Show first 10 photos overall
     
     res.json({
-      message: 'Photos found!',
+      message: photosWithFaces.length > 0 
+        ? 'Showing photos with detected faces from this wedding.' 
+        : 'Showing all photos from this wedding. (Face matching will be available once face detection is fully configured)',
       matches: matchedPhotos,
       wedding: wedding_name,
       total: matchedPhotos.length,
-      note: 'Using random selection - real face matching requires face detection to be fully configured'
+      note: 'Face matching requires face descriptors to be generated for all photos. Until then, showing gallery photos.'
     });
     
   } catch (error) {
