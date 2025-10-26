@@ -35,6 +35,7 @@ import PhotographerDashboard from "./pages/photographer/Dashboard";
 import PhotographerLogin from "./pages/photographer/Login";
 import CoupleDashboard from "./pages/couple/Dashboard";
 import CoupleLogin from "./pages/couple/Login";
+import FaceDetectionAdmin from "./pages/FaceDetectionAdmin";
 
 const queryClient = new QueryClient();
 
@@ -128,6 +129,7 @@ const App = () => {
               <Route path="/photographer" element={<PhotographerDashboard />} />
               <Route path="/couple-login" element={<CoupleLogin />} />
               <Route path="/couple" element={<CoupleDashboard />} />
+              <Route path="/face-admin" element={<FaceDetectionAdmin />} />
 
               {/* Not Found Route */}
               <Route path="*" element={<NotFound />} />
