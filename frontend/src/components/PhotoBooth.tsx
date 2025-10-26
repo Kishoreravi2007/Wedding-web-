@@ -14,6 +14,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'; // Import Select components
+import { API_BASE_URL } from '@/lib/api'; // Import API_BASE_URL
 
 // Import face-api.js
 import * as faceapi from 'face-api.js';
@@ -515,9 +516,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       console.log('Wedding:', selectedWedding);
       console.log('Image size:', blob.size, 'bytes');
       
-      // Use environment variable for API URL (works in both local and deployed)
-      const apiUrl = process.env.VITE_API_BASE_URL || 'http://localhost:5001';
-      const response = await fetch(`${apiUrl}/api/recognize`, {
+      // Use API_BASE_URL from config (works in both local and deployed)
+      const response = await fetch(`${API_BASE_URL}/api/recognize`, {
         method: 'POST',
         body: formData,
       });
