@@ -56,6 +56,10 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 console.log('📁 Serving static files from:', path.join(__dirname, '../uploads'));
 
+// Serve backend directory for face detection reference images and mappings
+app.use('/backend', express.static(path.join(__dirname)));
+console.log('📁 Serving backend files from:', path.join(__dirname));
+
 const wishesRouter = require('./wishes');
 app.use('/api/wishes', wishesRouter);
 
