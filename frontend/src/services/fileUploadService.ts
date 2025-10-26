@@ -98,7 +98,7 @@ export async function uploadFiles(
       console.log('Uploading file:', file.name, 'to sister:', sister);
       console.log('Using token:', token ? 'Token present' : 'No token');
 
-      const response = await fetch(`${API_BASE_URL}/api/photos`, {
+      const response = await fetch(`${API_BASE_URL}/api/photos-local`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
