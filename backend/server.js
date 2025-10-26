@@ -69,6 +69,10 @@ app.use('/api/auth', authRouter);
 const photosRouter = require('./photos');
 app.use('/api/photos', authenticateToken, photosRouter);
 
+// Local filesystem photo uploads (primary upload endpoint)
+const photosLocalRouter = require('./photos-local');
+app.use('/api/photos-local', authenticateToken, photosLocalRouter);
+
 // Enhanced photos API with face detection
 const photosEnhancedRouter = require('./photos-enhanced');
 app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
