@@ -45,11 +45,16 @@ if (!admin.apps.length) {
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Warning: Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) not fully set. Supabase storage will not be available.');
-}
+let supabase = null;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('⚠️  Warning: Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) not fully set.');
+  console.warn('⚠️  Supabase storage will NOT be available. Photo uploads will fail.');
+  console.warn('⚠️  Please set these environment variables in your Render dashboard.');
+} else {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  console.log('✅ Supabase client initialized successfully');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
