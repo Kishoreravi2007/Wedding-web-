@@ -673,26 +673,54 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             </div>
           )}
 
-          {/* Status and Guidance */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              {detectionStatus === 'success' && <CheckCircle className="w-5 h-5 text-green-500" />}
-              {detectionStatus === 'error' && <AlertCircle className="w-5 h-5 text-red-500" />}
-              {detectionStatus === 'detecting' && <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />}
-              <span className="font-medium">
-                {detectionStatus === 'success' && 'Face Detected!'}
-                {detectionStatus === 'error' && 'No Face Detected'}
-                {detectionStatus === 'detecting' && 'Detecting...'}
-                {detectionStatus === 'idle' && 'Ready'}
-              </span>
+          {/* Face Detection Status - Prominent Visual Indicator */}
+          {isWebcamActive && (
+            <div className={`p-6 rounded-lg border-3 transition-all duration-300 ${
+              detectionResults.length > 0 
+                ? 'bg-green-50 border-green-500 shadow-lg shadow-green-200' 
+                : 'bg-amber-50 border-amber-400'
+            }`}>
+              <div className="flex items-center justify-center gap-4">
+                {detectionResults.length > 0 ? (
+                  <>
+                    <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                      <CheckCircle className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-green-700 mb-1">
+                        ✓ Face Detected!
+                      </p>
+                      <p className="text-sm text-green-600">
+                        {detectionResults.length} face(s) detected • Ready to capture photo
+                      </p>
+                      <p className="text-xs text-green-500 mt-1">
+                        Confidence: {(detectionResults[0]?.score * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-14 h-14 bg-amber-500 rounded-full flex items-center justify-center animate-bounce">
+                      <AlertCircle className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-amber-700 mb-1">
+                        Looking for Face...
+                      </p>
+                      <p className="text-sm text-amber-600">
+                        {userGuidance || 'Move closer and face the camera directly'}
+                      </p>
+                      {detectionAttempts > 0 && (
+                        <p className="text-xs text-amber-500 mt-1">
+                          Attempt {detectionAttempts} of {maxAttempts}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            <p className="text-sm text-gray-600">{userGuidance}</p>
-            {detectionAttempts > 0 && (
-              <p className="text-xs text-orange-600 mt-1">
-                Attempt {detectionAttempts}/{maxAttempts}
-              </p>
-            )}
-          </div>
+          )}
 
           {/* Camera Feed */}
           <div className="relative bg-gray-100 rounded-lg overflow-hidden">
@@ -739,7 +767,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                   className={buttonClass}
                 >
                   <Camera className="w-4 h-4 mr-2" />
-                  Take Photo {detectionResults.length === 0 && '(No Face Detected)'}
+                  Take Photo
                 </Button>
                 
                 <Button
