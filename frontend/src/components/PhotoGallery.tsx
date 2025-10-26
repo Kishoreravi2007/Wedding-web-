@@ -326,9 +326,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         }
         const url = `${API_BASE_URL}/api/photos?${queryParams.toString()}`;
 
-        const response = await fetch(url, {
-          headers: getAuthHeaders()
-        });
+        const response = await fetch(url); // Public endpoint, no auth required
         if (!response.ok) {
           throw new Error('Failed to fetch photos');
         }

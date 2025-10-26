@@ -83,7 +83,7 @@ const { router: authRouter, authenticateToken } = require('./auth');
 app.use('/api/auth', authRouter);
 
 const photosRouter = require('./photos');
-app.use('/api/photos', authenticateToken, photosRouter);
+app.use('/api/photos', photosRouter); // Authentication handled per-route in photos.js
 
 // Local filesystem photo uploads (primary upload endpoint)
 // Note: GET requests are public (for gallery), POST/DELETE require authentication
