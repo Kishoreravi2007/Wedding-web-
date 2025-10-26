@@ -58,6 +58,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [isSearching, setIsSearching] = useState(false); // New state for search loader
   const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
   const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
+  const [showFacePreview, setShowFacePreview] = useState(false); // Show detected face preview before searching
   
   // Add state for ultra-smooth detection
   const [lastDetectionTime, setLastDetectionTime] = useState(0);
@@ -485,32 +486,71 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         throw new Error('Could not create canvas context.');
       }
 
-      // Get the bounding box of the first detected face
-      const { x, y, width, height } = detectionResults[0].box;
+      // Get the bounding box of the first detected face (or let user select if multiple)
+      // For now, use the largest/most confident face
+      const bestFace = detectionResults.reduce((best, current) => 
+        current.score > best.score ? current : best
+      , detectionResults[0]);
+      
+      const { x, y, width, height } = bestFace.box;
 
-      // Set canvas dimensions to the detected face
-      tempCanvas.width = width;
-      tempCanvas.height = height;
+      // Add some padding to the face crop for better results
+      const padding = Math.floor(Math.min(width, height) * 0.2);
+      const cropX = Math.max(0, x - padding);
+      const cropY = Math.max(0, y - padding);
+      const cropWidth = Math.min(video.videoWidth - cropX, width + padding * 2);
+      const cropHeight = Math.min(video.videoHeight - cropY, height + padding * 2);
+
+      // Set canvas dimensions to the detected face with padding
+      tempCanvas.width = cropWidth;
+      tempCanvas.height = cropHeight;
 
       // Draw the detected face from the video onto the temporary canvas
-      ctx.drawImage(video, x, y, width, height, 0, 0, width, height);
+      ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
       // Get the image data as a base64 string
-      const imageData = tempCanvas.toDataURL('image/jpeg');
-      setCapturedFaceImage(imageData); // Store for potential display in search results modal
+      const imageData = tempCanvas.toDataURL('image/jpeg', 0.9);
+      setCapturedFaceImage(imageData); // Store for display
+      setShowFacePreview(true); // Show preview for user confirmation
+      setUserGuidance('Is this your face? Click "Confirm & Search" or "Retry" if wrong.');
 
+      console.log('✅ Face captured - waiting for user confirmation');
+      
+      // Don't search yet - wait for user to confirm via the preview modal
+      
+    } catch (error) {
+      console.error('❌ Face capture error:', error);
+      setSearchError(error instanceof Error ? error.message : 'Failed to capture face');
+      setUserGuidance('Failed to capture face. Please try again.');
+    } finally {
+      setIsSearching(false);
+    }
+  }, [isModelLoaded, detectionResults, selectedWedding]);
+
+  // Confirm and search with the captured face
+  const confirmAndSearch = useCallback(async () => {
+    if (!capturedFaceImage) {
+      console.error('No captured face image');
+      return;
+    }
+
+    setIsSearching(true);
+    setShowFacePreview(false);
+    setUserGuidance('Searching your wedding memories...');
+
+    try {
       // Convert base64 to Blob for FormData
-      const byteString = atob(imageData.split(',')[1]);
+      const byteString = atob(capturedFaceImage.split(',')[1]);
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
       for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
+        ia[i] = byteString.charCodeAt(i);
       }
       const blob = new Blob([ab], { type: 'image/jpeg' });
 
       const formData = new FormData();
       formData.append('file', blob, 'face.jpg');
-      formData.append('wedding_name', selectedWedding); // Send selected wedding name
+      formData.append('wedding_name', selectedWedding);
 
       console.log('🔍 Calling Find My Photos API...');
       console.log('Wedding:', selectedWedding);
@@ -555,7 +595,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     } finally {
       setIsSearching(false);
     }
-  }, [isModelLoaded, detectionResults, selectedWedding]);
+  }, [capturedFaceImage, selectedWedding]);
 
   // Take photo
   const takePhoto = useCallback(() => {
@@ -864,6 +904,68 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                   </div>
         </CardContent>
       </Card>
+
+      {/* Face Preview Confirmation Modal */}
+      {showFacePreview && capturedFaceImage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-6 h-6" />
+                Is This Your Face?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Show captured face */}
+              <div className="flex justify-center">
+                <img 
+                  src={capturedFaceImage} 
+                  alt="Captured face" 
+                  className="rounded-lg border-4 border-blue-500 max-w-full h-auto"
+                  style={{ maxHeight: '300px' }}
+                />
+              </div>
+              
+              <p className="text-center text-gray-600">
+                Verify this is your face before searching for photos
+              </p>
+              
+              {/* Action buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => {
+                    setShowFacePreview(false);
+                    setCapturedFaceImage(null);
+                    setUserGuidance('Face preview cancelled. Try capturing again.');
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Retry
+                </Button>
+                <Button
+                  onClick={confirmAndSearch}
+                  disabled={isSearching}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isSearching ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4 mr-2" />
+                      Confirm & Search
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Face Search Results Modal */}
       {showFaceSearch && (
