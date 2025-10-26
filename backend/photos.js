@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const { supabase } = require('./lib/supabase'); // Use shared Supabase client
 const { PhotoDB } = require('./lib/supabase-db'); // Import PhotoDB
+const { authenticateToken } = require('./auth'); // Import authentication middleware
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -27,7 +28,8 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new photo to Supabase Storage and save metadata to Firestore
-router.post('/', upload.single('photo'), async (req, res) => {
+// Requires authentication
+router.post('/', authenticateToken, upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
@@ -100,7 +102,8 @@ router.post('/', upload.single('photo'), async (req, res) => {
 });
 
 // DELETE a photo from Supabase Storage and Database
-router.delete('/:id', async (req, res) => {
+// Requires authentication
+router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     const photo = await PhotoDB.findById(id);
