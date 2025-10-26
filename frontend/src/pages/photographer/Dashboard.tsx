@@ -2,9 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import PhotoGallery from '@/components/PhotoGallery'; // Use the full PhotoGallery component
-import PeopleManager from '@/components/PeopleManager';
-import PhotoUpload from '@/components/PhotoUpload'; // Import PhotoUpload
 import { PhotoUploadSimple } from '@/components/PhotoUpload-simple'; // Import PhotoUploadSimple
 import PhotoManager from './PhotoManager'; // Import PhotoManager
 import { useState, useEffect } from 'react';
@@ -368,7 +365,7 @@ const PhotographerDashboard = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Upload Photos
@@ -380,10 +377,6 @@ const PhotographerDashboard = () => {
             <TabsTrigger value="manage" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               Manage Photos
-            </TabsTrigger>
-            <TabsTrigger value="gallery" className="flex items-center gap-2">
-              <Camera className="w-4 h-4" />
-              Gallery View
             </TabsTrigger>
           </TabsList>
 
@@ -514,17 +507,6 @@ const PhotographerDashboard = () => {
 
           <TabsContent value="manage" className="space-y-6">
             <PhotoManager />
-          </TabsContent>
-
-          <TabsContent value="gallery" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4">Photo Gallery Management</h2>
-              <p className="text-gray-600 mb-6">
-                View, edit, and manage all uploaded wedding photos.
-                Tag people in photos to enable face-based search for guests.
-              </p>
-              <PhotoGallery isPhotographerView={true} uploadedPhotos={uploadedPhotos} />
-            </div>
           </TabsContent>
 
         </Tabs>
