@@ -78,7 +78,8 @@ function getFileCategory(file: File): 'image' | 'music' | 'audio-wish' {
 // Upload files to the backend and save metadata to Firestore
 export async function uploadFiles(
   files: File[],
-  sister: 'sister-a' | 'sister-b'
+  sister: 'sister-a' | 'sister-b',
+  faceData?: { faces: any[]; count: number } | null
 ): Promise<UploadResult> {
   try {
     const uploadedFiles: UploadedFile[] = [];
@@ -94,8 +95,15 @@ export async function uploadFiles(
       const formData = new FormData();
       formData.append('photo', file);
       formData.append('sister', sister);
+      
+      // Add face descriptors if available
+      if (faceData && faceData.faces && faceData.faces.length > 0) {
+        formData.append('face_descriptors', JSON.stringify(faceData.faces));
+        console.log(`📸 Uploading ${file.name} with ${faceData.count} face descriptor(s)`);
+      } else {
+        console.log('Uploading file:', file.name, 'to sister:', sister);
+      }
 
-      console.log('Uploading file:', file.name, 'to sister:', sister);
       console.log('Using token:', token ? 'Token present' : 'No token');
 
       // Use Supabase storage for production, local filesystem for development

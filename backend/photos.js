@@ -34,7 +34,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
   
-  const { sister, title, description, eventType, tags } = req.body;
+  const { sister, title, description, eventType, tags, face_descriptors } = req.body;
   if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
     return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
   }
@@ -49,6 +49,18 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     } catch (parseError) {
       console.error('Error parsing tags:', parseError);
       return res.status(400).json({ message: 'Invalid tags format.' });
+    }
+  }
+
+  // Parse face descriptors if provided
+  let parsedFaceDescriptors = [];
+  if (face_descriptors) {
+    try {
+      parsedFaceDescriptors = JSON.parse(face_descriptors);
+      console.log(`📸 Received ${parsedFaceDescriptors.length} face descriptor(s) with photo`);
+    } catch (parseError) {
+      console.warn('Error parsing face descriptors:', parseError);
+      // Continue upload even if face descriptors fail
     }
   }
 
@@ -92,16 +104,45 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
 
     const createdPhoto = await PhotoDB.create(newPhoto);
     
-    // Trigger automatic face detection (non-blocking)
-    try {
-      const autoFaceDetection = require('./services/auto-face-detection');
-      autoFaceDetection.triggerFaceDetection(sister).catch(error => {
-        console.error('Background face detection error:', error.message);
-      });
-      console.log(`🔍 Face detection triggered for ${sister} gallery`);
-    } catch (faceDetectionError) {
-      // Don't fail the upload if face detection fails
-      console.error('Failed to trigger face detection:', faceDetectionError.message);
+    // Store face descriptors if provided (from frontend)
+    if (parsedFaceDescriptors.length > 0) {
+      try {
+        const { PhotoFaceDB, FaceDescriptorDB } = require('./lib/supabase-db');
+        
+        for (const faceData of parsedFaceDescriptors) {
+          // Store face descriptor
+          const faceDescriptor = await FaceDescriptorDB.create({
+            photo_id: createdPhoto.id,
+            descriptor: faceData.descriptor,
+            confidence: faceData.confidence || 0.8
+          });
+          
+          // Create photo_face record
+          await PhotoFaceDB.create({
+            photo_id: createdPhoto.id,
+            face_descriptor_id: faceDescriptor.id,
+            bounding_box: faceData.boundingBox || null,
+            confidence: faceData.confidence || 0.8,
+            is_verified: false
+          });
+        }
+        
+        console.log(`✅ Stored ${parsedFaceDescriptors.length} face descriptor(s) for photo ${createdPhoto.id}`);
+      } catch (faceError) {
+        console.error('Error storing face descriptors:', faceError);
+        // Don't fail the upload
+      }
+    } else {
+      // No face descriptors provided - trigger background processing
+      try {
+        const autoFaceDetection = require('./services/auto-face-detection');
+        autoFaceDetection.triggerFaceDetection(sister).catch(error => {
+          console.error('Background face detection error:', error.message);
+        });
+        console.log(`🔍 Face detection triggered for ${sister} gallery`);
+      } catch (faceDetectionError) {
+        console.error('Failed to trigger face detection:', faceDetectionError.message);
+      }
     }
     
     res.status(201).json(createdPhoto);
