@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
-const { createClient } = require('@supabase/supabase-js');
+const { supabase } = require('./lib/supabase');
 
 // Initialize Firebase Admin SDK
 let serviceAccount;
@@ -41,20 +41,8 @@ if (!admin.apps.length) {
   });
 }
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-
-let supabase = null;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️  Warning: Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) not fully set.');
-  console.warn('⚠️  Supabase storage will NOT be available. Photo uploads will fail.');
-  console.warn('⚠️  Please set these environment variables in your Render dashboard.');
-} else {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
-  console.log('✅ Supabase client initialized successfully');
-}
+// Supabase client is now imported from lib/supabase.js
+// This avoids circular dependency issues
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
@@ -204,10 +192,8 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
   }
 });
 
-// Export supabase client for use in other modules (fix circular dependency)
-if (supabase) {
-  module.exports.supabase = supabase;
-}
+// Supabase client is exported from lib/supabase.js
+// No need to export from here
 
 
 app.get('/', (req, res) => {
