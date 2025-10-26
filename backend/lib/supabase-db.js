@@ -5,7 +5,7 @@
  * people, and face recognition.
  */
 
-const { supabase } = require('../server');
+const { supabase } = require('./supabase');
 
 /**
  * Photo operations
