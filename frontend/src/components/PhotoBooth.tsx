@@ -604,7 +604,10 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
       const data = await response.json();
       console.log('✅ API Response:', data);
+      console.log('Matches:', data.matches);
+      console.log('Total:', data.total);
       
+      // Always show results modal (even if no matches)
       if (data.matches && data.matches.length > 0) {
         console.log('📸 Found photos:', data.matches);
         setSearchResults(data.matches);
@@ -612,9 +615,22 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         setUserGuidance(`Found ${data.matches.length} matching photos!`);
       } else {
         console.log('❌ No photos found in response');
-        setSearchError('No matching photos found for this face in the selected wedding.');
+        setSearchResults([]);
+        setSearchError(data.message || 'No matching photos found for this face in the selected wedding.');
+        setShowFaceSearch(true); // Show modal even with no results
         setUserGuidance('No matching photos found.');
       }
+      
+      console.log('🖼️ Results modal state:', { 
+        showFaceSearch: true, 
+        resultsCount: data.matches?.length || 0,
+        hasError: !!data.message
+      });
+      
+      // Debug alert to confirm modal should be showing
+      setTimeout(() => {
+        alert(`Results ready! Found ${data.matches?.length || 0} photos. Modal should be visible now.`);
+      }, 100);
 
     } catch (error: any) {
       console.error('❌ Face search error:', error);
@@ -624,6 +640,10 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       const errorMsg = error?.message || 'Network error or API unavailable';
       setSearchError(errorMsg);
       setUserGuidance(`Search failed: ${errorMsg}`);
+      setShowFaceSearch(true); // Show modal with error
+      
+      // Debug alert
+      alert('Search error: ' + errorMsg);
     } finally {
       setIsSearching(false);
     }
@@ -1034,20 +1054,34 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       )}
 
       {/* Face Search Results Modal */}
+      {(() => {
+        console.log('🔍 Results modal render check:', { 
+          showFaceSearch,
+          resultsCount: searchResults.length,
+          hasError: !!searchError,
+          capturedImage: !!capturedFaceImage
+        });
+        return null;
+      })()}
+      
       {showFaceSearch && (
-        <FaceSearchResults
-          capturedFaceImage={capturedFaceImage} // Pass captured image
-          searchResults={searchResults} // Pass search results
-          onClose={() => {
-            setShowFaceSearch(false);
-            setCapturedFaceImage(null);
-            setSearchResults([]);
-            setSearchError(null);
-            setUserGuidance('Face search closed. You can search again anytime!');
-          }}
-          weddingName={selectedWedding} // Pass selected wedding name
-          searchError={searchError} // Pass search error
-        />
+        <div>
+          {console.log('✅ Rendering FaceSearchResults component')}
+          <FaceSearchResults
+            capturedFaceImage={capturedFaceImage} // Pass captured image
+            searchResults={searchResults} // Pass search results
+            onClose={() => {
+              console.log('🚪 Closing results modal');
+              setShowFaceSearch(false);
+              setCapturedFaceImage(null);
+              setSearchResults([]);
+              setSearchError(null);
+              setUserGuidance('Face search closed. You can search again anytime!');
+            }}
+            weddingName={selectedWedding} // Pass selected wedding name
+            searchError={searchError} // Pass search error
+          />
+        </div>
       )}
     </div>
   );
