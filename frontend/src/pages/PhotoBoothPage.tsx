@@ -93,7 +93,7 @@ const PhotoBoothPage: React.FC = () => {
           </Card>
 
           {/* Photo Booth Component */}
-          <PhotoBooth />
+          <PhotoBooth sister="a" />
 
           {/* Tips Section */}
           <Card>

@@ -16,6 +16,7 @@ const SisterBPhotoBooth = () => {
 
   return (
     <PhotoBooth
+      sister="b"
       primaryColor="#1B5E20"
       buttonClass="bg-[#1B5E20] hover:bg-[#2E7D32] text-white"
       overlayImageSrc="/couple-frame-placeholder.png"
