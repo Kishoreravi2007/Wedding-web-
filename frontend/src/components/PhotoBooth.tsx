@@ -689,6 +689,37 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
   return (
     <div className={`w-full max-w-4xl mx-auto p-6 ${className}`}>
+      {/* Model Loading Screen */}
+      {!isModelLoaded && (
+        <Card className="mb-6">
+          <CardContent className="p-8">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 mx-auto bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  Loading Face Detection Models...
+                </h3>
+                <p className="text-lg text-gray-600 mb-4">
+                  ⏱️ Please wait up to <span className="font-bold text-blue-600">1 minute</span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  We're loading advanced AI models for accurate face detection.
+                  This is a one-time process.
+                </p>
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg max-w-md mx-auto">
+                <p className="text-xs text-blue-700">
+                  💡 <strong>Tip:</strong> Make sure you have a stable internet connection.
+                  The models are being downloaded in the background.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
