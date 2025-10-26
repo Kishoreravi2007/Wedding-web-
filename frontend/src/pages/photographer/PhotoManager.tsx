@@ -91,7 +91,9 @@ const PhotoManager: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/photos-local/${photo.id}`, {
+      // Use /api/photos for production (Supabase), /api/photos-local for development
+      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      const response = await fetch(`${API_BASE_URL}${endpoint}/${photo.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
