@@ -6,12 +6,35 @@ const admin = require('firebase-admin');
 const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Firebase Admin SDK
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
-if (!serviceAccountPath) {
-  console.error('Error: FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable not set.');
+let serviceAccount;
+
+// Try to load service account from JSON string (for deployment) or file path (for local)
+if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  // For deployment: JSON string in environment variable
+  try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    console.log('✅ Loaded Firebase service account from FIREBASE_SERVICE_ACCOUNT_KEY');
+  } catch (error) {
+    console.error('❌ Error parsing FIREBASE_SERVICE_ACCOUNT_KEY:', error.message);
+    process.exit(1);
+  }
+} else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH) {
+  // For local development: file path
+  try {
+    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH.replace(/['"]/g, ''); // Remove quotes
+    serviceAccount = require(serviceAccountPath);
+    console.log('✅ Loaded Firebase service account from file:', serviceAccountPath);
+  } catch (error) {
+    console.error('❌ Error loading Firebase service account file:', error.message);
+    process.exit(1);
+  }
+} else {
+  console.error('Error: Neither FIREBASE_SERVICE_ACCOUNT_KEY nor FIREBASE_SERVICE_ACCOUNT_KEY_PATH is set.');
+  console.error('For deployment, set FIREBASE_SERVICE_ACCOUNT_KEY with the JSON content.');
+  console.error('For local development, set FIREBASE_SERVICE_ACCOUNT_KEY_PATH with the file path.');
   process.exit(1);
 }
-const serviceAccount = require(serviceAccountPath);
+
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
