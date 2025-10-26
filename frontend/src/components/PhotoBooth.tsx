@@ -536,25 +536,42 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
     setIsSearching(true);
     setShowFacePreview(false);
-    setUserGuidance('Searching your wedding memories...');
+    setUserGuidance('Extracting face features...');
 
     try {
-      // Convert base64 to Blob for FormData
-      const byteString = atob(capturedFaceImage.split(',')[1]);
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+      // STEP 1: Extract face descriptor from the captured image
+      const img = new Image();
+      img.src = capturedFaceImage;
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      console.log('🔍 Detecting face in captured image...');
+      const detection = await faceapi
+        .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detection) {
+        throw new Error('Could not detect face in captured image. Please try again.');
       }
-      const blob = new Blob([ab], { type: 'image/jpeg' });
 
+      // Get the 128-dimensional face descriptor
+      const faceDescriptor = Array.from(detection.descriptor);
+      console.log('✅ Face descriptor extracted:', faceDescriptor.length, 'dimensions');
+      
+      setUserGuidance('Searching for matching faces in wedding photos...');
+
+      // STEP 2: Send face descriptor to backend for matching
       const formData = new FormData();
-      formData.append('file', blob, 'face.jpg');
       formData.append('wedding_name', selectedWedding);
+      formData.append('face_descriptor', JSON.stringify(faceDescriptor));
 
-      console.log('🔍 Calling Find My Photos API...');
+      console.log('🔍 Calling Find My Photos API with face descriptor...');
       console.log('Wedding:', selectedWedding);
-      console.log('Image size:', blob.size, 'bytes');
+      console.log('Descriptor length:', faceDescriptor.length);
       
       // Use API_BASE_URL from config (works in both local and deployed)
       const response = await fetch(`${API_BASE_URL}/api/recognize`, {

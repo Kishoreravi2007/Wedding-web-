@@ -267,6 +267,20 @@ const FaceDescriptorDB = {
   },
 
   /**
+   * Get a single face descriptor by ID
+   */
+  async findById(id) {
+    const { data, error } = await supabase
+      .from('face_descriptors')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  /**
    * Get all face descriptors for a person
    */
   async findByPersonId(personId) {

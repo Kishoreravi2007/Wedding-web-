@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { PhotoUploadSimple } from '@/components/PhotoUpload-simple'; // Import PhotoUploadSimple
 import PhotoManager from './PhotoManager'; // Import PhotoManager
+import FaceProcessor from './FaceProcessor'; // Import FaceProcessor
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star, Trash2 } from 'lucide-react';
@@ -370,7 +371,7 @@ const PhotographerDashboard = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Upload Photos
@@ -382,6 +383,10 @@ const PhotographerDashboard = () => {
             <TabsTrigger value="manage" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               Manage Photos
+            </TabsTrigger>
+            <TabsTrigger value="faces" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Process Faces
             </TabsTrigger>
           </TabsList>
 
@@ -512,6 +517,10 @@ const PhotographerDashboard = () => {
 
           <TabsContent value="manage" className="space-y-6">
             <PhotoManager />
+          </TabsContent>
+
+          <TabsContent value="faces" className="space-y-6">
+            <FaceProcessor />
           </TabsContent>
 
         </Tabs>
