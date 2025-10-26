@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Upload, X, Check } from 'lucide-react';
+import { Upload, X, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadFiles } from '@/services/fileUploadService'; // Import the uploadFiles service
+import { loadFaceModels, extractFaceDescriptors, areModelsLoaded } from '@/utils/faceDescriptorExtractor';
 
 interface PhotoUploadSimpleProps {
   weddingId: string;
@@ -16,6 +17,15 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [processingFaces, setProcessingFaces] = useState(false);
+
+  // Load face detection models on component mount
+  useEffect(() => {
+    loadFaceModels().catch(error => {
+      console.warn('Face models failed to load:', error);
+      // Don't block upload if face detection fails
+    });
+  }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -52,10 +62,26 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
       try {
         setUploadProgress(prev => ({ ...prev, [index]: 0 }));
 
-        // Show initial progress
-        setUploadProgress(prev => ({ ...prev, [index]: 10 }));
+        // STEP 1: Extract face descriptors (if models loaded)
+        let faceData = null;
+        if (areModelsLoaded()) {
+          setProcessingFaces(true);
+          setUploadProgress(prev => ({ ...prev, [index]: 5 }));
+          
+          try {
+            console.log(`🔍 Extracting face descriptors from ${file.name}...`);
+            faceData = await extractFaceDescriptors(file);
+            console.log(`✅ Found ${faceData.count} face(s) in ${file.name}`);
+          } catch (faceError) {
+            console.warn('Face extraction failed, uploading without faces:', faceError);
+          }
+          
+          setProcessingFaces(false);
+        }
 
-        const result = await uploadFiles([file], weddingId === 'sister-a' ? 'sister-a' : 'sister-b');
+        // STEP 2: Upload photo
+        setUploadProgress(prev => ({ ...prev, [index]: 10 }));
+        const result = await uploadFiles([file], weddingId === 'sister-a' ? 'sister-a' : 'sister-b', faceData);
         
         // Update progress during upload
         setUploadProgress(prev => ({ ...prev, [index]: 50 }));
