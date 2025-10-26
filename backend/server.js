@@ -121,50 +121,48 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
       return res.status(400).json({ message: 'No image file provided' });
     }
     
-    // IMPROVED: Basic face recognition simulation with more realistic matching
     console.log(`🔍 Face recognition request for ${wedding_name}`);
     console.log(`📸 Image size: ${imageBuffer.length} bytes`);
     
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+    // Convert wedding_name format (sister_a -> sister-a)
+    const sister = wedding_name.replace('_', '-');
     
-    // Simulate more realistic face recognition results
-    // In production, this would use actual face descriptor comparison
-    const allPhotos = {
-      'sister_a': [
-        `${baseUrl}/uploads/wedding_gallery/sister_a/IMG_0309_Original.heic`,
-        `${baseUrl}/uploads/wedding_gallery/sister_a/IMG20230831163922_01.jpg`
-      ],
-      'sister_b': [
-        `${baseUrl}/uploads/wedding_gallery/sister_b/1.jpeg`,
-        `${baseUrl}/uploads/wedding_gallery/sister_b/2.jpeg`,
-        `${baseUrl}/uploads/wedding_gallery/sister_b/3.jpeg`,
-        `${baseUrl}/uploads/wedding_gallery/sister_b/4.jpeg`,
-        `${baseUrl}/uploads/wedding_gallery/sister_b/5.jpeg`,
-        `${baseUrl}/uploads/wedding_gallery/sister_b/6.jpeg`
-      ]
-    };
+    // Query actual photos from Supabase database
+    const { PhotoDB } = require('./lib/supabase-db');
+    const photos = await PhotoDB.findAll({ sister: sister });
     
-    // Get photos for the selected wedding
-    const availablePhotos = allPhotos[wedding_name] || [];
+    console.log(`📷 Found ${photos.length} total photos in ${sister} gallery`);
     
-    // Simulate face recognition by randomly selecting 1-3 photos
-    // This mimics real face recognition where not every photo will match
-    const numMatches = Math.floor(Math.random() * Math.min(3, availablePhotos.length)) + 1;
+    if (photos.length === 0) {
+      return res.json({
+        message: 'No photos found in this wedding gallery yet.',
+        matches: [],
+        wedding: wedding_name,
+        total: 0
+      });
+    }
+    
+    // Get photo URLs from database
+    const photoUrls = photos.map(photo => photo.public_url);
+    
+    // TEMPORARY: Return random selection for face matching simulation
+    // TODO: Replace with actual face descriptor comparison when face detection is fully set up
+    const numMatches = Math.min(Math.floor(Math.random() * 3) + 1, photos.length);
     const matchedPhotos = [];
     const usedIndices = new Set();
     
     for (let i = 0; i < numMatches; i++) {
       let randomIndex;
       do {
-        randomIndex = Math.floor(Math.random() * availablePhotos.length);
+        randomIndex = Math.floor(Math.random() * photoUrls.length);
       } while (usedIndices.has(randomIndex));
       
       usedIndices.add(randomIndex);
-      matchedPhotos.push(availablePhotos[randomIndex]);
+      matchedPhotos.push(photoUrls[randomIndex]);
     }
     
-    // Sometimes return no matches to simulate realistic face recognition
-    const shouldFindMatches = Math.random() > 0.2; // 80% chance of finding matches
+    // 80% chance of finding matches
+    const shouldFindMatches = Math.random() > 0.2;
     
     if (!shouldFindMatches || matchedPhotos.length === 0) {
       return res.json({
@@ -180,7 +178,7 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
       matches: matchedPhotos,
       wedding: wedding_name,
       total: matchedPhotos.length,
-      note: 'Simulated face recognition - for production use DeepFace or face-api.js descriptors'
+      note: 'Using random selection - real face matching requires face detection to be fully configured'
     });
     
   } catch (error) {
