@@ -96,7 +96,7 @@ const PhotographerDashboard = () => {
           ...prev,
           totalPhotos: allPhotos.length,
           uploadedToday: allPhotos.filter((p: any) => {
-            const uploadDate = new Date(p.uploadedAt);
+            const uploadDate = new Date(p.uploaded_at || p.uploadedAt || p.created_at);
             const today = new Date();
             return uploadDate.toDateString() === today.toDateString();
           }).length
@@ -104,14 +104,14 @@ const PhotographerDashboard = () => {
 
         // Set recent uploads (last 5 photos sorted by date)
         const sortedPhotos = [...allPhotos].sort((a: any, b: any) => 
-          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+          new Date(b.uploaded_at || b.uploadedAt || b.created_at).getTime() - new Date(a.uploaded_at || a.uploadedAt || a.created_at).getTime()
         ).slice(0, 5);
 
         setRecentUploads(sortedPhotos.map((photo: any) => ({
           id: photo.id,
           name: photo.filename,
           size: formatFileSize(photo.size || 0),
-          uploadTime: getTimeAgo(photo.uploadedAt),
+          uploadTime: getTimeAgo(photo.uploaded_at || photo.uploadedAt || photo.created_at),
           event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B'
         })));
 
