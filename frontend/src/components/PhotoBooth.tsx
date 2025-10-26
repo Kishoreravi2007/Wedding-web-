@@ -13,7 +13,6 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'; // Import Select components
 import { API_BASE_URL } from '@/lib/api'; // Import API_BASE_URL
 
 // Import face-api.js
@@ -27,7 +26,7 @@ interface PhotoBoothProps {
   primaryColor?: string;
   buttonClass?: string;
   overlayImageSrc?: string;
-  // weddingId?: string; // This prop will now be managed internally
+  sister?: 'a' | 'b'; // Auto-detect which wedding based on which page user is on
 }
 
 const PhotoBooth: React.FC<PhotoBoothProps> = ({ 
@@ -35,7 +34,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   primaryColor = '#3B82F6',
   buttonClass = 'bg-blue-500 hover:bg-blue-600 text-white',
   overlayImageSrc,
-  // weddingId // Remove from destructuring
+  sister = 'a' // Default to Sister A (Parvathy)
 }) => {
   // Refs for canvas and video elements
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -54,7 +53,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [showDiagnostic, setShowDiagnostic] = useState(false);
   const [showFaceSearch, setShowFaceSearch] = useState(false);
   const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null); // Store base64 image
-  const [selectedWedding, setSelectedWedding] = useState<'sister_a' | 'sister_b'>('sister_a'); // New state for wedding selection
+  // Auto-set wedding based on sister prop (no manual selection needed)
+  const selectedWedding = sister === 'a' ? 'sister_a' : 'sister_b';
   const [isSearching, setIsSearching] = useState(false); // New state for search loader
   const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
   const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
@@ -658,22 +658,6 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Wedding Selection */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="wedding-select" className="text-sm font-medium text-gray-700">
-              Select Wedding:
-            </label>
-            <Select value={selectedWedding} onValueChange={(value: 'sister_a' | 'sister_b') => setSelectedWedding(value)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a wedding" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sister_a">Sister A's Wedding</SelectItem>
-                <SelectItem value="sister_b">Sister B's Wedding</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Important Notice */}
           {isWebcamActive && (
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
