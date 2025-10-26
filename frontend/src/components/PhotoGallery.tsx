@@ -337,18 +337,18 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         // Map backend photos to PhotoType
         const mappedPhotos: PhotoType[] = fetchedBackendPhotos.map((file: any) => ({
           id: file.id,
-          url: file.publicUrl,
-          thumbnail: file.publicUrl, // Assuming thumbnail is same as full image for now
+          url: file.public_url || file.publicUrl, // Support both snake_case and camelCase
+          thumbnail: file.public_url || file.publicUrl, // Assuming thumbnail is same as full image for now
           title: file.filename,
-          description: '', // No description in backend, can be added later
-          tags: [], // No tags in backend, can be added later
+          description: file.description || '', // Include description if available
+          tags: file.tags || [], // Include tags if available
           event: file.sister, // Using 'sister' as event for now, can be refined
-          date: new Date(file.uploaded_at).toISOString(), // Use uploaded_at from Supabase
+          date: new Date(file.uploaded_at || file.created_at).toISOString(), // Use uploaded_at from Supabase
           views: 0,
           downloads: 0,
           photographer: 'Photographer', // Default photographer
           faces: file.photo_faces || [], // Include faces from backend
-          timestamp: new Date(file.uploaded_at), // Use uploaded_at from Supabase
+          timestamp: new Date(file.uploaded_at || file.created_at), // Use uploaded_at from Supabase
         }));
         setPhotos(mappedPhotos);
       } catch (error) {
@@ -359,7 +359,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
     };
 
     fetchPhotos();
-  }, []); // Fetch photos only once on component mount
+  }, [sister]); // Re-fetch photos when sister changes
 
   // Update internal photos state when uploadedPhotos prop changes (e.g., after a new upload)
   useEffect(() => {

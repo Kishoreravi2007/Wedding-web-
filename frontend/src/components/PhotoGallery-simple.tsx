@@ -213,12 +213,12 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
           description: photo.description || '',
           tags: photo.tags || ['wedding', 'celebration'],
           event: photo.sister === 'sister-a' ? 'Wedding' : 'Engagement',
-          date: photo.uploadedAt || new Date().toISOString(),
+          date: photo.uploaded_at || photo.uploadedAt || new Date().toISOString(),
           views: Math.floor(Math.random() * 200) + 50,
           downloads: Math.floor(Math.random() * 50) + 10,
           photographer: 'Wedding Photographer',
           faces: [],
-          timestamp: photo.uploadedAt ? new Date(photo.uploadedAt) : new Date(),
+          timestamp: photo.uploaded_at ? new Date(photo.uploaded_at) : (photo.uploadedAt ? new Date(photo.uploadedAt) : new Date()),
         }));
         
         setPhotos(mappedPhotos);
