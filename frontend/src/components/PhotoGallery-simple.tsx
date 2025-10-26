@@ -7,6 +7,7 @@ import { Search, Eye, Download, Check, X, ChevronLeft, ChevronRight, ZoomIn } fr
 import { motion, AnimatePresence, Easing } from 'framer-motion';
 import { Photo, Face } from '@/types/photo'; // Import Photo and Face interfaces from types
 import { cn } from '@/lib/utils';
+import { API_BASE_URL } from '@/lib/api';
 
 // Mock data for demonstration
 // Note: Real face descriptors would be Float32Array of length 128.
@@ -182,23 +183,45 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   // Memoize the initial photos based on galleryPath
   const initialPhotos = useMemo(() => {
     if (!galleryPath) return [];
-    const imageNames = [
-      '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg',
-      '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg',
-      '13.jpeg', '14.jpeg', '15.jpeg'
-    ];
+    
+    // Map gallery path to actual backend folder path
+    let actualPath = '';
+    let imageNames: string[] = [];
+    let eventType = 'Wedding';
+    let tags = ['wedding', 'celebration'];
+    
+    if (galleryPath === '/sister-a-gallery') {
+      actualPath = `${API_BASE_URL}/uploads/wedding_gallery/sister_a`;
+      imageNames = ['IMG_0309_Original.heic', 'IMG20230831163922_01.jpg'];
+      eventType = 'Wedding';
+      tags = ['wedding', 'celebration'];
+    } else if (galleryPath === '/sister-b-gallery') {
+      actualPath = `${API_BASE_URL}/uploads/wedding_gallery/sister_b`;
+      imageNames = [
+        '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg',
+        '7.jpeg', '8.jpeg', '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg',
+        '13.jpeg', '14.jpeg', '15.jpeg'
+      ];
+      eventType = 'Engagement';
+      tags = ['engagement', 'celebration'];
+    } else {
+      return [];
+    }
 
     return imageNames.map((name, index) => ({
       id: `${index + 1}`,
-      url: `${galleryPath}/${name}`,
-      thumbnail: `${galleryPath}/${name}`,
+      url: `${actualPath}/${name}`,
+      thumbnail: `${actualPath}/${name}`,
       title: `Photo ${index + 1}`,
-      tags: galleryPath === '/sister-b-gallery' ? ['engagement', 'celebration'] : ['wedding', 'celebration'],
-      event: galleryPath === '/sister-b-gallery' ? 'Engagement' : 'Wedding',
+      description: '',
+      tags: tags,
+      event: eventType,
       date: '2026-01-04',
       views: Math.floor(Math.random() * 200) + 50,
       downloads: Math.floor(Math.random() * 50) + 10,
+      photographer: 'Wedding Photographer',
       faces: [],
+      timestamp: new Date('2026-01-04'),
     }));
   }, [galleryPath]);
 
@@ -210,11 +233,15 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
       url: uploadedPhoto.preview || uploadedPhoto.url || '/couple-frame-placeholder.png',
       thumbnail: uploadedPhoto.preview || uploadedPhoto.thumbnail || '/couple-frame-placeholder.png',
       title: uploadedPhoto.title || uploadedPhoto.file?.name || `Uploaded Photo ${index + 1}`,
+      description: uploadedPhoto.description || '',
       tags: uploadedPhoto.tags || ['uploaded', 'wedding'],
       event: uploadedPhoto.event || 'Wedding Photos',
       date: uploadedPhoto.date || new Date().toISOString(),
       views: uploadedPhoto.views || 0,
       downloads: uploadedPhoto.downloads || 0,
+      photographer: uploadedPhoto.photographer || 'Photographer',
+      faces: uploadedPhoto.faces || [],
+      timestamp: uploadedPhoto.timestamp || new Date(),
       isUploaded: true,
     }));
   }, [uploadedPhotos]);
