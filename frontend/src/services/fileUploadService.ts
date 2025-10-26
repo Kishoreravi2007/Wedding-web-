@@ -98,7 +98,12 @@ export async function uploadFiles(
       console.log('Uploading file:', file.name, 'to sister:', sister);
       console.log('Using token:', token ? 'Token present' : 'No token');
 
-      const response = await fetch(`${API_BASE_URL}/api/photos-local`, {
+      // Use Supabase storage for production, local filesystem for development
+      const uploadEndpoint = import.meta.env.PROD 
+        ? `${API_BASE_URL}/api/photos`  // Supabase (cloud) - for deployment
+        : `${API_BASE_URL}/api/photos-local`;  // Local filesystem - for development
+      
+      const response = await fetch(uploadEndpoint, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

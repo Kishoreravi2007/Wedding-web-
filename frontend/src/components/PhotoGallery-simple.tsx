@@ -189,8 +189,13 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         // Determine sister parameter from gallery path
         const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
         
+        // Use appropriate endpoint based on environment
+        const photosEndpoint = import.meta.env.PROD
+          ? `${API_BASE_URL}/api/photos?sister=${sister}`  // Supabase for production
+          : `${API_BASE_URL}/api/photos-local?sister=${sister}`;  // Local for development
+        
         // Fetch photos from backend
-        const response = await fetch(`${API_BASE_URL}/api/photos-local?sister=${sister}`);
+        const response = await fetch(photosEndpoint);
         
         if (!response.ok) {
           console.error('Failed to fetch photos:', response.status);
