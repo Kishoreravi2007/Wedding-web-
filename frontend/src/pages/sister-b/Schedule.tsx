@@ -103,7 +103,9 @@ const createGoogleCalendarLink = (dayDate: string, event: any) => {
     return "#"; // Return placeholder if times are invalid
   }
 
-  let url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formattedStartDate}/${formattedEndDate}&details=${description}&location=${location}`;
+  // Use map link as location so it's clickable in Google Calendar
+  const locationLink = event.mapLink || location;
+  let url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formattedStartDate}/${formattedEndDate}&details=${description}&location=${encodeURIComponent(locationLink)}`;
 
   console.log("Generated Google Calendar URL:", url); // Log the generated URL
   return url;

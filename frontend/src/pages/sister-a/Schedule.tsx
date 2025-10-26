@@ -140,7 +140,9 @@ const SisterASchedule = () => {
     const startTime = formatCalendarDate(startDate);
     const endTime = formatCalendarDate(endDate);
 
-    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t(event.title))}&dates=${startTime}/${endTime}&details=${encodeURIComponent(t(event.description || ''))}&location=${encodeURIComponent(t(event.venue))}&sf=true&output=xml`;
+    // Use map link as location so it's clickable in Google Calendar
+    const location = event.mapLink || t(event.venue);
+    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t(event.title))}&dates=${startTime}/${endTime}&details=${encodeURIComponent(t(event.description || ''))}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
     console.log("Google Calendar URL:", googleCalendarUrl);
     window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer');
   };
