@@ -102,14 +102,132 @@ app.use('/api/faces', facesRouter);
 const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
 app.use('/api/face-detection', faceDetectionTriggerRouter);
 
+// Face processing API (store face descriptors)
+const processFacesRouter = require('./routes/process-faces');
+app.use('/api/process-faces', processFacesRouter);
+
 // Face recognition endpoint (for frontend compatibility)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Helper function: Match face descriptor against photos in database
+async function handleDescriptorMatching(req, res, wedding_name, face_descriptor_json) {
+  try {
+    const { PhotoDB, PhotoFaceDB } = require('./lib/supabase-db');
+    const { matchFace } = require('./lib/face-recognition');
+    
+    // Parse face descriptor
+    let userDescriptor;
+    try {
+      userDescriptor = JSON.parse(face_descriptor_json);
+    } catch (error) {
+      return res.status(400).json({ message: 'Invalid face descriptor format' });
+    }
+    
+    console.log(`🎯 Matching face descriptor (${userDescriptor.length} dimensions)`);
+    
+    // Convert wedding_name format
+    const sister = wedding_name.replace('_', '-');
+    
+    // Get all photos from this wedding
+    const allPhotos = await PhotoDB.findAll({ sister: sister });
+    console.log(`📷 Searching through ${allPhotos.length} photos in ${sister} gallery`);
+    
+    if (allPhotos.length === 0) {
+      return res.json({
+        message: 'No photos found in this wedding gallery yet.',
+        matches: [],
+        wedding: wedding_name,
+        total: 0
+      });
+    }
+    
+    // Find photos with matching faces
+    const matchedPhotoUrls = [];
+    const matchThreshold = 0.6; // Euclidean distance threshold
+    
+    for (const photo of allPhotos) {
+      try {
+        // Get all faces in this photo
+        const photoFaces = await PhotoFaceDB.findByPhotoId(photo.id);
+        
+        if (!photoFaces || photoFaces.length === 0) {
+          // No faces detected in this photo yet - skip it
+          continue;
+        }
+        
+        // Check if any face in this photo matches the user's face
+        for (const photoFace of photoFaces) {
+          // Get the face descriptor for this face
+          const { FaceDescriptorDB } = require('./lib/supabase-db');
+          if (photoFace.face_descriptor_id) {
+            const faceDesc = await FaceDescriptorDB.findById(photoFace.face_descriptor_id);
+            
+            if (faceDesc && faceDesc.descriptor) {
+              // Calculate Euclidean distance
+              const distance = euclideanDistance(userDescriptor, faceDesc.descriptor);
+              
+              if (distance <= matchThreshold) {
+                console.log(`✅ Match found! Distance: ${distance.toFixed(3)}, Photo: ${photo.filename}`);
+                matchedPhotoUrls.push(photo.public_url);
+                break; // Found match in this photo, move to next photo
+              }
+            }
+          }
+        }
+      } catch (photoError) {
+        console.error(`Error processing photo ${photo.id}:`, photoError.message);
+        // Continue with other photos
+      }
+    }
+    
+    console.log(`🎯 Found ${matchedPhotoUrls.length} photos with matching faces`);
+    
+    if (matchedPhotoUrls.length === 0) {
+      return res.json({
+        message: 'No photos with your face found. Either face detection hasn\'t been run on uploaded photos yet, or you\'re not in any photos from this wedding.',
+        matches: [],
+        wedding: wedding_name,
+        total: 0,
+        note: 'Make sure face detection has been run on all uploaded photos'
+      });
+    }
+    
+    return res.json({
+      message: `Found ${matchedPhotoUrls.length} photo(s) with matching faces!`,
+      matches: matchedPhotoUrls,
+      wedding: wedding_name,
+      total: matchedPhotoUrls.length,
+      method: 'descriptor_matching'
+    });
+    
+  } catch (error) {
+    console.error('❌ Descriptor matching error:', error);
+    return res.status(500).json({
+      message: 'Face matching failed',
+      error: error.message
+    });
+  }
+}
+
+// Euclidean distance calculation
+function euclideanDistance(desc1, desc2) {
+  if (desc1.length !== desc2.length) {
+    throw new Error('Descriptors must have the same length');
+  }
+  
+  let sum = 0;
+  for (let i = 0; i < desc1.length; i++) {
+    const diff = desc1[i] - desc2[i];
+    sum += diff * diff;
+  }
+  
+  return Math.sqrt(sum);
+}
+
 app.post('/api/recognize', upload.single('file'), async (req, res) => {
   try {
-    const { wedding_name } = req.body;
-    const imageBuffer = req.file.buffer;
+    const { wedding_name, face_descriptor } = req.body;
     
     if (!wedding_name || !['sister_a', 'sister_b'].includes(wedding_name)) {
       return res.status(400).json({ 
@@ -117,12 +235,21 @@ app.post('/api/recognize', upload.single('file'), async (req, res) => {
       });
     }
     
-    if (!imageBuffer) {
-      return res.status(400).json({ message: 'No image file provided' });
+    console.log(`🔍 Face recognition request for ${wedding_name}`);
+    
+    // Check if face descriptor was provided (new method)
+    if (face_descriptor) {
+      console.log('✅ Using face descriptor for matching');
+      return await handleDescriptorMatching(req, res, wedding_name, face_descriptor);
     }
     
-    console.log(`🔍 Face recognition request for ${wedding_name}`);
-    console.log(`📸 Image size: ${imageBuffer.length} bytes`);
+    // Fallback to image-based (old method)
+    const imageBuffer = req.file?.buffer;
+    if (!imageBuffer) {
+      return res.status(400).json({ message: 'No image file or face descriptor provided' });
+    }
+    
+    console.log(`📸 Image size: ${imageBuffer.length} bytes (fallback to gallery photos)`);
     
     // Convert wedding_name format (sister_a -> sister-a)
     const sister = wedding_name.replace('_', '-');
