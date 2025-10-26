@@ -833,26 +833,18 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             ) : (
               <>
                 <Button
-                  onClick={takePhoto}
-                  disabled={false}
-                  className={buttonClass}
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Take Photo
-                </Button>
-                
-                <Button
                   onClick={captureFaceForSearch}
                   disabled={!isModelLoaded}
-                  className="bg-purple-500 hover:bg-purple-600 text-white"
+                  className={`${buttonClass} text-lg py-6 px-8`}
                 >
-                  <Search className="w-4 h-4 mr-2" />
+                  <Search className="w-5 h-5 mr-2" />
                   Find My Photos
                 </Button>
                 
                 <Button
                   onClick={resetDetection}
                   variant="outline"
+                  className="py-6"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retry Detection
