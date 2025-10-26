@@ -67,28 +67,19 @@ const parseTime = (timeString: string, year: string, month: string, day: string)
 // Helper function to create Google Calendar event link
 const createGoogleCalendarLink = (dayDate: string, event: any) => {
   const title = encodeURIComponent(event.title);
-  const description = encodeURIComponent(event.description);
+  const description = encodeURIComponent(event.description || '');
   const location = encodeURIComponent(event.venue);
 
-  const dateParts = dayDate.split(" ");
-  const month = dateParts[0];
-  const dayOfMonth = dateParts[1].replace(/(\d+)(st|nd|rd|th)/, '$1');
-  const year = dateParts[2];
-
+  // Use startDateTime and endDateTime from the event object
   let startTime: Date | null = null;
   let endTime: Date | null = null;
 
-  if (event.time.includes(" to ")) {
-    const [timeRangeStart, timeRangeEnd] = event.time.split(" to ");
-    startTime = parseTime(timeRangeStart, year, month, dayOfMonth);
-    endTime = parseTime(timeRangeEnd, year, month, dayOfMonth);
-  } else {
-    startTime = parseTime(event.time, year, month, dayOfMonth);
-    if (startTime) {
-      // If no end time is specified, assume a 1-hour duration
-      endTime = new Date(startTime);
-      endTime.setHours(endTime.getHours() + 1);
-    }
+  // Check if event has startDateTime (Date object or ISO string)
+  if (event.startDateTime) {
+    startTime = event.startDateTime instanceof Date ? event.startDateTime : new Date(event.startDateTime);
+    endTime = event.endDateTime ? 
+      (event.endDateTime instanceof Date ? event.endDateTime : new Date(event.endDateTime)) :
+      new Date(startTime.getTime() + 60 * 60 * 1000); // Default to 1 hour duration
   }
 
   const formatDateTime = (date: Date | null) => {
@@ -108,6 +99,7 @@ const createGoogleCalendarLink = (dayDate: string, event: any) => {
 
   // Ensure we have valid start and end times before constructing the URL
   if (!formattedStartDate || !formattedEndDate) {
+    console.error("Invalid event dates:", event);
     return "#"; // Return placeholder if times are invalid
   }
 
