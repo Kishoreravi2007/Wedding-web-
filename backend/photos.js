@@ -91,6 +91,19 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     };
 
     const createdPhoto = await PhotoDB.create(newPhoto);
+    
+    // Trigger automatic face detection (non-blocking)
+    try {
+      const autoFaceDetection = require('./services/auto-face-detection');
+      autoFaceDetection.triggerFaceDetection(sister).catch(error => {
+        console.error('Background face detection error:', error.message);
+      });
+      console.log(`🔍 Face detection triggered for ${sister} gallery`);
+    } catch (faceDetectionError) {
+      // Don't fail the upload if face detection fails
+      console.error('Failed to trigger face detection:', faceDetectionError.message);
+    }
+    
     res.status(201).json(createdPhoto);
 
   } catch (error) {
