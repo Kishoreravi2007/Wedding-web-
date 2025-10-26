@@ -50,26 +50,9 @@ const PhotoGalleryPage = ({ sister }: PhotoGalleryPageProps) => {
     }
   };
 
-  if (sister === 'a') {
-    return (
-      <motion.div
-        className={`font-sans ${themeColors.bg} min-h-screen ${themeColors.text} pb-20 flex items-center justify-center`}
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <motion.div className="text-center" variants={itemVariants}>
-          <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: themeColors.primary }} />
-          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: themeColors.primary }}>
-            {t('galleryNotAvailable')}
-          </h1>
-          <p className="text-lg text-gray-600 max-w-md mx-auto">
-            {t('sisterAGalleryUnavailable')}
-          </p>
-        </motion.div>
-      </motion.div>
-    );
-  }
+  // Both sisters now have galleries enabled
+  const galleryPath = sister === 'a' ? '/sister-a-gallery' : '/sister-b-gallery';
+  const galleryTitle = sister === 'a' ? "Parvathy's Wedding Gallery" : "Sreedevi's Wedding Gallery";
 
   return (
     <motion.div
@@ -97,7 +80,7 @@ const PhotoGalleryPage = ({ sister }: PhotoGalleryPageProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Wedding Photo Gallery
+            {galleryTitle}
           </motion.h1>
           <motion.p
             className="text-lg text-gray-600 max-w-2xl mx-auto"
@@ -118,7 +101,7 @@ const PhotoGalleryPage = ({ sister }: PhotoGalleryPageProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <PhotoGallerySimple galleryPath={'/sister-b-gallery'} />
+              <PhotoGallerySimple galleryPath={galleryPath} />
             </CardContent>
           </Card>
         </motion.div>
