@@ -220,8 +220,10 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
     // Draw each detection with smooth, stable styling
     detections.forEach((detection, index) => {
-      const { x, y, width, height } = detection.box;
-      const confidence = detection.score;
+      // Handle both old format (detection.box) and new format (detection.detection.box)
+      const box = detection.detection?.box || detection.box;
+      const confidence = detection.detection?.score || detection.score;
+      const { x, y, width, height } = box;
 
       // Only draw detections with ultra-high confidence to eliminate flickering
       if (confidence < 0.85) return;
@@ -331,15 +333,20 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           }
           setLastDetectionTime(now);
 
-          // Detect faces with ultra-stable settings for video stream
+          // Detect faces with ultra-stable settings for video stream AND extract descriptors
           let detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
               inputSize: 416,
               scoreThreshold: 0.7 // Ultra-high threshold for maximum stability
-            }));
+            }))
+            .withFaceLandmarks()
+            .withFaceDescriptors();
 
           // Filter detections by very high confidence to eliminate flickering
-          detections = detections.filter(detection => detection.score > 0.8);
+          detections = detections.filter(detection => {
+            const score = detection.detection?.score || detection.score;
+            return score > 0.8;
+          });
 
           // Add to detection history for smoothing
           setDetectionHistory(prev => {
@@ -500,11 +507,14 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
       // Get the bounding box of the first detected face (or let user select if multiple)
       // For now, use the largest/most confident face
-      const bestFace = detectionResults.reduce((best, current) => 
-        current.score > best.score ? current : best
-      , detectionResults[0]);
+      const bestFace = detectionResults.reduce((best, current) => {
+        const currentScore = current.detection?.score || current.score;
+        const bestScore = best.detection?.score || best.score;
+        return currentScore > bestScore ? current : best;
+      }, detectionResults[0]);
       
-      const { x, y, width, height } = bestFace.box;
+      const box = bestFace.detection?.box || bestFace.box;
+      const { x, y, width, height } = box;
 
       // Add some padding to the face crop for better results
       const padding = Math.floor(Math.min(width, height) * 0.2);
@@ -554,28 +564,21 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Extracting face features...');
 
     try {
-      // STEP 1: Extract face descriptor from the captured image
-      const img = new Image();
-      img.src = capturedFaceImage;
+      // STEP 1: Use the face descriptor from the already-detected face
+      // Get the best face from detectionResults (already has descriptor)
+      const bestFace = detectionResults.reduce((best, current) => {
+        const currentScore = current.detection?.score || current.score;
+        const bestScore = best.detection?.score || best.score;
+        return currentScore > bestScore ? current : best;
+      }, detectionResults[0]);
       
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-
-      console.log('🔍 Detecting face in captured image...');
-      const detection = await faceapi
-        .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-      if (!detection) {
-        throw new Error('Could not detect face in captured image. Please try again.');
+      if (!bestFace || !bestFace.descriptor) {
+        throw new Error('No face descriptor available. Please ensure face is detected before searching.');
       }
 
-      // Get the 128-dimensional face descriptor
-      const faceDescriptor = Array.from(detection.descriptor);
-      console.log('✅ Face descriptor extracted:', faceDescriptor.length, 'dimensions');
+      // Get the 128-dimensional face descriptor from the stored detection
+      const faceDescriptor = Array.from(bestFace.descriptor);
+      console.log('✅ Using stored face descriptor:', faceDescriptor.length, 'dimensions');
       
       setUserGuidance('Searching for matching faces in wedding photos...');
 
@@ -679,8 +682,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (detectionResults.length > 0) {
         const detections = detectionResults;
         detections.forEach((detection, index) => {
-          const { x, y, width, height } = detection.box;
-          const confidence = detection.score;
+          const box = detection.detection?.box || detection.box;
+          const confidence = detection.detection?.score || detection.score;
+          const { x, y, width, height } = box;
 
           // Draw bounding box
           photoCtx.strokeStyle = '#00ff00';
@@ -939,14 +943,17 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             </span>
           </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                {detectionResults.map((detection, index) => (
-                  <div key={index} className="bg-white p-3 rounded">
-                    <div className="font-medium">Face {index + 1}</div>
-                    <div className="text-gray-600">
-                      Confidence: {(detection.score * 100).toFixed(1)}%
-                </div>
-              </div>
-            ))}
+                {detectionResults.map((detection, index) => {
+                  const confidence = detection.detection?.score || detection.score;
+                  return (
+                    <div key={index} className="bg-white p-3 rounded">
+                      <div className="font-medium">Face {index + 1}</div>
+                      <div className="text-gray-600">
+                        Confidence: {(confidence * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  );
+                })}
           </div>
         </div>
       )}
