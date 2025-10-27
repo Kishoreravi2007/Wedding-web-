@@ -85,6 +85,12 @@ app.use('/api/auth', authRouter);
 const usersRouter = require('./users');
 app.use('/api/users', authenticateToken, usersRouter);
 
+const settingsRouter = require('./settings');
+app.use('/api/settings', settingsRouter); // Public read, admin write
+
+const analyticsRouter = require('./analytics');
+app.use('/api/analytics', analyticsRouter); // Public track, admin read
+
 const photosRouter = require('./photos');
 app.use('/api/photos', photosRouter); // Authentication handled per-route in photos.js
 

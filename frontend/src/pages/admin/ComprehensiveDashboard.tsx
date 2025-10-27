@@ -97,11 +97,29 @@ const ComprehensiveAdminDashboard = () => {
   // Settings
   const [settings, setSettings] = useState({
     siteName: 'Parvathy & Sreedevi Wedding',
-    enablePhot oBooth: true,
+    enablePhotoBooth: true,
     enableFaceRecognition: true,
     enableGuestWishes: true,
     maintenanceMode: false
   });
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/settings`);
+      if (response.ok) {
+        const data = await response.json();
+        setSettings({
+          siteName: data.site_name || 'Parvathy & Sreedevi Wedding',
+          enablePhotoBooth: data.enable_photo_booth === 'true',
+          enableFaceRecognition: data.enable_face_recognition === 'true',
+          enableGuestWishes: data.enable_guest_wishes === 'true',
+          maintenanceMode: data.maintenance_mode === 'true'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
 
   // Check authentication
   useEffect(() => {
@@ -120,30 +138,28 @@ const ComprehensiveAdminDashboard = () => {
     await Promise.all([
       loadStats(),
       loadUsers(),
-      loadPhotos()
+      loadPhotos(),
+      loadSettings()
     ]);
   };
 
   const loadStats = async () => {
     try {
-      const [photosRes, usersRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/photos`),
-        fetch(`${API_BASE_URL}/api/users`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
-        })
-      ]);
-
-      const photosData = await photosRes.json();
-      const usersData = await usersRes.json();
-
-      setStats({
-        totalPhotos: photosData.length || 0,
-        totalUsers: usersData.length || 0,
-        totalFaces: 0, // Will be calculated from face detection
-        totalViews: 0  // Will be tracked later
+      const response = await fetch(`${API_BASE_URL}/api/analytics/stats`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats({
+          totalPhotos: data.totalPhotos || 0,
+          totalUsers: data.totalUsers || 0,
+          totalFaces: data.totalFaces || 0,
+          totalViews: data.totalViews || 0
+        });
+      }
     } catch (error) {
       console.error('Error loading stats:', error);
     }
@@ -316,8 +332,45 @@ const ComprehensiveAdminDashboard = () => {
   };
 
   const handleSaveSettings = async () => {
-    showSuccess('Settings saved successfully!');
-    // In a real app, save to backend
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/settings/bulk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({
+          site_name: settings.siteName,
+          enable_photo_booth: settings.enablePhotoBooth.toString(),
+          enable_face_recognition: settings.enableFaceRecognition.toString(),
+          enable_guest_wishes: settings.enableGuestWishes.toString(),
+          maintenance_mode: settings.maintenanceMode.toString()
+        })
+      });
+
+      if (response.ok) {
+        showSuccess('Settings saved successfully!');
+        
+        // Track this admin action
+        await fetch(`${API_BASE_URL}/api/analytics/track`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            event_type: 'settings_updated',
+            event_category: 'admin',
+            event_data: { admin: localStorage.getItem('username') }
+          })
+        });
+      } else {
+        showError('Failed to save settings');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      showError('Error saving settings');
+    }
   };
 
   return (
