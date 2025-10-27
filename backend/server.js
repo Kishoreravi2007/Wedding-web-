@@ -82,6 +82,9 @@ app.use('/api/wishes', wishesRouter);
 const { router: authRouter, authenticateToken } = require('./auth');
 app.use('/api/auth', authRouter);
 
+const usersRouter = require('./users');
+app.use('/api/users', authenticateToken, usersRouter);
+
 const photosRouter = require('./photos');
 app.use('/api/photos', photosRouter); // Authentication handled per-route in photos.js
 

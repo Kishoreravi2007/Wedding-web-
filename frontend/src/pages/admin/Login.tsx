@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, ArrowLeft } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { API_BASE_URL } from '@/lib/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -20,15 +21,38 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call backend API for authentication
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+      });
 
-      if (credentials.username === 'kishore' && credentials.password === 'Qwerty123') {
-        showSuccess('Login successful! Welcome to the Admin Portal.');
-        navigate('/admin');
-      } else {
-        throw new Error('Invalid credentials. Please try again.');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Invalid credentials. Please try again.');
       }
+
+      // Check if user is admin
+      if (data.role !== 'admin') {
+        throw new Error('Access denied. Admin privileges required.');
+      }
+
+      // Store authentication token and user info
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('userRole', data.role);
+      localStorage.setItem('username', data.username);
+
+      showSuccess('Login successful! Welcome to the Admin Portal.');
+      navigate('/admin/dashboard');
     } catch (error: any) {
+      console.error('Login error:', error);
       showError(error.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
