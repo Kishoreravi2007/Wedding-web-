@@ -30,6 +30,7 @@ import SreedeviEngagementVideo from "./pages/sister-b/EngagementVideo";
 import ParvathyEngagementVideo from "./pages/sister-a/EngagementVideo";
 
 import AdminDashboard from "./pages/admin/Dashboard";
+import ComprehensiveAdminDashboard from "./pages/admin/ComprehensiveDashboard";
 import AdminLogin from "./pages/admin/Login";
 import PhotographerDashboard from "./pages/photographer/Dashboard";
 import PhotographerLogin from "./pages/photographer/Login";
@@ -125,6 +126,7 @@ const App = () => {
               {/* Portal Routes */}
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/dashboard" element={<ComprehensiveAdminDashboard />} />
               <Route path="/photographer-login" element={<PhotographerLogin />} />
               <Route path="/photographer" element={<PhotographerDashboard />} />
               <Route path="/couple-login" element={<CoupleLogin />} />
