@@ -142,7 +142,7 @@ CREATE OR REPLACE FUNCTION increment_stat(
 )
 RETURNS VOID
 LANGUAGE plpgsql
-AS $$
+AS $function$
 BEGIN
   -- Update today's statistics
   INSERT INTO website_statistics (stat_date)
@@ -177,7 +177,7 @@ BEGIN
       WHERE stat_date = CURRENT_DATE;
   END CASE;
 END;
-$$;
+$function$;
 
 -- Function to get current statistics
 CREATE OR REPLACE FUNCTION get_current_stats()
@@ -190,7 +190,7 @@ RETURNS TABLE(
   wishes_submitted BIGINT
 )
 LANGUAGE sql
-AS $$
+AS $function$
   SELECT 
     COALESCE(SUM(total_visits), 0)::BIGINT as total_visits,
     COALESCE(SUM(photo_booth_visits), 0)::BIGINT as photo_booth_visits,
@@ -200,7 +200,7 @@ AS $$
     COALESCE(SUM(wishes_submitted), 0)::BIGINT as wishes_submitted
   FROM website_statistics
   WHERE stat_date >= CURRENT_DATE - INTERVAL '30 days';
-$$;
+$function$;
 
 -- =====================================================
 -- SETUP COMPLETE!
