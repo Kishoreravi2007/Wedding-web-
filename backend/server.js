@@ -115,6 +115,10 @@ app.use('/api/face-detection', faceDetectionTriggerRouter);
 const processFacesRouter = require('./routes/process-faces');
 app.use('/api/process-faces', processFacesRouter);
 
+// Auto face detection API
+const autoFaceDetectionRouter = require('./routes/auto-face-detection');
+app.use('/api/auto-face-detection', autoFaceDetectionRouter);
+
 // Face recognition endpoint (for frontend compatibility)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -336,8 +340,16 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ Backend server running on http://localhost:${PORT}`);
   console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos-local`);
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
+  
+  // Run auto face detection startup check
+  try {
+    const autoFaceProcessor = require('./services/auto-face-processor');
+    await autoFaceProcessor.checkOnStartup();
+  } catch (error) {
+    console.error('Error running face detection startup check:', error);
+  }
 });
