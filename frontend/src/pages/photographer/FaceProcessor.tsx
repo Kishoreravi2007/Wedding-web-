@@ -193,7 +193,39 @@ const FaceProcessor = () => {
   useEffect(() => {
     fetchPhotos();
     fetchStats();
+    checkAndAutoProcess();
   }, []);
+
+  // Auto-process photos if they need processing
+  const checkAndAutoProcess = async () => {
+    try {
+      // Check if auto-processing is needed
+      const response = await fetch(`${API_BASE_URL}/api/auto-face-detection/status`);
+      const data = await response.json();
+      
+      if (data.needsProcessing && data.unprocessedCount > 0) {
+        console.log(`🤖 Auto-processing ${data.unprocessedCount} unprocessed photos...`);
+        
+        // Wait for models to load before auto-processing
+        const checkModels = setInterval(() => {
+          if (modelsLoaded && !isProcessing) {
+            clearInterval(checkModels);
+            console.log('🚀 Starting automatic face detection...');
+            processAllPhotos();
+          }
+        }, 1000);
+
+        // Timeout after 30 seconds if models don't load
+        setTimeout(() => {
+          clearInterval(checkModels);
+        }, 30000);
+      } else {
+        console.log('✅ All photos already have face descriptors');
+      }
+    } catch (error) {
+      console.error('Error checking auto-process status:', error);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
