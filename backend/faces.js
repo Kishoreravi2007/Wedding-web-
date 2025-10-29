@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { PeopleDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/supabase-db');
+const { FaceDescriptorDB, PhotoFacesDB } = require('./lib/firestore-db');
 const { 
   matchFace, 
   validateDescriptor, 
@@ -14,6 +14,45 @@ const {
   getStatistics,
   findSimilarFaces
 } = require('./lib/face-recognition');
+
+// People DB operations
+const { db } = require('./lib/firebase');
+const PeopleDB = {
+  async create(personData) {
+    const { v4: uuidv4 } = require('uuid');
+    const personId = uuidv4();
+    const timestamp = new Date().toISOString();
+    const person = {
+      id: personId,
+      ...personData,
+      created_at: timestamp,
+      updated_at: timestamp
+    };
+    await db.collection('people').doc(personId).set(person);
+    return person;
+  },
+  async findAll(filters = {}) {
+    let query = db.collection('people');
+    if (filters.sister) query = query.where('sister', '==', filters.sister);
+    if (filters.role) query = query.where('role', '==', filters.role);
+    const snapshot = await query.get();
+    return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+  },
+  async findById(id) {
+    const doc = await db.collection('people').doc(id).get();
+    return doc.exists ? { ...doc.data(), id: doc.id } : null;
+  },
+  async update(id, updates) {
+    await db.collection('people').doc(id).update({ ...updates, updated_at: new Date().toISOString() });
+    return await this.findById(id);
+  },
+  async delete(id) {
+    await db.collection('people').doc(id).delete();
+    return true;
+  }
+};
+
+const PhotoFaceDB = PhotoFacesDB;
 
 /**
  * POST /api/faces/match

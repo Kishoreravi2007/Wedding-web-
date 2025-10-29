@@ -26,12 +26,10 @@ import {
   Database
 } from 'lucide-react';
 import * as faceapi from 'face-api.js';
-import { createClient } from '@supabase/supabase-js';
+import { PhotoService } from '../services/firebaseService';
+import axios from 'axios';
 
-// Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 interface UploadProgress {
   filename: string;
@@ -115,19 +113,9 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         i === index ? { ...item, status: 'uploading', progress: 0 } : item
       ));
 
-      // Upload to Supabase storage
-      const storagePath = `${eventId}/${Date.now()}-${filename}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('event-photos')
-        .upload(storagePath, file);
-
-      if (uploadError) {
-        throw new Error(`Upload failed: ${uploadError.message}`);
-      }
-
       // Update progress to processing
       setUploadProgress(prev => prev.map((item, i) => 
-        i === index ? { ...item, status: 'processing', progress: 50 } : item
+        i === index ? { ...item, status: 'processing', progress: 25 } : item
       ));
 
       // Create image element for face detection
@@ -143,34 +131,39 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       // Extract face embeddings
       const faceEmbeddings = await extractFaceEmbeddings(img);
       
-      // Get image dimensions
-      const { width, height } = img;
+      // Update progress
+      setUploadProgress(prev => prev.map((item, i) => 
+        i === index ? { ...item, progress: 50 } : item
+      ));
 
-      // Store metadata in database
-      const { data: photoData, error: dbError } = await supabase
-        .from('event_photos')
-        .insert({
-          event_id: eventId,
-          filename: filename,
-          storage_path: storagePath,
-          file_size: file.size,
-          mime_type: file.type,
-          width: width,
-          height: height,
-          face_count: faceEmbeddings.length,
-          face_embeddings: faceEmbeddings.map(embedding => Array.from(embedding)),
-          metadata: {
-            uploaded_by: 'photographer',
-            processing_date: new Date().toISOString(),
-            original_filename: filename
-          }
-        })
-        .select()
-        .single();
-
-      if (dbError) {
-        throw new Error(`Database error: ${dbError.message}`);
+      // Upload to backend API with face descriptors
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('sister', eventId === 'sister-a' ? 'sister-a' : 'sister-b');
+      formData.append('title', filename);
+      formData.append('eventType', 'wedding');
+      formData.append('tags', JSON.stringify([]));
+      
+      // Add face descriptors if any
+      if (faceEmbeddings.length > 0) {
+        const faceDescriptors = faceEmbeddings.map(embedding => ({
+          descriptor: Array.from(embedding),
+          confidence: 1.0
+        }));
+        formData.append('face_descriptors', JSON.stringify(faceDescriptors));
       }
+
+      // Get authentication token
+      const token = localStorage.getItem('accessToken');
+      
+      const response = await axios.post(`${BACKEND_URL}/api/photos`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+
+      const photoData = response.data.photo;
 
       // Update progress to completed
       setUploadProgress(prev => prev.map((item, i) => 
