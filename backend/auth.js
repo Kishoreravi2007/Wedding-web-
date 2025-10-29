@@ -1,121 +1,326 @@
+/**
+ * Firebase Authentication Router
+ * 
+ * This router implements authentication using Firebase Auth
+ * with custom claims for role-based access control.
+ */
+
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { supabase } = require('./server'); // Import the Supabase client
-const UserDB = require('./lib/user-db')(supabase); // Initialize UserDB with the Supabase client
+const { FirebaseAuth, authMiddleware } = require('./lib/firebase-auth');
 
-// Middleware to verify JWT token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) return res.sendStatus(401); // No token
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403); // Invalid token
-    req.user = user;
-    next();
-  });
-};
-
-// Register a new user
+/**
+ * POST /api/auth/register
+ * Register a new user (admin only in production)
+ */
 router.post('/register', async (req, res) => {
-  const { username, password, role } = req.body; // role can be 'admin', 'couple', 'photographer'
-
-  if (!username || !password || !role) {
-    return res.status(400).json({ message: 'Username, password, and role are required.' });
-  }
-
   try {
-    const existingUser = await UserDB.findByUsername(username);
-
-    if (existingUser) {
-      return res.status(409).json({ message: 'Username already exists.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await UserDB.create({
-      username,
-      password: hashedPassword,
-      role,
-    });
-    res.status(201).json({ id: newUser.id, username, role });
-
-  } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Error registering user.' });
-  }
-});
-
-// Login user
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required.' });
-  }
-
-  try {
-    // Fallback authentication for photographer (temporary solution)
-    if (username === 'photographer' && password === 'photo123') {
-      const accessToken = jwt.sign({ 
-        id: 'photographer-1', 
-        username: 'photographer', 
-        role: 'photographer' 
-      }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      
-      console.log('✅ Photographer logged in successfully (fallback auth)');
-      return res.json({ accessToken, role: 'photographer' });
+    const { email, password, displayName, role = 'user' } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required' 
+      });
     }
     
-    // Try database authentication
-    const user = await UserDB.findByUsername(username);
-
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
+    // Validate role
+    const validRoles = ['admin', 'photographer', 'couple', 'user'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ 
+        message: 'Invalid role. Must be one of: ' + validRoles.join(', ') 
+      });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
-    }
-
-    const accessToken = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token: accessToken, accessToken, role: user.role, username: user.username, id: user.id });
-
+    
+    const newUser = await FirebaseAuth.createUser({
+      email,
+      password,
+      displayName,
+      role
+    });
+    
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        uid: newUser.uid,
+        email: newUser.email,
+        displayName: newUser.displayName,
+        role: newUser.role
+      }
+    });
+    
   } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ message: 'Error logging in.' });
+    console.error('Registration error:', error);
+    
+    let message = 'Registration failed';
+    if (error.code === 'auth/email-already-exists') {
+      message = 'Email already exists';
+    } else if (error.code === 'auth/invalid-email') {
+      message = 'Invalid email address';
+    } else if (error.code === 'auth/weak-password') {
+      message = 'Password is too weak';
+    }
+    
+    res.status(400).json({ message });
   }
 });
 
-// Password reset endpoint (for administrative use or a simplified flow)
-router.post('/reset-password', async (req, res) => {
-  const { username, newPassword } = req.body;
-
-  if (!username || !newPassword) {
-    return res.status(400).json({ message: 'Username and new password are required.' });
-  }
-
+/**
+ * POST /api/auth/verify-token
+ * Verify Firebase ID token and return user info
+ */
+router.post('/verify-token', async (req, res) => {
   try {
-    const user = await UserDB.findByUsername(username);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({ message: 'Firebase ID token is required' });
     }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await UserDB.update(user.id, { password: hashedPassword });
-
-    res.status(200).json({ message: 'Password reset successfully.' });
-
+    
+    const user = await FirebaseAuth.verifyToken(idToken);
+    
+    res.json({
+      valid: true,
+      user: {
+        uid: user.uid,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        emailVerified: user.emailVerified
+      }
+    });
+    
   } catch (error) {
-    console.error('Error resetting password:', error);
-    res.status(500).json({ message: 'Error resetting password.' });
+    res.status(401).json({ 
+      valid: false, 
+      message: 'Invalid or expired token' 
+    });
   }
 });
 
-module.exports = { router, authenticateToken };
+/**
+ * GET /api/auth/profile
+ * Get current user profile
+ */
+router.get('/profile', authMiddleware.verifyFirebaseToken, async (req, res) => {
+  try {
+    const user = await FirebaseAuth.getUser(req.user.uid);
+    res.json({
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      role: user.customClaims?.role || 'user',
+      emailVerified: user.emailVerified,
+      disabled: user.disabled
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).json({ message: 'Failed to get profile' });
+  }
+});
+
+/**
+ * PUT /api/auth/profile
+ * Update user profile
+ */
+router.put('/profile', authMiddleware.verifyFirebaseToken, async (req, res) => {
+  try {
+    const { displayName } = req.body;
+    
+    // Update user in Firebase
+    const { admin } = require('./lib/firebase-auth');
+    await admin.auth().updateUser(req.user.uid, {
+      displayName: displayName
+    });
+    
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        uid: req.user.uid,
+        email: req.user.email,
+        displayName: displayName,
+        role: req.user.role
+      }
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(400).json({ 
+      message: error.message || 'Profile update failed' 
+    });
+  }
+});
+
+/**
+ * POST /api/auth/update-role
+ * Update user role (admin only)
+ */
+router.post('/update-role', 
+  authMiddleware.verifyFirebaseToken, 
+  authMiddleware.requireAdmin, 
+  async (req, res) => {
+    try {
+      const { uid, role } = req.body;
+      
+      if (!uid || !role) {
+        return res.status(400).json({ 
+          message: 'User UID and role are required' 
+        });
+      }
+      
+      const validRoles = ['admin', 'photographer', 'couple', 'user'];
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({ 
+          message: 'Invalid role. Must be one of: ' + validRoles.join(', ') 
+        });
+      }
+      
+      await FirebaseAuth.updateUserRole(uid, role);
+      
+      res.json({
+        message: 'User role updated successfully',
+        uid,
+        role
+      });
+    } catch (error) {
+      console.error('Role update error:', error);
+      res.status(400).json({ 
+        message: error.message || 'Role update failed' 
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/auth/users
+ * List all users (admin only)
+ */
+router.get('/users', 
+  authMiddleware.verifyFirebaseToken, 
+  authMiddleware.requireAdmin, 
+  async (req, res) => {
+    try {
+      const { limit = 100 } = req.query;
+      const users = await FirebaseAuth.listUsers(parseInt(limit));
+      
+      res.json({
+        users,
+        total: users.length
+      });
+    } catch (error) {
+      console.error('Users list error:', error);
+      res.status(500).json({ message: 'Failed to get users list' });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/disable-user
+ * Disable user account (admin only)
+ */
+router.post('/disable-user', 
+  authMiddleware.verifyFirebaseToken, 
+  authMiddleware.requireAdmin, 
+  async (req, res) => {
+    try {
+      const { uid } = req.body;
+      
+      if (!uid) {
+        return res.status(400).json({ message: 'User UID is required' });
+      }
+      
+      await FirebaseAuth.disableUser(uid);
+      
+      res.json({
+        message: 'User account disabled successfully',
+        uid
+      });
+    } catch (error) {
+      console.error('Disable user error:', error);
+      res.status(400).json({ 
+        message: error.message || 'Failed to disable user' 
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/auth/enable-user
+ * Enable user account (admin only)
+ */
+router.post('/enable-user', 
+  authMiddleware.verifyFirebaseToken, 
+  authMiddleware.requireAdmin, 
+  async (req, res) => {
+    try {
+      const { uid } = req.body;
+      
+      if (!uid) {
+        return res.status(400).json({ message: 'User UID is required' });
+      }
+      
+      await FirebaseAuth.enableUser(uid);
+      
+      res.json({
+        message: 'User account enabled successfully',
+        uid
+      });
+    } catch (error) {
+      console.error('Enable user error:', error);
+      res.status(400).json({ 
+        message: error.message || 'Failed to enable user' 
+      });
+    }
+  }
+);
+
+/**
+ * DELETE /api/auth/user/:uid
+ * Delete user account (admin only)
+ */
+router.delete('/user/:uid', 
+  authMiddleware.verifyFirebaseToken, 
+  authMiddleware.requireAdmin, 
+  async (req, res) => {
+    try {
+      const { uid } = req.params;
+      
+      await FirebaseAuth.deleteUser(uid);
+      
+      res.json({
+        message: 'User account deleted successfully',
+        uid
+      });
+    } catch (error) {
+      console.error('Delete user error:', error);
+      res.status(400).json({ 
+        message: error.message || 'Failed to delete user' 
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/auth/health
+ * Authentication system health check
+ */
+router.get('/health', async (req, res) => {
+  try {
+    // Test Firebase connection
+    const { admin } = require('./lib/firebase-auth');
+    await admin.auth().listUsers(1);
+    
+    res.json({
+      status: 'healthy',
+      provider: 'Firebase Auth',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      provider: 'Firebase Auth',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+module.exports = { router, authenticateToken: authMiddleware.verifyFirebaseToken };

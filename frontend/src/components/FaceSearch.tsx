@@ -30,12 +30,9 @@ import {
   Eye
 } from 'lucide-react';
 import * as faceapi from 'face-api.js';
-import { createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 
-// Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 interface FaceMatch {
   id: string;
@@ -152,90 +149,63 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       setError('');
       setSuccess('');
 
-      // Get all stored photos from Supabase
-      const { data: photos, error: fetchError } = await supabase
-        .from('event_photos')
-        .select('*')
-        .eq('event_id', eventId)
-        .order('created_at', { ascending: false });
+      // Convert Float32Array to regular array
+      const descriptorArray = Array.from(queryDescriptor);
 
-      if (fetchError) {
-        console.error('❌ Error fetching photos:', fetchError);
-        setError('Failed to fetch photos from database.');
+      // Call backend API for face matching
+      const response = await axios.post(`${BACKEND_URL}/api/faces/find-similar`, {
+        descriptor: descriptorArray,
+        limit: 50,
+        threshold: 0.6
+      });
+
+      const { faces } = response.data;
+
+      if (!faces || faces.length === 0) {
+        setError('No matching photos found. Try uploading a clearer photo with your face clearly visible.');
+        setSearchResults([]);
         return;
       }
 
-      if (!photos || photos.length === 0) {
-        setError('No photos found for this event. Please contact the photographer.');
-        return;
-      }
+      console.log(`✅ Found ${faces.length} matching photos from backend`);
 
-      console.log(`📸 Found ${photos.length} photos to search through`);
-
-      const matches: FaceMatch[] = [];
-
-      // Process each photo to find face matches
-      for (const photo of photos) {
+      // Get photos for the matched faces
+      const photoIds = [...new Set(faces.map((face: any) => face.photo_id))];
+      
+      // Fetch photo details
+      const photoPromises = photoIds.map(async (photoId: string) => {
         try {
-          // Get photo from Supabase storage
-          const { data: photoData, error: photoError } = await supabase.storage
-            .from('event-photos')
-            .download(photo.storage_path);
-
-          if (photoError) {
-            console.error('❌ Error downloading photo:', photoError);
-            continue;
-          }
-
-          // Create image element from blob
-          const imageUrl = URL.createObjectURL(photoData);
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = imageUrl;
-          });
-
-          // Detect faces in the photo
-          const detections = await faceapi
-            .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptors();
-
-          // Compare with query descriptor
-          for (const detection of detections) {
-            const similarity = calculateSimilarity(queryDescriptor, detection.descriptor);
-            
-            // Only include matches above threshold (0.6 = 60% similarity)
-            if (similarity > 0.6) {
-              matches.push({
-                id: photo.id,
-                photoUrl: imageUrl,
-                confidence: similarity,
-                metadata: {
-                  filename: photo.filename,
-                  uploadedAt: photo.created_at,
-                  eventId: photo.event_id
-                }
-              });
-            }
-          }
-
-          // Clean up object URL
-          URL.revokeObjectURL(imageUrl);
-
+          const photoResponse = await axios.get(`${BACKEND_URL}/api/photos/${photoId}`);
+          return photoResponse.data;
         } catch (error) {
-          console.error('❌ Error processing photo:', error);
-          continue;
+          console.error(`Error fetching photo ${photoId}:`, error);
+          return null;
         }
-      }
+      });
+
+      const photos = (await Promise.all(photoPromises)).filter(p => p !== null);
+
+      // Map to FaceMatch format
+      const matches: FaceMatch[] = photos.map((photo: any) => {
+        // Find the face match for this photo
+        const face = faces.find((f: any) => f.photo_id === photo.id);
+        
+        return {
+          id: photo.id,
+          photoUrl: photo.public_url,
+          confidence: face?.similarity || 0.7,
+          metadata: {
+            filename: photo.filename,
+            uploadedAt: photo.created_at || photo.uploaded_at,
+            eventId: photo.sister
+          }
+        };
+      });
 
       // Sort matches by confidence (highest first)
       matches.sort((a, b) => b.confidence - a.confidence);
 
-      console.log(`✅ Found ${matches.length} matching photos`);
+      console.log(`✅ Displaying ${matches.length} matching photos`);
       setSearchResults(matches);
       
       if (matches.length > 0) {

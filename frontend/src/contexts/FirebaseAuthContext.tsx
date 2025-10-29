@@ -1,130 +1,184 @@
 /**
  * Firebase Authentication Context
  * 
- * Provides Firebase authentication state and methods
- * throughout the React application.
+ * Provides authentication functionality using Firebase Auth
+ * Replaces the previous Supabase authentication
  */
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { firebaseAuth, AuthUser } from '../lib/firebase-auth';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+  updateProfile
+} from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
-interface FirebaseAuthContextType {
-  user: AuthUser | null;
+interface User {
+  id: string;
+  uid: string;
+  email: string | null;
+  username: string | null;
+  displayName: string | null;
+  role: string;
+}
+
+interface AuthContextType {
+  currentUser: User | null;
+  firebaseUser: FirebaseUser | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<AuthUser>;
-  signOut: () => Promise<void>;
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (roles: string[]) => boolean;
-  getIdToken: () => Promise<string | null>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, displayName: string, role?: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const FirebaseAuthContext = createContext<FirebaseAuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface FirebaseAuthProviderProps {
-  children: ReactNode;
-}
-
-export const FirebaseAuthProvider: React.FC<FirebaseAuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = firebaseAuth.onAuthStateChange((authUser) => {
-      setUser(authUser);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const signIn = async (email: string, password: string): Promise<AuthUser> => {
-    setLoading(true);
-    try {
-      const authUser = await firebaseAuth.signIn(email, password);
-      setUser(authUser);
-      return authUser;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signOut = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      await firebaseAuth.signOut();
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const hasRole = (role: string): boolean => {
-    return firebaseAuth.hasRole(role);
-  };
-
-  const hasAnyRole = (roles: string[]): boolean => {
-    return firebaseAuth.hasAnyRole(roles);
-  };
-
-  const getIdToken = async (): Promise<string | null> => {
-    return await firebaseAuth.getIdToken();
-  };
-
-  const value: FirebaseAuthContextType = {
-    user,
-    loading,
-    signIn,
-    signOut,
-    hasRole,
-    hasAnyRole,
-    getIdToken
-  };
-
-  return (
-    <FirebaseAuthContext.Provider value={value}>
-      {children}
-    </FirebaseAuthContext.Provider>
-  );
-};
-
-export const useFirebaseAuth = (): FirebaseAuthContextType => {
-  const context = useContext(FirebaseAuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useFirebaseAuth must be used within a FirebaseAuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-// Higher-order component for role-based access
-interface WithRoleProps {
-  roles: string[];
-  fallback?: ReactNode;
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
-export const withRole = <P extends object>(
-  Component: React.ComponentType<P>,
-  { roles, fallback = null }: WithRoleProps
-) => {
-  return (props: P) => {
-    const { hasAnyRole } = useFirebaseAuth();
-    
-    if (!hasAnyRole(roles)) {
-      return <>{fallback}</>;
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+
+  useEffect(() => {
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setFirebaseUser(user);
+      
+      if (user) {
+        // Get ID token to fetch custom claims
+        const idTokenResult = await user.getIdTokenResult();
+        const role = idTokenResult.claims.role as string || 'user';
+        
+        setCurrentUser({
+          id: user.uid,
+          uid: user.uid,
+          email: user.email,
+          username: user.displayName,
+          displayName: user.displayName,
+          role: role
+        });
+      } else {
+        setCurrentUser(null);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Get ID token with custom claims
+      const idTokenResult = await user.getIdTokenResult();
+      const role = idTokenResult.claims.role as string || 'user';
+      
+      // Store token in localStorage for backend API calls
+      const idToken = await user.getIdToken();
+      localStorage.setItem('accessToken', idToken);
+      
+      setCurrentUser({
+        id: user.uid,
+        uid: user.uid,
+        email: user.email,
+        username: user.displayName,
+        displayName: user.displayName,
+        role: role
+      });
+      
+      console.log('✅ Login successful:', user.email);
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw new Error(error.message || 'Login failed');
     }
-    
-    return <Component {...props} />;
   };
+
+  const signup = async (email: string, password: string, displayName: string, role: string = 'user') => {
+    try {
+      // First, create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Update user profile with display name
+      await updateProfile(user, { displayName });
+      
+      // Call backend to set custom claims for role
+      const idToken = await user.getIdToken();
+      
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ 
+            email, 
+            displayName,
+            role 
+          }),
+        });
+        
+        if (!response.ok) {
+          console.warn('Failed to set custom claims on backend');
+        }
+      } catch (backendError) {
+        console.warn('Backend registration endpoint not available:', backendError);
+      }
+      
+      console.log('✅ Signup successful:', user.email);
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      throw new Error(error.message || 'Signup failed');
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('accessToken');
+      setCurrentUser(null);
+      console.log('✅ Logout successful');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      throw new Error(error.message || 'Logout failed');
+    }
+  };
+
+  const value: AuthContextType = {
+    currentUser,
+    firebaseUser,
+    loading,
+    login,
+    signup,
+    logout,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };
 
-// Hook for role-based rendering
-export const useRole = (role: string): boolean => {
-  const { hasRole } = useFirebaseAuth();
-  return hasRole(role);
-};
-
-// Hook for multiple roles
-export const useAnyRole = (roles: string[]): boolean => {
-  const { hasAnyRole } = useFirebaseAuth();
-  return hasAnyRole(roles);
-};
+// Export FirebaseAuthContext as default for compatibility
+export default AuthProvider;

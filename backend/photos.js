@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { supabase } = require('./lib/supabase'); // Use shared Supabase client
-const { PhotoDB } = require('./lib/supabase-db'); // Import PhotoDB
+const { storage, getPublicUrl } = require('./lib/firebase'); // Use Firebase Storage
+const { PhotoDB, FaceDescriptorDB, PhotoFacesDB } = require('./lib/firestore-db'); // Use Firestore DB
 const { authenticateToken } = require('./auth'); // Import authentication middleware
+const { v4: uuidv4 } = require('uuid');
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -11,7 +12,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
 });
 
-// GET all photos metadata from Supabase
+// GET all photos metadata from Firestore
 router.get('/', async (req, res) => {
   try {
     const { sister } = req.query;
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new photo to Supabase Storage and save metadata to Firestore
+// POST a new photo to Firebase Storage and save metadata to Firestore
 // Requires authentication
 router.post('/', authenticateToken, upload.single('photo'), async (req, res) => {
   if (!req.file) {
@@ -68,122 +69,216 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     const file = req.file;
     const fileName = `${sister}/${Date.now()}_${file.originalname}`;
     
-    const { data, error } = await supabase.storage
-      .from('wedding-photos') // Replace with your Supabase bucket name
-      .upload(fileName, file.buffer, {
+    // Upload to Firebase Storage
+    const fileBuffer = file.buffer;
+    const blob = storage.file(fileName);
+    const blobStream = blob.createWriteStream({
+      metadata: {
         contentType: file.mimetype,
-        upsert: false,
         metadata: {
           title: title || '',
           description: description || '',
           eventType: eventType || '',
           tags: JSON.stringify(parsedTags),
         }
+      }
+    });
+
+    // Wait for upload to complete
+    await new Promise((resolve, reject) => {
+      blobStream.on('error', (error) => {
+        console.error('Error uploading to Firebase Storage:', error);
+        reject(error);
       });
 
-    if (error) {
-      console.error('Error uploading to Supabase Storage:', error);
-      return res.status(500).json({ message: 'Error uploading photo to Supabase storage.' });
-    }
+      blobStream.on('finish', async () => {
+        try {
+          // Make the file public
+          await blob.makePublic();
+          resolve();
+        } catch (error) {
+          console.error('Error making file public:', error);
+          reject(error);
+        }
+      });
 
-    const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/wedding-photos/${fileName}`; // Construct public URL
+      blobStream.end(fileBuffer);
+    });
+
+    const publicUrl = getPublicUrl(fileName);
 
     const newPhoto = {
       filename: file.originalname,
-      file_path: fileName, // Use file_path to match Supabase schema
-      public_url: publicUrl, // Use public_url to match Supabase schema
+      file_path: fileName,
+      public_url: publicUrl,
       size: file.size,
       mimetype: file.mimetype,
       sister: sister,
       title: title || '',
       description: description || '',
-      event_type: eventType || '', // Use event_type to match Supabase schema
+      event_type: eventType || '',
       tags: parsedTags,
-      storage_provider: 'supabase', // Use storage_provider to match Supabase schema
+      storage_provider: 'firebase',
+      photographer_id: req.user?.id || req.user?.uid || null,
     };
 
-    const createdPhoto = await PhotoDB.create(newPhoto);
-    
-    // Store face descriptors if provided (from frontend)
-    if (parsedFaceDescriptors.length > 0) {
-      try {
-        const { PhotoFaceDB, FaceDescriptorDB } = require('./lib/supabase-db');
-        
-        for (const faceData of parsedFaceDescriptors) {
+    const insertedPhoto = await PhotoDB.create(newPhoto);
+
+    // Store face descriptors if provided
+    if (parsedFaceDescriptors && parsedFaceDescriptors.length > 0) {
+      console.log(`💾 Storing ${parsedFaceDescriptors.length} face descriptor(s) for photo ${insertedPhoto.id}`);
+      
+      for (const faceData of parsedFaceDescriptors) {
+        try {
           // Store face descriptor
           const faceDescriptor = await FaceDescriptorDB.create({
-            photo_id: createdPhoto.id,
             descriptor: faceData.descriptor,
-            confidence: faceData.confidence || 0.8
+            photo_id: insertedPhoto.id,
+            person_id: null, // Will be set when matched with a person
+            confidence: faceData.confidence || null
           });
-          
-          // Create photo_face record
-          await PhotoFaceDB.create({
-            photo_id: createdPhoto.id,
+
+          // Store photo face with bounding box
+          await PhotoFacesDB.create({
+            photo_id: insertedPhoto.id,
             face_descriptor_id: faceDescriptor.id,
-            bounding_box: faceData.boundingBox || null,
-            confidence: faceData.confidence || 0.8,
+            person_id: null,
+            bounding_box: faceData.detection?.box || {
+              x: 0,
+              y: 0,
+              width: 0,
+              height: 0
+            },
+            confidence: faceData.confidence || null,
             is_verified: false
           });
+
+          console.log(`✅ Face descriptor stored: ${faceDescriptor.id}`);
+        } catch (faceError) {
+          console.error('Error storing face descriptor:', faceError);
+          // Continue even if face storage fails
         }
-        
-        console.log(`✅ Stored ${parsedFaceDescriptors.length} face descriptor(s) for photo ${createdPhoto.id}`);
-      } catch (faceError) {
-        console.error('Error storing face descriptors:', faceError);
-        // Don't fail the upload
-      }
-    } else {
-      // No face descriptors provided - trigger background processing
-      try {
-        const autoFaceDetection = require('./services/auto-face-detection');
-        autoFaceDetection.triggerFaceDetection(sister).catch(error => {
-          console.error('Background face detection error:', error.message);
-        });
-        console.log(`🔍 Face detection triggered for ${sister} gallery`);
-      } catch (faceDetectionError) {
-        console.error('Failed to trigger face detection:', faceDetectionError.message);
       }
     }
-    
-    res.status(201).json(createdPhoto);
 
+    res.status(201).json({
+      message: 'Photo uploaded successfully!',
+      photo: insertedPhoto
+    });
   } catch (error) {
     console.error('Error uploading photo:', error);
-    if (!res.headersSent) { // Prevent sending headers multiple times
-      res.status(500).json({ message: 'Error uploading photo.' });
-    }
+    res.status(500).json({ message: 'Error uploading photo.' });
   }
 });
 
-// DELETE a photo from Supabase Storage and Database
-// Requires authentication
-router.delete('/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
+// GET a single photo by ID
+router.get('/:id', async (req, res) => {
   try {
+    const { id } = req.params;
     const photo = await PhotoDB.findById(id);
-
+    
     if (!photo) {
       return res.status(404).json({ message: 'Photo not found.' });
     }
+    
+    res.json(photo);
+  } catch (error) {
+    console.error('Error getting photo:', error);
+    res.status(500).json({ message: 'Error retrieving photo.' });
+  }
+});
 
-    const filePath = photo.file_path;
-
-    const { error: storageError } = await supabase.storage
-      .from('wedding-photos') // Replace with your Supabase bucket name
-      .remove([filePath]);
-
-    if (storageError) {
-      console.error('Error deleting from Supabase Storage:', storageError);
-      return res.status(500).json({ message: 'Error deleting photo from Supabase storage.' });
+// PUT update a photo's metadata (authentication required)
+router.put('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, event_type, tags } = req.body;
+    
+    const updates = {};
+    if (title !== undefined) updates.title = title;
+    if (description !== undefined) updates.description = description;
+    if (event_type !== undefined) updates.event_type = event_type;
+    if (tags !== undefined) updates.tags = tags;
+    
+    const updatedPhoto = await PhotoDB.update(id, updates);
+    
+    if (!updatedPhoto) {
+      return res.status(404).json({ message: 'Photo not found.' });
     }
+    
+    res.json({
+      message: 'Photo updated successfully!',
+      photo: updatedPhoto
+    });
+  } catch (error) {
+    console.error('Error updating photo:', error);
+    res.status(500).json({ message: 'Error updating photo.' });
+  }
+});
 
-    // Delete metadata from Supabase DB
+// DELETE a photo (authentication required)
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get photo metadata first
+    const photo = await PhotoDB.findById(id);
+    
+    if (!photo) {
+      return res.status(404).json({ message: 'Photo not found.' });
+    }
+    
+    // Delete file from Firebase Storage
+    try {
+      const file = storage.file(photo.file_path);
+      await file.delete();
+      console.log(`✅ Photo file deleted from Firebase Storage: ${photo.file_path}`);
+    } catch (storageError) {
+      console.error('Error deleting from Firebase Storage:', storageError);
+      // Continue even if storage deletion fails
+    }
+    
+    // Delete associated face descriptors
+    const faceDescriptors = await FaceDescriptorDB.findAll({ photo_id: id });
+    for (const descriptor of faceDescriptors) {
+      await FaceDescriptorDB.delete(descriptor.id);
+    }
+    
+    // Delete associated photo faces
+    const photoFaces = await PhotoFacesDB.findAll({ photo_id: id });
+    for (const photoFace of photoFaces) {
+      await PhotoFacesDB.delete(photoFace.id);
+    }
+    
+    // Delete photo metadata from Firestore
     await PhotoDB.delete(id);
-
-    res.status(200).json({ message: 'Photo deleted successfully.' });
+    
+    res.json({ message: 'Photo deleted successfully!' });
   } catch (error) {
     console.error('Error deleting photo:', error);
     res.status(500).json({ message: 'Error deleting photo.' });
+  }
+});
+
+// GET photos by face search
+router.post('/search/faces', async (req, res) => {
+  try {
+    const { face_descriptors } = req.body;
+    
+    if (!face_descriptors || !Array.isArray(face_descriptors) || face_descriptors.length === 0) {
+      return res.status(400).json({ message: 'Face descriptors array is required.' });
+    }
+    
+    console.log(`🔍 Searching photos with ${face_descriptors.length} face descriptor(s)`);
+    
+    // This would require implementing face matching algorithm
+    // For now, return empty array
+    // TODO: Implement face matching with Firestore
+    
+    res.json([]);
+  } catch (error) {
+    console.error('Error searching photos by faces:', error);
+    res.status(500).json({ message: 'Error searching photos.' });
   }
 });
 
