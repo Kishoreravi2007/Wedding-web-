@@ -7,15 +7,15 @@
 
 const admin = require('firebase-admin');
 
-// Firebase configuration from user
+// Firebase configuration - Use environment variables or fallback to defaults
 const firebaseConfig = {
-  apiKey: "AIzaSyB8BGBnEsJhDRhJ03Bvdevh792Gh8A9Uj8",
-  authDomain: "kishore-75492.firebaseapp.com",
-  projectId: "kishore-75492",
-  storageBucket: "kishore-75492.firebasestorage.app",
-  messagingSenderId: "904463871757",
-  appId: "1:904463871757:web:e742970921a623a5718a44",
-  measurementId: "G-0YJHHJ26L8"
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJO3Bvdevh792Gh8A9Uj8",
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "kishore-75492.firebaseapp.com",
+  projectId: process.env.FIREBASE_PROJECT_ID || "kishore-75492",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "kishore-75492.firebasestorage.app",
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "904463871757",
+  appId: process.env.FIREBASE_APP_ID || "1:904463871757:web:e742970921a623a5718a44",
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID || "G-0YJHHJ26L8"
 };
 
 let firebaseApp;
@@ -29,24 +29,49 @@ try {
 } catch (error) {
   // Initialize Firebase Admin SDK
   try {
-    // Try to use service account key if available
-    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
+    const path = require('path');
+    const fs = require('fs');
     
-    if (serviceAccountPath) {
-      const serviceAccount = require(serviceAccountPath);
-      firebaseApp = admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        projectId: firebaseConfig.projectId,
-        storageBucket: firebaseConfig.storageBucket
-      });
-    } else {
-      // Initialize with config only (for basic operations)
-      firebaseApp = admin.initializeApp({
-        projectId: firebaseConfig.projectId,
-        storageBucket: firebaseConfig.storageBucket
-      });
+    // Try to find the service account key file
+    const possiblePaths = [
+      path.join(__dirname, '..', 'weddingweb-9421e-firebase-adminsdk-fbsvc-184b677d23 (2).json'),
+      path.join(__dirname, '..', 'firebase-service-account.json'),
+      path.join(__dirname, '..', 'serviceAccountKey.json')
+    ];
+    
+    let credential;
+    let foundServiceAccount = false;
+    
+    for (const filePath of possiblePaths) {
+      if (fs.existsSync(filePath)) {
+        try {
+          const serviceAccount = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+          credential = admin.credential.cert(serviceAccount);
+          console.log(`✅ Using Firebase service account from: ${path.basename(filePath)}`);
+          foundServiceAccount = true;
+          break;
+        } catch (parseError) {
+          console.warn(`⚠️  Failed to parse service account file: ${filePath}`);
+        }
+      }
     }
     
+    if (!foundServiceAccount) {
+      console.warn('⚠️  No service account file found, initializing without credentials');
+      // Initialize without credentials (will work for some operations if GOOGLE_APPLICATION_CREDENTIALS is set)
+      credential = null;
+    }
+    
+    const initConfig = {
+      projectId: firebaseConfig.projectId,
+      storageBucket: firebaseConfig.storageBucket
+    };
+    
+    if (credential) {
+      initConfig.credential = credential;
+    }
+    
+    firebaseApp = admin.initializeApp(initConfig);
     console.log('✅ Firebase Admin SDK initialized');
   } catch (initError) {
     console.error('❌ Failed to initialize Firebase Admin SDK:', initError);

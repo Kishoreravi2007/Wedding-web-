@@ -53,9 +53,8 @@ const PhotographerDashboard = () => {
       try {
         console.log('Loading all photos from API...');
         
-        // Fetch photos from both galleries
-        // Use /api/photos for production (Supabase), /api/photos-local for development
-        const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+        // Fetch photos from both galleries via Firebase-backed endpoint
+        const endpoint = '/api/photos';
         
         const [sisterAResponse, sisterBResponse] = await Promise.all([
           fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),

@@ -106,10 +106,8 @@ export async function uploadFiles(
 
       console.log('Using token:', token ? 'Token present' : 'No token');
 
-      // Use Supabase storage for production, local filesystem for development
-      const uploadEndpoint = import.meta.env.PROD 
-        ? `${API_BASE_URL}/api/photos`  // Supabase (cloud) - for deployment
-        : `${API_BASE_URL}/api/photos-local`;  // Local filesystem - for development
+      // Always use Firebase-backed photos endpoint
+      const uploadEndpoint = `${API_BASE_URL}/api/photos`;
       
       const response = await fetch(uploadEndpoint, {
         method: 'POST',

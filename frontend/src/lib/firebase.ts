@@ -11,15 +11,15 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getAnalytics, Analytics } from 'firebase/analytics';
 
-// Firebase configuration
+// Firebase configuration - Use environment variables or fallback to defaults
 const firebaseConfig = {
-  apiKey: "AIzaSyB8BGBnEsJhDRhJ03Bvdevh792Gh8A9Uj8",
-  authDomain: "kishore-75492.firebaseapp.com",
-  projectId: "kishore-75492",
-  storageBucket: "kishore-75492.firebasestorage.app",
-  messagingSenderId: "904463871757",
-  appId: "1:904463871757:web:e742970921a623a5718a44",
-  measurementId: "G-0YJHHJ26L8"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJO3Bvdevh792Gh8A9Uj8",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "kishore-75492.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "kishore-75492",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "kishore-75492.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "904463871757",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:904463871757:web:e742970921a623a5718a44",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-0YJHHJ26L8"
 };
 
 // Initialize Firebase
