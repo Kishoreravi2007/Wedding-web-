@@ -44,8 +44,8 @@ const PhotoManager: React.FC = () => {
     try {
       setLoading(true);
       
-      // Use /api/photos for production (Supabase), /api/photos-local for development
-      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      // Always use Firebase-backed endpoint
+      const endpoint = '/api/photos';
       
       const [sisterAResponse, sisterBResponse] = await Promise.all([
         fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
@@ -91,8 +91,8 @@ const PhotoManager: React.FC = () => {
     }
 
     try {
-      // Use /api/photos for production (Supabase), /api/photos-local for development
-      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      // Always use Firebase-backed endpoint
+      const endpoint = '/api/photos';
       const response = await fetch(`${API_BASE_URL}${endpoint}/${photo.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()

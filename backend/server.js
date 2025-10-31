@@ -61,25 +61,21 @@ app.use('/api/photos', photosRouter); // Authentication handled per-route in pho
 const photosLocalRouter = require('./photos-local');
 app.use('/api/photos-local', photosLocalRouter);
 
-// Enhanced photos API with face detection
-const photosEnhancedRouter = require('./photos-enhanced');
-app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
+// Enhanced photos API with face detection (Disabled - using Firebase-backed /api/photos instead)
+// const photosEnhancedRouter = require('./photos-enhanced');
+// app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
 
-// Face recognition API
-const facesRouter = require('./faces');
-app.use('/api/faces', facesRouter);
+// Face recognition API (Temporarily disabled during Supabase to Firebase migration)
+// const facesRouter = require('./faces');
+// app.use('/api/faces', facesRouter);
 
-// Face detection trigger API (automatic processing)
-const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
-app.use('/api/face-detection', faceDetectionTriggerRouter);
-
-// Face processing API (store face descriptors)
-const processFacesRouter = require('./routes/process-faces');
-app.use('/api/process-faces', processFacesRouter);
-
-// Auto face detection API
-const autoFaceDetectionRouter = require('./routes/auto-face-detection');
-app.use('/api/auto-face-detection', autoFaceDetectionRouter);
+// Face detection routes - Temporarily disabled during Supabase to Firebase migration
+// const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
+// app.use('/api/face-detection', faceDetectionTriggerRouter);
+// const processFacesRouter = require('./routes/process-faces');
+// app.use('/api/process-faces', processFacesRouter);
+// const autoFaceDetectionRouter = require('./routes/auto-face-detection');
+// app.use('/api/auto-face-detection', autoFaceDetectionRouter);
 
 // Face recognition endpoint (for frontend compatibility)
 const multer = require('multer');
