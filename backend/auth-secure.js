@@ -233,4 +233,10 @@ router.get('/health', async (req, res) => {
   }
 });
 
-module.exports = router;
+// Export router and authenticateToken middleware
+const { authMiddleware } = require('./lib/secure-auth');
+
+module.exports = {
+  router,
+  authenticateToken: authMiddleware.verifyToken
+};
