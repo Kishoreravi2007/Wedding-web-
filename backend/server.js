@@ -94,9 +94,77 @@ app.use('/api/photos-local', photosLocalRouter);
 // const autoFaceDetectionRouter = require('./routes/auto-face-detection');
 // app.use('/api/auto-face-detection', autoFaceDetectionRouter);
 
-// Face recognition endpoint (for frontend compatibility)
+// Face recognition endpoint (for photo booth feature)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+const { matchFace } = require('./lib/face-recognition');
+const { PhotoDB } = require('./lib/supabase-db');
+
+// POST /api/recognize - Find photos by face descriptor
+app.post('/api/recognize', async (req, res) => {
+  try {
+    const { descriptor } = req.body;
+    
+    if (!descriptor || !Array.isArray(descriptor)) {
+      return res.status(400).json({ 
+        message: 'Face descriptor is required and must be an array' 
+      });
+    }
+    
+    console.log(`🔍 Face recognition request with descriptor length: ${descriptor.length}`);
+    
+    // Match the face against known faces (threshold 0.6 = 60% similarity)
+    const matchResult = await matchFace(descriptor, 0.6);
+    
+    if (!matchResult.matches || matchResult.matches.length === 0) {
+      console.log('❌ No matching faces found');
+      return res.json({ 
+        message: 'No matching photos found.',
+        matches: []
+      });
+    }
+    
+    console.log(`✅ Found ${matchResult.matches.length} matching face(s)`);
+    
+    // Get unique photo IDs from matches
+    const photoIds = [...new Set(matchResult.matches.map(m => m.photoId).filter(Boolean))];
+    
+    // Fetch photo details
+    const photos = [];
+    for (const photoId of photoIds) {
+      try {
+        const photo = await PhotoDB.findById(photoId);
+        if (photo) {
+          photos.push({
+            id: photo.id,
+            url: photo.public_url,
+            filename: photo.filename,
+            title: photo.title,
+            sister: photo.sister
+          });
+        }
+      } catch (err) {
+        console.error(`Error fetching photo ${photoId}:`, err);
+      }
+    }
+    
+    console.log(`📸 Returning ${photos.length} photo(s)`);
+    
+    res.json({
+      message: photos.length > 0 ? 'Photos found!' : 'No matching photos found.',
+      matches: photos,
+      matchCount: photos.length,
+      bestMatch: matchResult.bestMatch
+    });
+    
+  } catch (error) {
+    console.error('❌ Face recognition error:', error);
+    res.status(500).json({ 
+      message: 'Error during face recognition',
+      error: error.message 
+    });
+  }
+});
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');
