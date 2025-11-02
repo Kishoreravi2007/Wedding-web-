@@ -40,11 +40,21 @@ console.log('📁 Serving static files from:', path.join(__dirname, '../uploads'
 app.use('/backend', express.static(path.join(__dirname)));
 console.log('📁 Serving backend files from:', path.join(__dirname));
 
-const wishesRouter = require('./wishes');
+// Use Supabase wishes endpoint (switched back from Firebase)
+const wishesRouter = require('./wishes-supabase');
 app.use('/api/wishes', wishesRouter);
 
-const { router: authRouter, authenticateToken } = require('./auth');
+// Firebase wishes endpoint (commented out - keeping for future migration)
+// const wishesFirebaseRouter = require('./wishes');
+// app.use('/api/wishes', wishesFirebaseRouter);
+
+// Use Supabase-based secure authentication (switched from Firebase)
+const { router: authRouter, authenticateToken } = require('./auth-secure');
 app.use('/api/auth', authRouter);
+
+// Firebase authentication (commented out - keeping for future migration)
+// const { router: authFirebaseRouter, authenticateToken: authFirebaseToken } = require('./auth');
+// app.use('/api/auth', authFirebaseRouter);
 
 const usersRouter = require('./users');
 app.use('/api/users', authenticateToken, usersRouter);
