@@ -1,7 +1,11 @@
-import { db, storage } from '@/lib/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+// Supabase for storage (switched back from Firebase)
+import { supabase } from '@/lib/supabase';
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+
+// Firebase imports (commented out - keeping for future migration)
+// import { db, storage } from '@/lib/firebase';
+// import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+// import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // File Upload Service for organizing wedding photos and music
 export interface UploadedFile {
@@ -131,8 +135,8 @@ export async function uploadFiles(
       }
 
       const result = await response.json();
-      console.log('Upload successful:', result);
-      uploadedFiles.push(result);
+      console.log('Upload successful to Supabase:', result);
+      uploadedFiles.push(result.photo || result);
     }
 
     return {
@@ -149,33 +153,68 @@ export async function uploadFiles(
   }
 }
 
-// New function to upload audio blobs for wishes
+// New function to upload audio blobs for wishes using Supabase
 export async function uploadAudioWish(audioBlob: Blob, recipient: string): Promise<string> {
   try {
     const fileExtension = audioBlob.type.split('/').pop() || 'webm';
     const fileName = generateFileName(`audio_wish.${fileExtension}`, recipient);
     const storagePath = getDirectoryPath(recipient, 'audio-wish'); // Use recipient as eventType for directory
-    const fileRef = ref(storage, `${storagePath}/${fileName}`);
+    const filePath = `${storagePath}/${fileName}`;
 
-    await uploadBytes(fileRef, audioBlob);
-    const audioUrl = await getDownloadURL(fileRef);
-    console.log("Audio wish uploaded successfully:", audioUrl);
-    return audioUrl;
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('wedding-photos')
+      .upload(filePath, audioBlob, {
+        contentType: audioBlob.type,
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error("Error uploading audio wish to Supabase:", error);
+      throw error;
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('wedding-photos')
+      .getPublicUrl(filePath);
+
+    console.log("Audio wish uploaded successfully to Supabase:", publicUrl);
+    return publicUrl;
   } catch (error) {
     console.error("Error uploading audio wish:", error);
     throw error;
   }
 }
 
-// Get all uploaded files from Firestore
+// Get all uploaded files from Supabase
 export async function getUploadedFiles(): Promise<UploadedFile[]> {
   try {
-    const q = query(collection(db, 'uploadedFiles'), orderBy('uploadedAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    const files: UploadedFile[] = [];
-    querySnapshot.forEach((doc) => {
-      files.push({ id: doc.id, ...doc.data() } as UploadedFile);
-    });
+    const { data, error } = await supabase
+      .from('photos')
+      .select('*')
+      .order('uploaded_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error getting uploaded files from Supabase:', error);
+      return [];
+    }
+    
+    // Map Supabase data to UploadedFile format
+    const files: UploadedFile[] = (data || []).map((photo: any) => ({
+      id: photo.id,
+      originalName: photo.filename,
+      fileName: photo.file_path,
+      filePath: photo.file_path,
+      publicUrl: photo.public_url,
+      size: photo.size,
+      type: photo.mimetype,
+      eventType: photo.event_type || 'other',
+      uploadedAt: photo.uploaded_at,
+      fileCategory: photo.mimetype.startsWith('image/') ? 'image' : 'music'
+    }));
+    
     return files;
   } catch (error) {
     console.error('Error getting uploaded files:', error);
@@ -183,17 +222,32 @@ export async function getUploadedFiles(): Promise<UploadedFile[]> {
   }
 }
 
-// Delete uploaded file from Firebase Storage and Firestore
+// Delete uploaded file from Supabase Storage and Database
 export async function deleteUploadedFile(fileId: string, filePath: string): Promise<boolean> {
   try {
-    // Delete from Firebase Storage
-    const fileRef = ref(storage, filePath);
-    await deleteObject(fileRef);
+    // Delete from Supabase Storage
+    const { error: storageError } = await supabase.storage
+      .from('wedding-photos')
+      .remove([filePath]);
 
-    // Delete metadata from Firestore
-    await deleteDoc(doc(db, 'uploadedFiles', fileId));
+    if (storageError) {
+      console.error('Error deleting from Supabase Storage:', storageError);
+    }
 
-    console.log(`Deleting file with ID: ${fileId} and path: ${filePath}`);
+    // Delete metadata from Supabase DB using backend API
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/api/photos/${fileId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete photo metadata');
+    }
+
+    console.log(`Deleted file with ID: ${fileId} and path: ${filePath} from Supabase`);
     return true;
   } catch (error) {
     console.error('Error deleting file:', error);
