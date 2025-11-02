@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const { supabase } = require('./lib/supabase'); // Use Supabase
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/supabase-db'); // Use Supabase DB
-const { authenticateToken } = require('./auth'); // Import authentication middleware
+const { authenticateToken } = require('./auth-secure'); // Import Supabase authentication middleware
 const { v4: uuidv4 } = require('uuid');
 
 // Multer configuration for in-memory storage
