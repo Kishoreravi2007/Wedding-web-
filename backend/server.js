@@ -101,13 +101,28 @@ const { matchFace } = require('./lib/face-recognition');
 const { PhotoDB } = require('./lib/supabase-db');
 
 // POST /api/recognize - Find photos by face descriptor
-app.post('/api/recognize', async (req, res) => {
+app.post('/api/recognize', upload.none(), async (req, res) => {
   try {
-    const { descriptor } = req.body;
+    // Photo booth sends FormData with face_descriptor as JSON string
+    let descriptor;
     
-    if (!descriptor || !Array.isArray(descriptor)) {
+    if (req.body.face_descriptor) {
+      // Parse from FormData
+      descriptor = JSON.parse(req.body.face_descriptor);
+      console.log('✅ Parsed descriptor from FormData');
+    } else if (req.body.descriptor) {
+      // Accept direct descriptor (for backwards compatibility)
+      descriptor = req.body.descriptor;
+      console.log('✅ Received descriptor from JSON body');
+    } else {
       return res.status(400).json({ 
-        message: 'Face descriptor is required and must be an array' 
+        message: 'Face descriptor is required (send as face_descriptor in FormData or descriptor in JSON)' 
+      });
+    }
+    
+    if (!Array.isArray(descriptor)) {
+      return res.status(400).json({ 
+        message: 'Face descriptor must be an array' 
       });
     }
     
