@@ -48,9 +48,13 @@ app.use('/api/wishes', wishesRouter);
 // const wishesFirebaseRouter = require('./wishes');
 // app.use('/api/wishes', wishesFirebaseRouter);
 
-// Use Supabase-based secure authentication (switched from Firebase)
-const { router: authRouter, authenticateToken } = require('./auth-secure');
+// Use simple authentication (works with basic users table)
+const { router: authRouter, authenticateToken } = require('./auth-simple');
 app.use('/api/auth', authRouter);
+
+// Secure auth with RLS (commented out - needs RPC functions)
+// const { router: authSecureRouter, authenticateToken: authSecureToken } = require('./auth-secure');
+// app.use('/api/auth', authSecureRouter);
 
 // Firebase authentication (commented out - keeping for future migration)
 // const { router: authFirebaseRouter, authenticateToken: authFirebaseToken } = require('./auth');
