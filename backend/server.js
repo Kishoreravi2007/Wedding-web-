@@ -3,8 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-// Initialize Firebase (moved to lib/firebase.js for better organization)
-const { db, storage, checkFirebaseConnection } = require('./lib/firebase');
+// Initialize Supabase (switched back from Firebase)
+const { supabase } = require('./lib/supabase');
+// Firebase (commented out - keeping for future migration)
+// const { db, storage, checkFirebaseConnection } = require('./lib/firebase');
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
@@ -53,8 +55,13 @@ app.use('/api/settings', settingsRouter); // Public read, admin write
 const analyticsRouter = require('./analytics');
 app.use('/api/analytics', analyticsRouter); // Public track, admin read
 
-const photosRouter = require('./photos');
-app.use('/api/photos', photosRouter); // Authentication handled per-route in photos.js
+// Use Supabase photos endpoint (switched back from Firebase)
+const photosRouter = require('./photos-supabase');
+app.use('/api/photos', photosRouter); // Authentication handled per-route in photos-supabase.js
+
+// Firebase photos endpoint (commented out - keeping for future migration)
+// const photosFirebaseRouter = require('./photos');
+// app.use('/api/photos', photosFirebaseRouter);
 
 // Local filesystem photo uploads (primary upload endpoint)
 // Note: GET requests are public (for gallery), POST/DELETE require authentication
@@ -87,14 +94,22 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`✅ Backend server running on http://localhost:${PORT}`);
-  console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos-local`);
+  console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos`);
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
+  console.log(`💾 Using Supabase for photo storage`);
   
-  // Check Firebase connection
-  const isConnected = await checkFirebaseConnection();
-  if (isConnected) {
-    console.log('✅ Firebase connection successful');
+  // Check Supabase connection
+  if (supabase) {
+    console.log('✅ Supabase client initialized');
   } else {
-    console.warn('⚠️  Firebase connection check failed');
+    console.warn('⚠️  Supabase client not initialized. Check environment variables.');
   }
+  
+  // Firebase connection check (commented out)
+  // const isConnected = await checkFirebaseConnection();
+  // if (isConnected) {
+  //   console.log('✅ Firebase connection successful');
+  // } else {
+  //   console.warn('⚠️  Firebase connection check failed');
+  // }
 });

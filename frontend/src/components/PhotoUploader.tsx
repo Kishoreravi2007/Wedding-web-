@@ -26,7 +26,8 @@ import {
   Database
 } from 'lucide-react';
 import * as faceapi from 'face-api.js';
-import { PhotoService } from '../services/firebaseService';
+// Firebase service (commented out - using Supabase backend API instead)
+// import { PhotoService } from '../services/firebaseService';
 import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
