@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { PhotoDB, PhotoFaceDB, FaceDescriptorDB } = require('../lib/supabase-db');
-const { authenticateToken } = require('../auth');
+const { authenticateToken } = require('../auth-simple');
 
 /**
  * POST /api/process-faces/store-descriptors
