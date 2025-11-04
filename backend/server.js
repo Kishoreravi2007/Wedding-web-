@@ -90,11 +90,13 @@ app.use('/api/photos-local', photosLocalRouter);
 // const facesRouter = require('./faces');
 // app.use('/api/faces', facesRouter);
 
-// Face detection routes - Temporarily disabled during Supabase to Firebase migration
+// Face detection routes - Enabled for face descriptor processing
+const processFacesRouter = require('./routes/process-faces');
+app.use('/api/process-faces', processFacesRouter);
+
+// Other face detection routes (temporarily disabled)
 // const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
 // app.use('/api/face-detection', faceDetectionTriggerRouter);
-// const processFacesRouter = require('./routes/process-faces');
-// app.use('/api/process-faces', processFacesRouter);
 // const autoFaceDetectionRouter = require('./routes/auto-face-detection');
 // app.use('/api/auto-face-detection', autoFaceDetectionRouter);
 
