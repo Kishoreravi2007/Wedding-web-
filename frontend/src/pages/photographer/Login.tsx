@@ -30,7 +30,7 @@ const PhotographerLogin = () => {
 
       if (response.data.accessToken) {
         localStorage.setItem('token', response.data.accessToken);
-        localStorage.setItem('role', response.data.role);
+        localStorage.setItem('role', response.data.user?.role || 'photographer');
         showSuccess('Login successful! Welcome to the Photographer Portal.');
         navigate('/photographer');
       } else {

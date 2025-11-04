@@ -40,14 +40,17 @@ const AdminLogin = () => {
       }
 
       // Check if user is admin
-      if (data.role !== 'admin') {
+      const userRole = data.user?.role || data.role;
+      if (userRole !== 'admin') {
         throw new Error('Access denied. Admin privileges required.');
       }
 
       // Store authentication token and user info
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('userRole', data.role);
-      localStorage.setItem('username', data.username);
+      const token = data.accessToken || data.token;
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('token', token); // Also store as 'token' for consistency
+      localStorage.setItem('userRole', userRole);
+      localStorage.setItem('username', data.user?.username || data.username);
 
       showSuccess('Login successful! Welcome to the Admin Portal.');
       navigate('/admin/dashboard');
