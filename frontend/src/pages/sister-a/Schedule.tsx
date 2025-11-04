@@ -246,6 +246,16 @@ const SisterASchedule = () => {
 
   return (
     <div className="text-white relative">
+      {/* Watch Live Button */}
+      <div className="flex justify-start px-4 mb-4">
+        <Button
+          onClick={() => navigate('/parvathy/live')}
+          className="bg-gradient-to-r from-[#8C3B3B] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#8C3B3B] text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center gap-2 animate-pulse"
+        >
+          <Radio className="w-5 h-5" />
+          Watch Live
+        </Button>
+      </div>
 
       <div className="relative w-full h-64 mb-4 overflow-hidden rounded-lg shadow-lg">
         <img
@@ -268,17 +278,6 @@ const SisterASchedule = () => {
           </p>
           {/* Add to my Calendar button - functionality can be added later if needed */}
         </div>
-      </div>
-
-      {/* Watch Live Button */}
-      <div className="flex justify-end px-4 mb-4">
-        <Button
-          onClick={() => navigate('/parvathy/live')}
-          className="bg-gradient-to-r from-[#8C3B3B] to-[#D4AF37] hover:from-[#D4AF37] hover:to-[#8C3B3B] text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center gap-2 animate-pulse"
-        >
-          <Radio className="w-5 h-5" />
-          Watch Live
-        </Button>
       </div>
 
       <div className="py-12 px-4 sm:px-6 lg:px-8">
