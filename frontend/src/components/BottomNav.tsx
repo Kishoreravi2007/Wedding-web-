@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { CalendarDays, Camera, Image, Video } from "lucide-react";
+import { CalendarDays, Camera, Image, Video, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +15,7 @@ const BottomNav = ({ basePath, activeColor }: BottomNavProps) => {
     { to: "/photobooth", icon: Camera, label: t('photoBooth') },
     { to: "/gallery", icon: Image, label: t('gallery') },
     { to: "/engagement-video", icon: Video, label: t('video') },
+    { to: "/live", icon: Radio, label: "Watch Live" },
   ];
 
   return (

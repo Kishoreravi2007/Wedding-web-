@@ -20,9 +20,11 @@ import NotFound from "./pages/NotFound";
 import ParvathyLayout from "./pages/sister-a/Layout";
 import ParvathySchedule from "./pages/sister-a/Schedule";
 import ParvathyPhotoBooth from "./pages/sister-a/PhotoBooth";
+import ParvathyLiveStream from "./pages/sister-a/LiveStream";
 import SreedeviLayout from "./pages/sister-b/Layout";
 import SreedeviSchedule from "./pages/sister-b/Schedule";
 import SreedeviPhotoBooth from "./pages/sister-b/PhotoBooth";
+import SreedeviLiveStream from "./pages/sister-b/LiveStream";
 import EventInvitation from "./pages/EventInvitation";
 import Wishes from "./pages/Wishes";
 import PhotoGallery from "./pages/PhotoGallery";
@@ -111,8 +113,8 @@ const App = () => {
                 <Route path="schedule/:eventId" element={<EventInvitation sister="a" />} />
                 <Route path="photobooth" element={<ParvathyPhotoBooth />} />
                 <Route path="gallery" element={<PhotoGallery sister="a" />} />
-                {/* This seems like a mistake, should probably be a Parvathy video component */}
-                <Route path="engagement-video" element={<ParvathyEngagementVideo />} /> 
+                <Route path="engagement-video" element={<ParvathyEngagementVideo />} />
+                <Route path="live" element={<ParvathyLiveStream />} />
               </Route>
               <Route path="/sreedevi" element={<SreedeviLayout />}>
                 <Route index element={<SreedeviSchedule />} />
@@ -121,6 +123,7 @@ const App = () => {
                 <Route path="photobooth" element={<SreedeviPhotoBooth />} />
                 <Route path="gallery" element={<PhotoGallery sister="b" />} />
                 <Route path="engagement-video" element={<SreedeviEngagementVideo />} />
+                <Route path="live" element={<SreedeviLiveStream />} />
               </Route>
 
               {/* Portal Routes */}
