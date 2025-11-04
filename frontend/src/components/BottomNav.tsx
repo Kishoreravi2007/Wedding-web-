@@ -27,7 +27,7 @@ const BottomNav = ({ basePath, activeColor }: BottomNavProps) => {
             to={`${basePath}${item.to}`}
             className={({ isActive }) =>
               cn(
-                "flex flex-col items-center justify-center w-full pt-3 pb-2 px-4 rounded-xl transition-all duration-300 group",
+                "flex flex-col items-center justify-center w-full pt-3 pb-2 px-2 rounded-xl transition-all duration-300 group",
                 isActive
                   ? `bg-gradient-to-t from-[${activeColor}]/10 to-transparent scale-105 shadow-lg`
                   : "text-gray-500 hover:text-stone-700 hover:scale-105"
@@ -45,7 +45,7 @@ const BottomNav = ({ basePath, activeColor }: BottomNavProps) => {
                   )}
                   style={isActive ? { color: activeColor } : {}}
                 />
-                <span className="text-xs font-medium transition-all duration-300 group-hover:scale-105">
+                <span className="text-xs font-medium transition-all duration-300 group-hover:scale-105 whitespace-nowrap">
                   {item.label}
                 </span>
                 {/* Active indicator */}
