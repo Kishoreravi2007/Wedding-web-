@@ -70,7 +70,8 @@ router.post('/login', async (req, res) => {
     
     res.json({
       message: 'Login successful',
-      token,
+      accessToken: token,
+      token, // Keep for backwards compatibility
       user: {
         id: user.id,
         username: user.username,
