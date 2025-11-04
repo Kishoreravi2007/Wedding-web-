@@ -33,17 +33,26 @@
 
 ## 🚀 What You Need To Do
 
-### Step 1: Deploy Backend
-```bash
-cd C:\Users\KISHORERAVI\Documents\projects\Wedding-web-1
+### Step 1: Fix Database Schema (URGENT!)
 
-# Commit changes
-git add .
-git commit -m "Fix authentication and enable face processing endpoint"
-git push
+The backend is deployed and working, but the database needs the `confidence` column.
+
+**Go to Supabase Dashboard → SQL Editor and run this:**
+
+```sql
+-- Add missing confidence column
+ALTER TABLE face_descriptors 
+ADD COLUMN IF NOT EXISTS confidence REAL CHECK (confidence >= 0 AND confidence <= 1);
+
+ALTER TABLE photo_faces 
+ADD COLUMN IF NOT EXISTS confidence REAL CHECK (confidence >= 0 AND confidence <= 1);
+
+-- Verify it worked
+SELECT column_name FROM information_schema.columns 
+WHERE table_name = 'face_descriptors' AND column_name = 'confidence';
 ```
 
-Your Render backend should auto-deploy. **Wait 2-3 minutes.**
+**See detailed instructions:** `FIX_CONFIDENCE_COLUMN.md`
 
 ### Step 2: Set Frontend Environment Variable
 
@@ -65,9 +74,9 @@ Then **trigger a redeploy** of your frontend.
    - Go to `https://weddingweb.co.in/photographer-login`
    - Username: `photographer`
    - Password: `wedding2024`
-   - Should redirect to photographer portal ✅
+   - Should redirect to photographer portal ✅ **WORKING NOW!**
 
-2. **Test Face Processing:**
+2. **Test Face Processing (after DB fix):**
    - In photographer portal, click "Process Faces" tab
    - Click "Process 18 Photos"
    - Watch console - should see success messages ✅
@@ -78,11 +87,19 @@ Then **trigger a redeploy** of your frontend.
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Photographer Login | ✅ Fixed | Working after redeploy |
-| Admin Login | ✅ Fixed | Working after redeploy |
-| Face Detection | ✅ Working | Was already working |
-| Face Descriptor Storage | ✅ Fixed | Will work after backend deploy |
+| Photographer Login | ✅ Fixed | Working! |
+| Admin Login | ✅ Fixed | Working! |
+| Backend Endpoint | ✅ Fixed | Deployed and running! |
+| Face Detection | ✅ Working | Working! |
+| Database Schema | ⚠️ **ACTION NEEDED** | Need to add `confidence` column |
+| Face Descriptor Storage | ⏳ Pending | Will work after DB fix |
 | Photo Booth | ⏳ Pending | Will work after face processing completes |
+
+## 🚨 NEW ISSUE: Database Schema Missing Column
+
+Your backend is now working, but the Supabase database is missing the `confidence` column.
+
+**Quick Fix:** Run SQL migration in Supabase (2 minutes)
 
 ---
 
