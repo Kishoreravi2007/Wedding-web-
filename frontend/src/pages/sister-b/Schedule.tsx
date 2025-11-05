@@ -338,9 +338,6 @@ const SisterBSchedule = () => {
         <WishBox recipient="sreedevi" /> {/* Add the WishBox component here */}
         </div>
       </div>
-      <div className="fixed bottom-20 left-4 text-[#800000] text-sm bg-white p-2 rounded z-20">
-        <a href="mailto:help.weddingweb@gmail.com" className="underline">help.weddingweb@gmail.com</a>
-      </div>
     </div>
   );
 };
