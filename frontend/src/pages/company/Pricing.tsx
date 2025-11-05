@@ -22,9 +22,10 @@ const Pricing = () => {
       icon: <Sparkles className="w-8 h-8" />,
       description: "Perfect for intimate gatherings",
       color: "from-blue-500 to-cyan-500",
-      monthlyPrice: 99,
-      yearlyPrice: 999,
+      monthlyPrice: 2999,
+      yearlyPrice: 9999,
       features: [
+        { text: "Build your wedding website", included: true },
         { text: "Up to 100 guests", included: true },
         { text: "5GB photo storage", included: true },
         { text: "AI Face Detection", included: true },
@@ -34,7 +35,6 @@ const Pricing = () => {
         { text: "Email support", included: true },
         { text: "Live streaming", included: false },
         { text: "Photographer portal", included: false },
-        { text: "Admin dashboard", included: false },
         { text: "Custom branding", included: false },
         { text: "Priority support", included: false }
       ],
@@ -45,9 +45,11 @@ const Pricing = () => {
       icon: <Crown className="w-8 h-8" />,
       description: "Most popular for weddings",
       color: "from-rose-500 to-purple-600",
-      monthlyPrice: 199,
-      yearlyPrice: 1999,
+      monthlyPrice: 5999,
+      yearlyPrice: 19999,
       features: [
+        { text: "Build your wedding website", included: true },
+        { text: "Premium templates", included: true },
         { text: "Up to 500 guests", included: true },
         { text: "50GB photo storage", included: true },
         { text: "AI Face Detection", included: true },
@@ -56,8 +58,6 @@ const Pricing = () => {
         { text: "Event scheduling", included: true },
         { text: "Live streaming (HD)", included: true },
         { text: "Photographer portal", included: true },
-        { text: "Admin dashboard", included: true },
-        { text: "Priority email support", included: true },
         { text: "Custom branding", included: false },
         { text: "24/7 phone support", included: false }
       ],
@@ -68,21 +68,21 @@ const Pricing = () => {
       icon: <Rocket className="w-8 h-8" />,
       description: "For large events & multiple weddings",
       color: "from-purple-500 to-indigo-600",
-      monthlyPrice: 499,
-      yearlyPrice: 4999,
+      monthlyPrice: 14999,
+      yearlyPrice: 49999,
       features: [
+        { text: "Build your wedding website", included: true },
+        { text: "All premium templates", included: true },
+        { text: "Custom domain included", included: true },
         { text: "Unlimited guests", included: true },
         { text: "Unlimited storage", included: true },
         { text: "AI Face Detection", included: true },
         { text: "Premium photo gallery", included: true },
         { text: "Digital wishes", included: true },
-        { text: "Event scheduling", included: true },
         { text: "Live streaming (4K)", included: true },
         { text: "Photographer portal", included: true },
-        { text: "Advanced admin dashboard", included: true },
         { text: "Custom branding", included: true },
-        { text: "24/7 priority support", included: true },
-        { text: "Dedicated account manager", included: true }
+        { text: "24/7 priority support", included: true }
       ],
       popular: false
     }
@@ -90,16 +90,16 @@ const Pricing = () => {
 
   const faqs = [
     {
-      question: "Can I upgrade or downgrade my plan?",
-      answer: "Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate the charges accordingly."
+      question: "How does the one-time payment work?",
+      answer: "Pay once and use the service for the duration you choose - 1 month or 1 year. No recurring charges, no hidden fees. Just one simple payment!"
     },
     {
-      question: "What happens after my event?",
-      answer: "Your photos and data remain accessible for 1 year after your event. You can download everything or extend storage for an additional fee."
+      question: "What happens after my plan expires?",
+      answer: "Your photos and data remain accessible for 30 days after expiration. You can download everything or purchase an extension to keep access."
     },
     {
-      question: "Is there a free trial?",
-      answer: "Yes! We offer a 14-day free trial on all plans. No credit card required. Experience all features before committing."
+      question: "Can I extend my plan later?",
+      answer: "Yes! You can purchase additional time at any point. We'll notify you before your plan expires so you don't lose access."
     },
     {
       question: "How does the face detection work?",
@@ -111,7 +111,7 @@ const Pricing = () => {
     },
     {
       question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards, debit cards, PayPal, and bank transfers. Enterprise clients can also pay via invoice."
+      answer: "We accept all major credit cards, debit cards, UPI, Net Banking, and bank transfers. Enterprise clients can also pay via invoice."
     }
   ];
 
@@ -119,22 +119,22 @@ const Pricing = () => {
     {
       name: "Extended Storage",
       description: "Keep your memories accessible for 5 years",
-      price: 99
+      price: 2999
     },
     {
       name: "Professional Videography",
       description: "Professional video editing and highlights",
-      price: 499
+      price: 14999
     },
     {
       name: "Custom Domain",
       description: "Use your own custom domain (e.g., ourwedding.com)",
-      price: 49
+      price: 1499
     },
     {
       name: "Advanced Analytics",
       description: "Detailed insights and engagement reports",
-      price: 79
+      price: 2499
     }
   ];
 
@@ -176,7 +176,7 @@ const Pricing = () => {
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
               From intimate gatherings to grand celebrations, we have a plan for every wedding. 
-              Start with a 14-day free trial, no credit card required.
+              One-time payment - no recurring charges!
             </p>
 
             {/* Billing Toggle */}
@@ -189,7 +189,7 @@ const Pricing = () => {
                     : 'text-slate-600'
                 }`}
               >
-                Monthly
+                1 Month
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
@@ -199,9 +199,9 @@ const Pricing = () => {
                     : 'text-slate-600'
                 }`}
               >
-                Yearly
+                1 Year
                 <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                  Save 15%
+                  Best Value
                 </span>
               </button>
             </div>
@@ -241,28 +241,27 @@ const Pricing = () => {
                     <div className="mb-6">
                       <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-bold">
-                          ${billingPeriod === 'monthly' ? plan.monthlyPrice : Math.floor(plan.yearlyPrice / 12)}
+                          ₹{billingPeriod === 'monthly' ? plan.monthlyPrice.toLocaleString('en-IN') : plan.yearlyPrice.toLocaleString('en-IN')}
                         </span>
-                        <span className="text-slate-600">/month</span>
                       </div>
-                      {billingPeriod === 'yearly' && (
-                        <div className="text-sm text-slate-500 mt-1">
-                          ${plan.yearlyPrice} billed annually
-                        </div>
-                      )}
+                      <div className="text-sm text-slate-500 mt-1">
+                        One-time payment for {billingPeriod === 'monthly' ? '1 month' : '1 year'}
+                      </div>
                     </div>
 
-                    <Button 
-                      className={`w-full mb-6 ${
-                        plan.popular 
-                          ? 'bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700' 
-                          : ''
-                      }`}
-                      variant={plan.popular ? 'default' : 'outline'}
-                      size="lg"
-                    >
-                      {plan.popular ? 'Start Free Trial' : 'Get Started'}
-                    </Button>
+                    <Link to="/company/contact">
+                      <Button 
+                        className={`w-full mb-6 ${
+                          plan.popular 
+                            ? 'bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700' 
+                            : ''
+                        }`}
+                        variant={plan.popular ? 'default' : 'outline'}
+                        size="lg"
+                      >
+                        Get Started
+                      </Button>
+                    </Link>
 
                     <div className="space-y-3">
                       {plan.features.map((feature, featureIndex) => (
@@ -313,7 +312,7 @@ const Pricing = () => {
                     <h3 className="font-bold text-lg mb-2">{addon.name}</h3>
                     <p className="text-sm text-slate-600 mb-4">{addon.description}</p>
                     <div className="text-2xl font-bold text-rose-600">
-                      ${addon.price}
+                      ₹{addon.price.toLocaleString('en-IN')}
                       <span className="text-sm text-slate-500 font-normal">/one-time</span>
                     </div>
                   </CardContent>

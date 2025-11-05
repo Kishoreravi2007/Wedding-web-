@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Heart, Gift, Shirt, Settings, Camera } from "lucide-react";
+import { Heart, Gift, Shirt, Camera } from "lucide-react";
 import { useWebsite } from "@/contexts/WebsiteContext";
 import { motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -82,11 +82,24 @@ const Index = () => {
   
   return (
     <motion.div 
-      className="min-h-screen w-full flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden animated-gradient-background"
+      className="min-h-screen w-full flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
+      {/* Background Image with overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      />
+      {/* Overlay to make text more readable */}
+      <div className="absolute inset-0 bg-white/0" />
+      
       {/* Background decorative elements */}
       <motion.div 
         className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-[#D4AF37]/20 to-transparent rounded-full blur-xl"
@@ -100,15 +113,15 @@ const Index = () => {
         transition={{ delay: 1 }}
       ></motion.div>
 
-      <motion.div className="text-center mb-12 flex items-center justify-center" variants={itemVariants}>
+      <motion.div className="text-center mb-12 flex items-center justify-center relative z-10" variants={itemVariants}>
         <motion.div
             variants={heartbeatVariants}
             animate="animate"
         >
-            <Heart className="w-8 h-8 text-[#8C3B3B]" />
+            <Heart className="w-8 h-8 text-[#FFD700] drop-shadow-lg" />
         </motion.div>
         <motion.h1 
-          className="font-heading text-4xl md:text-7xl text-[#5D4037] bg-gradient-to-r from-[#5D4037] to-[#8C3B3B] bg-clip-text text-transparent mx-4"
+          className="font-heading text-4xl md:text-7xl bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] bg-clip-text text-transparent mx-4 drop-shadow-2xl"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
@@ -119,18 +132,18 @@ const Index = () => {
             variants={heartbeatVariants}
             animate="animate"
         >
-            <Heart className="w-8 h-8 text-[#8C3B3B]" />
+            <Heart className="w-8 h-8 text-[#FFD700] drop-shadow-lg" />
         </motion.div>
       </motion.div>
 
-      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-12" variants={containerVariants}>
+      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-12 relative z-10" variants={containerVariants}>
         <motion.div variants={cardVariants}>
           <Link to="/parvathy" className="group" onClick={() => playTrack('/wedding-music.mp3')}>
             <motion.div
               whileHover="hover"
               variants={cardVariants}
             >
-              <Card className="text-center cursor-hover border-2 border-transparent hover:border-[#D4AF37] bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 relative overflow-hidden">
+              <Card className="text-center cursor-hover border-2 border-transparent hover:border-[#D4AF37] bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-500 relative overflow-hidden">
                 {/* Background Image for Parvathy */}
                 <motion.div 
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 group-hover:opacity-30 transition-opacity duration-500"
@@ -154,7 +167,7 @@ const Index = () => {
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.2 }}
                     >
-                        <CardTitle className="font-heading text-3xl text-[#8C3B3B] group-hover:text-[#6d2d2d] transition-colors duration-300 drop-shadow-sm">
+                        <CardTitle className="font-heading text-3xl text-[#FFFDD0] group-hover:text-[#FFE4B5] transition-colors duration-300 drop-shadow-lg">
                           {t('sisterAWedding')}
                         </CardTitle>
                       </motion.div>
@@ -173,7 +186,7 @@ const Index = () => {
                         whileTap={{ scale: 0.9 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <Heart className="w-8 h-8 mx-auto mt-4 text-[#8C3B3B] group-hover:text-[#6d2d2d] transition-all duration-300 drop-shadow-sm" />
+                        <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFFDD0] group-hover:text-[#FFE4B5] transition-all duration-300 drop-shadow-lg" />
                       </motion.div>
                     </CardContent>
                   </div>
@@ -188,13 +201,13 @@ const Index = () => {
                 whileHover="hover"
                 variants={cardVariants}
               >
-                <Card className="text-center cursor-hover border-2 border-transparent hover:border-[#B8860B] bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500">
+                <Card className="text-center cursor-hover border-2 border-transparent hover:border-[#B8860B] bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-500">
                   <CardHeader className="pb-2">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.2 }}
                     >
-                        <CardTitle className="font-heading text-3xl text-[#1B5E20] group-hover:text-[#0d3d12] transition-colors duration-300">
+                        <CardTitle className="font-heading text-3xl text-[#FFD700] group-hover:text-[#FFA500] transition-colors duration-300 drop-shadow-md">
                           {t('sisterBWedding')}
                         </CardTitle>
                     </motion.div>
@@ -213,7 +226,7 @@ const Index = () => {
                       whileTap={{ scale: 0.9 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Heart className="w-8 h-8 mx-auto mt-4 text-[#1B5E20] group-hover:text-[#0d3d12] transition-all duration-300" />
+                      <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFD700] group-hover:text-[#FFA500] transition-all duration-300 drop-shadow-md" />
                     </motion.div>
                   </CardContent>
                 </Card>
@@ -223,104 +236,12 @@ const Index = () => {
       </motion.div>
 
       <motion.div 
-        className="w-full max-w-4xl pb-8" 
+        className="w-full max-w-4xl pb-8 relative z-10" 
         variants={itemVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.h2 
-          className="font-heading text-3xl text-center my-8 text-[#5D4037] bg-gradient-to-r from-[#5D4037] to-[#8C3B3B] bg-clip-text text-transparent"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          {t('View Wedding Photos')}
-        </motion.h2>
-        <div className="w-full">
-        </div>
-
-        {/* Quick Access Gallery */}
-        <motion.div 
-          className="mt-8"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          viewport={{ once: true }}
-        >
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card className="bg-white/95 backdrop-blur-sm border-2 border-stone-200 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-hover">
-              <CardContent className="p-6">
-                <motion.h3
-                  className="text-lg font-semibold text-center mb-6 text-stone-800"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.1 }}
-                  viewport={{ once: true }}
-                >
-                  {t('')}
-                </motion.h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <motion.div 
-                    className="flex items-center justify-center gap-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 1.2 }}
-                    viewport={{ once: true }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.3, rotate: 10 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Camera className="w-5 h-5 text-[#8C3B3B]" />
-                    </motion.div>
-                    <Link to="/parvathy/gallery">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button variant="outline" className="text-[#8C3B3B] hover:text-[#6d2d2d] border-[#8C3B3B] hover:border-[#6d2d2d] font-medium">
-                          {t('sisterAPhotos')}
-                        </Button>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                  <motion.div 
-                    className="flex items-center justify-center gap-2"
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 1.4 }}
-                    viewport={{ once: true }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.3, rotate: -10 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Camera className="w-5 h-5 text-[#1B5E20]" />
-                    </motion.div>
-                    <Link to="/sreedevi/gallery">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button variant="outline" className="text-[#1B5E20] hover:text-[#0d3d12] border-[#1B5E20] hover:border-[#0d3d12] font-medium">
-                          {t('sisterBPhotos')}
-                        </Button>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </motion.div>
-
         {/* Portal Access */}
         <motion.div 
           className="mt-8"
@@ -333,10 +254,10 @@ const Index = () => {
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.3 }}
           >
-            <Card className="bg-white/95 backdrop-blur-sm border-2 border-stone-200 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-hover">
+            <Card className="bg-white/15 backdrop-blur-sm border-2 border-stone-200 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-hover">
               <CardContent className="p-6">
                 <motion.h3 
-                  className="text-lg font-semibold text-center mb-6 text-stone-800"
+                  className="text-lg font-semibold text-center mb-6 text-[#FFD700] drop-shadow-md"
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1.7 }}
@@ -344,7 +265,7 @@ const Index = () => {
                 >
                   {t('portalAccess')}
                 </motion.h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <motion.div 
                     className="flex items-center justify-center gap-2"
                     initial={{ opacity: 0, x: -20 }}
@@ -357,40 +278,15 @@ const Index = () => {
                       whileHover={{ scale: 1.3, rotate: 10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Heart className="w-5 h-5 text-stone-600" />
+                      <Heart className="w-5 h-5 text-[#FFFDD0]" />
                     </motion.div>
                     <Link to="/couple-login">
                       <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <Button variant="ghost" className="text-stone-600 hover:text-stone-800 font-medium">
+                        <Button variant="ghost" className="text-[#FFFDD0] hover:text-[#FFE4B5] font-medium bg-white/10 hover:bg-white/20 backdrop-blur-sm drop-shadow-md">
                           {t('couplePortal')}
-                        </Button>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                  <motion.div 
-                    className="flex items-center justify-center gap-2"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 2.0 }}
-                    viewport={{ once: true }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.3, rotate: -10 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Camera className="w-5 h-5 text-stone-600" />
-                    </motion.div>
-                    <Link to="/photographer-login">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button variant="ghost" className="text-stone-600 hover:text-stone-800 font-medium">
-                          {t('photographerPortal')}
                         </Button>
                       </motion.div>
                     </Link>
@@ -399,23 +295,23 @@ const Index = () => {
                     className="flex items-center justify-center gap-2"
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 2.2 }}
+                    transition={{ duration: 0.6, delay: 2.0 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1 }}
                   >
                     <motion.div
-                      whileHover={{ scale: 1.3, rotate: 360 }}
-                      transition={{ duration: 0.5 }}
+                      whileHover={{ scale: 1.3, rotate: -10 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <Settings className="w-5 h-5 text-stone-600" />
+                      <Camera className="w-5 h-5 text-[#FFD700]" />
                     </motion.div>
-                    <Link to="/admin-login">
+                    <Link to="/photographer-login">
                       <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <Button variant="ghost" className="text-stone-600 hover:text-stone-800 font-medium">
-                          {t('adminPortal')}
+                        <Button variant="ghost" className="text-[#FFD700] hover:text-[#FFA500] font-medium bg-white/10 hover:bg-white/20 backdrop-blur-sm drop-shadow-md">
+                          {t('photographerPortal')}
                         </Button>
                       </motion.div>
                     </Link>

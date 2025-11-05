@@ -9,7 +9,7 @@ import MusicPlayer from "./components/MusicPlayer";
 import { WebsiteProvider } from "./contexts/WebsiteContext";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "./components/ui/button";
-import { X, Music } from "lucide-react";
+import { X, Music, MessageSquare } from "lucide-react";
 import CountdownTimer from "./components/CountdownTimer";
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLocation } from "react-router-dom";
@@ -31,14 +31,12 @@ import PhotoGallery from "./pages/PhotoGallery";
 import SreedeviEngagementVideo from "./pages/sister-b/EngagementVideo";
 import ParvathyEngagementVideo from "./pages/sister-a/EngagementVideo";
 
-import AdminDashboard from "./pages/admin/Dashboard";
-import ComprehensiveAdminDashboard from "./pages/admin/ComprehensiveDashboard";
-import AdminLogin from "./pages/admin/Login";
 import PhotographerDashboard from "./pages/photographer/Dashboard";
 import PhotographerLogin from "./pages/photographer/Login";
 import CoupleDashboard from "./pages/couple/Dashboard";
 import CoupleLogin from "./pages/couple/Login";
-import FaceDetectionAdmin from "./pages/FaceDetectionAdmin";
+import Feedback from "./pages/Feedback";
+import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
 import CompanyLanding from "./pages/company/Landing";
@@ -64,6 +62,7 @@ const itemVariants = {
 
 const App = () => {
   const [showMusicPlayer, setShowMusicPlayer] = useState(true);
+  const [feedbackCompact, setFeedbackCompact] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
 
@@ -98,6 +97,15 @@ const App = () => {
     return location.pathname.startsWith('/company');
   }, [location.pathname]);
 
+  // Feedback button animation - shrink to icon only after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFeedbackCompact(true);
+    }, 3000); // 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // Reset on page change
+
   return (
     <QueryClientProvider client={queryClient}>
       <WebsiteProvider>
@@ -116,8 +124,8 @@ const App = () => {
               </Button>
             </Link>
           )}
-          {/* Music Player Toggle - Hidden on company pages */}
-          {!isCompanyPage && (
+          {/* Music Player Toggle - Hidden on company pages and feedback page */}
+          {!isCompanyPage && location.pathname !== '/feedback' && (
             <Button
               variant="outline"
               size="icon"
@@ -129,6 +137,22 @@ const App = () => {
           )}
           {/* Music Player - Hidden on company pages */}
           {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
+          
+          {/* Feedback Button - Available on all pages except feedback page itself */}
+          {location.pathname !== '/feedback' && (
+            <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isCompanyPage ? 'bottom-20' : 'bottom-20'}`}>
+              <Button 
+                className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${
+                  feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
+                }`}
+                title="Give Feedback"
+                onMouseEnter={() => setFeedbackCompact(false)}
+              >
+                <MessageSquare className={`w-5 h-5 transition-all duration-500 ${feedbackCompact ? '' : 'mr-2'}`} />
+                {!feedbackCompact && <span className="transition-opacity duration-500">Feedback</span>}
+              </Button>
+            </Link>
+          )}
             <AnimatePresence mode="wait">
               <Routes>
               {/* Company Routes */}
@@ -177,25 +201,25 @@ const App = () => {
               </Route>
 
               {/* Portal Routes */}
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/dashboard" element={<ComprehensiveAdminDashboard />} />
               <Route path="/photographer-login" element={<PhotographerLogin />} />
               <Route path="/photographer" element={<PhotographerDashboard />} />
               <Route path="/couple-login" element={<CoupleLogin />} />
               <Route path="/couple" element={<CoupleDashboard />} />
-              <Route path="/face-admin" element={<FaceDetectionAdmin />} />
+              <Route path="/feedback" element={<Feedback />} />
+              <Route path="/view-feedback" element={<ViewFeedback />} />
 
               {/* Not Found Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
-        <motion.footer 
-          className="text-center p-4 mt-8 text-stone-500 text-sm support-text"
-          variants={itemVariants}
-        >
-          <a href="mailto:help.weddingweb@gmail.com" className="underline hover:text-stone-700">help.weddingweb@gmail.com</a>
-        </motion.footer>
+        {!isCompanyPage && (
+          <motion.footer 
+            className="text-center p-4 mt-8 text-stone-500 text-sm support-text"
+            variants={itemVariants}
+          >
+            <a href="mailto:help.weddingweb@gmail.com" className="underline hover:text-stone-700">help.weddingweb@gmail.com</a>
+          </motion.footer>
+        )}
         </TooltipProvider>
       </WebsiteProvider>
     </QueryClientProvider>

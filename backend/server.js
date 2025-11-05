@@ -44,6 +44,14 @@ console.log('📁 Serving backend files from:', path.join(__dirname));
 const wishesRouter = require('./wishes-supabase');
 app.use('/api/wishes', wishesRouter);
 
+// Contact messages endpoint
+const contactMessagesRouter = require('./routes/contact-messages');
+app.use('/api/contact-messages', contactMessagesRouter);
+
+// Feedback endpoint
+const feedbackRouter = require('./routes/feedback');
+app.use('/api/feedback', feedbackRouter);
+
 // Firebase wishes endpoint (commented out - keeping for future migration)
 // const wishesFirebaseRouter = require('./wishes');
 // app.use('/api/wishes', wishesFirebaseRouter);

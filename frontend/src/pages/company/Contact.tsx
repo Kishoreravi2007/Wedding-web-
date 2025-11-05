@@ -40,49 +40,13 @@ const Contact = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      description: "Mon-Sat, 9 AM - 8 PM IST",
-      value: "+91 XXX-XXX-XXXX",
-      link: "tel:+91XXXXXXXXXX",
+      description: "Mon-Fri: After 4:30 PM | Sat-Sun: Anytime",
+      value: "+91 79071 77841",
+      link: "tel:+917907177841",
       color: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: <MessageSquare className="w-6 h-6" />,
-      title: "Live Chat",
-      description: "Chat with our team instantly",
-      value: "Start Chat",
-      link: "#",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: <Calendar className="w-6 h-6" />,
-      title: "Schedule Demo",
-      description: "Book a personalized demo call",
-      value: "Book Now",
-      link: "#",
-      color: "from-rose-500 to-orange-500"
     }
   ];
 
-  const offices = [
-    {
-      city: "Bangalore",
-      address: "HSR Layout, Sector 1",
-      country: "India",
-      icon: <MapPin className="w-5 h-5" />
-    },
-    {
-      city: "Mumbai",
-      address: "Andheri West",
-      country: "India",
-      icon: <MapPin className="w-5 h-5" />
-    },
-    {
-      city: "Delhi",
-      address: "Connaught Place",
-      country: "India",
-      icon: <MapPin className="w-5 h-5" />
-    }
-  ];
 
   const faqs = [
     {
@@ -103,11 +67,43 @@ const Contact = () => {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    alert('Thank you for contacting us! We\'ll get back to you within 24 hours.');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/contact-messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Thank you for contacting us! We\'ll get back to you within 24 hours.');
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          eventDate: '',
+          guestCount: '',
+          message: ''
+        });
+      } else {
+        alert('Something went wrong. Please try again or email us directly.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Something went wrong. Please try again or email us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -166,7 +162,7 @@ const Contact = () => {
       {/* Contact Methods */}
       <section className="py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {contactMethods.map((method, index) => (
               <motion.div
                 key={index}
@@ -299,9 +295,10 @@ const Contact = () => {
                     <Button 
                       type="submit" 
                       size="lg"
+                      disabled={isSubmitting}
                       className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700"
                     >
-                      Send Message <Send className="ml-2 w-4 h-4" />
+                      {isSubmitting ? 'Sending...' : 'Send Message'} <Send className="ml-2 w-4 h-4" />
                     </Button>
                   </form>
                 </CardContent>
@@ -315,30 +312,6 @@ const Contact = () => {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              {/* Office Locations */}
-              <Card className="border-2 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white">
-                      <MapPin className="w-5 h-5" />
-                    </div>
-                    <h3 className="text-xl font-bold">Our Offices</h3>
-                  </div>
-                  <div className="space-y-4">
-                    {offices.map((office, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                        <div className="text-rose-500 mt-1">{office.icon}</div>
-                        <div>
-                          <div className="font-semibold">{office.city}</div>
-                          <div className="text-sm text-slate-600">{office.address}</div>
-                          <div className="text-sm text-slate-500">{office.country}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* Business Hours */}
               <Card className="border-2 shadow-lg">
                 <CardContent className="p-6">
@@ -351,20 +324,16 @@ const Contact = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Monday - Friday</span>
-                      <span className="text-slate-600">9:00 AM - 8:00 PM</span>
+                      <span className="text-slate-600">After 4:30 PM</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold">Saturday</span>
-                      <span className="text-slate-600">10:00 AM - 6:00 PM</span>
+                      <span className="font-semibold">Saturday & Sunday</span>
+                      <span className="text-slate-600">Anytime</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold">Sunday</span>
-                      <span className="text-slate-600">Closed</span>
-                    </div>
-                    <div className="mt-4 p-3 bg-rose-50 rounded-lg">
-                      <p className="text-sm text-rose-700">
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-700">
                         <Sparkles className="w-4 h-4 inline mr-1" />
-                        24/7 support available for Premium & Enterprise customers
+                        100% online service - No physical offices
                       </p>
                     </div>
                   </div>
