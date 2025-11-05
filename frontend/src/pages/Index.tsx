@@ -167,7 +167,7 @@ const Index = () => {
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.2 }}
                     >
-                        <CardTitle className="font-heading text-3xl text-[#FFFDD0] group-hover:text-[#FFE4B5] transition-colors duration-300 drop-shadow-lg">
+                        <CardTitle className="font-heading text-3xl text-[#FFD700] group-hover:text-[#FFA500] transition-colors duration-300 drop-shadow-lg">
                           {t('sisterAWedding')}
                         </CardTitle>
                       </motion.div>
@@ -186,7 +186,7 @@ const Index = () => {
                         whileTap={{ scale: 0.9 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFFDD0] group-hover:text-[#FFE4B5] transition-all duration-300 drop-shadow-lg" />
+                        <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFD700] group-hover:text-[#FFA500] transition-all duration-300 drop-shadow-lg" />
                       </motion.div>
                     </CardContent>
                   </div>
@@ -278,14 +278,14 @@ const Index = () => {
                       whileHover={{ scale: 1.3, rotate: 10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Heart className="w-5 h-5 text-[#FFFDD0]" />
+                      <Heart className="w-5 h-5 text-[#FFD700]" />
                     </motion.div>
                     <Link to="/couple-login">
                       <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <Button variant="ghost" className="text-[#FFFDD0] hover:text-[#FFE4B5] font-medium bg-white/10 hover:bg-white/20 backdrop-blur-sm drop-shadow-md">
+                        <Button variant="ghost" className="text-[#FFD700] hover:text-[#FFA500] font-medium bg-white/10 hover:bg-white/20 backdrop-blur-sm drop-shadow-md">
                           {t('couplePortal')}
                         </Button>
                       </motion.div>
