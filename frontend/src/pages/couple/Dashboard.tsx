@@ -301,7 +301,7 @@ const CoupleDashboard = () => {
 
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> To edit website content, please contact the admin or use the Admin Portal. 
+                  <strong>Note:</strong> To edit website content, please contact the website administrator. 
                   This view shows the current content for reference.
                 </p>
               </div>

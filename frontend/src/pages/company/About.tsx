@@ -38,28 +38,18 @@ const About = () => {
   ];
 
   const milestones = [
-    { year: "2023", title: "Company Founded", description: "Started with a vision to revolutionize wedding technology" },
-    { year: "2023", title: "First 100 Events", description: "Successfully hosted our first 100 weddings" },
-    { year: "2024", title: "AI Face Detection", description: "Launched industry-leading face recognition technology" },
-    { year: "2024", title: "10K+ Events", description: "Crossed 10,000 successful events worldwide" },
-    { year: "2025", title: "Global Expansion", description: "Serving couples in 50+ countries" }
+    { year: "2025", title: "Company Founded", description: "Started with a vision to revolutionize wedding technology" },
+    { year: "2025", title: "Platform Development", description: "Built our MVP with AI-powered face recognition and event management" },
+    { year: "2025", title: "First Customers", description: "Successfully launched with our first 2 wedding events" },
+    { year: "2025", title: "Beta Testing", description: "Gathering feedback and continuously improving our platform" }
   ];
 
   const team = [
     {
       name: "Kishore Ravi",
       role: "Founder & CEO",
-      description: "Passionate about technology and creating memorable experiences"
-    },
-    {
-      name: "Tech Team",
-      role: "Engineering",
-      description: "Building innovative solutions with AI and cloud technologies"
-    },
-    {
-      name: "Support Team",
-      role: "Customer Success",
-      description: "Ensuring every wedding runs smoothly from start to finish"
+      description: "Passionate about technology and creating memorable experiences",
+      photo: "/kishore-photo.jpg"
     }
   ];
 
@@ -97,11 +87,11 @@ const About = () => {
               <span className="text-rose-600 font-semibold">Our Story</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Reimagining Weddings Through Technology
+              A Fresh Start in Wedding Technology
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              We're on a mission to make every wedding moment accessible, memorable, 
-              and magical through innovative technology solutions.
+              We're a new startup on a mission to make every wedding moment accessible and 
+              magical through innovative AI-powered technology. Just getting started, and excited for what's ahead!
             </p>
           </motion.div>
         </div>
@@ -129,8 +119,9 @@ const About = () => {
                   combines AI-powered face detection with beautiful galleries, live streaming, and more.
                 </p>
                 <p>
-                  Today, we've helped thousands of couples and millions of guests create and relive 
-                  their special moments. But we're just getting started.
+                  We're a fresh startup on a mission to transform the wedding experience. With our first 
+                  successful events completed, we're excited to help more couples create and relive 
+                  their special moments. We're just getting started on this incredible journey.
                 </p>
               </div>
             </motion.div>
@@ -141,10 +132,13 @@ const About = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-rose-400 via-purple-400 to-indigo-400 p-1">
-                <div className="w-full h-full bg-white rounded-3xl flex items-center justify-center">
-                  <Heart className="w-32 h-32 text-slate-300" />
-                </div>
+              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
+                  alt="Wedding celebration"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-purple-500/20 to-indigo-500/20" />
               </div>
             </motion.div>
           </div>
@@ -187,8 +181,8 @@ const About = () => {
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
                   <p className="text-lg text-slate-600">
-                    To become the world's leading wedding technology platform, bringing joy to 
-                    millions of couples and guests through seamless, intelligent, and delightful experiences.
+                    To grow into a trusted wedding technology platform that brings joy to 
+                    couples and guests through seamless, intelligent, and delightful experiences.
                   </p>
                 </CardContent>
               </Card>
@@ -278,11 +272,11 @@ const About = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4">Meet Our Team</h2>
-            <p className="text-xl text-slate-600">Passionate people building amazing experiences</p>
+            <h2 className="text-4xl font-bold mb-4">Meet the Founder</h2>
+            <p className="text-xl text-slate-600">Building amazing wedding experiences with technology</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="flex justify-center max-w-md mx-auto">
             {team.map((member, index) => (
               <motion.div
                 key={index}
@@ -293,9 +287,19 @@ const About = () => {
               >
                 <Card className="h-full hover:shadow-xl transition-all duration-300">
                   <CardContent className="p-6 text-center">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-rose-400 to-purple-600 flex items-center justify-center text-white text-3xl font-bold mb-4 mx-auto">
-                      {member.name.charAt(0)}
-                    </div>
+                    {member.photo ? (
+                      <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-gradient-to-br from-rose-400 to-purple-600 shadow-lg">
+                        <img 
+                          src={member.photo} 
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-rose-400 to-purple-600 flex items-center justify-center text-white text-3xl font-bold mb-4 mx-auto">
+                        {member.name.charAt(0)}
+                      </div>
+                    )}
                     <h3 className="text-xl font-bold mb-1">{member.name}</h3>
                     <div className="text-rose-600 font-semibold mb-3">{member.role}</div>
                     <p className="text-slate-600">{member.description}</p>
@@ -310,6 +314,10 @@ const About = () => {
       {/* Stats Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 text-white">
         <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Our Journey So Far</h2>
+            <p className="text-lg opacity-90">Small beginnings, big dreams</p>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -317,8 +325,8 @@ const About = () => {
               viewport={{ once: true }}
             >
               <TrendingUp className="w-12 h-12 mx-auto mb-4" />
-              <div className="text-5xl font-bold mb-2">10K+</div>
-              <div className="text-lg opacity-90">Events Hosted</div>
+              <div className="text-5xl font-bold mb-2">2</div>
+              <div className="text-lg opacity-90">Happy Couples</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -327,8 +335,8 @@ const About = () => {
               transition={{ delay: 0.1 }}
             >
               <Users className="w-12 h-12 mx-auto mb-4" />
-              <div className="text-5xl font-bold mb-2">5M+</div>
-              <div className="text-lg opacity-90">Happy Guests</div>
+              <div className="text-5xl font-bold mb-2">500+</div>
+              <div className="text-lg opacity-90">Guests Served</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -336,9 +344,9 @@ const About = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <Globe className="w-12 h-12 mx-auto mb-4" />
-              <div className="text-5xl font-bold mb-2">50+</div>
-              <div className="text-lg opacity-90">Countries</div>
+              <Sparkles className="w-12 h-12 mx-auto mb-4" />
+              <div className="text-5xl font-bold mb-2">AI</div>
+              <div className="text-lg opacity-90">Powered Tech</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -347,7 +355,7 @@ const About = () => {
               transition={{ delay: 0.3 }}
             >
               <Award className="w-12 h-12 mx-auto mb-4" />
-              <div className="text-5xl font-bold mb-2">99.9%</div>
+              <div className="text-5xl font-bold mb-2">100%</div>
               <div className="text-lg opacity-90">Satisfaction</div>
             </motion.div>
           </div>
@@ -364,7 +372,8 @@ const About = () => {
           >
             <h2 className="text-4xl font-bold mb-6">Join Us on This Journey</h2>
             <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-              Be part of the wedding technology revolution. Let's create unforgettable experiences together.
+              We're a young startup with big dreams. Be one of our early customers and help us shape 
+              the future of wedding technology together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/company/contact">

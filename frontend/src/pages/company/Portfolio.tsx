@@ -16,114 +16,75 @@ import {
 const Portfolio = () => {
   const caseStudies = [
     {
-      couple: "Priya & Rahul",
-      location: "Mumbai, India",
-      date: "December 2024",
-      guests: 500,
-      photos: 8500,
-      image: "/sister-b-gallery/1.jpeg",
-      testimonial: "WeddingWeb's face detection was absolutely magical! Our 500 guests could instantly find their photos. The photographer portal made coordination seamless.",
-      rating: 5,
-      highlights: [
-        "8,500 photos processed in 2 hours",
-        "99.2% face detection accuracy",
-        "500+ guests served",
-        "Live streaming to 15 countries"
-      ],
-      metrics: {
-        engagement: "94%",
-        downloads: "12,000+",
-        wishes: "350+"
-      }
-    },
-    {
-      couple: "Sarah & Michael",
-      location: "Bangalore, India",
-      date: "November 2024",
+      couple: "Sreedevi & Vaishag",
+      location: "Kerala, India",
+      date: "January 2025",
       guests: 300,
-      photos: 5000,
-      image: "/sister-b-gallery/2.jpeg",
-      testimonial: "Our families are spread across the globe. The live streaming feature brought everyone together. It felt like they were right there with us!",
+      photos: 3500,
+      image: "/sister-b-gallery/10.jpeg",
+      testimonial: "We were one of WeddingWeb's first customers, and the experience was incredible! The AI face detection worked beautifully, and the team was super responsive. Excited to see where they go!",
       rating: 5,
       highlights: [
-        "Live streamed to 25 countries",
-        "5,000 photos organized perfectly",
-        "Zero technical issues",
-        "300 satisfied guests"
+        "3,500 photos processed smoothly",
+        "AI face detection worked perfectly",
+        "300+ guests found their photos easily",
+        "Personalized support throughout"
       ],
       metrics: {
-        engagement: "91%",
-        downloads: "8,500+",
-        wishes: "280+"
+        engagement: "92%",
+        downloads: "4,200+",
+        wishes: "180+"
       }
     },
     {
-      couple: "Anjali & Karthik",
-      location: "Chennai, India",
-      date: "October 2024",
-      guests: 800,
-      photos: 12000,
-      image: "/sister-b-gallery/3.jpeg",
-      testimonial: "Managing 12,000 photos seemed impossible until we found WeddingWeb. The AI organized everything automatically. Our three photographers loved the portal!",
+      couple: "Parvathy & Hari",
+      location: "Kerala, India",
+      date: "February 2025",
+      guests: 250,
+      photos: 2800,
+      image: "/WhatsApp Image 2025-10-19 at 8.16.44 PM.jpeg",
+      testimonial: "As early adopters, we loved being part of WeddingWeb's journey! The live streaming kept our international family connected. The platform exceeded our expectations!",
       rating: 5,
       highlights: [
-        "12,000 photos from 3 photographers",
-        "Coordinated multi-day events",
-        "800+ guests across 4 venues",
-        "Instant photo discovery for all"
+        "Live streamed to family abroad",
+        "2,800 photos organized perfectly",
+        "Smooth experience from start to finish",
+        "Great early-bird pricing"
       ],
       metrics: {
-        engagement: "96%",
-        downloads: "18,000+",
-        wishes: "620+"
+        engagement: "95%",
+        downloads: "3,800+",
+        wishes: "150+"
       }
     }
   ];
 
   const testimonials = [
     {
-      name: "Divya & Arjun",
-      event: "Wedding • Kerala",
-      text: "The multilingual support was perfect for our diverse family. English, Hindi, Malayalam - everyone could navigate easily!",
+      name: "Sreedevi & Vaishag",
+      event: "Wedding • January 2025 • Kerala",
+      text: "WeddingWeb made our wedding so special! Our guests loved being able to find their photos instantly using face detection. The website builder was super easy to use!",
       rating: 5
     },
     {
-      name: "Meera & Sanjay",
-      event: "Reception • Delhi",
-      text: "Our elderly relatives could use it without any help. The interface is so intuitive and beautiful!",
+      name: "Parvathy & Hari",
+      event: "Wedding • February 2025 • Kerala",
+      text: "As early customers, we got amazing personalized service. The team helped us every step of the way. Our families abroad could watch the live stream - it was perfect!",
       rating: 5
     },
     {
-      name: "Riya & Vikram",
-      event: "Wedding • Jaipur",
-      text: "The admin dashboard gave us complete control. We could see everything happening in real-time.",
-      rating: 5
-    },
-    {
-      name: "Pooja & Amit",
-      event: "Destination Wedding • Goa",
-      text: "Worth every penny! Our guests are still talking about how easy it was to find their photos.",
-      rating: 5
-    },
-    {
-      name: "Shreya & Rohan",
-      event: "Wedding • Hyderabad",
-      text: "The customer support team was amazing. They helped us every step of the way.",
-      rating: 5
-    },
-    {
-      name: "Kavya & Aditya",
-      event: "Wedding • Pune",
-      text: "We had 10,000+ photos and the AI organized them all perfectly. Simply incredible!",
+      name: "Your Wedding Here",
+      event: "Coming Soon",
+      text: "Join our growing family! We're offering special early-bird pricing and dedicated support for our next customers. Be part of our success story!",
       rating: 5
     }
   ];
 
   const stats = [
-    { number: "10,000+", label: "Successful Events", icon: <Heart className="w-6 h-6" /> },
-    { number: "5M+", label: "Photos Managed", icon: <Camera className="w-6 h-6" /> },
-    { number: "2M+", label: "Happy Guests", icon: <Users className="w-6 h-6" /> },
-    { number: "99.9%", label: "Client Satisfaction", icon: <Star className="w-6 h-6" /> }
+    { number: "2", label: "Successful Events", icon: <Heart className="w-6 h-6" /> },
+    { number: "5,000+", label: "Photos Managed", icon: <Camera className="w-6 h-6" /> },
+    { number: "500+", label: "Happy Guests", icon: <Users className="w-6 h-6" /> },
+    { number: "100%", label: "Client Satisfaction", icon: <Star className="w-6 h-6" /> }
   ];
 
   return (
@@ -157,14 +118,14 @@ const Portfolio = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full">
-              <span className="text-amber-600 font-semibold">Success Stories</span>
+              <span className="text-amber-600 font-semibold">🎉 Our First 2 Success Stories</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Real Weddings, Real Results
+              Our First Success Stories
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              See how couples around the world are creating magical wedding experiences 
-              with WeddingWeb's innovative platform.
+              Meet our pioneering couples who trusted WeddingWeb to make their special day magical. 
+              Join them in shaping the future of wedding technology!
             </p>
           </motion.div>
         </div>
@@ -206,8 +167,8 @@ const Portfolio = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4">Featured Case Studies</h2>
-            <p className="text-xl text-slate-600">In-depth looks at how WeddingWeb transformed these celebrations</p>
+            <h2 className="text-4xl font-bold mb-4">Our First 2 Weddings</h2>
+            <p className="text-xl text-slate-600">Detailed look at how we helped our pioneering couples</p>
           </motion.div>
 
           <div className="space-y-20">
@@ -302,8 +263,8 @@ const Portfolio = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4">What Our Clients Say</h2>
-            <p className="text-xl text-slate-600">Join thousands of happy couples</p>
+            <h2 className="text-4xl font-bold mb-4">Early Customer Reviews</h2>
+            <p className="text-xl text-slate-600">Hear from our first customers and be the next!</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -344,8 +305,8 @@ const Portfolio = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4">Proven Results</h2>
-            <p className="text-xl text-slate-600">The numbers speak for themselves</p>
+            <h2 className="text-4xl font-bold mb-4">Early Results</h2>
+            <p className="text-xl text-slate-600">Our first events showed promising results</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -357,7 +318,7 @@ const Portfolio = () => {
               <Card className="text-center hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-8">
                   <TrendingUp className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                  <div className="text-4xl font-bold text-slate-800 mb-2">94%</div>
+                  <div className="text-4xl font-bold text-slate-800 mb-2">93%</div>
                   <div className="text-slate-600">Average Guest Engagement</div>
                 </CardContent>
               </Card>
@@ -387,7 +348,7 @@ const Portfolio = () => {
               <Card className="text-center hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-8">
                   <Star className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                  <div className="text-4xl font-bold text-slate-800 mb-2">4.9/5</div>
+                  <div className="text-4xl font-bold text-slate-800 mb-2">5/5</div>
                   <div className="text-slate-600">Client Satisfaction Score</div>
                 </CardContent>
               </Card>
@@ -405,10 +366,10 @@ const Portfolio = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Create Your Success Story?
+              Be Our Next Success Story!
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join thousands of couples who made their weddings unforgettable with WeddingWeb
+              Join our pioneering customers and get exclusive early-bird pricing plus personalized support
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/company/pricing">

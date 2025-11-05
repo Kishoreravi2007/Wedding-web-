@@ -13,11 +13,18 @@ import {
   Zap,
   CheckCircle2,
   ArrowRight,
-  Star
+  Star,
+  Globe
 } from "lucide-react";
 
 const CompanyLanding = () => {
   const features = [
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "Build Your Wedding Website",
+      description: "Create a stunning, personalized wedding website in minutes with our drag-and-drop builder",
+      color: "from-rose-500 to-pink-500"
+    },
     {
       icon: <Sparkles className="w-8 h-8" />,
       title: "AI-Powered Face Detection",
@@ -61,27 +68,27 @@ const CompanyLanding = () => {
     "Secure cloud storage for all memories",
     "Multi-language support for diverse guests",
     "Real-time photo uploads during events",
-    "Professional admin dashboard",
+    "Professional dashboards for couples and photographers",
     "24/7 technical support"
   ];
 
   const testimonials = [
     {
-      name: "Priya & Rahul",
-      event: "Wedding • Mumbai",
-      text: "The face detection feature was a game-changer! Our 500+ guests could instantly find their photos. Simply amazing!",
+      name: "Sreedevi & Vaishag",
+      event: "Wedding • January 2025 • Kerala",
+      text: "WeddingWeb made our wedding so special! Our guests loved being able to find their photos instantly using face detection. The website builder was super easy to use!",
       rating: 5
     },
     {
-      name: "Sarah & Michael",
-      event: "Wedding • Bangalore",
-      text: "Our international family could join via live stream. The platform made our wedding truly global and inclusive.",
+      name: "Parvathy & Hari",
+      event: "Wedding • February 2025 • Kerala",
+      text: "As early customers, we got amazing personalized service. The team helped us every step of the way. Our families abroad could watch the live stream - it was perfect!",
       rating: 5
     },
     {
-      name: "Anjali & Karthik",
-      event: "Reception • Chennai",
-      text: "The photographer portal made collaboration seamless. We had 10,000+ photos organized perfectly within hours!",
+      name: "Your Wedding Here",
+      event: "Coming Soon",
+      text: "Join our growing family! We're offering special early-bird pricing and dedicated support for our next customers. Be part of our success story!",
       rating: 5
     }
   ];
@@ -131,23 +138,18 @@ const CompanyLanding = () => {
               Into a Digital Experience
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto">
-              The complete wedding platform with AI face detection, smart galleries, 
-              live streaming, and more. Make every moment memorable and accessible.
+              Build your own personalized wedding website with AI face detection, smart galleries, 
+              live streaming, and more. Join us in revolutionizing wedding experiences!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg px-8 py-6"
-              >
-                Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-lg px-8 py-6 border-2 hover:border-rose-500 hover:text-rose-500"
-              >
-                Watch Demo Video
-              </Button>
+            <div className="flex justify-center">
+              <Link to="/company/contact">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg px-8 py-6"
+                >
+                  Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
             </div>
           </motion.div>
 
@@ -159,20 +161,20 @@ const CompanyLanding = () => {
             className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 max-w-4xl mx-auto"
           >
             <div>
-              <div className="text-4xl font-bold text-rose-600">10K+</div>
-              <div className="text-slate-600 mt-1">Events Hosted</div>
+              <div className="text-4xl font-bold text-rose-600">2</div>
+              <div className="text-slate-600 mt-1">Happy Couples</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-600">99.9%</div>
-              <div className="text-slate-600 mt-1">Uptime</div>
+              <div className="text-4xl font-bold text-purple-600">100%</div>
+              <div className="text-slate-600 mt-1">Satisfaction</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-indigo-600">5M+</div>
-              <div className="text-slate-600 mt-1">Photos Managed</div>
+              <div className="text-4xl font-bold text-indigo-600">AI</div>
+              <div className="text-slate-600 mt-1">Powered</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-cyan-600">50+</div>
-              <div className="text-slate-600 mt-1">Countries</div>
+              <div className="text-4xl font-bold text-cyan-600">2025</div>
+              <div className="text-slate-600 mt-1">Just Started</div>
             </div>
           </motion.div>
         </div>
@@ -231,15 +233,15 @@ const CompanyLanding = () => {
               <div className="inline-block mb-4 px-4 py-2 bg-purple-100 rounded-full">
                 <span className="text-purple-600 font-semibold flex items-center gap-2">
                   <Shield className="w-4 h-4" />
-                  Trusted by Thousands
+                  Fresh Startup, Big Vision
                 </span>
               </div>
               <h2 className="text-4xl font-bold mb-6">
                 Why Choose WeddingWeb?
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                We combine cutting-edge technology with intuitive design to create 
-                the perfect platform for your special day.
+                We're a new startup combining cutting-edge technology with intuitive design. 
+                Be one of our early customers and help shape the future of wedding technology!
               </p>
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
@@ -264,10 +266,13 @@ const CompanyLanding = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-rose-400 via-purple-400 to-indigo-400 p-1">
-                <div className="w-full h-full bg-white rounded-3xl flex items-center justify-center">
-                  <Camera className="w-32 h-32 text-slate-300" />
-                </div>
+              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
+                  alt="Happy wedding couple celebration"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-purple-500/10 to-indigo-500/10" />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border-2 border-slate-100">
                 <div className="flex items-center gap-2 text-green-600 font-semibold">
@@ -290,10 +295,10 @@ const CompanyLanding = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Loved by Couples Worldwide
+              Early Customer Reviews
             </h2>
             <p className="text-xl text-slate-600">
-              See what our clients say about their experience
+              Join our growing community of happy couples
             </p>
           </motion.div>
 
@@ -339,7 +344,7 @@ const CompanyLanding = () => {
               Ready to Create Magic?
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join thousands of couples who trust WeddingWeb to make their special day unforgettable
+              Be an early adopter! Get special pricing and help us build the future of wedding technology together
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -392,9 +397,9 @@ const CompanyLanding = () => {
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="mailto:help.weddingweb@gmail.com" className="hover:text-white">help.weddingweb@gmail.com</a></li>
                 <li><a href="#" className="hover:text-white">Documentation</a></li>
                 <li><a href="#" className="hover:text-white">FAQ</a></li>
+                <li><Link to="/company/contact" className="hover:text-white">Contact Us</Link></li>
               </ul>
             </div>
           </div>

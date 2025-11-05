@@ -17,16 +17,33 @@ import {
   BarChart,
   Download,
   Share2,
-  Lock
+  Lock,
+  Layout
 } from "lucide-react";
 
 const Services = () => {
   const coreServices = [
     {
+      icon: <Layout className="w-12 h-12" />,
+      title: "Build Your Own Wedding Website",
+      description: "Create a beautiful, personalized wedding website in minutes with our easy-to-use builder",
+      color: "from-rose-500 to-pink-500",
+      image: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=800&q=80",
+      features: [
+        "Drag-and-drop website builder",
+        "Beautiful customizable templates",
+        "Custom domain support",
+        "Mobile-responsive design",
+        "No coding required",
+        "Real-time preview"
+      ]
+    },
+    {
       icon: <Sparkles className="w-12 h-12" />,
       title: "AI-Powered Face Detection",
       description: "Revolutionary face recognition technology that helps guests find their photos instantly",
       color: "from-purple-500 to-pink-500",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
       features: [
         "Advanced facial recognition algorithms",
         "99%+ accuracy rate",
@@ -41,6 +58,7 @@ const Services = () => {
       title: "Smart Photo Gallery",
       description: "Beautiful, organized galleries that make sharing and downloading photos effortless",
       color: "from-blue-500 to-cyan-500",
+      image: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80",
       features: [
         "Unlimited photo storage",
         "Auto-categorization by event",
@@ -55,6 +73,7 @@ const Services = () => {
       title: "Live Streaming",
       description: "Broadcast your special moments to family and friends around the world in real-time",
       color: "from-red-500 to-orange-500",
+      image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
       features: [
         "HD video streaming",
         "No viewer limits",
@@ -69,6 +88,7 @@ const Services = () => {
       title: "Photographer Portal",
       description: "Professional dashboard for photographers to upload and manage photos seamlessly",
       color: "from-green-500 to-emerald-500",
+      image: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&q=80",
       features: [
         "Bulk photo upload",
         "Automatic face processing",
@@ -83,6 +103,7 @@ const Services = () => {
       title: "Digital Wishes",
       description: "Collect heartfelt messages and blessings from your guests in a beautiful digital guestbook",
       color: "from-pink-500 to-rose-500",
+      image: "https://images.unsplash.com/photo-1531973576160-7125cd663d86?w=800&q=80",
       features: [
         "Customizable wish forms",
         "Moderation tools",
@@ -97,6 +118,7 @@ const Services = () => {
       title: "Event Management",
       description: "Keep guests informed with detailed schedules, countdowns, and real-time updates",
       color: "from-indigo-500 to-purple-500",
+      image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80",
       features: [
         "Interactive event timeline",
         "Countdown timers",
@@ -143,34 +165,29 @@ const Services = () => {
       icon: <Lock className="w-6 h-6" />,
       title: "Privacy Controls",
       description: "Granular privacy and access controls"
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Admin Portal",
-      description: "Comprehensive admin dashboard for full control"
     }
   ];
 
   const process = [
     {
       step: "1",
-      title: "Sign Up & Setup",
-      description: "Create your account and customize your wedding website in minutes"
+      title: "Create Your Wedding Website",
+      description: "Sign up and customize your beautiful wedding website with our easy drag-and-drop builder - no coding needed!"
     },
     {
       step: "2",
-      title: "Invite Your Photographer",
-      description: "Give your photographer access to upload photos directly"
+      title: "Add Your Content",
+      description: "Upload photos, set your event schedule, add venue details, and share your love story"
     },
     {
       step: "3",
-      title: "AI Processing",
-      description: "Our AI automatically detects faces and organizes photos"
+      title: "Enable AI Features",
+      description: "Our smart AI automatically organizes photos and helps guests find themselves using face detection"
     },
     {
       step: "4",
-      title: "Share with Guests",
-      description: "Guests can find their photos instantly using their face"
+      title: "Go Live & Share",
+      description: "Launch your website, share the link with guests, and let them enjoy the magic of instant photo discovery"
     }
   ];
 
@@ -248,10 +265,13 @@ const Services = () => {
                           ))}
                         </div>
                       </div>
-                      <div className={`bg-gradient-to-br ${service.color} flex items-center justify-center p-12 ${index % 2 === 1 ? 'md:col-start-1' : ''}`}>
-                        <div className="text-white text-8xl opacity-20">
-                          {service.icon}
-                        </div>
+                      <div className={`relative overflow-hidden ${index % 2 === 1 ? 'md:col-start-1' : ''}`}>
+                        <img 
+                          src={service.image} 
+                          alt={service.title}
+                          className="w-full h-full object-cover min-h-[400px]"
+                        />
+                        <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-30`} />
                       </div>
                     </div>
                   </CardContent>
@@ -354,7 +374,7 @@ const Services = () => {
               Ready to Experience the Magic?
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join thousands of couples who chose WeddingWeb for their special day
+              Be one of our early customers and experience the future of wedding technology
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/company/pricing">
