@@ -181,13 +181,6 @@ const Index = () => {
                       >
                         {/* Description removed as per user request */}
                       </motion.p>
-                      <motion.div
-                        whileHover={{ scale: 1.2, rotate: 5 }}
-                        whileTap={{ scale: 0.9 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFD700] group-hover:text-[#FFA500] transition-all duration-300 drop-shadow-lg" />
-                      </motion.div>
                     </CardContent>
                   </div>
                 </Card>
@@ -221,13 +214,6 @@ const Index = () => {
                     >
                       {/* Description removed as per user request */}
                     </motion.p>
-                    <motion.div
-                      whileHover={{ scale: 1.2, rotate: -5 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Heart className="w-8 h-8 mx-auto mt-4 text-[#FFD700] group-hover:text-[#FFA500] transition-all duration-300 drop-shadow-md" />
-                    </motion.div>
                   </CardContent>
                 </Card>
               </motion.div>
