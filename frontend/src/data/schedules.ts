@@ -18,23 +18,6 @@ interface Schedule {
 
 export const parvathySchedule: Schedule[] = [
   {
-    date: "October 19, 2025",
-    events: [
-      {
-        id: "engagement-a",
-        title: "Engagement",
-        date: "October 19, 2025",
-        time: "10:00 AM",
-        dresscode: "Traditional",
-        venue: "Thayankavu Bhagavathy Temple",
-        locationUrl: "https://maps.app.goo.gl/vKkmhnzw3V1T9eu48",
-        image: "/engagement-background.jpg",
-        description: "A warm and intimate gathering of close family and loved ones. This occasion gives both families a chance to come together, share joyful moments, and grow closer in celebration.The highlight of the evening is the exchange of rings, where the couple makes a heartfelt promise of love and commitment to one another. With blessings, laughter, and togetherness, this marks the beginning of a lifetime of cherished memories.",
-        mapLink: "https://maps.app.goo.gl/vKkmhnzw3V1T9eu48"
-      },
-    ],
-  },
-  {
     date: "January 3, 2026",
     events: [
       {

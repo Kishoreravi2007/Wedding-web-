@@ -13,9 +13,6 @@ const SisterALayout = () => {
         <main className="py-12 px-4 sm:px-6 lg:px-8">
           <Outlet />
         </main>
-        <div className="fixed bottom-20 left-4 text-[#8C3B3B] text-sm bg-white p-2 rounded z-20">
-          <a href="mailto:help.weddingweb@gmail.com" className="underline">help.weddingweb@gmail.com</a>
-        </div>
         <BottomNav basePath="/parvathy" activeColor="#D4AF37" />
       </div>
     </div>

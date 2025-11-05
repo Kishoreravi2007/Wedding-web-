@@ -129,7 +129,7 @@ const App = () => {
             <Button
               variant="outline"
               size="icon"
-              className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-32' : 'bottom-4'}`}
+              className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-[4.5rem]' : 'bottom-4'}`}
               onClick={() => setShowMusicPlayer(!showMusicPlayer)}
             >
               {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}

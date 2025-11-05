@@ -45,7 +45,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
       className={cn(
         `fixed left-4 z-40 bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-stone-200 p-3 animate-fade-in`,
         "hover:shadow-3xl transition-all duration-300 cursor-hover",
-        hasBottomNav ? "bottom-40" : "bottom-14",
+        hasBottomNav ? "bottom-[7.5rem]" : "bottom-14",
         className
       )}
       style={{ animationDelay: '1s' }}
