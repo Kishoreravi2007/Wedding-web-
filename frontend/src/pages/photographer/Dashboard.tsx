@@ -53,8 +53,8 @@ const PhotographerDashboard = () => {
       try {
         console.log('Loading all photos from API...');
         
-        // Fetch photos from both galleries via Firebase-backed endpoint
-        const endpoint = '/api/photos';
+        // Fetch photos from both galleries via local filesystem endpoint
+        const endpoint = '/api/photos-local';
         
         const [sisterAResponse, sisterBResponse] = await Promise.all([
           fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
