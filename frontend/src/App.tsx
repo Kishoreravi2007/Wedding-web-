@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
@@ -40,6 +40,14 @@ import CoupleDashboard from "./pages/couple/Dashboard";
 import CoupleLogin from "./pages/couple/Login";
 import FaceDetectionAdmin from "./pages/FaceDetectionAdmin";
 
+// Company Pages
+import CompanyLanding from "./pages/company/Landing";
+import CompanyAbout from "./pages/company/About";
+import CompanyServices from "./pages/company/Services";
+import CompanyPricing from "./pages/company/Pricing";
+import CompanyPortfolio from "./pages/company/Portfolio";
+import CompanyContact from "./pages/company/Contact";
+
 const queryClient = new QueryClient();
 
 const itemVariants = {
@@ -71,6 +79,11 @@ const App = () => {
     return 0; // Default to 'wedding-music.mp3'
   }, [location.pathname]);
 
+  // Check if current route has bottom navigation
+  const hasBottomNav = useMemo(() => {
+    return location.pathname.startsWith('/parvathy') || location.pathname.startsWith('/sreedevi');
+  }, [location.pathname]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <WebsiteProvider>
@@ -78,10 +91,19 @@ const App = () => {
           <Toaster />
           <Sonner />
           <LanguageSwitcher />
+          {/* Company Book Button - Bottom Right Corner - Fixed on all pages */}
+          <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
+            <Button 
+              size="lg"
+              className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              Book
+            </Button>
+          </Link>
             <Button
               variant="outline"
               size="icon"
-              className="fixed bottom-4 right-4 z-50 rounded-full w-10 h-10"
+              className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-32' : 'bottom-4'}`}
               onClick={() => setShowMusicPlayer(!showMusicPlayer)}
             >
               {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
@@ -89,6 +111,14 @@ const App = () => {
             {showMusicPlayer && <MusicPlayer />}
             <AnimatePresence mode="wait">
               <Routes>
+              {/* Company Routes */}
+              <Route path="/company" element={<CompanyLanding />} />
+              <Route path="/company/about" element={<CompanyAbout />} />
+              <Route path="/company/services" element={<CompanyServices />} />
+              <Route path="/company/pricing" element={<CompanyPricing />} />
+              <Route path="/company/portfolio" element={<CompanyPortfolio />} />
+              <Route path="/company/contact" element={<CompanyContact />} />
+
               {/* Public Routes */}
               <Route path="/countdown" element={
                 <div className="text-center p-8">

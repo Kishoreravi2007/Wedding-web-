@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useRef } from 'react'; // Removed unused imports
+import React, { useRef, useMemo } from 'react'; // Removed unused imports
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Play, Pause, Music, Rewind, FastForward } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext'; // Import the context hook
+import { useLocation } from 'react-router-dom';
 
 interface MusicPlayerProps {
   className?: string;
@@ -21,6 +22,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
     musicSources,
   } = useMusicPlayer();
 
+  const location = useLocation();
+
+  // Check if current route has bottom navigation
+  const hasBottomNav = useMemo(() => {
+    return location.pathname.startsWith('/parvathy') || location.pathname.startsWith('/sreedevi');
+  }, [location.pathname]);
+
   // Removed local state and audioRef, as they are managed by the provider.
 
   // Removed toggleMinimize function as it's no longer needed.
@@ -35,9 +43,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
   return (
     <div
       className={cn(
-        "fixed bottom-20 right-4 z-50 bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-stone-200 p-3 animate-fade-in",
+        `fixed left-4 z-40 bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-stone-200 p-3 animate-fade-in`,
         "hover:shadow-3xl transition-all duration-300 cursor-hover",
-        "md:bottom-6 md:right-6",
+        hasBottomNav ? "bottom-40" : "bottom-14",
         className
       )}
       style={{ animationDelay: '1s' }}
