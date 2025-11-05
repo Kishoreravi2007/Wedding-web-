@@ -84,6 +84,20 @@ const App = () => {
     return location.pathname.startsWith('/parvathy') || location.pathname.startsWith('/sreedevi');
   }, [location.pathname]);
 
+  // Check if Book button should be shown (only on homepage and schedule pages)
+  const showBookButton = useMemo(() => {
+    return location.pathname === '/' || 
+           location.pathname === '/parvathy' || 
+           location.pathname === '/parvathy/schedule' ||
+           location.pathname === '/sreedevi' ||
+           location.pathname === '/sreedevi/schedule';
+  }, [location.pathname]);
+
+  // Check if on company pages (hide music player on company pages)
+  const isCompanyPage = useMemo(() => {
+    return location.pathname.startsWith('/company');
+  }, [location.pathname]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <WebsiteProvider>
@@ -91,15 +105,19 @@ const App = () => {
           <Toaster />
           <Sonner />
           <LanguageSwitcher />
-          {/* Company Book Button - Bottom Right Corner - Fixed on all pages */}
-          <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
-            <Button 
-              size="lg"
-              className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              Book
-            </Button>
-          </Link>
+          {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
+          {showBookButton && (
+            <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
+              <Button 
+                size="lg"
+                className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                Book
+              </Button>
+            </Link>
+          )}
+          {/* Music Player Toggle - Hidden on company pages */}
+          {!isCompanyPage && (
             <Button
               variant="outline"
               size="icon"
@@ -108,7 +126,9 @@ const App = () => {
             >
               {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
             </Button>
-            {showMusicPlayer && <MusicPlayer />}
+          )}
+          {/* Music Player - Hidden on company pages */}
+          {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
             <AnimatePresence mode="wait">
               <Routes>
               {/* Company Routes */}
