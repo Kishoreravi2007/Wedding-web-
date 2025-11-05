@@ -44,8 +44,8 @@ const PhotoManager: React.FC = () => {
     try {
       setLoading(true);
       
-      // Always use Firebase-backed endpoint
-      const endpoint = '/api/photos';
+      // Use local filesystem endpoint
+      const endpoint = '/api/photos-local';
       
       const [sisterAResponse, sisterBResponse] = await Promise.all([
         fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),

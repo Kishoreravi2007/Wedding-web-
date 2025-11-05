@@ -189,8 +189,8 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         // Determine sister parameter from gallery path
         const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
         
-        // Always use Firebase-backed endpoint
-        const photosEndpoint = `${API_BASE_URL}/api/photos?sister=${sister}`;
+        // Use local filesystem endpoint to get photos from uploads/wedding_gallery
+        const photosEndpoint = `${API_BASE_URL}/api/photos-local?sister=${sister}`;
         
         // Fetch photos from backend
         const response = await fetch(photosEndpoint);

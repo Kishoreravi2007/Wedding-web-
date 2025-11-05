@@ -324,7 +324,8 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         if (sister) {
           queryParams.append('sister', sister);
         }
-        const url = `${API_BASE_URL}/api/photos?${queryParams.toString()}`;
+        // Use local filesystem endpoint to get photos from uploads/wedding_gallery
+        const url = `${API_BASE_URL}/api/photos-local?${queryParams.toString()}`;
 
         const response = await fetch(url); // Public endpoint, no auth required
         if (!response.ok) {
