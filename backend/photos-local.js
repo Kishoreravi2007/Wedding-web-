@@ -27,7 +27,10 @@ router.get('/', async (req, res) => {
     const { sister } = req.query;
     
     const photos = [];
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+    // Use the request's hostname to build the base URL so it works on any device
+    const protocol = req.protocol || 'http';
+    const host = req.get('host') || `localhost:${process.env.PORT || 5000}`;
+    const baseUrl = process.env.BACKEND_URL || `${protocol}://${host}`;
     
     // Determine which galleries to scan
     const galleries = sister && (sister === 'sister-a' || sister === 'sister-b')
@@ -109,7 +112,10 @@ router.post('/', (req, res, next) => {
     // Write file to disk
     await fs.writeFile(filePath, req.file.buffer);
 
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+    // Use the request's hostname to build the base URL so it works on any device
+    const protocol = req.protocol || 'http';
+    const host = req.get('host') || `localhost:${process.env.PORT || 5001}`;
+    const baseUrl = process.env.BACKEND_URL || `${protocol}://${host}`;
     const publicUrl = `${baseUrl}/uploads/wedding_gallery/${galleryName}/${filename}`;
     
     const photoData = {
@@ -165,7 +171,10 @@ router.post('/batch', (req, res, next) => {
     // Ensure directory exists
     await fs.mkdir(uploadDir, { recursive: true });
     
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+    // Use the request's hostname to build the base URL so it works on any device
+    const protocol = req.protocol || 'http';
+    const host = req.get('host') || `localhost:${process.env.PORT || 5001}`;
+    const baseUrl = process.env.BACKEND_URL || `${protocol}://${host}`;
     const uploadedPhotos = [];
     
     // Save each file from memory to disk
