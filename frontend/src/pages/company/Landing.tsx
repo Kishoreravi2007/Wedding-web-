@@ -2,12 +2,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import CompanyNavSimple from "@/components/CompanyNavSimple";
 import { 
   Camera, 
   Users, 
   Sparkles, 
   Video, 
-  Heart, 
   Clock,
   Shield,
   Zap,
@@ -96,27 +96,7 @@ const CompanyLanding = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-slate-200">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-rose-500" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text text-transparent">
-              WeddingWeb
-            </span>
-          </div>
-          <div className="hidden md:flex gap-6 items-center">
-            <Link to="/company" className="hover:text-rose-500 transition-colors">Home</Link>
-            <Link to="/company/about" className="hover:text-rose-500 transition-colors">About</Link>
-            <Link to="/company/services" className="hover:text-rose-500 transition-colors">Services</Link>
-            <Link to="/company/pricing" className="hover:text-rose-500 transition-colors">Pricing</Link>
-            <Link to="/company/portfolio" className="hover:text-rose-500 transition-colors">Portfolio</Link>
-            <Link to="/company/contact" className="hover:text-rose-500 transition-colors">Contact</Link>
-            <Button className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700">
-              Book a Demo
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <CompanyNavSimple />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
