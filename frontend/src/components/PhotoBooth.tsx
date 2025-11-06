@@ -12,7 +12,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon } from 'lucide-react';
+import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon, Lightbulb } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api'; // Import API_BASE_URL
 
 // Import face-api.js
@@ -907,28 +907,12 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 </Button>
                 
                 <Button
-                  onClick={runDiagnostic}
-                  variant="outline"
-                  className="text-sm"
-                >
-                  🔍 Run Diagnostic
-                </Button>
-                
-              <Button
-                  onClick={() => setShowDiagnostic(!showDiagnostic)}
-                variant="outline"
-                  className="text-sm"
-                >
-                  <Wrench className="w-4 h-4 mr-1" />
-                  {showDiagnostic ? 'Hide' : 'Show'} Diagnostic
-                </Button>
-                
-                <Button
                   onClick={stopWebcam}
                   variant="destructive"
+                  className="py-6"
                 >
                   Stop Camera
-              </Button>
+                </Button>
               </>
             )}
           </div>
@@ -958,32 +942,20 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         </div>
       )}
 
-          {/* Diagnostic Information */}
-          {diagnosticInfo && (
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h4 className="font-medium text-yellow-900 mb-2">System Status:</h4>
-              <p className="text-sm text-yellow-800">{diagnosticInfo}</p>
-                    </div>
-                  )}
-                  
-          {/* Diagnostic Component */}
-          {showDiagnostic && (
-            <div className="mt-6">
-              <PhotoBoothDiagnostic />
-                    </div>
-                  )}
-                  
           {/* Tips for Better Detection */}
           <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Tips for Better Face Detection:</h4>
+            <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5" />
+              Tips for Better Results
+            </h4>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Ensure good lighting on your face</li>
               <li>• Position your face in the center of the frame</li>
               <li>• Look directly at the camera</li>
               <li>• Avoid backlighting or shadows</li>
-              <li>• Keep your face at a reasonable distance (not too close or far)</li>
+              <li>• Keep your face at a reasonable distance</li>
             </ul>
-                  </div>
+          </div>
         </CardContent>
       </Card>
 

@@ -44,11 +44,6 @@ const CompanyNav = () => {
               {link.label}
             </Link>
           ))}
-          <Link to="/company/contact">
-            <Button className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700">
-              Book a Demo
-            </Button>
-          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -82,15 +77,6 @@ const CompanyNav = () => {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/company/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mt-4"
-              >
-                <Button className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700">
-                  Book a Demo
-                </Button>
-              </Link>
             </div>
           </SheetContent>
         </Sheet>

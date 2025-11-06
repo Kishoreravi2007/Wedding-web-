@@ -26,11 +26,6 @@ const LandingMinimal = () => {
             <Link to="/company/pricing" className="hover:text-rose-500">Pricing</Link>
             <Link to="/company/portfolio" className="hover:text-rose-500">Portfolio</Link>
             <Link to="/company/contact" className="hover:text-rose-500">Contact</Link>
-            <Link to="/company/contact">
-              <Button className="bg-gradient-to-r from-rose-500 to-purple-600">
-                Book a Demo
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -91,14 +86,6 @@ const LandingMinimal = () => {
                 className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
               >
                 Contact
-              </Link>
-              <Link 
-                to="/company/contact" 
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Button className="w-full bg-gradient-to-r from-rose-500 to-purple-600">
-                  Book a Demo
-                </Button>
               </Link>
             </div>
           </div>
