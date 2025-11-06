@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Deployment Diagnostics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .test-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-success {
+            background: #28a745;
+        }
+        
+        .status-error {
+            background: #dc3545;
+        }
+        
+        .status-warning {
+            background: #ffc107;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Gallery Deployment Diagnostics</h1>
+        <p class="subtitle">Test your backend connection and photo gallery setup</p>
+        
+        <!-- Backend URL Input -->
+        <div class="test-section">
+            <h2>1️⃣ Enter Your Backend URL</h2>
+            <input 
+                type="text" 
+                id="backendUrl" 
+                placeholder="e.g., https://your-backend.onrender.com or http://localhost:5001"
+                value="http://localhost:5001"
+            >
+            <button onclick="saveBackendUrl()">Save Backend URL</button>
+            <div id="urlResult"></div>
+        </div>
+        
+        <!-- Test Backend Connection -->
+        <div class="test-section">
+            <h2>2️⃣ Test Backend Connection</h2>
+            <button onclick="testBackendConnection()">Test Connection</button>
+            <div id="connectionResult"></div>
+        </div>
+        
+        <!-- Test Photos API -->
+        <div class="test-section">
+            <h2>3️⃣ Test Photos API</h2>
+            <button onclick="testPhotosAPI('sister-a')">Test Sister A Gallery</button>
+            <button onclick="testPhotosAPI('sister-b')">Test Sister B Gallery</button>
+            <div id="photosResult"></div>
+        </div>
+        
+        <!-- Test Photo Loading -->
+        <div class="test-section">
+            <h2>4️⃣ Test Photo Loading</h2>
+            <button onclick="loadPhotos('sister-a')">Load Sister A Photos</button>
+            <button onclick="loadPhotos('sister-b')">Load Sister B Photos</button>
+            <div id="photosDisplay"></div>
+        </div>
+        
+        <!-- Environment Check -->
+        <div class="test-section">
+            <h2>5️⃣ Environment Check</h2>
+            <button onclick="checkEnvironment()">Check Environment Variables</button>
+            <div id="envResult"></div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="test-section">
+            <h2>📊 Diagnostic Summary</h2>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <div id="summaryResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let backendUrl = 'http://localhost:5001';
+        
+        function saveBackendUrl() {
+            const input = document.getElementById('backendUrl');
+            backendUrl = input.value.trim();
+            
+            if (!backendUrl) {
+                showResult('urlResult', 'error', '❌ Please enter a backend URL');
+                return;
+            }
+            
+            localStorage.setItem('backendUrl', backendUrl);
+            showResult('urlResult', 'success', `✅ Backend URL saved: ${backendUrl}`);
+        }
+        
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            showResult('connectionResult', 'info', '🔄 Testing connection...');
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    showResult('connectionResult', 'success', 
+                        `✅ Backend is accessible!\n` +
+                        `Status: ${response.status} ${response.statusText}\n` +
+                        `URL: ${backendUrl}`
+                    );
+                } else {
+                    showResult('connectionResult', 'error', 
+                        `❌ Backend responded with error\n` +
+                        `Status: ${response.status} ${response.statusText}\n` +
+                        `URL: ${backendUrl}`
+                    );
+                }
+            } catch (error) {
+                showResult('connectionResult', 'error', 
+                    `❌ Cannot connect to backend\n` +
+                    `Error: ${error.message}\n\n` +
+                    `Possible causes:\n` +
+                    `1. Backend is not running\n` +
+                    `2. Backend URL is incorrect\n` +
+                    `3. CORS is blocking the request\n` +
+                    `4. Network/firewall issue`
+                );
+            }
+        }
+        
+        async function testPhotosAPI(sister) {
+            const resultDiv = document.getElementById('photosResult');
+            showResult('photosResult', 'info', `🔄 Fetching photos for ${sister}...`);
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local?sister=${sister}`);
+                
+                if (!response.ok) {
+                    showResult('photosResult', 'error', 
+                        `❌ API request failed\n` +
+                        `Status: ${response.status} ${response.statusText}\n` +
+                        `Endpoint: /api/photos-local?sister=${sister}`
+                    );
+                    return;
+                }
+                
+                const photos = await response.json();
+                
+                if (photos.length === 0) {
+                    showResult('photosResult', 'error', 
+                        `⚠️ No photos found for ${sister}\n\n` +
+                        `The API is working, but there are no photos in the gallery.\n\n` +
+                        `Solution:\n` +
+                        `1. Upload photos to: uploads/wedding_gallery/${sister.replace('-', '_')}/\n` +
+                        `2. Or use the photo upload feature in the admin panel`
+                    );
+                } else {
+                    showResult('photosResult', 'success', 
+                        `✅ Found ${photos.length} photos for ${sister}\n\n` +
+                        `Sample photo:\n` +
+                        JSON.stringify(photos[0], null, 2).substring(0, 400) + '...'
+                    );
+                }
+            } catch (error) {
+                showResult('photosResult', 'error', 
+                    `❌ Error fetching photos\n` +
+                    `Error: ${error.message}`
+                );
+            }
+        }
+        
+        async function loadPhotos(sister) {
+            const resultDiv = document.getElementById('photosDisplay');
+            showResult('photosDisplay', 'info', `🔄 Loading photos for ${sister}...`);
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local?sister=${sister}`);
+                const photos = await response.json();
+                
+                if (photos.length === 0) {
+                    showResult('photosDisplay', 'error', `⚠️ No photos to display for ${sister}`);
+                    return;
+                }
+                
+                const photosHtml = photos.slice(0, 12).map(photo => `
+                    <div class="photo-item">
+                        <img 
+                            src="${photo.public_url}" 
+                            alt="${photo.filename}"
+                            onerror="this.style.background='#f8d7da'; this.alt='❌ Failed to load'"
+                            onload="this.style.border='3px solid #28a745'"
+                        >
+                    </div>
+                `).join('');
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        ✅ Loaded ${photos.length} photos for ${sister} (showing first 12)
+                    </div>
+                    <div class="photo-grid">
+                        ${photosHtml}
+                    </div>
+                `;
+            } catch (error) {
+                showResult('photosDisplay', 'error', `❌ Error loading photos: ${error.message}`);
+            }
+        }
+        
+        function checkEnvironment() {
+            const checks = [];
+            
+            // Check if we can access import.meta.env
+            const apiUrl = typeof import !== 'undefined' && import.meta?.env?.VITE_API_BASE_URL;
+            
+            checks.push({
+                name: 'Backend URL',
+                value: backendUrl,
+                status: backendUrl.includes('localhost') ? 'warning' : 'success',
+                message: backendUrl.includes('localhost') 
+                    ? 'Using localhost - this won\'t work in deployment!' 
+                    : 'Using deployed URL ✓'
+            });
+            
+            checks.push({
+                name: 'Protocol',
+                value: backendUrl.startsWith('https') ? 'HTTPS' : 'HTTP',
+                status: backendUrl.startsWith('https') || backendUrl.includes('localhost') ? 'success' : 'warning',
+                message: backendUrl.startsWith('https') 
+                    ? 'Secure connection ✓' 
+                    : 'Not using HTTPS (required for production)'
+            });
+            
+            const html = checks.map(check => {
+                const indicator = check.status === 'success' ? 'status-success' : 
+                               check.status === 'warning' ? 'status-warning' : 'status-error';
+                return `
+                    <div style="margin-bottom: 10px;">
+                        <div><span class="status-indicator ${indicator}"></span><strong>${check.name}</strong></div>
+                        <div style="margin-left: 20px; color: #666;">Value: <code>${check.value}</code></div>
+                        <div style="margin-left: 20px; color: #666; font-size: 13px;">${check.message}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('envResult').innerHTML = `<div class="result info">${html}</div>`;
+        }
+        
+        async function runAllTests() {
+            showResult('summaryResult', 'info', '🔄 Running all diagnostic tests...');
+            
+            const results = [];
+            
+            // Test 1: Backend Connection
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local`);
+                results.push({
+                    test: 'Backend Connection',
+                    status: response.ok ? 'success' : 'error',
+                    message: response.ok ? 'Connected successfully' : `Error: ${response.status}`
+                });
+            } catch (error) {
+                results.push({
+                    test: 'Backend Connection',
+                    status: 'error',
+                    message: `Cannot connect: ${error.message}`
+                });
+            }
+            
+            // Test 2: Sister A Photos
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local?sister=sister-a`);
+                const photos = await response.json();
+                results.push({
+                    test: 'Sister A Gallery',
+                    status: photos.length > 0 ? 'success' : 'warning',
+                    message: `${photos.length} photos found`
+                });
+            } catch (error) {
+                results.push({
+                    test: 'Sister A Gallery',
+                    status: 'error',
+                    message: error.message
+                });
+            }
+            
+            // Test 3: Sister B Photos
+            try {
+                const response = await fetch(`${backendUrl}/api/photos-local?sister=sister-b`);
+                const photos = await response.json();
+                results.push({
+                    test: 'Sister B Gallery',
+                    status: photos.length > 0 ? 'success' : 'warning',
+                    message: `${photos.length} photos found`
+                });
+            } catch (error) {
+                results.push({
+                    test: 'Sister B Gallery',
+                    status: 'error',
+                    message: error.message
+                });
+            }
+            
+            // Test 4: Configuration
+            results.push({
+                test: 'Backend URL Configuration',
+                status: backendUrl.includes('localhost') ? 'warning' : 'success',
+                message: backendUrl.includes('localhost') 
+                    ? 'Using localhost (won\'t work in deployment)' 
+                    : 'Using deployed URL'
+            });
+            
+            // Display results
+            const html = results.map(result => {
+                const indicator = result.status === 'success' ? 'status-success' : 
+                               result.status === 'warning' ? 'status-warning' : 'status-error';
+                return `
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-indicator ${indicator}"></span>
+                        <strong>${result.test}</strong>: ${result.message}
+                    </div>
+                `;
+            }).join('');
+            
+            const successCount = results.filter(r => r.status === 'success').length;
+            const errorCount = results.filter(r => r.status === 'error').length;
+            
+            const summaryClass = errorCount > 0 ? 'error' : successCount === results.length ? 'success' : 'info';
+            
+            document.getElementById('summaryResult').innerHTML = `
+                <div class="result ${summaryClass}">
+                    <h3 style="margin-bottom: 15px;">
+                        ${errorCount === 0 ? '✅' : '⚠️'} Test Results: 
+                        ${successCount}/${results.length} passed
+                    </h3>
+                    ${html}
+                </div>
+            `;
+        }
+        
+        function showResult(elementId, type, message) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        // Load saved backend URL on page load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('backendUrl');
+            if (saved) {
+                backendUrl = saved;
+                document.getElementById('backendUrl').value = saved;
+            }
+        });
+    </script>
+</body>
+</html>
+
