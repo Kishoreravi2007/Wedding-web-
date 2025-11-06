@@ -46,6 +46,10 @@ import CompanyPricing from "./pages/company/Pricing";
 import CompanyPortfolio from "./pages/company/Portfolio";
 import CompanyContact from "./pages/company/Contact";
 
+// Admin Pages
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+
 const queryClient = new QueryClient();
 
 const itemVariants = {
@@ -162,6 +166,10 @@ const App = () => {
               <Route path="/company/pricing" element={<CompanyPricing />} />
               <Route path="/company/portfolio" element={<CompanyPortfolio />} />
               <Route path="/company/contact" element={<CompanyContact />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
               {/* Public Routes */}
               <Route path="/countdown" element={

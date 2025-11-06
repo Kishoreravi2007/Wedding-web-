@@ -77,6 +77,10 @@ app.use('/api/settings', settingsRouter); // Public read, admin write
 const analyticsRouter = require('./analytics');
 app.use('/api/analytics', analyticsRouter); // Public track, admin read
 
+// Wedding management API
+const weddingsRouter = require('./routes/weddings');
+app.use('/api/weddings', weddingsRouter); // Wedding customer management
+
 // Use Supabase photos endpoint (switched back from Firebase)
 const photosRouter = require('./photos-supabase');
 app.use('/api/photos', photosRouter); // Authentication handled per-route in photos-supabase.js

@@ -1,0 +1,652 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Archive, Calendar, Users, Image, Heart } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from './ui/dialog';
+import { Badge } from './ui/badge';
+import { Alert, AlertDescription } from './ui/alert';
+import { Switch } from './ui/switch';
+
+interface Wedding {
+  id: string;
+  wedding_code: string;
+  bride_name: string;
+  groom_name: string;
+  wedding_date: string;
+  wedding_month: string;
+  venue: string;
+  venue_address: string;
+  package_type: 'basic' | 'premium' | 'luxury';
+  status: 'active' | 'upcoming' | 'completed' | 'archived';
+  theme_color: string;
+  contact_email: string;
+  contact_phone: string;
+  enable_photo_booth: boolean;
+  enable_face_recognition: boolean;
+  enable_wishes: boolean;
+  enable_live_stream: boolean;
+  max_photos: number;
+  storage_used_mb: number;
+  created_at: string;
+}
+
+interface WeddingStats {
+  total_photos: number;
+  total_people: number;
+  total_wishes: number;
+  storage_used_mb: number;
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+
+const WeddingManager: React.FC = () => {
+  const [weddings, setWeddings] = useState<Wedding[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedWedding, setSelectedWedding] = useState<Wedding | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [weddingStats, setWeddingStats] = useState<Record<string, WeddingStats>>({});
+
+  // Form state for new/edit wedding
+  const [formData, setFormData] = useState<Partial<Wedding>>({
+    wedding_code: '',
+    bride_name: '',
+    groom_name: '',
+    wedding_date: '',
+    wedding_month: '',
+    venue: '',
+    venue_address: '',
+    package_type: 'basic',
+    status: 'upcoming',
+    theme_color: '#ff6b9d',
+    contact_email: '',
+    contact_phone: '',
+    enable_photo_booth: true,
+    enable_face_recognition: true,
+    enable_wishes: true,
+    enable_live_stream: false,
+    max_photos: 1000,
+  });
+
+  // Fetch all weddings
+  const fetchWeddings = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/weddings`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setWeddings(data.weddings);
+        
+        // Fetch stats for each wedding
+        data.weddings.forEach((wedding: Wedding) => {
+          fetchWeddingStats(wedding.id);
+        });
+      } else {
+        setError(data.error || 'Failed to fetch weddings');
+      }
+    } catch (err) {
+      console.error('Error fetching weddings:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch wedding statistics
+  const fetchWeddingStats = async (weddingId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}/stats`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setWeddingStats(prev => ({
+          ...prev,
+          [weddingId]: data.stats
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching wedding stats:', err);
+    }
+  };
+
+  // Create new wedding
+  const handleCreateWedding = async () => {
+    try {
+      // Generate wedding_code from bride name if not provided
+      if (!formData.wedding_code && formData.bride_name) {
+        const code = `${formData.bride_name.toLowerCase().replace(/\s+/g, '-')}-${formData.groom_name?.toLowerCase().replace(/\s+/g, '-') || 'wedding'}-${new Date().getFullYear()}`;
+        formData.wedding_code = code;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/weddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsCreateDialogOpen(false);
+        fetchWeddings();
+        resetForm();
+        alert('Wedding created successfully!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error creating wedding:', err);
+      alert('Failed to create wedding');
+    }
+  };
+
+  // Update wedding
+  const handleUpdateWedding = async () => {
+    if (!selectedWedding) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/weddings/${selectedWedding.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsEditDialogOpen(false);
+        fetchWeddings();
+        resetForm();
+        alert('Wedding updated successfully!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error updating wedding:', err);
+      alert('Failed to update wedding');
+    }
+  };
+
+  // Delete wedding
+  const handleDeleteWedding = async (weddingId: string) => {
+    if (!confirm('Are you sure you want to delete this wedding? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        fetchWeddings();
+        alert('Wedding deleted successfully!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error deleting wedding:', err);
+      alert('Failed to delete wedding');
+    }
+  };
+
+  // Archive wedding
+  const handleArchiveWedding = async (weddingId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}/archive`, {
+        method: 'POST'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        fetchWeddings();
+        alert('Wedding archived successfully!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error archiving wedding:', err);
+      alert('Failed to archive wedding');
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      wedding_code: '',
+      bride_name: '',
+      groom_name: '',
+      wedding_date: '',
+      wedding_month: '',
+      venue: '',
+      venue_address: '',
+      package_type: 'basic',
+      status: 'upcoming',
+      theme_color: '#ff6b9d',
+      contact_email: '',
+      contact_phone: '',
+      enable_photo_booth: true,
+      enable_face_recognition: true,
+      enable_wishes: true,
+      enable_live_stream: false,
+      max_photos: 1000,
+    });
+    setSelectedWedding(null);
+  };
+
+  // Open edit dialog
+  const openEditDialog = (wedding: Wedding) => {
+    setSelectedWedding(wedding);
+    setFormData(wedding);
+    setIsEditDialogOpen(true);
+  };
+
+  useEffect(() => {
+    fetchWeddings();
+  }, []);
+
+  const getStatusBadge = (status: string) => {
+    const colors: Record<string, string> = {
+      active: 'bg-green-500',
+      upcoming: 'bg-blue-500',
+      completed: 'bg-gray-500',
+      archived: 'bg-yellow-500'
+    };
+    return <Badge className={colors[status] || 'bg-gray-500'}>{status}</Badge>;
+  };
+
+  const getPackageBadge = (packageType: string) => {
+    const colors: Record<string, string> = {
+      basic: 'bg-gray-600',
+      premium: 'bg-purple-600',
+      luxury: 'bg-gold-600'
+    };
+    return <Badge className={colors[packageType] || 'bg-gray-600'}>{packageType}</Badge>;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-xl">Loading weddings...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-6 max-w-7xl">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">Wedding Customer Management</h1>
+          <p className="text-gray-600 mt-2">Manage your wedding clients and their details</p>
+        </div>
+        
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-pink-600 hover:bg-pink-700" onClick={resetForm}>
+              <Plus className="mr-2 h-4 w-4" /> Add New Wedding
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New Wedding</DialogTitle>
+              <DialogDescription>Add a new wedding customer to your system</DialogDescription>
+            </DialogHeader>
+            
+            <WeddingForm formData={formData} setFormData={setFormData} />
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleCreateWedding} className="bg-pink-600 hover:bg-pink-700">
+                Create Wedding
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Weddings Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {weddings.map((wedding) => {
+          const stats = weddingStats[wedding.id] || { total_photos: 0, total_people: 0, total_wishes: 0, storage_used_mb: 0 };
+          
+          return (
+            <Card key={wedding.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-2">
+                      {wedding.bride_name} {wedding.groom_name && `& ${wedding.groom_name}`}
+                    </CardTitle>
+                    <CardDescription className="flex gap-2 items-center">
+                      <Calendar className="h-4 w-4" />
+                      {wedding.wedding_month || wedding.wedding_date || 'Date TBD'}
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {getStatusBadge(wedding.status)}
+                    {getPackageBadge(wedding.package_type)}
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                {/* Wedding Code */}
+                <div className="mb-4 p-2 bg-gray-100 rounded text-sm font-mono">
+                  /{wedding.wedding_code}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Image className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm">{stats.total_photos} photos</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">{stats.total_people} people</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    <span className="text-sm">{stats.total_wishes} wishes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">
+                      {Number(stats.storage_used_mb).toFixed(1)} MB used
+                    </span>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {wedding.enable_photo_booth && <Badge variant="outline">Photo Booth</Badge>}
+                  {wedding.enable_face_recognition && <Badge variant="outline">Face Recognition</Badge>}
+                  {wedding.enable_wishes && <Badge variant="outline">Wishes</Badge>}
+                  {wedding.enable_live_stream && <Badge variant="outline">Live Stream</Badge>}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => openEditDialog(wedding)}
+                    className="flex-1"
+                  >
+                    <Edit2 className="h-3 w-3 mr-1" /> Edit
+                  </Button>
+                  
+                  {wedding.status !== 'archived' && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleArchiveWedding(wedding.id)}
+                    >
+                      <Archive className="h-3 w-3" />
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    size="sm" 
+                    variant="destructive" 
+                    onClick={() => handleDeleteWedding(wedding.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* No weddings message */}
+      {weddings.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-xl text-gray-600">No weddings found. Create your first wedding to get started!</p>
+        </div>
+      )}
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Wedding</DialogTitle>
+            <DialogDescription>Update wedding details</DialogDescription>
+          </DialogHeader>
+          
+          <WeddingForm formData={formData} setFormData={setFormData} isEdit />
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleUpdateWedding} className="bg-pink-600 hover:bg-pink-700">
+              Update Wedding
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+// Wedding Form Component
+interface WeddingFormProps {
+  formData: Partial<Wedding>;
+  setFormData: React.Dispatch<React.SetStateAction<Partial<Wedding>>>;
+  isEdit?: boolean;
+}
+
+const WeddingForm: React.FC<WeddingFormProps> = ({ formData, setFormData, isEdit = false }) => {
+  const handleChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="bride_name">Bride Name *</Label>
+          <Input
+            id="bride_name"
+            value={formData.bride_name || ''}
+            onChange={(e) => handleChange('bride_name', e.target.value)}
+            placeholder="Sreedevi"
+          />
+        </div>
+        <div>
+          <Label htmlFor="groom_name">Groom Name</Label>
+          <Input
+            id="groom_name"
+            value={formData.groom_name || ''}
+            onChange={(e) => handleChange('groom_name', e.target.value)}
+            placeholder="Vaishag"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="wedding_code">Wedding Code * {!isEdit && '(auto-generated if empty)'}</Label>
+        <Input
+          id="wedding_code"
+          value={formData.wedding_code || ''}
+          onChange={(e) => handleChange('wedding_code', e.target.value)}
+          placeholder="sreedevi-vaishag-2026"
+          disabled={isEdit}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="wedding_date">Wedding Date</Label>
+          <Input
+            id="wedding_date"
+            type="date"
+            value={formData.wedding_date || ''}
+            onChange={(e) => handleChange('wedding_date', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="wedding_month">Wedding Month</Label>
+          <Input
+            id="wedding_month"
+            value={formData.wedding_month || ''}
+            onChange={(e) => handleChange('wedding_month', e.target.value)}
+            placeholder="January 2026"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="venue">Venue</Label>
+        <Input
+          id="venue"
+          value={formData.venue || ''}
+          onChange={(e) => handleChange('venue', e.target.value)}
+          placeholder="Grand Palace Hall"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="venue_address">Venue Address</Label>
+        <Input
+          id="venue_address"
+          value={formData.venue_address || ''}
+          onChange={(e) => handleChange('venue_address', e.target.value)}
+          placeholder="123 Main St, City"
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="package_type">Package</Label>
+          <Select value={formData.package_type} onValueChange={(value) => handleChange('package_type', value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="basic">Basic</SelectItem>
+              <SelectItem value="premium">Premium</SelectItem>
+              <SelectItem value="luxury">Luxury</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="status">Status</Label>
+          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="theme_color">Theme Color</Label>
+          <Input
+            id="theme_color"
+            type="color"
+            value={formData.theme_color || '#ff6b9d'}
+            onChange={(e) => handleChange('theme_color', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="contact_email">Contact Email</Label>
+          <Input
+            id="contact_email"
+            type="email"
+            value={formData.contact_email || ''}
+            onChange={(e) => handleChange('contact_email', e.target.value)}
+            placeholder="bride@example.com"
+          />
+        </div>
+        <div>
+          <Label htmlFor="contact_phone">Contact Phone</Label>
+          <Input
+            id="contact_phone"
+            type="tel"
+            value={formData.contact_phone || ''}
+            onChange={(e) => handleChange('contact_phone', e.target.value)}
+            placeholder="+91 1234567890"
+          />
+        </div>
+      </div>
+
+      <div className="border-t pt-4">
+        <Label className="text-base font-semibold mb-3 block">Features</Label>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="enable_photo_booth" className="cursor-pointer">Enable Photo Booth</Label>
+            <Switch
+              id="enable_photo_booth"
+              checked={formData.enable_photo_booth}
+              onCheckedChange={(checked) => handleChange('enable_photo_booth', checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="enable_face_recognition" className="cursor-pointer">Enable Face Recognition</Label>
+            <Switch
+              id="enable_face_recognition"
+              checked={formData.enable_face_recognition}
+              onCheckedChange={(checked) => handleChange('enable_face_recognition', checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="enable_wishes" className="cursor-pointer">Enable Wishes</Label>
+            <Switch
+              id="enable_wishes"
+              checked={formData.enable_wishes}
+              onCheckedChange={(checked) => handleChange('enable_wishes', checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="enable_live_stream" className="cursor-pointer">Enable Live Stream</Label>
+            <Switch
+              id="enable_live_stream"
+              checked={formData.enable_live_stream}
+              onCheckedChange={(checked) => handleChange('enable_live_stream', checked)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="max_photos">Maximum Photos Allowed</Label>
+        <Input
+          id="max_photos"
+          type="number"
+          value={formData.max_photos || 1000}
+          onChange={(e) => handleChange('max_photos', parseInt(e.target.value))}
+          min="100"
+          step="100"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default WeddingManager;
+
