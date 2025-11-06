@@ -7,6 +7,7 @@ import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
 import { WebsiteProvider } from "./contexts/WebsiteContext";
+import { useMusicPlayer } from "./contexts/MusicPlayerContext";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "./components/ui/button";
 import { X, Music, MessageSquare } from "lucide-react";
@@ -39,7 +40,7 @@ import Feedback from "./pages/Feedback";
 import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
-import CompanyLanding from "./pages/company/Landing";
+import CompanyLanding from "./pages/company/LandingMinimal";
 import CompanyAbout from "./pages/company/About";
 import CompanyServices from "./pages/company/Services";
 import CompanyPricing from "./pages/company/Pricing";
@@ -69,6 +70,7 @@ const App = () => {
   const [feedbackCompact, setFeedbackCompact] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const { isPlaying, togglePlay } = useMusicPlayer();
 
   // Set language attribute on document root
   useEffect(() => {
@@ -99,6 +101,21 @@ const App = () => {
   // Check if on company pages (hide music player on company pages)
   const isCompanyPage = useMemo(() => {
     return location.pathname.startsWith('/company');
+  }, [location.pathname]);
+
+  // Pause music when on company pages
+  useEffect(() => {
+    if (isCompanyPage && isPlaying) {
+      togglePlay(); // Pause the music
+    }
+  }, [isCompanyPage]); // Only depend on isCompanyPage, not isPlaying or togglePlay to avoid loops
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // Smooth scroll animation
+    });
   }, [location.pathname]);
 
   // Feedback button animation - shrink to icon only after 3 seconds
