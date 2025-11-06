@@ -75,13 +75,13 @@ const CompanyLanding = () => {
   const testimonials = [
     {
       name: "Sreedevi & Vaishag",
-      event: "Wedding • January 2025 • Kerala",
+      event: "Wedding • January 11, 2026 • Kerala",
       text: "WeddingWeb made our wedding so special! Our guests loved being able to find their photos instantly using face detection. The website builder was super easy to use!",
       rating: 5
     },
     {
       name: "Parvathy & Hari",
-      event: "Wedding • February 2025 • Kerala",
+      event: "Wedding • January 04, 2026 • Kerala",
       text: "As early customers, we got amazing personalized service. The team helped us every step of the way. Our families abroad could watch the live stream - it was perfect!",
       rating: 5
     },

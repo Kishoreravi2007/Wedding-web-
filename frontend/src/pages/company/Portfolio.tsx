@@ -18,7 +18,7 @@ const Portfolio = () => {
     {
       couple: "Sreedevi & Vaishag",
       location: "Kerala, India",
-      date: "January 2025",
+      date: "January 11, 2026",
       guests: 300,
       photos: 3500,
       image: "/sister-b-gallery/10.jpeg",
@@ -39,7 +39,7 @@ const Portfolio = () => {
     {
       couple: "Parvathy & Hari",
       location: "Kerala, India",
-      date: "February 2025",
+      date: "January 04, 2026",
       guests: 250,
       photos: 2800,
       image: "/WhatsApp Image 2025-10-19 at 8.16.44 PM.jpeg",
@@ -62,13 +62,13 @@ const Portfolio = () => {
   const testimonials = [
     {
       name: "Sreedevi & Vaishag",
-      event: "Wedding • January 2025 • Kerala",
+      event: "Wedding • January 11, 2026 • Kerala",
       text: "WeddingWeb made our wedding so special! Our guests loved being able to find their photos instantly using face detection. The website builder was super easy to use!",
       rating: 5
     },
     {
       name: "Parvathy & Hari",
-      event: "Wedding • February 2025 • Kerala",
+      event: "Wedding • January 04, 2026 • Kerala",
       text: "As early customers, we got amazing personalized service. The team helped us every step of the way. Our families abroad could watch the live stream - it was perfect!",
       rating: 5
     },
