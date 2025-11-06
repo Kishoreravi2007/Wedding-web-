@@ -220,14 +220,6 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
-        {!isCompanyPage && (
-          <motion.footer 
-            className="text-center p-4 mt-8 text-stone-500 text-sm support-text"
-            variants={itemVariants}
-          >
-            <a href="mailto:help.weddingweb@gmail.com" className="underline hover:text-stone-700">help.weddingweb@gmail.com</a>
-          </motion.footer>
-        )}
         </TooltipProvider>
       </WebsiteProvider>
     </QueryClientProvider>
