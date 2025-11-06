@@ -91,8 +91,8 @@ const PhotoManager: React.FC = () => {
     }
 
     try {
-      // Always use Firebase-backed endpoint
-      const endpoint = '/api/photos';
+      // Use local filesystem endpoint (same as loadPhotos)
+      const endpoint = '/api/photos-local';
       const response = await fetch(`${API_BASE_URL}${endpoint}/${photo.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()

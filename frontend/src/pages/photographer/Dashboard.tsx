@@ -172,7 +172,8 @@ const PhotographerDashboard = () => {
 
   const handlePhotoUploadSuccess = (photoId: string) => {
     // Fetch the newly uploaded photo and add it to the state
-    const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+    // Use local filesystem endpoint (same as loadAllPhotos)
+    const endpoint = '/api/photos-local';
     fetch(`${API_BASE_URL}${endpoint}`, {
       headers: getAuthHeaders()
     })
@@ -240,7 +241,8 @@ const PhotographerDashboard = () => {
     }
 
     try {
-      const endpoint = import.meta.env.PROD ? '/api/photos' : '/api/photos-local';
+      // Use local filesystem endpoint (same as loadAllPhotos)
+      const endpoint = '/api/photos-local';
       const response = await fetch(`${API_BASE_URL}${endpoint}/${photoId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()

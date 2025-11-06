@@ -81,8 +81,8 @@ router.get('/', async (req, res) => {
 
 // POST upload photos to local filesystem (requires authentication)
 router.post('/', (req, res, next) => {
-  // Import authenticateToken from Supabase auth module
-  const { authenticateToken } = require('./auth-secure');
+  // Import authenticateToken from auth module
+  const { authenticateToken } = require('./auth-simple');
   authenticateToken(req, res, next);
 }, upload.single('photo'), async (req, res) => {
   try {
@@ -152,7 +152,7 @@ router.post('/', (req, res, next) => {
 
 // POST upload multiple photos at once (requires authentication)
 router.post('/batch', (req, res, next) => {
-  const { authenticateToken } = require('./auth-secure');
+  const { authenticateToken } = require('./auth-simple');
   authenticateToken(req, res, next);
 }, upload.array('photos', 50), async (req, res) => {
   try {
@@ -225,7 +225,7 @@ router.post('/batch', (req, res, next) => {
 
 // DELETE a photo from local filesystem (requires authentication)
 router.delete('/:id', (req, res, next) => {
-  const { authenticateToken } = require('./auth-secure');
+  const { authenticateToken } = require('./auth-simple');
   authenticateToken(req, res, next);
 }, async (req, res) => {
   try {
