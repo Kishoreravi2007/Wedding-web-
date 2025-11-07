@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import WeddingManager from '@/components/WeddingManager';
 import { Button } from '@/components/ui/button';
-import { Home, Users, Settings, LogOut } from 'lucide-react';
+import { Home, Users, Settings, LogOut, Mail } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -20,6 +20,12 @@ const AdminDashboard: React.FC = () => {
                   <Button variant="ghost" size="sm">
                     <Users className="mr-2 h-4 w-4" />
                     Weddings
+                  </Button>
+                </Link>
+                <Link to="/admin/contact-messages">
+                  <Button variant="ghost" size="sm">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Messages
                   </Button>
                 </Link>
                 <Link to="/">

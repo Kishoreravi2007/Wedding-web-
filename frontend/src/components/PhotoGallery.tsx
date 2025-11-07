@@ -14,6 +14,7 @@ import * as faceapi from 'face-api.js';
 import { Photo as PhotoType } from '@/types/photo'; // Import Photo interface from types
 import { getUploadedFiles, UploadedFile } from '@/services/fileUploadService'; // Import getUploadedFiles
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { mapApiPhotoToPhotoType } from '@/utils/photoMapper';
 import { useTranslation } from 'react-i18next';
 
 interface Person {
@@ -325,7 +326,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
           queryParams.append('sister', sister);
         }
         // Use local filesystem endpoint to get photos from uploads/wedding_gallery
-        const url = `${API_BASE_URL}/api/photos-local?${queryParams.toString()}`;
+        const url = `${API_BASE_URL}/api/photos?${queryParams.toString()}`;
 
         const response = await fetch(url); // Public endpoint, no auth required
         if (!response.ok) {
@@ -333,22 +334,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         }
         const fetchedBackendPhotos = await response.json();
 
-        // Map backend photos to PhotoType
-        const mappedPhotos: PhotoType[] = fetchedBackendPhotos.map((file: any) => ({
-          id: file.id,
-          url: file.public_url || file.publicUrl, // Support both snake_case and camelCase
-          thumbnail: file.public_url || file.publicUrl, // Assuming thumbnail is same as full image for now
-          title: file.filename,
-          description: file.description || '', // Include description if available
-          tags: file.tags || [], // Include tags if available
-          event: file.sister, // Using 'sister' as event for now, can be refined
-          date: new Date(file.uploaded_at || file.created_at).toISOString(), // Use uploaded_at from Supabase
-          views: 0,
-          downloads: 0,
-          photographer: 'Photographer', // Default photographer
-          faces: file.photo_faces || [], // Include faces from backend
-          timestamp: new Date(file.uploaded_at || file.created_at), // Use uploaded_at from Supabase
-        }));
+        const mappedPhotos: PhotoType[] = fetchedBackendPhotos.map(mapApiPhotoToPhotoType);
         setPhotos(mappedPhotos);
       } catch (error) {
         console.error('Error fetching photos:', error);

@@ -1,0 +1,421 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Home, 
+  Users, 
+  Settings, 
+  LogOut, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  User, 
+  MessageSquare, 
+  CheckCircle, 
+  Clock, 
+  Trash2,
+  RefreshCcw
+} from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  event_date?: string;
+  guest_count?: number;
+  message: string;
+  status: 'new' | 'read' | 'replied' | 'archived';
+  response?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+const ContactMessages: React.FC = () => {
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  const fetchMessages = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/contact-messages`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessages(data.messages);
+      } else {
+        setError('Failed to load messages');
+      }
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+      setError('Failed to load messages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contact-messages/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fetchMessages(); // Refresh the list
+      }
+    } catch (err) {
+      console.error('Error updating message status:', err);
+    }
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contact-messages/${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fetchMessages(); // Refresh the list
+        setSelectedMessage(null);
+      }
+    } catch (err) {
+      console.error('Error deleting message:', err);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'new':
+        return <Badge className="bg-blue-500">New</Badge>;
+      case 'read':
+        return <Badge className="bg-yellow-500">Read</Badge>;
+      case 'replied':
+        return <Badge className="bg-green-500">Replied</Badge>;
+      case 'archived':
+        return <Badge className="bg-gray-500">Archived</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Admin Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Wedding Website Admin
+              </h1>
+              <nav className="flex gap-4 ml-8">
+                <Link to="/admin/dashboard">
+                  <Button variant="ghost" size="sm">
+                    <Users className="mr-2 h-4 w-4" />
+                    Weddings
+                  </Button>
+                </Link>
+                <Link to="/admin/contact-messages">
+                  <Button variant="ghost" size="sm" className="bg-gray-100">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Messages
+                  </Button>
+                </Link>
+                <Link to="/">
+                  <Button variant="ghost" size="sm">
+                    <Home className="mr-2 h-4 w-4" />
+                    View Site
+                  </Button>
+                </Link>
+              </nav>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={fetchMessages}>
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Button>
+              <Button variant="ghost" size="sm">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="py-8">
+        <div className="container mx-auto px-6">
+          {/* Header */}
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Contact Messages</h2>
+            <p className="text-gray-600">View and manage customer inquiries</p>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading messages...</p>
+            </div>
+          ) : messages.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg">No messages yet</p>
+                <p className="text-gray-500 text-sm mt-2">Customer inquiries will appear here</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Messages List */}
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <Card 
+                    key={message.id}
+                    className={`cursor-pointer transition-all hover:shadow-lg ${
+                      selectedMessage?.id === message.id ? 'border-rose-500 border-2' : ''
+                    }`}
+                    onClick={() => setSelectedMessage(message)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            {message.name}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 mt-1">
+                            <Mail className="w-3 h-3" />
+                            {message.email}
+                          </CardDescription>
+                        </div>
+                        {getStatusBadge(message.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                        {message.message}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {formatDate(message.created_at)}
+                        </span>
+                        {message.guest_count && (
+                          <span>{message.guest_count} guests</span>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Message Detail */}
+              <div className="sticky top-24">
+                {selectedMessage ? (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle>Message Details</CardTitle>
+                        {getStatusBadge(selectedMessage.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          Name
+                        </label>
+                        <p className="text-gray-900 mt-1">{selectedMessage.name}</p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Email
+                        </label>
+                        <a 
+                          href={`mailto:${selectedMessage.email}`}
+                          className="text-blue-600 hover:underline mt-1 block"
+                        >
+                          {selectedMessage.email}
+                        </a>
+                      </div>
+
+                      {selectedMessage.phone && (
+                        <div>
+                          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <Phone className="w-4 h-4" />
+                            Phone
+                          </label>
+                          <a 
+                            href={`tel:${selectedMessage.phone}`}
+                            className="text-blue-600 hover:underline mt-1 block"
+                          >
+                            {selectedMessage.phone}
+                          </a>
+                        </div>
+                      )}
+
+                      {selectedMessage.event_date && (
+                        <div>
+                          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            Event Date
+                          </label>
+                          <p className="text-gray-900 mt-1">
+                            {new Date(selectedMessage.event_date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+
+                      {selectedMessage.guest_count && (
+                        <div>
+                          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            Guest Count
+                          </label>
+                          <p className="text-gray-900 mt-1">{selectedMessage.guest_count}</p>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4" />
+                          Message
+                        </label>
+                        <p className="text-gray-900 mt-1 whitespace-pre-wrap bg-gray-50 p-3 rounded">
+                          {selectedMessage.message}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          Received
+                        </label>
+                        <p className="text-gray-900 mt-1">{formatDate(selectedMessage.created_at)}</p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="pt-4 border-t space-y-2">
+                        <p className="text-sm font-semibold text-gray-700 mb-2">Mark as:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => updateStatus(selectedMessage.id, 'read')}
+                            className="w-full"
+                          >
+                            Read
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => updateStatus(selectedMessage.id, 'replied')}
+                            className="w-full"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Replied
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => updateStatus(selectedMessage.id, 'archived')}
+                            className="w-full"
+                          >
+                            Archive
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => deleteMessage(selectedMessage.id)}
+                            className="w-full"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Button 
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-rose-500 to-purple-600"
+                        asChild
+                      >
+                        <a href={`mailto:${selectedMessage.email}`}>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Reply via Email
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="text-center py-12">
+                      <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">Select a message to view details</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="container mx-auto px-6 py-4 text-center text-gray-600 text-sm">
+          © {new Date().getFullYear()} Wedding Website. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default ContactMessages;
+
