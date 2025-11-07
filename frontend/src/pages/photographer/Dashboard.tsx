@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star, Trash2 } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
+import { mapApiPhotoToPhotoType } from '@/utils/photoMapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
 import { Label } from '@/components/ui/label'; // Import Label
 import { useWebsite } from '@/contexts/WebsiteContext';
@@ -53,12 +54,9 @@ const PhotographerDashboard = () => {
       try {
         console.log('Loading all photos from API...');
         
-        // Fetch photos from both galleries via local filesystem endpoint
-        const endpoint = '/api/photos-local';
-        
         const [sisterAResponse, sisterBResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
-          fetch(`${API_BASE_URL}${endpoint}?sister=sister-b`)
+          fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
+          fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
         ]);
 
         if (!sisterAResponse.ok || !sisterBResponse.ok) {
@@ -66,52 +64,37 @@ const PhotographerDashboard = () => {
           return;
         }
 
-        const sisterAPhotos = await sisterAResponse.json();
-        const sisterBPhotos = await sisterBResponse.json();
-        const allPhotos = [...sisterAPhotos, ...sisterBPhotos];
+        const [sisterAPhotosRaw, sisterBPhotosRaw] = await Promise.all([
+          sisterAResponse.json(),
+          sisterBResponse.json()
+        ]);
 
-        console.log(`Loaded ${allPhotos.length} total photos (${sisterAPhotos.length} Sister A, ${sisterBPhotos.length} Sister B)`);
+        const allPhotosRaw = [...sisterAPhotosRaw, ...sisterBPhotosRaw];
 
-        // Map to PhotoType format
-        const mappedPhotos: PhotoType[] = allPhotos.map((photo: any) => ({
-          id: photo.id,
-          url: photo.public_url || photo.url,
-          thumbnail: photo.thumbnail || photo.public_url || photo.url,
-          title: photo.filename,
-          description: '',
-          tags: [],
-          event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B',
-          date: photo.uploaded_at || photo.uploadedAt || new Date().toISOString(),
-          views: 0,
-          downloads: 0,
-          photographer: 'Photographer',
-          faces: [],
-          timestamp: photo.uploaded_at ? new Date(photo.uploaded_at) : (photo.uploadedAt ? new Date(photo.uploadedAt) : new Date()),
-        }));
+        console.log(`Loaded ${allPhotosRaw.length} total photos (${sisterAPhotosRaw.length} Sister A, ${sisterBPhotosRaw.length} Sister B)`);
 
+        const mappedPhotos: PhotoType[] = allPhotosRaw.map(mapApiPhotoToPhotoType);
         setUploadedPhotos(mappedPhotos);
 
-        // Update stats
         setStats(prev => ({
           ...prev,
-          totalPhotos: allPhotos.length,
-          uploadedToday: allPhotos.filter((p: any) => {
-            const uploadDate = new Date(p.uploaded_at || p.uploadedAt || p.created_at);
+          totalPhotos: allPhotosRaw.length,
+          uploadedToday: allPhotosRaw.filter((p: any) => {
+            const uploadDate = new Date(p.uploaded_at || p.created_at || p.timestamp);
             const today = new Date();
             return uploadDate.toDateString() === today.toDateString();
           }).length
         }));
 
-        // Set recent uploads (last 5 photos sorted by date)
-        const sortedPhotos = [...allPhotos].sort((a: any, b: any) => 
-          new Date(b.uploaded_at || b.uploadedAt || b.created_at).getTime() - new Date(a.uploaded_at || a.uploadedAt || a.created_at).getTime()
-        ).slice(0, 5);
+        const sortedPhotos = [...allPhotosRaw]
+          .sort((a: any, b: any) => new Date(b.uploaded_at || b.created_at || b.timestamp).getTime() - new Date(a.uploaded_at || a.created_at || a.timestamp).getTime())
+          .slice(0, 5);
 
         setRecentUploads(sortedPhotos.map((photo: any) => ({
           id: photo.id,
-          name: photo.filename,
+          name: photo.title || photo.filename || 'Photo',
           size: formatFileSize(photo.size || 0),
-          uploadTime: getTimeAgo(photo.uploaded_at || photo.uploadedAt || photo.created_at),
+          uploadTime: getTimeAgo(photo.uploaded_at || photo.created_at || photo.timestamp),
           event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B'
         })));
 
@@ -157,68 +140,44 @@ const PhotographerDashboard = () => {
     navigate('/');
   };
 
-  const handlePhotosUploaded = (newlyUploadedPhotos: PhotoType[]) => {
-    setUploadedPhotos(prev => [...prev, ...newlyUploadedPhotos]);
-    setRecentUploads(prev => [...newlyUploadedPhotos, ...prev].slice(0, 5)); // Keep it to 5 recent uploads
-
-    setStats(prev => ({
-      ...prev,
-      totalPhotos: prev.totalPhotos + newlyUploadedPhotos.length,
-      uploadedToday: prev.uploadedToday + newlyUploadedPhotos.length
-    }));
-
-    showSuccess(`${newlyUploadedPhotos.length} photo(s) uploaded successfully!`);
-  };
-
   const handlePhotoUploadSuccess = (photoId: string) => {
-    // Fetch the newly uploaded photo and add it to the state
-    // Use local filesystem endpoint (same as loadAllPhotos)
-    const endpoint = '/api/photos-local';
-    fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: getAuthHeaders()
-    })
+    fetch(`${API_BASE_URL}/api/photos/${photoId}`)
       .then(response => {
         if (!response.ok) {
-          throw new Error('Failed to fetch photos');
+          throw new Error('Failed to fetch uploaded photo');
         }
         return response.json();
       })
-      .then(photos => {
-        const newPhoto = photos.find((p: any) => p.id === photoId);
-        if (newPhoto) {
-          const mappedPhoto: PhotoType = {
-            id: newPhoto.id,
-            url: newPhoto.public_url || newPhoto.url,
-            thumbnail: newPhoto.thumbnail || newPhoto.public_url || newPhoto.url,
-            title: newPhoto.filename,
-            description: '',
-            tags: [],
-            event: newPhoto.sister === 'sister-a' ? 'Sister A' : 'Sister B',
-            date: newPhoto.uploadedAt || new Date().toISOString(),
-            views: 0,
-            downloads: 0,
-            photographer: 'Photographer',
-            faces: [],
-            timestamp: newPhoto.uploadedAt ? new Date(newPhoto.uploadedAt) : new Date(),
-          };
-          setUploadedPhotos(prev => [mappedPhoto, ...prev]);
-          setRecentUploads(prev => [{
-            id: mappedPhoto.id,
-            name: mappedPhoto.title,
-            size: formatFileSize(newPhoto.size || 0),
-            uploadTime: 'Just now',
-            event: mappedPhoto.event
-          }, ...prev].slice(0, 5));
-          setStats(prev => ({
-            ...prev,
-            totalPhotos: prev.totalPhotos + 1,
-            uploadedToday: prev.uploadedToday + 1
-          }));
+      .then(photo => {
+        if (!photo) {
+          return;
         }
+
+        const mappedPhoto = mapApiPhotoToPhotoType(photo);
+
+        setUploadedPhotos(prev => {
+          const withoutExisting = prev.filter(p => p.id !== mappedPhoto.id);
+          return [mappedPhoto, ...withoutExisting];
+        });
+
+        setRecentUploads(prev => [{
+          id: mappedPhoto.id,
+          name: mappedPhoto.title,
+          size: formatFileSize(photo.size || 0),
+          uploadTime: 'Just now',
+          event: mappedPhoto.event || ''
+        }, ...prev].slice(0, 5));
+
+        setStats(prev => ({
+          ...prev,
+          totalPhotos: prev.totalPhotos + 1,
+          uploadedToday: prev.uploadedToday + 1
+        }));
+
+        showSuccess('Photo uploaded successfully!');
       })
       .catch(error => {
         console.error('Error fetching uploaded photo:', error);
-        // Don't break the app if fetch fails
       });
   };
   
@@ -241,9 +200,7 @@ const PhotographerDashboard = () => {
     }
 
     try {
-      // Use local filesystem endpoint (same as loadAllPhotos)
-      const endpoint = '/api/photos-local';
-      const response = await fetch(`${API_BASE_URL}${endpoint}/${photoId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/photos/${photoId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

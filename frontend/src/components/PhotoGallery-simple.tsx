@@ -8,6 +8,7 @@ import { motion, AnimatePresence, Easing } from 'framer-motion';
 import { Photo, Face } from '@/types/photo'; // Import Photo and Face interfaces from types
 import { cn } from '@/lib/utils';
 import { API_BASE_URL } from '@/lib/api';
+import { mapApiPhotoToPhotoType } from '@/utils/photoMapper';
 
 // Mock data for demonstration
 // Note: Real face descriptors would be Float32Array of length 128.
@@ -189,10 +190,8 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         // Determine sister parameter from gallery path
         const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
         
-        // Use local filesystem endpoint to get photos from uploads/wedding_gallery
-        const photosEndpoint = `${API_BASE_URL}/api/photos-local?sister=${sister}`;
+        const photosEndpoint = `${API_BASE_URL}/api/photos?sister=${sister}`;
         
-        // Fetch photos from backend
         const response = await fetch(photosEndpoint);
         
         if (!response.ok) {
@@ -202,22 +201,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         
         const photosData = await response.json();
         
-        // Map backend response to Photo format
-        const mappedPhotos = photosData.map((photo: any, index: number) => ({
-          id: photo.id || `photo-${index}`,
-          url: photo.public_url || photo.url,
-          thumbnail: photo.thumbnail || photo.public_url || photo.url,
-          title: photo.filename || `Photo ${index + 1}`,
-          description: photo.description || '',
-          tags: photo.tags || ['wedding', 'celebration'],
-          event: photo.sister === 'sister-a' ? 'Wedding' : 'Engagement',
-          date: photo.uploaded_at || photo.uploadedAt || new Date().toISOString(),
-          views: Math.floor(Math.random() * 200) + 50,
-          downloads: Math.floor(Math.random() * 50) + 10,
-          photographer: 'Wedding Photographer',
-          faces: [],
-          timestamp: photo.uploaded_at ? new Date(photo.uploaded_at) : (photo.uploadedAt ? new Date(photo.uploadedAt) : new Date()),
-        }));
+        const mappedPhotos = photosData.map(mapApiPhotoToPhotoType);
         
         setPhotos(mappedPhotos);
       } catch (error) {

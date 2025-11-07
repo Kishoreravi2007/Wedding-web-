@@ -50,6 +50,7 @@ import CompanyContact from "./pages/company/Contact";
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminContactMessages from "./pages/admin/ContactMessages";
 
 const queryClient = new QueryClient();
 
@@ -187,6 +188,7 @@ const App = () => {
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
 
               {/* Public Routes */}
               <Route path="/countdown" element={

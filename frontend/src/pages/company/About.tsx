@@ -260,7 +260,7 @@ const About = () => {
             <p className="text-xl text-slate-600">Building amazing wedding experiences with technology</p>
           </motion.div>
 
-          <div className="flex justify-center max-w-md mx-auto">
+        <div className="flex justify-center max-w-md mx-auto">
             {team.map((member, index) => (
               <motion.div
                 key={index}

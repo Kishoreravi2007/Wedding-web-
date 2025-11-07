@@ -44,23 +44,20 @@ const PhotoManager: React.FC = () => {
     try {
       setLoading(true);
       
-      // Use local filesystem endpoint
-      const endpoint = '/api/photos-local';
-      
       const [sisterAResponse, sisterBResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}${endpoint}?sister=sister-a`),
-        fetch(`${API_BASE_URL}${endpoint}?sister=sister-b`)
+        fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
+        fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
       ]);
 
       if (sisterAResponse.ok) {
         const photosA = await sisterAResponse.json();
         setSisterAPhotos(photosA.map((p: any) => ({
           id: p.id,
-          filename: p.filename,
-          url: p.public_url || p.url,
-          thumbnail: p.thumbnail || p.public_url || p.url,
+          filename: p.title || p.filename || 'Photo',
+          url: p.public_url || p.publicUrl || p.url,
+          thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
           size: p.size,
-          uploadedAt: p.uploaded_at || p.uploadedAt || p.created_at,
+          uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
           sister: 'sister-a'
         })));
       }
@@ -69,11 +66,11 @@ const PhotoManager: React.FC = () => {
         const photosB = await sisterBResponse.json();
         setSisterBPhotos(photosB.map((p: any) => ({
           id: p.id,
-          filename: p.filename,
-          url: p.public_url || p.url,
-          thumbnail: p.thumbnail || p.public_url || p.url,
+          filename: p.title || p.filename || 'Photo',
+          url: p.public_url || p.publicUrl || p.url,
+          thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
           size: p.size,
-          uploadedAt: p.uploaded_at || p.uploadedAt || p.created_at,
+          uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
           sister: 'sister-b'
         })));
       }
@@ -91,9 +88,7 @@ const PhotoManager: React.FC = () => {
     }
 
     try {
-      // Use local filesystem endpoint (same as loadPhotos)
-      const endpoint = '/api/photos-local';
-      const response = await fetch(`${API_BASE_URL}${endpoint}/${photo.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/photos/${photo.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
