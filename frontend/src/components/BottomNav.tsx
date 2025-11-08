@@ -6,15 +6,16 @@ import { useTranslation } from "react-i18next";
 interface BottomNavProps {
   basePath: string;
   activeColor: string;
+  showVideo?: boolean;
 }
 
-const BottomNav = ({ basePath, activeColor }: BottomNavProps) => {
+const BottomNav = ({ basePath, activeColor, showVideo = true }: BottomNavProps) => {
   const { t } = useTranslation();
   const navItems = [
     { to: "/schedule", icon: CalendarDays, label: t('schedule') },
     { to: "/photobooth", icon: Camera, label: t('photoBooth') },
     { to: "/gallery", icon: Image, label: t('gallery') },
-    { to: "/engagement-video", icon: Video, label: t('video') },
+    ...(showVideo ? [{ to: "/engagement-video", icon: Video, label: t('video') }] : []),
     { to: "/live", icon: Radio, label: "Watch Live" },
   ];
 
