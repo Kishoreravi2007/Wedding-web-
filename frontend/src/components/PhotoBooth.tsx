@@ -29,6 +29,16 @@ interface PhotoBoothProps {
   sister?: 'a' | 'b'; // Auto-detect which wedding based on which page user is on
 }
 
+const MIN_VIDEO_DETECTION_SCORE = 0.15;
+const MIN_DISPLAY_CONFIDENCE = 0.15;
+const MIN_LOCK_CONFIDENCE = 0.2;
+
+const getDetectionScore = (detection: any) =>
+  detection?.detection?.score ?? detection?.score ?? 0;
+
+const getDetectionBox = (detection: any) =>
+  detection?.detection?.box ?? detection?.box;
+
 const PhotoBooth: React.FC<PhotoBoothProps> = ({ 
   className = '', 
   primaryColor = '#3B82F6',
@@ -54,7 +64,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [showFaceSearch, setShowFaceSearch] = useState(false);
   const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null); // Store base64 image
   // Auto-set wedding based on sister prop (no manual selection needed)
-  const selectedWedding = sister === 'a' ? 'sister_a' : 'sister_b';
+  // Backend expects hyphenated identifiers
+  const selectedWedding = sister === 'a' ? 'sister-a' : 'sister-b';
   const [isSearching, setIsSearching] = useState(false); // New state for search loader
   const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
   const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
@@ -221,12 +232,12 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     // Draw each detection with smooth, stable styling
     detections.forEach((detection, index) => {
       // Handle both old format (detection.box) and new format (detection.detection.box)
-      const box = detection.detection?.box || detection.box;
-      const confidence = detection.detection?.score || detection.score;
+      const box = getDetectionBox(detection);
+      const confidence = getDetectionScore(detection);
       const { x, y, width, height } = box;
 
       // Only draw detections with ultra-high confidence to eliminate flickering
-      if (confidence < 0.85) return;
+      if (confidence < MIN_DISPLAY_CONFIDENCE) return;
 
       // Draw bounding box with smooth gradient
       const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
@@ -243,8 +254,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       ctx.shadowOffsetX = 1;
       ctx.shadowOffsetY = 1;
 
-      // Draw confidence score with background (only for very high confidence)
-      if (confidence > 0.8) {
+      // Draw confidence score with background (only for sufficiently high confidence)
+      if (confidence >= MIN_DISPLAY_CONFIDENCE) {
         ctx.fillStyle = 'rgba(0, 255, 0, 0.9)';
         ctx.fillRect(x, y - 22, 90, 18);
         
@@ -339,17 +350,14 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
               video,
               new faceapi.TinyFaceDetectorOptions({
                 inputSize: 608,
-                scoreThreshold: 0.35 // Lower threshold so smaller faces are picked up
+                scoreThreshold: 0.12 // Lower threshold so smaller faces are picked up, especially for groups
               })
             )
             .withFaceLandmarks()
             .withFaceDescriptors();
 
           // Filter detections by very high confidence to eliminate flickering
-          detections = detections.filter(detection => {
-            const score = detection.detection?.score || detection.score;
-            return score >= 0.55;
-          });
+          detections = detections.filter(detection => getDetectionScore(detection) >= MIN_VIDEO_DETECTION_SCORE);
 
           // Add to detection history for smoothing
           setDetectionHistory(prev => {
@@ -371,20 +379,35 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
           // Use ultra-stable detections with persistence for UI updates
           const displayDetections = stableDetections.length > 0 ? stableDetections : detections;
-          
+
           // Apply persistence - keep showing last good detection for stability
           if (displayDetections.length > 0) {
-            setPersistentDetection(displayDetections);
-            setDetectionConfirmed(true);
+            const faceLabel = displayDetections.length === 1 ? 'face' : 'faces';
+            const lockableDetections = displayDetections.filter(det => getDetectionScore(det) >= MIN_LOCK_CONFIDENCE);
+
             setDetectionResults(displayDetections);
             setDetectionStatus('success');
-            setUserGuidance(`Perfect! Face detected and locked. Ready to take photo!`);
             drawDetections(displayDetections);
+
+            if (lockableDetections.length > 0) {
+              setPersistentDetection(displayDetections);
+              setDetectionConfirmed(true);
+              const lockLabel = lockableDetections.length === 1 ? 'face locked' : 'faces locked';
+              setUserGuidance(`Perfect! ${lockLabel}. Ready to take photo!`);
+            } else if (detectionConfirmed && persistentDetection.length > 0) {
+              setDetectionResults(persistentDetection);
+              setDetectionStatus('success');
+              const lockLabel = persistentDetection.length === 1 ? 'Face' : 'Faces';
+              setUserGuidance(`${lockLabel} locked and stable. Ready to take photo!`);
+              drawDetections(persistentDetection);
+            } else {
+              setUserGuidance(`${faceLabel.charAt(0).toUpperCase()}${faceLabel.slice(1)} detected. Hold steady for best results.`);
+            }
           } else if (detectionConfirmed && persistentDetection.length > 0) {
             // Keep showing the last confirmed detection for stability
             setDetectionResults(persistentDetection);
             setDetectionStatus('success');
-            setUserGuidance(`Face locked and stable. Ready to take photo!`);
+            setUserGuidance(`Faces locked and stable. Ready to take photo!`);
             drawDetections(persistentDetection);
           } else {
             setDetectionStatus('error');
@@ -474,23 +497,17 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     
     const video = videoRef.current;
     if (!video) {
-      const msg = 'Camera not available. Please start the camera first.';
-      setUserGuidance(msg);
-      alert(msg);
+      setUserGuidance('Camera not available. Please start the camera first.');
       return;
     }
 
     if (!isModelLoaded) {
-      const msg = 'Face detection models are still loading. Please wait...';
-      setUserGuidance(msg);
-      alert(msg);
+      setUserGuidance('Face detection models are still loading. Please wait...');
       return;
     }
 
     if (detectionResults.length === 0) {
-      const msg = 'No face detected. Please ensure your face is clearly visible before searching.';
-      setUserGuidance(msg);
-      alert(msg);
+      setUserGuidance('No face detected. Please ensure your face is clearly visible before searching.');
       return;
     }
 
@@ -511,12 +528,12 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       // Get the bounding box of the first detected face (or let user select if multiple)
       // For now, use the largest/most confident face
       const bestFace = detectionResults.reduce((best, current) => {
-        const currentScore = current.detection?.score || current.score;
-        const bestScore = best.detection?.score || best.score;
+        const currentScore = getDetectionScore(current);
+        const bestScore = getDetectionScore(best);
         return currentScore > bestScore ? current : best;
       }, detectionResults[0]);
       
-      const box = bestFace.detection?.box || bestFace.box;
+      const box = getDetectionBox(bestFace);
       const { x, y, width, height } = box;
 
       // Add some padding to the face crop for better results
@@ -549,7 +566,6 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       console.error('❌ Face capture error:', error);
       setSearchError(error instanceof Error ? error.message : 'Failed to capture face');
       setUserGuidance('Failed to capture face. Please try again.');
-      alert('Failed to capture face: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSearching(false);
     }
@@ -570,8 +586,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       // STEP 1: Use the face descriptor from the already-detected face
       // Get the best face from detectionResults (already has descriptor)
       const bestFace = detectionResults.reduce((best, current) => {
-        const currentScore = current.detection?.score || current.score;
-        const bestScore = best.detection?.score || best.score;
+        const currentScore = getDetectionScore(current);
+        const bestScore = getDetectionScore(best);
         return currentScore > bestScore ? current : best;
       }, detectionResults[0]);
       
@@ -645,11 +661,6 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         resultsCount: data.matches?.length || 0,
         hasError: !!data.message
       });
-      
-      // Debug alert to confirm modal should be showing
-      setTimeout(() => {
-        alert(`Results ready! Found ${data.matches?.length || 0} photos. Modal should be visible now.`);
-      }, 100);
 
     } catch (error: any) {
       console.error('❌ Face search error:', error);
@@ -660,9 +671,6 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       setSearchError(errorMsg);
       setUserGuidance(`Search failed: ${errorMsg}`);
       setShowFaceSearch(true); // Show modal with error
-      
-      // Debug alert
-      alert('Search error: ' + errorMsg);
     } finally {
       setIsSearching(false);
     }
@@ -698,8 +706,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (detectionResults.length > 0) {
         const detections = detectionResults;
         detections.forEach((detection, index) => {
-          const box = detection.detection?.box || detection.box;
-          const confidence = detection.detection?.score || detection.score;
+          const box = getDetectionBox(detection);
+          const confidence = getDetectionScore(detection);
           const { x, y, width, height } = box;
 
           // Draw bounding box
@@ -837,7 +845,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                         {detectionResults.length} face(s) detected • Ready to capture photo
                       </p>
                       <p className="text-xs text-green-500 mt-1">
-                        Confidence: {(detectionResults[0]?.score * 100).toFixed(1)}%
+                        Confidence: {(getDetectionScore(detectionResults[0]) * 100).toFixed(1)}%
                       </p>
                     </div>
                   </>
@@ -944,7 +952,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 {detectionResults.map((detection, index) => {
-                  const confidence = detection.detection?.score || detection.score;
+                  const confidence = getDetectionScore(detection);
                   return (
                     <div key={index} className="bg-white p-3 rounded">
                       <div className="font-medium">Face {index + 1}</div>

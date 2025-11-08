@@ -63,6 +63,13 @@ async function matchFace(descriptor, threshold = 0.6) {
     
     // Sort by distance (closest first)
     matches.sort((a, b) => a.distance - b.distance);
+
+    console.log('🎯 Face match distances:', matches.slice(0, 10).map(m => ({
+      photoId: m.photoId,
+      distance: Number(m.distance.toFixed(4)),
+      confidence: Number(m.confidence.toFixed(4)),
+      person: m.personName || null
+    })));
     
     // Filter by threshold
     const goodMatches = matches.filter(m => m.distance <= threshold);
@@ -91,9 +98,16 @@ async function matchFace(descriptor, threshold = 0.6) {
 
     // Fallback: no person associations yet (common right after automatic processing)
     // Return top matches based purely on distance so guests still see their photos.
-    const fallbackMatches = matches
+    let fallbackMatches = matches
       .filter(match => match.distance <= threshold && match.photoId)
       .slice(0, 10); // limit to top 10
+
+    // If still no matches within threshold, take the best candidates regardless of distance
+    if (fallbackMatches.length === 0) {
+      fallbackMatches = matches
+        .filter(match => match.photoId)
+        .slice(0, 5); // top 5 closest even if above threshold
+    }
 
     return {
       matches: fallbackMatches,

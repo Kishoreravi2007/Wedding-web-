@@ -123,6 +123,13 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
   try {
     // Photo booth sends FormData with face_descriptor as JSON string
     let descriptor;
+    const weddingName = req.body.wedding_name;
+    
+    if (weddingName && !['sister-a', 'sister-b'].includes(weddingName)) {
+      return res.status(400).json({
+        message: 'Invalid wedding name. Expected "sister-a" or "sister-b".'
+      });
+    }
     
     if (req.body.face_descriptor) {
       // Parse from FormData
@@ -168,6 +175,12 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
       try {
         const photo = await PhotoDB.findById(photoId);
         if (photo) {
+          // If a wedding is specified, only include photos from that wedding
+          if (weddingName && photo.sister !== weddingName) {
+            console.log(`⏭️  Skipping photo ${photo.filename} (belongs to ${photo.sister}, requested ${weddingName})`);
+            continue;
+          }
+
           photos.push({
             id: photo.id,
             url: photo.public_url,
@@ -183,12 +196,18 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
     
     console.log(`📸 Returning ${photos.length} photo(s)`);
     
-    res.json({
+    const responsePayload = {
       message: photos.length > 0 ? 'Photos found!' : 'No matching photos found.',
       matches: photos,
       matchCount: photos.length,
       bestMatch: matchResult.bestMatch
-    });
+    };
+
+    if (weddingName) {
+      responsePayload.wedding = weddingName;
+    }
+    
+    res.json(responsePayload);
     
   } catch (error) {
     console.error('❌ Face recognition error:', error);
