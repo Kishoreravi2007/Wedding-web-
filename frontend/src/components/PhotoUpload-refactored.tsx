@@ -629,8 +629,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                       <SelectValue placeholder="Select gallery" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sister-a-gallery">Sister A's Gallery</SelectItem>
-                      <SelectItem value="sister-b-gallery">Sister B's Gallery</SelectItem>
+                      <SelectItem value="sister-a-gallery">Parvathy's Gallery</SelectItem>
+                      <SelectItem value="sister-b-gallery">Sreedevi's Gallery</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

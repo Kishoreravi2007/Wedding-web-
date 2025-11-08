@@ -55,7 +55,7 @@ const LiveStream = () => {
           className="space-y-8"
           variants={itemVariants}
         >
-          {/* Sister B Live Stream */}
+          {/* Sreedevi's Live Stream */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-[#B8860B]/20">
             <div className="bg-gradient-to-r from-[#B8860B] to-[#FFD700] p-4">
               <h2 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-2">
@@ -66,7 +66,7 @@ const LiveStream = () => {
             <div className="aspect-video w-full">
               <iframe
                 src="https://www.youtube.com/embed/2qXrxmf0LpU"
-                title="Sister B Live Stream"
+                title="Sreedevi's Live Stream"
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen

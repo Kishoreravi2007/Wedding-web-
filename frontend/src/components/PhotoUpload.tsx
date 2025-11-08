@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { loadFaceModels, extractFaceDescriptors, areModelsLoaded } from '@/utils/faceDescriptorExtractor';
 
 interface PhotoFile {
   file: File;
@@ -56,8 +57,8 @@ const eventTypes = [
 ];
 
 const destinationGalleries = [
-  { value: 'sister-a-gallery', label: "Sister A's Gallery" },
-  { value: 'sister-b-gallery', label: "Sister B's Gallery" },
+  { value: 'sister-a-gallery', label: "Parvathy's Gallery" },
+  { value: 'sister-b-gallery', label: "Sreedevi's Gallery" },
 ];
 
 const storageProviders = [
@@ -72,7 +73,33 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
   const [isUploading, setIsUploading] = useState(false);
   const [showMetadataDialog, setShowMetadataDialog] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [faceModelsLoaded, setFaceModelsLoaded] = useState(false);
+  const [loadingFaceModels, setLoadingFaceModels] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load face-api models on component mount
+  useEffect(() => {
+    const initFaceModels = async () => {
+      if (areModelsLoaded()) {
+        setFaceModelsLoaded(true);
+        return;
+      }
+      
+      try {
+        setLoadingFaceModels(true);
+        await loadFaceModels();
+        setFaceModelsLoaded(true);
+        console.log('✅ Face detection models loaded - automatic processing enabled');
+      } catch (error) {
+        console.error('⚠️ Failed to load face detection models:', error);
+        console.log('⚠️ Photos will upload without automatic face processing');
+      } finally {
+        setLoadingFaceModels(false);
+      }
+    };
+
+    initFaceModels();
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -114,7 +141,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
       description: '',
       eventType: '',
       tags: [],
-      destinationGallery: 'sister-a-gallery', // Default to Sister A's Gallery
+      destinationGallery: 'sister-a-gallery', // Default to Parvathy's Gallery
       storageProvider: storageProvider, // Set storage provider
       status: 'pending',
       progress: 0,
@@ -164,8 +191,34 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
           p.id === photo.id ? { ...p, status: 'uploading', progress: 0 } : p
         ));
 
+        // Extract face descriptors if models are loaded
+        let faceData = null;
+        if (faceModelsLoaded) {
+          try {
+            console.log(`🔍 Extracting faces from ${photo.file.name}...`);
+            setPhotos(prev => prev.map(p =>
+              p.id === photo.id ? { ...p, progress: 10 } : p
+            ));
+            
+            faceData = await extractFaceDescriptors(photo.file);
+            
+            if (faceData && faceData.count > 0) {
+              console.log(`✅ Found ${faceData.count} face(s) in ${photo.file.name}`);
+            } else {
+              console.log(`ℹ️ No faces detected in ${photo.file.name}`);
+            }
+            
+            setPhotos(prev => prev.map(p =>
+              p.id === photo.id ? { ...p, progress: 30 } : p
+            ));
+          } catch (faceError) {
+            console.warn('⚠️ Face extraction failed, continuing with upload:', faceError);
+            // Continue with upload even if face extraction fails
+          }
+        }
+
         // Simulate progress updates (can be replaced with actual progress from upload service)
-        for (let progress = 0; progress <= 100; progress += 10) {
+        for (let progress = 40; progress <= 90; progress += 10) {
           setPhotos(prev => prev.map(p =>
             p.id === photo.id ? { ...p, progress } : p
           ));
@@ -179,20 +232,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
           headers['Authorization'] = `Bearer ${token}`;
         }
 
+        const formData = new FormData();
+        formData.append('photo', photo.file);
+        formData.append('sister', photo.destinationGallery === 'sister-a-gallery' ? 'sister-a' : 'sister-b');
+        formData.append('title', photo.title);
+        formData.append('description', photo.description);
+        formData.append('storageProvider', photo.storageProvider);
+        formData.append('eventType', photo.eventType);
+        formData.append('tags', JSON.stringify(photo.tags));
+        
+        // Add face data if extracted
+        if (faceData && faceData.faces && faceData.faces.length > 0) {
+          formData.append('faces', JSON.stringify(faceData.faces));
+          console.log(`📤 Uploading ${photo.file.name} with ${faceData.count} face descriptor(s)`);
+        }
+
         const result = await fetch('/api/photos', {
           method: 'POST',
           headers: headers,
-          body: (() => {
-            const formData = new FormData();
-            formData.append('photo', photo.file);
-            formData.append('sister', photo.destinationGallery === 'sister-a-gallery' ? 'sister-a' : 'sister-b');
-            formData.append('title', photo.title);
-            formData.append('description', photo.description);
-            formData.append('storageProvider', photo.storageProvider); // Add storage provider to form data
-            formData.append('eventType', photo.eventType);
-            formData.append('tags', JSON.stringify(photo.tags));
-            return formData;
-          })(),
+          body: formData,
         });
 
         if (!result.ok) {
@@ -251,9 +309,29 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
       {/* Upload Area */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
-            Upload Wedding Photos
+          <CardTitle className="flex items-center gap-2 justify-between">
+            <div className="flex items-center gap-2">
+              <Camera className="w-5 h-5" />
+              Upload Wedding Photos
+            </div>
+            {loadingFaceModels && (
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Loading Face Detection...
+              </Badge>
+            )}
+            {faceModelsLoaded && (
+              <Badge variant="default" className="flex items-center gap-1 bg-green-500">
+                <CheckCircle className="w-3 h-3" />
+                Auto Face Detection ON
+              </Badge>
+            )}
+            {!loadingFaceModels && !faceModelsLoaded && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                Face Detection Unavailable
+              </Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -490,8 +568,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                       <SelectValue placeholder="Select gallery" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sister-a-gallery">Sister A's Gallery</SelectItem>
-                      <SelectItem value="sister-b-gallery">Sister B's Gallery</SelectItem>
+                      <SelectItem value="sister-a-gallery">Parvathy's Gallery</SelectItem>
+                      <SelectItem value="sister-b-gallery">Sreedevi's Gallery</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

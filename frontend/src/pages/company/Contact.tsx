@@ -41,8 +41,8 @@ const Contact = () => {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
       description: "Mon-Fri: After 4:30 PM | Sat-Sun: Anytime",
-      value: "+91 79071 77841",
-      link: "tel:+917907177841",
+      value: "+91 99614 30726",
+      link: "tel:+919961430726",
       color: "from-green-500 to-emerald-500"
     }
   ];

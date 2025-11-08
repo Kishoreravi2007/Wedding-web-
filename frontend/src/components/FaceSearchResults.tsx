@@ -33,7 +33,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
   weddingName,
   searchError
 }) => {
-  const weddingTitle = weddingName === 'sister_a' ? "Sister A's Wedding" : "Sister B's Wedding";
+  const weddingTitle = weddingName === 'sister_a' ? "Parvathy's Wedding" : "Sreedevi's Wedding";
 
   // Download photo
   const downloadPhoto = useCallback(async (photoUrl: string) => {

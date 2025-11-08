@@ -33,16 +33,16 @@ const PhotographerDashboard = () => {
   useEffect(() => {
     if (content) {
       setPeople([
-        { id: '1', name: content.parvathy.name, role: 'Bride (Sister A)', avatar: '' },
-        { id: '2', name: content.sreedevi.name, role: 'Bride (Sister B)', avatar: '' },
-        { id: '3', name: 'Rajesh Kumar', role: 'Groom (Sister A)', avatar: '' },
-        { id: '4,', name: 'Vikram Nair', role: 'Groom (Sister B)', avatar: '' },
-        { id: '5', name: 'Lakshmi C', role: 'Mother of Brides', avatar: '' },
-        { id: '6', name: 'Raman C', role: 'Father of Brides', avatar: '' },
-        { id: '7', name: 'Priya C', role: 'Sister', avatar: '' },
-        { id: '8', name: 'Arun C', role: 'Brother', avatar: '' },
+        { id: '1', name: content.parvathy.name, role: 'Bride (Parvathy)', avatar: '' },
+        { id: '2', name: content.sreedevi.name, role: 'Bride (Sreedevi)', avatar: '' },
+        { id: '3', name: 'Hari', role: 'Groom (Parvathy)', avatar: '' },
+        { id: '4,', name: 'Vaishag', role: 'Groom (Sreedevi)', avatar: '' },
+        { id: '5', name: 'Vanaja', role: 'Mother of Brides', avatar: '' },
+        { id: '6', name: 'Jayachandran', role: 'Father of Brides', avatar: '' },
+        { id: '7', name: 'Remya', role: 'Sister', avatar: '' },
+        { id: '8', name: 'Kishore', role: 'Brother', avatar: '' },
         { id: '9', name: 'Dr. Suresh', role: 'Family Friend', avatar: '' },
-        { id: '10', name: 'Meera', role: 'Best Friend', avatar: '' },
+        { id: '10', name: 'Fincy', role: 'Best Friend', avatar: '' },
       ]);
       setIsLoading(false);
     }
@@ -71,7 +71,7 @@ const PhotographerDashboard = () => {
 
         const allPhotosRaw = [...sisterAPhotosRaw, ...sisterBPhotosRaw];
 
-        console.log(`Loaded ${allPhotosRaw.length} total photos (${sisterAPhotosRaw.length} Sister A, ${sisterBPhotosRaw.length} Sister B)`);
+        console.log(`Loaded ${allPhotosRaw.length} total photos (${sisterAPhotosRaw.length} Parvathy, ${sisterBPhotosRaw.length} Sreedevi)`);
 
         const mappedPhotos: PhotoType[] = allPhotosRaw.map(mapApiPhotoToPhotoType);
         setUploadedPhotos(mappedPhotos);
@@ -95,7 +95,7 @@ const PhotographerDashboard = () => {
           name: photo.title || photo.filename || 'Photo',
           size: formatFileSize(photo.size || 0),
           uploadTime: getTimeAgo(photo.uploaded_at || photo.created_at || photo.timestamp),
-          event: photo.sister === 'sister-a' ? 'Sister A' : 'Sister B'
+          event: photo.sister === 'sister-a' ? 'Parvathy' : 'Sreedevi'
         })));
 
       } catch (error) {
