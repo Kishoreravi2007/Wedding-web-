@@ -77,6 +77,13 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [stableDetections, setStableDetections] = useState<any[]>([]);
   const [persistentDetection, setPersistentDetection] = useState<any[]>([]);
   const [detectionConfirmed, setDetectionConfirmed] = useState(false);
+  const [selectedFaceIndex, setSelectedFaceIndex] = useState(0);
+
+  useEffect(() => {
+    if (selectedFaceIndex >= detectionResults.length) {
+      setSelectedFaceIndex(detectionResults.length > 0 ? detectionResults.length - 1 : 0);
+    }
+  }, [detectionResults, selectedFaceIndex]);
 
   // Run diagnostic when models fail to load
   const runDiagnostic = useCallback(async () => {
@@ -241,11 +248,16 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
       // Draw bounding box with smooth gradient
       const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
-      gradient.addColorStop(0, '#00ff00');
-      gradient.addColorStop(1, '#00aa00');
+      if (index === selectedFaceIndex) {
+        gradient.addColorStop(0, '#00c0ff');
+        gradient.addColorStop(1, '#0077ff');
+      } else {
+        gradient.addColorStop(0, '#00ff00');
+        gradient.addColorStop(1, '#00aa00');
+      }
       
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 2; // Slightly thinner for less visual noise
+      ctx.lineWidth = index === selectedFaceIndex ? 3 : 2; // Highlight selected face
       ctx.strokeRect(x, y, width, height);
       
       // Add subtle shadow for better visibility
@@ -271,7 +283,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
       // Draw face number with subtle circle (less prominent)
       ctx.shadowColor = 'transparent'; // Reset shadow
-      ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+      ctx.fillStyle = index === selectedFaceIndex ? 'rgba(0, 160, 255, 0.8)' : 'rgba(0, 255, 0, 0.8)';
       ctx.beginPath();
       ctx.arc(x + width / 2, y + height / 2, 12, 0, 2 * Math.PI);
       ctx.fill();
@@ -288,7 +300,13 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     
     // Reset text alignment for other canvas operations
     ctx.textAlign = 'left';
-  }, []);
+  }, [selectedFaceIndex]);
+
+useEffect(() => {
+  if (detectionResults.length > 0) {
+    drawDetections(detectionResults);
+  }
+}, [selectedFaceIndex, detectionResults, drawDetections]);
 
   // Start webcam with enhanced error handling
   const startWebcam = useCallback(async () => {
@@ -486,6 +504,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setDetectionResults([]);
     setDetectionStatus('idle');
     setUserGuidance('Camera stopped. Click "Start Camera" to begin again.');
+    setSelectedFaceIndex(0);
   }, []);
 
   // Capture face for searching and send to backend
@@ -493,7 +512,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     console.log('🔍 captureFaceForSearch called');
     console.log('Video ref:', videoRef.current ? 'Available' : 'Not available');
     console.log('Models loaded:', isModelLoaded);
-    console.log('Detection results:', detectionResults.length);
+    console.log('Detection results:', detectionResults.length, 'selected index:', selectedFaceIndex);
     
     const video = videoRef.current;
     if (!video) {
@@ -525,15 +544,10 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         throw new Error('Could not create canvas context.');
       }
 
-      // Get the bounding box of the first detected face (or let user select if multiple)
-      // For now, use the largest/most confident face
-      const bestFace = detectionResults.reduce((best, current) => {
-        const currentScore = getDetectionScore(current);
-        const bestScore = getDetectionScore(best);
-        return currentScore > bestScore ? current : best;
-      }, detectionResults[0]);
+      // Use the currently selected face (fallback to first if out of range)
+      const faceToCapture = detectionResults[selectedFaceIndex] || detectionResults[0];
       
-      const box = getDetectionBox(bestFace);
+      const box = getDetectionBox(faceToCapture);
       const { x, y, width, height } = box;
 
       // Add some padding to the face crop for better results
@@ -569,7 +583,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     } finally {
       setIsSearching(false);
     }
-  }, [isModelLoaded, detectionResults, selectedWedding]);
+  }, [isModelLoaded, detectionResults, selectedWedding, selectedFaceIndex]);
 
   // Confirm and search with the captured face
   const confirmAndSearch = useCallback(async () => {
@@ -583,20 +597,15 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Extracting face features...');
 
     try {
-      // STEP 1: Use the face descriptor from the already-detected face
-      // Get the best face from detectionResults (already has descriptor)
-      const bestFace = detectionResults.reduce((best, current) => {
-        const currentScore = getDetectionScore(current);
-        const bestScore = getDetectionScore(best);
-        return currentScore > bestScore ? current : best;
-      }, detectionResults[0]);
+      // STEP 1: Use the face descriptor from the selected detected face
+      const faceToSearch = detectionResults[selectedFaceIndex] || detectionResults[0];
       
-      if (!bestFace || !bestFace.descriptor) {
+      if (!faceToSearch || !faceToSearch.descriptor) {
         throw new Error('No face descriptor available. Please ensure face is detected before searching.');
       }
 
       // Get the 128-dimensional face descriptor from the stored detection
-      const faceDescriptor = Array.from(bestFace.descriptor);
+      const faceDescriptor = Array.from(faceToSearch.descriptor);
       console.log('✅ Using stored face descriptor:', faceDescriptor.length, 'dimensions');
       
       setUserGuidance('Searching for matching faces in wedding photos...');
@@ -674,7 +683,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     } finally {
       setIsSearching(false);
     }
-  }, [capturedFaceImage, selectedWedding]);
+  }, [capturedFaceImage, selectedWedding, detectionResults, selectedFaceIndex]);
 
   // Take photo
   const takePhoto = useCallback(() => {
@@ -757,6 +766,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setDetectionAttempts(0);
     setDetectionStatus('idle');
     setUserGuidance('Detection reset. Position your face and try again.');
+    setSelectedFaceIndex(0);
     
       const canvas = canvasRef.current;
     if (canvas) {
@@ -845,7 +855,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                         {detectionResults.length} face(s) detected • Ready to capture photo
                       </p>
                       <p className="text-xs text-green-500 mt-1">
-                        Confidence: {(getDetectionScore(detectionResults[0]) * 100).toFixed(1)}%
+                        Confidence: {(getDetectionScore(detectionResults[selectedFaceIndex] || detectionResults[0]) * 100).toFixed(1)}%
                       </p>
                     </div>
                   </>
@@ -953,13 +963,33 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 {detectionResults.map((detection, index) => {
                   const confidence = getDetectionScore(detection);
+                  const isSelected = index === selectedFaceIndex;
                   return (
-                    <div key={index} className="bg-white p-3 rounded">
-                      <div className="font-medium">Face {index + 1}</div>
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setSelectedFaceIndex(index)}
+                      className={`text-left bg-white p-3 rounded border transition-all ${
+                        isSelected
+                          ? 'border-blue-500 shadow-md shadow-blue-100'
+                          : 'border-transparent hover:border-blue-200 hover:shadow-sm'
+                      }`}
+                    >
+                      <div className="font-medium flex items-center gap-2">
+                        Face {index + 1}
+                        {isSelected && (
+                          <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                            Selected
+                          </span>
+                        )}
+                      </div>
                       <div className="text-gray-600">
                         Confidence: {(confidence * 100).toFixed(1)}%
                       </div>
-                    </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Click to search with this face
+                      </div>
+                    </button>
                   );
                 })}
           </div>
