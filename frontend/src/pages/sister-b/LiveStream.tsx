@@ -65,7 +65,7 @@ const LiveStream = () => {
             </div>
             <div className="aspect-video w-full">
               <iframe
-                src="https://www.youtube.com/embed/2qXrxmf0LpU"
+                src="https://www.youtube.com/embed/n1eugvcfIsA?si=hq4MxYB4j9TO_3Lp"
                 title="Sreedevi's Live Stream"
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

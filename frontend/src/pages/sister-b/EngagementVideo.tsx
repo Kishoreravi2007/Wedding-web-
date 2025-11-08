@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 const EngagementVideo: React.FC = () => {
   const { t } = useTranslation();
-  const genericVideoUrl = "https://youtu.be/8dQKcb6JqEA?si=8CrFIsA-MavtBH0V";
+  const genericVideoUrl = "https://youtu.be/aWe4-KhLr2o";
 
   return (
     <motion.div
