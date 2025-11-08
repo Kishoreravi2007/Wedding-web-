@@ -35,7 +35,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     return res.status(400).json({ message: 'No photo file uploaded.' });
   }
   
-  const { sister, title, description, eventType, tags, face_descriptors } = req.body;
+  const { sister, title, description, eventType, tags, face_descriptors, faces } = req.body;
   if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
     return res.status(400).json({ message: 'Invalid or missing sister identifier.' });
   }
@@ -53,11 +53,12 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     }
   }
 
-  // Parse face descriptors if provided
+  // Parse face descriptors if provided (accept both 'faces' and 'face_descriptors' for compatibility)
   let parsedFaceDescriptors = [];
-  if (face_descriptors) {
+  const faceDataParam = faces || face_descriptors;
+  if (faceDataParam) {
     try {
-      parsedFaceDescriptors = JSON.parse(face_descriptors);
+      parsedFaceDescriptors = JSON.parse(faceDataParam);
       console.log(`📸 Received ${parsedFaceDescriptors.length} face descriptor(s) with photo`);
     } catch (parseError) {
       console.warn('Error parsing face descriptors:', parseError);
@@ -126,7 +127,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
             photo_id: insertedPhoto.id,
             face_descriptor_id: faceDescriptor.id,
             person_id: null,
-            bounding_box: faceData.detection?.box || {
+            bounding_box: faceData.boundingBox || faceData.detection?.box || {
               x: 0,
               y: 0,
               width: 0,

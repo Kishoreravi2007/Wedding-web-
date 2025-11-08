@@ -81,9 +81,23 @@ async function matchFace(descriptor, threshold = 0.6) {
     const uniqueMatches = Array.from(personMatches.values())
       .sort((a, b) => a.distance - b.distance);
     
+    // If we have matches associated with people, return those
+    if (uniqueMatches.length > 0) {
+      return {
+        matches: uniqueMatches,
+        bestMatch: uniqueMatches[0]
+      };
+    }
+
+    // Fallback: no person associations yet (common right after automatic processing)
+    // Return top matches based purely on distance so guests still see their photos.
+    const fallbackMatches = matches
+      .filter(match => match.distance <= threshold && match.photoId)
+      .slice(0, 10); // limit to top 10
+
     return {
-      matches: uniqueMatches,
-      bestMatch: uniqueMatches.length > 0 ? uniqueMatches[0] : null
+      matches: fallbackMatches,
+      bestMatch: fallbackMatches.length > 0 ? fallbackMatches[0] : null
     };
   } catch (error) {
     console.error('Error matching face:', error);

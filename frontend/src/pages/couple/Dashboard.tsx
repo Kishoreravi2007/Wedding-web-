@@ -197,7 +197,7 @@ const CoupleDashboard = () => {
                     className="mt-4 bg-pink-500 hover:bg-pink-600 text-white"
                     onClick={() => navigate('/parvathy/gallery')}
                   >
-                    View Sister A Gallery
+                    View Parvathy's Gallery
                   </Button>
                 </div>
               </CardContent>

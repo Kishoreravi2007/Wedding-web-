@@ -34,7 +34,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   primaryColor = '#3B82F6',
   buttonClass = 'bg-blue-500 hover:bg-blue-600 text-white',
   overlayImageSrc,
-  sister = 'a' // Default to Sister A (Parvathy)
+  sister = 'a' // Default to Parvathy's wedding
 }) => {
   // Refs for canvas and video elements
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -608,14 +608,27 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       const data = await response.json();
       console.log('✅ API Response:', data);
       console.log('Matches:', data.matches);
-      console.log('Total:', data.total);
+      console.log('Total:', data.total ?? data.matches?.length ?? 0);
+
+      // Normalize matches into array of URLs for the results modal
+      const normalizedMatches = Array.isArray(data.matches)
+        ? data.matches
+            .map((match: any) => {
+              if (!match) return null;
+              if (typeof match === 'string') return match;
+              return match.url || match.public_url || match.publicUrl || match.photo_url || null;
+            })
+            .filter((url: string | null): url is string => typeof url === 'string' && url.length > 0)
+        : [];
+
+      console.log('🔁 Normalized match URLs:', normalizedMatches);
       
       // Always show results modal (even if no matches)
-      if (data.matches && data.matches.length > 0) {
-        console.log('📸 Found photos:', data.matches);
-        setSearchResults(data.matches);
+      if (normalizedMatches.length > 0) {
+        console.log('📸 Found photos:', normalizedMatches);
+        setSearchResults(normalizedMatches);
         setShowFaceSearch(true);
-        setUserGuidance(`Found ${data.matches.length} matching photos!`);
+        setUserGuidance(`Found ${normalizedMatches.length} matching photos!`);
       } else {
         console.log('❌ No photos found in response');
         setSearchResults([]);
