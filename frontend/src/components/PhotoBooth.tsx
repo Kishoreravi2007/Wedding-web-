@@ -153,8 +153,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     try {
       // Use optimized detection options for better accuracy
       const options = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 416,
-        scoreThreshold: 0.3
+        inputSize: 608,
+        scoreThreshold: 0.25
       });
 
       // Try multiple detection methods
@@ -164,8 +164,8 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (detections.length === 0) {
         console.log('No faces detected, trying with more sensitive settings...');
         const sensitiveOptions = new faceapi.TinyFaceDetectorOptions({
-          inputSize: 320,
-          scoreThreshold: 0.2
+          inputSize: 416,
+          scoreThreshold: 0.15
         });
         detections = await faceapi.detectAllFaces(imageElement, sensitiveOptions);
       }
@@ -335,17 +335,20 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
           // Detect faces with ultra-stable settings for video stream AND extract descriptors
           let detections = await faceapi
-            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-              inputSize: 416,
-              scoreThreshold: 0.7 // Ultra-high threshold for maximum stability
-            }))
+            .detectAllFaces(
+              video,
+              new faceapi.TinyFaceDetectorOptions({
+                inputSize: 608,
+                scoreThreshold: 0.35 // Lower threshold so smaller faces are picked up
+              })
+            )
             .withFaceLandmarks()
             .withFaceDescriptors();
 
           // Filter detections by very high confidence to eliminate flickering
           detections = detections.filter(detection => {
             const score = detection.detection?.score || detection.score;
-            return score > 0.8;
+            return score >= 0.55;
           });
 
           // Add to detection history for smoothing
@@ -359,7 +362,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             
             // Use ultra-stable detection count to completely eliminate flickering
             const stable = avgFaceCount > 0 && faceCountHistory.filter(count => count > 0).length >= stableCount
-              ? detections.slice(0, Math.min(avgFaceCount, 1)) // Limit to max 1 face for maximum stability
+              ? detections.slice(0, Math.min(avgFaceCount, detections.length)) // Keep as many consistent faces as detected
               : [];
             
             setStableDetections(stable);
