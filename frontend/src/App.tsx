@@ -30,7 +30,6 @@ import EventInvitation from "./pages/EventInvitation";
 import Wishes from "./pages/Wishes";
 import PhotoGallery from "./pages/PhotoGallery";
 import SreedeviEngagementVideo from "./pages/sister-b/EngagementVideo";
-import ParvathyEngagementVideo from "./pages/sister-a/EngagementVideo";
 
 import PhotographerDashboard from "./pages/photographer/Dashboard";
 import PhotographerLogin from "./pages/photographer/Login";
@@ -214,7 +213,6 @@ const App = () => {
                 <Route path="schedule/:eventId" element={<EventInvitation sister="a" />} />
                 <Route path="photobooth" element={<ParvathyPhotoBooth />} />
                 <Route path="gallery" element={<PhotoGallery sister="a" />} />
-                <Route path="engagement-video" element={<ParvathyEngagementVideo />} />
                 <Route path="live" element={<ParvathyLiveStream />} />
               </Route>
               <Route path="/sreedevi" element={<SreedeviLayout />}>

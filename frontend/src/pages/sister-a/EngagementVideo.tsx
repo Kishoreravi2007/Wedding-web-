@@ -1,11 +1,9 @@
 import React from 'react';
-import VideoPlayer from '@/components/VideoPlayer';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 const EngagementVideo: React.FC = () => {
   const { t } = useTranslation();
-  const genericVideoUrl = "https://youtu.be/egGMIfRgNTg";
 
   return (
     <motion.div

@@ -13,7 +13,7 @@ const SisterALayout = () => {
         <main className="py-12 px-4 sm:px-6 lg:px-8">
           <Outlet />
         </main>
-        <BottomNav basePath="/parvathy" activeColor="#D4AF37" />
+        <BottomNav basePath="/parvathy" activeColor="#D4AF37" showVideo={false} />
       </div>
     </div>
   );
