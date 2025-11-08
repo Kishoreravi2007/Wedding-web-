@@ -51,7 +51,13 @@ async function processPhoto(photo) {
     
     // Detect faces
     const detections = await faceapi
-      .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 416 }))
+      .detectAllFaces(
+        img,
+        new faceapi.TinyFaceDetectorOptions({
+          inputSize: 608,
+          scoreThreshold: 0.2
+        })
+      )
       .withFaceLandmarks()
       .withFaceDescriptors();
     
