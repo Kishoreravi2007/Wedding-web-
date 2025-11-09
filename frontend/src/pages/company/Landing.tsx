@@ -3,21 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
-import { 
-  Camera, 
-  Users, 
-  Sparkles, 
-  Video, 
+import {
+  Camera,
+  Users,
+  Sparkles,
+  Video,
   Clock,
   Shield,
   Zap,
   CheckCircle2,
   ArrowRight,
   Star,
-  Globe
+  Globe,
+  Heart,
+  FileText
 } from "lucide-react";
 
 const CompanyLanding = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+  const documentationUrl = `${API_BASE_URL.replace(/\/$/, "")}/backend/docs/WeddingWeb_Customer_Documentation_Final.pdf`;
+
   const features = [
     {
       icon: <Globe className="w-8 h-8" />,
@@ -121,7 +126,7 @@ const CompanyLanding = () => {
               Build your own personalized wedding website with AI face detection, smart galleries, 
               live streaming, and more. Join us in revolutionizing wedding experiences!
             </p>
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/company/contact">
                 <Button 
                   size="lg" 
@@ -130,6 +135,16 @@ const CompanyLanding = () => {
                   Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-rose-200 text-rose-600 hover:bg-rose-50 text-lg px-8 py-6"
+                asChild
+              >
+                <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                  View Customer Guide <FileText className="ml-2 w-5 h-5" />
+                </a>
+              </Button>
             </div>
           </motion.div>
 
@@ -377,7 +392,16 @@ const CompanyLanding = () => {
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-slate-400">
-                <li><a href="#" className="hover:text-white">Documentation</a></li>
+                <li>
+                  <a
+                    href={documentationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white"
+                  >
+                    Documentation
+                  </a>
+                </li>
                 <li><a href="#" className="hover:text-white">FAQ</a></li>
                 <li><Link to="/company/contact" className="hover:text-white">Contact Us</Link></li>
               </ul>
