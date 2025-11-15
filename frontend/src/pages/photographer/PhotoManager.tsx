@@ -26,6 +26,7 @@ interface Photo {
   size: number;
   uploadedAt: string;
   sister: string;
+  tags?: string[];
 }
 
 const PhotoManager: React.FC = () => {
@@ -58,7 +59,8 @@ const PhotoManager: React.FC = () => {
           thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
           size: p.size,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
-          sister: 'sister-a'
+          sister: 'sister-a',
+          tags: p.tags || []
         })));
       }
 
@@ -71,7 +73,8 @@ const PhotoManager: React.FC = () => {
           thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
           size: p.size,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
-          sister: 'sister-b'
+          sister: 'sister-b',
+          tags: p.tags || []
         })));
       }
 
@@ -137,6 +140,75 @@ const PhotoManager: React.FC = () => {
   const filteredPhotos = currentPhotos.filter(photo =>
     photo.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const updatePhotoTags = async (photo: Photo, tags: string[]) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/photos/${photo.id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tags })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update tags');
+      }
+
+      // Update local state
+      const updater = (photos: Photo[]) =>
+        photos.map(p => (p.id === photo.id ? { ...p, tags } : p));
+
+      if (photo.sister === 'sister-a') {
+        setSisterAPhotos(prev => updater(prev));
+      } else {
+        setSisterBPhotos(prev => updater(prev));
+      }
+
+      showSuccess('Tags updated!');
+    } catch (error) {
+      console.error('Error updating tags:', error);
+      alert('Failed to update tags. Please try again.');
+    }
+  };
+
+  const renderTagEditor = (photo: Photo) => {
+    const tagOptions: Array<{ value: string; label: string }> = [
+      { value: 'wedding', label: 'Wedding' },
+      { value: 'engagement', label: 'Engagement' }
+    ];
+
+    return (
+      <div className="space-y-2">
+        <p className="text-xs text-gray-500">Tags</p>
+        <div className="flex flex-wrap gap-2">
+          {tagOptions.map(option => {
+            const isActive = photo.tags?.includes(option.value);
+            return (
+              <Button
+                key={option.value}
+                size="sm"
+                variant={isActive ? 'default' : 'outline'}
+                className="text-xs"
+                onClick={() => {
+                  let nextTags: string[];
+                  if (isActive) {
+                    nextTags = (photo.tags || []).filter(tag => tag !== option.value);
+                  } else {
+                    nextTags = [...(photo.tags || []), option.value];
+                  }
+                  updatePhotoTags(photo, nextTags);
+                }}
+              >
+                {option.label}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   const renderPhotoCard = (photo: Photo) => (
     <motion.div
@@ -206,6 +278,7 @@ const PhotoManager: React.FC = () => {
             <Trash2 className="w-3 h-3 mr-1" />
             Delete Photo
           </Button>
+          {renderTagEditor(photo)}
         </CardContent>
       </Card>
     </motion.div>

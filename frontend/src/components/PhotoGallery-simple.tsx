@@ -537,14 +537,16 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                     )}
                   </motion.div>
 
-                  <motion.div 
-                    className="flex items-center justify-between text-xs text-gray-500 mb-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                  >
-                    <span>{photo.event}</span>
-                  </motion.div>
+                  {photo.event && (
+                    <motion.div 
+                      className="flex items-center justify-between text-xs text-gray-500 mb-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <span>{photo.event}</span>
+                    </motion.div>
+                  )}
 
                   <motion.div 
                     className="flex items-center justify-between"

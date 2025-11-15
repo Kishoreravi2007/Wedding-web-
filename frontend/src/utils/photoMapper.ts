@@ -67,7 +67,7 @@ export const mapApiPhotoToPhotoType = (apiPhoto: ApiPhoto): PhotoType => {
     title: apiPhoto.title || apiPhoto.filename || 'Untitled Photo',
     description: apiPhoto.description || '',
     tags: apiPhoto.tags || [],
-    event: apiPhoto.event_type || apiPhoto.sister || undefined,
+    event: apiPhoto.event_type || '',
     date: new Date(uploadedAt).toISOString(),
     views: apiPhoto.views || 0,
     downloads: apiPhoto.downloads || 0,
