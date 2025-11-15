@@ -14,3 +14,7 @@
 🔐 Auth endpoint: http://localhost:5001/api/auth/login
 💾 Using Supabase for photo storage
 ✅ Supabase client initialized
+🔐 Login attempt for username: photographer
+✅ User found: photographer | Role: photographer
+✅ Password verified for: photographer
+✅ Login successful for: photographer

@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Upload, X, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadFiles } from '@/services/fileUploadService'; // Import the uploadFiles service
@@ -18,6 +19,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [processingFaces, setProcessingFaces] = useState(false);
+  const [photoTag, setPhotoTag] = useState<'wedding' | 'engagement'>('wedding');
 
   // Load face detection models on component mount
   useEffect(() => {
@@ -81,7 +83,15 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
 
         // STEP 2: Upload photo
         setUploadProgress(prev => ({ ...prev, [index]: 10 }));
-        const result = await uploadFiles([file], weddingId === 'sister-a' ? 'sister-a' : 'sister-b', faceData);
+        const result = await uploadFiles(
+          [file], 
+          weddingId === 'sister-a' ? 'sister-a' : 'sister-b', 
+          faceData,
+          {
+            eventType: photoTag,
+            tags: [photoTag]
+          }
+        );
         
         // Update progress during upload
         setUploadProgress(prev => ({ ...prev, [index]: 50 }));
@@ -179,6 +189,22 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
             </div>
           </div>
 
+
+          <div className="grid gap-2">
+            <Label>Tag</Label>
+            <Select value={photoTag} onValueChange={(value: 'wedding' | 'engagement') => setPhotoTag(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wedding">Wedding</SelectItem>
+                <SelectItem value="engagement">Engagement</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-gray-500">
+              Tag helps guests filter between full wedding coverage and engagement sessions.
+            </p>
+          </div>
 
           <Button onClick={handleUpload} disabled={uploading || selectedFiles.length === 0}>
             {uploading ? (

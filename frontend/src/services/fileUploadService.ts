@@ -80,10 +80,16 @@ function getFileCategory(file: File): 'image' | 'music' | 'audio-wish' {
 }
 
 // Upload files to the backend and save metadata to Firestore
+export interface UploadOptions {
+  eventType?: string;
+  tags?: string[];
+}
+
 export async function uploadFiles(
   files: File[],
   sister: 'sister-a' | 'sister-b',
-  faceData?: { faces: any[]; count: number } | null
+  faceData?: { faces: any[]; count: number } | null,
+  options?: UploadOptions
 ): Promise<UploadResult> {
   try {
     const uploadedFiles: UploadedFile[] = [];
@@ -99,6 +105,14 @@ export async function uploadFiles(
       const formData = new FormData();
       formData.append('photo', file);
       formData.append('sister', sister);
+      
+      if (options?.eventType) {
+        formData.append('eventType', options.eventType);
+      }
+      
+      if (options?.tags?.length) {
+        formData.append('tags', JSON.stringify(options.tags));
+      }
       
       // Add face descriptors if available
       if (faceData && faceData.faces && faceData.faces.length > 0) {
