@@ -64,15 +64,15 @@ const CoupleDashboard = () => {
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-pink-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-rose-800">Couple's Portal</h1>
-              <p className="text-rose-600 mt-1">Your special memories and wishes</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold text-rose-800">Couple's Portal</h1>
+              <p className="text-rose-600 mt-1 text-sm sm:text-base">Your special memories and wishes</p>
             </div>
             <Button 
               onClick={handleSignOut} 
               variant="outline" 
-              className="flex items-center gap-2 border-rose-200 text-rose-600 hover:bg-rose-50"
+              className="w-full sm:w-auto justify-center flex items-center gap-2 border-rose-200 text-rose-600 hover:bg-rose-50"
             >
               <LogOut className="w-4 h-4" />
               Sign Out
@@ -82,19 +82,19 @@ const CoupleDashboard = () => {
       </div>
 
       {/* Welcome Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="bg-gradient-to-r from-pink-500 to-rose-600 text-white border-0 shadow-xl mb-8">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <div className="flex justify-center items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                  <Heart className="w-8 h-8" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <Card className="bg-gradient-to-r from-pink-500 to-rose-600 text-white border-0 shadow-xl mb-6 sm:mb-8">
+          <CardContent className="p-6 sm:p-8">
+            <div className="text-center space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <Heart className="w-7 h-7 sm:w-8 sm:h-8" />
                 </div>
                 <div>
-                  <h2 className="text-4xl font-bold">{coupleData.parvathy.name} & {coupleData.sreedevi.name}</h2>
+                  <h2 className="text-3xl sm:text-4xl font-bold">{coupleData.parvathy.name} & {coupleData.sreedevi.name}</h2>
                 </div>
               </div>
-              <p className="text-pink-100 text-lg max-w-2xl mx-auto">
+              <p className="text-pink-100 text-base sm:text-lg max-w-2xl mx-auto">
                 Welcome to your personal portal! Here you can view all the beautiful wishes from your guests, 
                 browse through your wedding photos, and see the love and joy your special day brought to everyone.
               </p>
@@ -103,72 +103,41 @@ const CoupleDashboard = () => {
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <MessageCircle className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{totalWishesCount}</p>
-              <p className="text-sm text-rose-600">Wishes</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <Image className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{stats.totalPhotos}</p>
-              <p className="text-sm text-rose-600">Photos</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <BarChart3 className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{stats.totalViews}</p>
-              <p className="text-sm text-rose-600">Views</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <Star className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{stats.avgRating}</p>
-              <p className="text-sm text-rose-600">Rating</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <Users className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{stats.totalGuests}</p>
-              <p className="text-sm text-rose-600">Guests</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-4 text-center">
-              <Calendar className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-rose-800">{stats.eventsCompleted}</p>
-              <p className="text-sm text-rose-600">Events</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
+          {[
+            { icon: MessageCircle, value: totalWishesCount, label: 'Wishes' },
+            { icon: Image, value: stats.totalPhotos, label: 'Photos' },
+            { icon: BarChart3, value: stats.totalViews, label: 'Views' },
+            { icon: Star, value: stats.avgRating, label: 'Rating' },
+            { icon: Users, value: stats.totalGuests, label: 'Guests' },
+            { icon: Calendar, value: stats.eventsCompleted, label: 'Events' }
+          ].map((item) => (
+            <Card key={item.label} className="bg-white/85 backdrop-blur-sm border-pink-200">
+              <CardContent className="p-3 sm:p-4 text-center space-y-1 sm:space-y-2">
+                <item.icon className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500 mx-auto" />
+                <p className="text-xl sm:text-2xl font-bold text-rose-800">{item.value}</p>
+                <p className="text-xs sm:text-sm text-rose-600">{item.label}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="wishes" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/80 backdrop-blur-sm">
-            <TabsTrigger value="wishes" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full mb-6 rounded-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+            <TabsTrigger value="wishes" className="flex items-center gap-2 text-sm sm:text-base py-3">
               <Heart className="w-4 h-4" />
               Guest Wishes
             </TabsTrigger>
-            <TabsTrigger value="photos" className="flex items-center gap-2">
+            <TabsTrigger value="photos" className="flex items-center gap-2 text-sm sm:text-base py-3">
               <Camera className="w-4 h-4" />
               Photo Gallery
             </TabsTrigger>
-            <TabsTrigger value="details" className="flex items-center gap-2">
+            <TabsTrigger value="details" className="flex items-center gap-2 text-sm sm:text-base py-3">
               <Gift className="w-4 h-4" />
               Wedding Details
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
+            <TabsTrigger value="content" className="flex items-center gap-2 text-sm sm:text-base py-3">
               <Settings className="w-4 h-4" />
               Website Content
             </TabsTrigger>
