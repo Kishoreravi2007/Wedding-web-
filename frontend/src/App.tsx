@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
@@ -50,6 +50,7 @@ import CompanyContact from "./pages/company/Contact";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminContactMessages from "./pages/admin/ContactMessages";
+import AdminSettings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
@@ -185,9 +186,11 @@ const App = () => {
               <Route path="/company/contact" element={<CompanyContact />} />
 
               {/* Admin Routes */}
+              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
 
               {/* Public Routes */}
               <Route path="/countdown" element={

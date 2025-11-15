@@ -13,6 +13,7 @@ const AdminLogin: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,17 +21,33 @@ const AdminLogin: React.FC = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement actual authentication
-      // For now, simple check
-      if (email === 'admin@weddingweb.com' && password === 'admin123') {
-        // Store auth token (implement proper auth later)
-        localStorage.setItem('admin_token', 'demo_token');
-        navigate('/admin/dashboard');
-      } else {
-        setError('Invalid credentials');
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: email.toLowerCase(),
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Invalid credentials');
       }
+
+      if (!data?.accessToken && !data?.token) {
+        throw new Error('Login response missing access token');
+      }
+
+      localStorage.setItem('admin_token', data.accessToken || data.token);
+      localStorage.setItem('admin_user', JSON.stringify(data.user));
+      navigate('/admin/dashboard');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Admin login error:', err);
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,9 +107,7 @@ const AdminLogin: React.FC = () => {
             </Button>
 
             <p className="text-sm text-gray-600 text-center mt-4">
-              Demo credentials:<br />
-              Email: admin@weddingweb.com<br />
-              Password: admin123
+              Need an account? Run <code>node backend/setup-admin-user.js</code> to create one.
             </p>
           </form>
         </CardContent>

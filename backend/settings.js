@@ -5,25 +5,54 @@
 
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('./server');
+const { authenticateToken } = require('./auth-simple');
 
-// Middleware to check if user is admin
-const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseRestUrl = supabaseUrl ? `${supabaseUrl.replace(/\/+$/, '')}/rest/v1` : null;
+
+const ensureSupabaseConfig = () => {
+  if (!supabaseRestUrl || !supabaseKey) {
+    throw new Error('Supabase credentials missing. Set SUPABASE_URL and service role/anon key.');
   }
-  next();
 };
+
+const supabaseRequest = async (path, { method = 'GET', body, headers = {} } = {}) => {
+  ensureSupabaseConfig();
+
+  const response = await fetch(`${supabaseRestUrl}${path}`, {
+    method,
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`Supabase request failed (${response.status}): ${message}`);
+  }
+
+  return response.json();
+};
+
+const ensureAdmin = [
+  authenticateToken,
+  (req, res, next) => {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    }
+    next();
+  }
+];
 
 // GET all settings
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('website_settings')
-      .select('*')
-      .order('category', { ascending: true });
-
-    if (error) throw error;
+    const data = await supabaseRequest('/website_settings?select=*');
 
     // Convert to key-value object
     const settings = {};
@@ -41,20 +70,13 @@ router.get('/', async (req, res) => {
 // GET single setting by key
 router.get('/:key', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('website_settings')
-      .select('*')
-      .eq('key', req.params.key)
-      .single();
+    const data = await supabaseRequest(`/website_settings?select=*&key=eq.${encodeURIComponent(req.params.key)}`);
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return res.status(404).json({ message: 'Setting not found.' });
-      }
-      throw error;
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: 'Setting not found.' });
     }
 
-    res.json(data);
+    res.json(data[0]);
   } catch (error) {
     console.error('Error fetching setting:', error);
     res.status(500).json({ message: 'Error fetching setting.' });
@@ -62,7 +84,7 @@ router.get('/:key', async (req, res) => {
 });
 
 // PUT/UPDATE setting (admin only)
-router.put('/:key', requireAdmin, async (req, res) => {
+router.put('/:key', ...ensureAdmin, async (req, res) => {
   try {
     const { value } = req.body;
     
@@ -70,36 +92,24 @@ router.put('/:key', requireAdmin, async (req, res) => {
       return res.status(400).json({ message: 'Value is required.' });
     }
 
-    const { data, error } = await supabase
-      .from('website_settings')
-      .update({ 
-        value: String(value),
-        updated_by: req.user.id,
-        updated_at: new Date().toISOString()
-      })
-      .eq('key', req.params.key)
-      .select()
-      .single();
+    const now = new Date().toISOString();
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return res.status(404).json({ message: 'Setting not found.' });
+    const payload = {
+      key: req.params.key,
+      value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+      updated_by: req.user.id,
+      updated_at: now
+    };
+
+    const data = await supabaseRequest('/website_settings', {
+      method: 'POST',
+      body: [payload],
+      headers: {
+        Prefer: 'return=representation,resolution=merge-duplicates'
       }
-      throw error;
-    }
+    });
 
-    // Log admin activity
-    await supabase
-      .from('admin_activity_log')
-      .insert({
-        admin_id: req.user.id,
-        action: 'update_setting',
-        entity_type: 'setting',
-        entity_id: data.id,
-        details: { key: req.params.key, old_value: data.value, new_value: value }
-      });
-
-    res.json({ message: 'Setting updated successfully', setting: data });
+    res.json({ message: 'Setting updated successfully', setting: data[0] });
   } catch (error) {
     console.error('Error updating setting:', error);
     res.status(500).json({ message: 'Error updating setting.' });
@@ -107,7 +117,7 @@ router.put('/:key', requireAdmin, async (req, res) => {
 });
 
 // POST/UPDATE multiple settings at once (admin only)
-router.post('/bulk', requireAdmin, async (req, res) => {
+router.post('/bulk', ...ensureAdmin, async (req, res) => {
   try {
     const settings = req.body;
     
@@ -115,37 +125,24 @@ router.post('/bulk', requireAdmin, async (req, res) => {
       return res.status(400).json({ message: 'Settings object is required.' });
     }
 
+    const now = new Date().toISOString();
+
     const updates = Object.keys(settings).map(key => ({
       key,
-      value: String(settings[key]),
+      value: typeof settings[key] === 'object' 
+        ? JSON.stringify(settings[key]) 
+        : String(settings[key]),
       updated_by: req.user.id,
-      updated_at: new Date().toISOString()
+      updated_at: now
     }));
 
-    // Update each setting
-    const results = await Promise.all(
-      updates.map(update =>
-        supabase
-          .from('website_settings')
-          .update({ 
-            value: update.value,
-            updated_by: update.updated_by,
-            updated_at: update.updated_at
-          })
-          .eq('key', update.key)
-          .select()
-      )
-    );
-
-    // Log admin activity
-    await supabase
-      .from('admin_activity_log')
-      .insert({
-        admin_id: req.user.id,
-        action: 'bulk_update_settings',
-        entity_type: 'settings',
-        details: { keys: Object.keys(settings), count: updates.length }
-      });
+    await supabaseRequest('/website_settings', {
+      method: 'POST',
+      body: updates,
+      headers: {
+        Prefer: 'resolution=merge-duplicates'
+      }
+    });
 
     res.json({ 
       message: 'Settings updated successfully', 
