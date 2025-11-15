@@ -39,7 +39,12 @@ const WishDisplay: React.FC<WishDisplayProps> = ({ recipient }) => {
     return <div className="text-center text-red-500 mt-8">{error}</div>;
   }
 
-  const recipientName = recipient.charAt(0).toUpperCase() + recipient.slice(1);
+  const recipientDisplayMap: Record<WishDisplayProps["recipient"], string> = {
+    parvathy: "Parvathy and Hari",
+    sreedevi: "Sreedevi and Vaishak",
+  };
+
+  const recipientName = recipientDisplayMap[recipient] ?? recipient.charAt(0).toUpperCase() + recipient.slice(1);
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
