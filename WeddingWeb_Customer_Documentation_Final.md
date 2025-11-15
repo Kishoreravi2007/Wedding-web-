@@ -106,7 +106,7 @@ These company pages are optimized for SEO, conversion, and trust-building—help
 
 ## Contact & Support
 - **Email**: help.weddingweb@gmail.com
-- **Phone/WhatsApp**: +91 99614 30726
+- **Phone/WhatsApp**: +91 95441 43072
 - **Availability**: Monday–Friday after 4:30 PM IST · Saturday–Sunday on demand
 
 Premium and enterprise customers receive 24/7 on-call assistance, priority ticket routing, and dedicated event specialists.

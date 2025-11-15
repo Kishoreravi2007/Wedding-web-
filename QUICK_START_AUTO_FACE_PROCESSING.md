@@ -211,7 +211,7 @@ LIMIT 10;
 ## 📞 Support
 
 - Email: help.weddingweb@gmail.com
-- Phone: +919961430726
+- Phone: +91 95441 43072
 
 ## 🚀 Next Steps
 
