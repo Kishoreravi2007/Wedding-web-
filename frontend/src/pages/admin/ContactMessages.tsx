@@ -168,10 +168,12 @@ const ContactMessages: React.FC = () => {
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Refresh
               </Button>
-              <Button variant="ghost" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
+              <Link to="/admin/settings">
+                <Button variant="ghost" size="sm">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
               <Button variant="ghost" size="sm">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout

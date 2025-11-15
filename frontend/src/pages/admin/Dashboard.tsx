@@ -38,10 +38,12 @@ const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
+              <Link to="/admin/settings">
+                <Button variant="ghost" size="sm">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
               <Button variant="ghost" size="sm">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout

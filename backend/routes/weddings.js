@@ -1,12 +1,14 @@
 // Wedding Management API Routes
 const express = require('express');
 const router = express.Router();
-const { createClient } = require('@supabase/supabase-js');
+const { supabase } = require('../lib/supabase');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const ensureSupabase = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized. Check SUPABASE_URL and service keys.');
+  }
+  return supabase;
+};
 
 // =====================================================
 // GET ALL WEDDINGS
@@ -15,7 +17,8 @@ router.get('/', async (req, res) => {
   try {
     const { status } = req.query;
     
-    let query = supabase
+    const client = ensureSupabase();
+    let query = client
       .from('weddings')
       .select('*')
       .order('wedding_date', { ascending: false });
@@ -50,7 +53,8 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .select('*')
       .eq('id', id)
@@ -85,7 +89,8 @@ router.get('/code/:weddingCode', async (req, res) => {
   try {
     const { weddingCode } = req.params;
     
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .select('*')
       .eq('wedding_code', weddingCode)
@@ -121,7 +126,8 @@ router.get('/:id/stats', async (req, res) => {
     const { id } = req.params;
     
     // Use the database function to get stats
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .rpc('get_wedding_stats', { p_wedding_id: id });
     
     if (error) throw error;
@@ -169,15 +175,16 @@ router.post('/', async (req, res) => {
     } = req.body;
     
     // Validate required fields
-    if (!wedding_code || !bride_name) {
+    if (!wedding_code || (!bride_name && !groom_name)) {
       return res.status(400).json({
         success: false,
-        error: 'wedding_code and bride_name are required'
+        error: 'wedding_code and at least one of bride_name or groom_name are required'
       });
     }
     
     // Insert new wedding
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .insert([{
         wedding_code,
@@ -237,7 +244,8 @@ router.put('/:id', async (req, res) => {
     delete updateData.created_at;
     delete updateData.created_by;
     
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .update(updateData)
       .eq('id', id)
@@ -275,7 +283,8 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     
     // First, check if wedding has any photos
-    const { data: photos } = await supabase
+    const client = ensureSupabase();
+    const { data: photos } = await client
       .from('photos')
       .select('id')
       .eq('wedding_id', id)
@@ -288,7 +297,7 @@ router.delete('/:id', async (req, res) => {
       });
     }
     
-    const { error } = await supabase
+    const { error } = await client
       .from('weddings')
       .delete()
       .eq('id', id);
@@ -315,7 +324,8 @@ router.post('/:id/archive', async (req, res) => {
   try {
     const { id } = req.params;
     
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .update({ status: 'archived' })
       .eq('id', id)
@@ -343,7 +353,8 @@ router.post('/:id/archive', async (req, res) => {
 // =====================================================
 router.get('/public/upcoming', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('weddings')
       .select('wedding_code, bride_name, groom_name, wedding_date, wedding_month, theme_color')
       .in('status', ['active', 'upcoming'])

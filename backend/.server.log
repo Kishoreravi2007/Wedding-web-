@@ -1,0 +1,16 @@
+
+> backend@1.0.0 start
+> node server.js
+
+[dotenv@17.2.3] injecting env (8) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+✅ Supabase client initialized using service role key
+📁 Serving static files from: /Users/kishoreravi/Desktop/projects/Wedding-web-1/uploads
+📁 Serving backend files from: /Users/kishoreravi/Desktop/projects/Wedding-web-1/backend
+(node:22511) Warning: Accessing non-existent property 'supabase' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22511) Warning: Accessing non-existent property 'supabase' of module exports inside circular dependency
+✅ Backend server running on http://localhost:5001
+📸 Upload endpoint: http://localhost:5001/api/photos
+🔐 Auth endpoint: http://localhost:5001/api/auth/login
+💾 Using Supabase for photo storage
+✅ Supabase client initialized
