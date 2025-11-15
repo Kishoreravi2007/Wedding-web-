@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WeddingWeb</string>
+    <string name="title_activity_main">WeddingWeb</string>
+    <string name="package_name">com.weddingweb.app</string>
+    <string name="custom_url_scheme">com.weddingweb.app</string>
+</resources>
