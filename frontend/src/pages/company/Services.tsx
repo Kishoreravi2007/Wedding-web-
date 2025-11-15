@@ -368,15 +368,6 @@ const Services = () => {
                   View Pricing Plans
                 </Button>
               </Link>
-              <Link to="/company/contact">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
-                >
-                  Request a Demo
-                </Button>
-              </Link>
             </div>
           </motion.div>
         </div>
