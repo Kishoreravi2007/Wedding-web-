@@ -113,27 +113,15 @@ const Index = () => {
         transition={{ delay: 1 }}
       ></motion.div>
 
-      <motion.div className="text-center mb-12 flex items-center justify-center relative z-10" variants={itemVariants}>
-        <motion.div
-            variants={heartbeatVariants}
-            animate="animate"
-        >
-            <Heart className="w-8 h-8 text-[#FFD700] drop-shadow-lg" />
-        </motion.div>
+      <motion.div className="text-center mb-12 flex flex-col items-center justify-center gap-4 relative z-10" variants={itemVariants}>
         <motion.h1 
-          className="font-heading text-4xl md:text-7xl bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] bg-clip-text text-transparent mx-4 drop-shadow-2xl"
+          className="font-heading text-4xl md:text-7xl bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] bg-clip-text text-transparent drop-shadow-2xl"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
           {t('homeScreenTitle')}
         </motion.h1>
-        <motion.div
-            variants={heartbeatVariants}
-            animate="animate"
-        >
-            <Heart className="w-8 h-8 text-[#FFD700] drop-shadow-lg" />
-        </motion.div>
       </motion.div>
 
       <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-12 relative z-10" variants={containerVariants}>

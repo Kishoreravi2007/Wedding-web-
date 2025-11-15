@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Heart, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 const CompanyNav = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,11 +22,13 @@ const CompanyNav = () => {
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-slate-200">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/company" className="flex items-center gap-2">
-          <Heart className="w-8 h-8 text-rose-500" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text text-transparent">
-            WeddingWeb
-          </span>
+        <Link to="/company" className="flex items-center gap-4">
+          <img
+            src="/logo.png"
+            alt="WeddingWeb logo"
+            className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
+          />
+          <span className="text-3xl font-bold text-slate-900">WeddingWeb</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -55,11 +57,13 @@ const CompanyNav = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                <Heart className="w-6 h-6 text-rose-500" />
-                <span className="bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text text-transparent">
-                  WeddingWeb
-                </span>
+              <SheetTitle className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="WeddingWeb logo"
+                  className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
+                />
+                <span className="text-slate-900 text-xl font-semibold">WeddingWeb</span>
               </SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-4 mt-8">
