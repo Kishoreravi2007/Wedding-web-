@@ -27,7 +27,7 @@ app.use(cors({
     process.env.FRONTEND_URL, // Environment variable for dynamic URLs
   ].filter(Boolean), // Remove undefined values
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -47,6 +47,10 @@ app.use('/api/wishes', wishesRouter);
 // Contact messages endpoint
 const contactMessagesRouter = require('./routes/contact-messages');
 app.use('/api/contact-messages', contactMessagesRouter);
+
+// Call schedules endpoint
+const callSchedulesRouter = require('./routes/call-schedules');
+app.use('/api/call-schedules', callSchedulesRouter);
 
 // Feedback endpoint
 const feedbackRouter = require('./routes/feedback');

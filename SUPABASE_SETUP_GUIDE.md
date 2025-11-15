@@ -8,6 +8,8 @@ This guide will help you migrate your wedding website backend from local filesys
 - Face detection data
 - Guest mappings
 
+> **New (Call Scheduling):** Run `SUPABASE_CALL_SCHEDULES_SETUP.sql` in the Supabase SQL Editor to create the `call_schedules` table used by the “Schedule a Call” form on the pricing page.
+
 ## Prerequisites
 
 ✅ Supabase account (free tier works fine)  

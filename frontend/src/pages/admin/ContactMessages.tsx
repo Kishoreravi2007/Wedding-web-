@@ -16,7 +16,8 @@ import {
   CheckCircle, 
   Clock, 
   Trash2,
-  RefreshCcw
+  RefreshCcw,
+  CalendarClock
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -152,6 +153,12 @@ const ContactMessages: React.FC = () => {
                   <Button variant="ghost" size="sm" className="bg-gray-100">
                     <Mail className="mr-2 h-4 w-4" />
                     Messages
+                  </Button>
+                </Link>
+                <Link to="/admin/call-schedules">
+                  <Button variant="ghost" size="sm">
+                    <CalendarClock className="mr-2 h-4 w-4" />
+                    Call Schedules
                   </Button>
                 </Link>
                 <Link to="/">

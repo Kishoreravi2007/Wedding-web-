@@ -9,9 +9,20 @@ import {
   Sparkles,
   Crown,
   Rocket,
-  HelpCircle
+  HelpCircle,
+  Calendar,
+  Clock,
+  Phone,
+  UserRound,
+  Mail,
+  Globe
 } from "lucide-react";
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
 type BillingOption = {
   id: 'oneMonth' | 'threeMonths' | 'sixMonths' | 'oneYear';
@@ -105,6 +116,97 @@ const Pricing = () => {
       popular: false
     }
   ];
+
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    preferredDate: '',
+    preferredTime: '',
+    timezone: 'Asia/Kolkata',
+    message: ''
+  });
+  const { toast } = useToast();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+  const timezoneOptions = [
+    'Asia/Kolkata',
+    'Asia/Dubai',
+    'Asia/Singapore',
+    'Europe/London',
+    'America/New_York'
+  ];
+
+  const handleScheduleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setScheduleForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleScheduleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsScheduling(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/call-schedules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...scheduleForm,
+          preferredDate: scheduleForm.preferredDate,
+          preferredTime: scheduleForm.preferredTime,
+          source: 'pricing-page'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Call scheduled!',
+          description: 'Our team will reach out to confirm the meeting.'
+        });
+        setScheduleForm({
+          name: '',
+          email: '',
+          phone: '',
+          preferredDate: '',
+          preferredTime: '',
+          timezone: 'Asia/Kolkata',
+          message: ''
+        });
+        setScheduleDialogOpen(false);
+      } else {
+        if (data.error === 'CALL_SCHEDULES_TABLE_MISSING') {
+          toast({
+            title: 'Setup required in Supabase',
+            description: 'Create the "call_schedules" table by running SUPABASE_CALL_SCHEDULES_SETUP.sql.',
+            variant: 'destructive'
+          });
+          return;
+        }
+        toast({
+          title: 'Something went wrong',
+          description: data.error || 'Please try again later.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error scheduling call:', error);
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsScheduling(false);
+    }
+  };
 
   const getPlanPrice = (plan: (typeof plans)[number]) => {
     switch (selectedBillingOption.id) {
@@ -397,13 +499,153 @@ const Pricing = () => {
                   Contact Sales
                 </Button>
               </Link>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
-              >
-                Schedule a Call
-              </Button>
+              <Dialog open={scheduleDialogOpen} onOpenChange={setScheduleDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
+                  >
+                    Schedule a Call
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Schedule a Live Demo Call</DialogTitle>
+                    <DialogDescription>
+                      Tell us a bit about your wedding and we’ll confirm a call within 24 hours.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <form className="space-y-4" onSubmit={handleScheduleSubmit}>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="schedule-name" className="flex items-center gap-2">
+                          <UserRound className="w-4 h-4" />
+                          Name *
+                        </Label>
+                        <Input
+                          id="schedule-name"
+                          name="name"
+                          value={scheduleForm.name}
+                          onChange={handleScheduleChange}
+                          placeholder="Full name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="schedule-email" className="flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Email *
+                        </Label>
+                        <Input
+                          id="schedule-email"
+                          name="email"
+                          type="email"
+                          value={scheduleForm.email}
+                          onChange={handleScheduleChange}
+                          placeholder="you@email.com"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="schedule-phone" className="flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          Phone / WhatsApp
+                        </Label>
+                        <Input
+                          id="schedule-phone"
+                          name="phone"
+                          value={scheduleForm.phone}
+                          onChange={handleScheduleChange}
+                          placeholder="+91 95441 43072"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="schedule-timezone" className="flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          Timezone
+                        </Label>
+                        <select
+                          id="schedule-timezone"
+                          name="timezone"
+                          value={scheduleForm.timezone}
+                          onChange={handleScheduleChange}
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        >
+                          {timezoneOptions.map((tz) => (
+                            <option key={tz} value={tz}>
+                              {tz}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="schedule-date" className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          Preferred Date *
+                        </Label>
+                        <Input
+                          id="schedule-date"
+                          name="preferredDate"
+                          type="date"
+                          value={scheduleForm.preferredDate}
+                          onChange={handleScheduleChange}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="schedule-time" className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          Preferred Time
+                        </Label>
+                        <Input
+                          id="schedule-time"
+                          name="preferredTime"
+                          type="time"
+                          value={scheduleForm.preferredTime}
+                          onChange={handleScheduleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="schedule-message" className="flex items-center gap-2">
+                        <HelpCircle className="w-4 h-4" />
+                        Anything specific you’d like to see?
+                      </Label>
+                      <Textarea
+                        id="schedule-message"
+                        name="message"
+                        value={scheduleForm.message}
+                        onChange={handleScheduleChange}
+                        placeholder="Share your priorities, guest size, or custom requirements..."
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <Button 
+                        type="submit" 
+                        size="lg"
+                        className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 flex-1"
+                        disabled={isScheduling}
+                      >
+                        {isScheduling ? 'Booking your slot...' : 'Confirm Call'}
+                      </Button>
+                      <p className="text-sm text-slate-500">
+                        We typically respond within 12 hours.
+                      </p>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </motion.div>
         </div>
