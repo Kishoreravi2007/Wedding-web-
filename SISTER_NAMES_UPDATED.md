@@ -135,7 +135,7 @@ The application is currently running:
 
 ## Contact Information
 
-Updated contact number: **+919961430726** ✅
+Updated contact number: **+91 95441 43072** ✅
 
 ---
 

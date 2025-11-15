@@ -278,7 +278,7 @@ Potential improvements:
 
 For issues or questions:
 - Email: help.weddingweb@gmail.com
-- Phone: +919961430726
+- Phone: +91 95441 43072
 - Check console logs for detailed error messages
 - Verify all prerequisites are met
 
