@@ -13,8 +13,26 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+type BillingOption = {
+  id: 'oneMonth' | 'threeMonths' | 'sixMonths' | 'oneYear';
+  label: string;
+  durationLabel: string;
+  months: number;
+  badge?: string;
+};
+
+const billingOptions: BillingOption[] = [
+  { id: 'oneMonth', label: '1 Month', durationLabel: '1 month', months: 1 },
+  { id: 'threeMonths', label: '3 Months', durationLabel: '3 months', months: 3 },
+  { id: 'sixMonths', label: '6 Months', durationLabel: '6 months', months: 6 },
+  { id: 'oneYear', label: '1 Year', durationLabel: '1 year', months: 12, badge: 'Best Value' }
+];
+
+type BillingOptionId = BillingOption['id'];
+
 const Pricing = () => {
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [billingPeriod, setBillingPeriod] = useState<BillingOptionId>('oneYear');
+  const selectedBillingOption = billingOptions.find((option) => option.id === billingPeriod) ?? billingOptions[0];
 
   const plans = [
     {
@@ -88,10 +106,24 @@ const Pricing = () => {
     }
   ];
 
+  const getPlanPrice = (plan: (typeof plans)[number]) => {
+    switch (selectedBillingOption.id) {
+      case 'oneMonth':
+        return plan.monthlyPrice;
+      case 'threeMonths':
+        return Math.round((plan.monthlyPrice * 2 + Math.round(plan.yearlyPrice / 2)) / 3);
+      case 'sixMonths':
+        return Math.round(plan.yearlyPrice / 2);
+      case 'oneYear':
+      default:
+        return plan.yearlyPrice;
+    }
+  };
+
   const faqs = [
     {
       question: "How does the one-time payment work?",
-      answer: "Pay once and use the service for the duration you choose - 1 month or 1 year. No recurring charges, no hidden fees. Just one simple payment!"
+      answer: "Pay once and use the service for the duration you choose - 1 month, 3 months, 6 months, or 1 year. No recurring charges, no hidden fees. Just one simple payment!"
     },
     {
       question: "What happens after my plan expires?",
@@ -163,30 +195,25 @@ const Pricing = () => {
             </p>
 
             {/* Billing Toggle */}
-            <div className="inline-flex items-center gap-4 bg-slate-100 p-1 rounded-full">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-6 py-2 rounded-full transition-all ${
-                  billingPeriod === 'monthly' 
-                    ? 'bg-white shadow-md font-semibold' 
-                    : 'text-slate-600'
-                }`}
-              >
-                1 Month
-              </button>
-              <button
-                onClick={() => setBillingPeriod('yearly')}
-                className={`px-6 py-2 rounded-full transition-all ${
-                  billingPeriod === 'yearly' 
-                    ? 'bg-white shadow-md font-semibold' 
-                    : 'text-slate-600'
-                }`}
-              >
-                1 Year
-                <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
-                  Best Value
-                </span>
-              </button>
+            <div className="inline-flex items-center gap-2 bg-slate-100 p-1 rounded-full flex-wrap justify-center">
+              {billingOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => setBillingPeriod(option.id)}
+                  className={`px-4 py-2 rounded-full transition-all flex items-center gap-2 ${
+                    billingPeriod === option.id 
+                      ? 'bg-white shadow-md font-semibold' 
+                      : 'text-slate-600'
+                  }`}
+                >
+                  {option.label}
+                  {option.badge && (
+                    <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                      {option.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -224,11 +251,11 @@ const Pricing = () => {
                     <div className="mb-6">
                       <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-bold">
-                          ₹{billingPeriod === 'monthly' ? plan.monthlyPrice.toLocaleString('en-IN') : plan.yearlyPrice.toLocaleString('en-IN')}
+                          ₹{getPlanPrice(plan).toLocaleString('en-IN')}
                         </span>
                       </div>
                       <div className="text-sm text-slate-500 mt-1">
-                        One-time payment for {billingPeriod === 'monthly' ? '1 month' : '1 year'}
+                        One-time payment for {selectedBillingOption.durationLabel}
                       </div>
                     </div>
 
