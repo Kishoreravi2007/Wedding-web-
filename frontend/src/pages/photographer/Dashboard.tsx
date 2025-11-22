@@ -7,7 +7,8 @@ import PhotoManager from './PhotoManager'; // Import PhotoManager
 import FaceProcessor from './FaceProcessor'; // Import FaceProcessor
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star, Trash2 } from 'lucide-react';
+import { Upload, Image, Users, BarChart3, LogOut, Camera, Settings, Download, Eye, Star, Trash2, Radio } from 'lucide-react';
+import LiveSyncDashboard from './LiveSyncDashboard';
 import { showSuccess } from '@/utils/toast';
 import { mapApiPhotoToPhotoType } from '@/utils/photoMapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
@@ -329,7 +330,7 @@ const PhotographerDashboard = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Upload Photos
@@ -345,6 +346,10 @@ const PhotographerDashboard = () => {
             <TabsTrigger value="faces" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Process Faces
+            </TabsTrigger>
+            <TabsTrigger value="live" className="flex items-center gap-2">
+              <Radio className="w-4 h-4" />
+              Live Sync
             </TabsTrigger>
           </TabsList>
 
@@ -479,6 +484,10 @@ const PhotographerDashboard = () => {
 
           <TabsContent value="faces" className="space-y-6">
             <FaceProcessor />
+          </TabsContent>
+
+          <TabsContent value="live" className="space-y-6">
+            <LiveSyncDashboard />
           </TabsContent>
 
         </Tabs>
