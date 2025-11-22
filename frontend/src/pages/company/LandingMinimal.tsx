@@ -142,8 +142,9 @@ const LandingMinimal = () => {
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-12">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-center space-y-2">
           <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+          <p className="text-slate-400 text-sm">Made with love from Kerala ❤️</p>
         </div>
       </footer>
     </div>
