@@ -1,5 +1,6 @@
 require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const path = require('path');
 
@@ -116,6 +117,10 @@ app.use('/api/process-faces', processFacesRouter);
 // const autoFaceDetectionRouter = require('./routes/auto-face-detection');
 // app.use('/api/auto-face-detection', autoFaceDetectionRouter);
 
+// Live sync API routes
+const liveSyncRouter = require('./routes/live-sync');
+app.use('/api/live', liveSyncRouter);
+
 // Face recognition endpoint (for photo booth feature)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -226,10 +231,22 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-app.listen(PORT, async () => {
+// Create HTTP server for WebSocket support
+const httpServer = http.createServer(app);
+
+// Initialize WebSocket server
+const { initializeWebSocketServer } = require('./websocket-server');
+const io = initializeWebSocketServer(httpServer);
+
+// Make io available globally for emitting events from routes
+app.locals.io = io;
+
+httpServer.listen(PORT, async () => {
   console.log(`✅ Backend server running on http://localhost:${PORT}`);
   console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos`);
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
+  console.log(`📡 Live sync endpoint: http://localhost:${PORT}/api/live/uploadPhoto`);
+  console.log(`🔌 WebSocket server: ws://localhost:${PORT}`);
   console.log(`💾 Using Supabase for photo storage`);
   
   // Check Supabase connection

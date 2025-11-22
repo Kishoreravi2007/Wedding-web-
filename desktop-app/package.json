@@ -1,0 +1,81 @@
+{
+  "name": "weddingweb-desktop-app",
+  "version": "1.0.0",
+  "description": "WeddingWeb Desktop App for Live Photo Sync",
+  "main": "electron.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:electron\" \"npm run dev:react\"",
+    "dev:electron": "electron .",
+    "dev:react": "vite",
+    "build": "npm run build:ts && npm run build:react && npm run build:electron",
+    "build:ts": "tsc",
+    "build:react": "vite build",
+    "build:electron": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "wedding",
+    "photo",
+    "sync",
+    "camera"
+  ],
+  "author": "WeddingWeb",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "chokidar": "^3.6.0",
+    "electron-updater": "^6.1.7",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "postcss": "^8.4.47",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.11",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  },
+  "build": {
+    "appId": "com.weddingweb.desktop",
+    "productName": "WeddingWeb Desktop",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.photography",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}
+

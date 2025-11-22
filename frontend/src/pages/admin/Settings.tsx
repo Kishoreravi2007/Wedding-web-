@@ -12,7 +12,7 @@ import { Users, Mail, Settings as SettingsIcon, LogOut, Home, Save, RefreshCcw, 
 const defaultGeneralSettings = {
   companyName: 'Wedding Website',
   supportEmail: 'support@weddingweb.com',
-  contactNumber: '+91 98765 43210',
+  contactNumber: '+91 79071 77841',
   brandTagline: 'Capturing every magical moment.',
   aboutCompany: 'Tell couples why your studio is special. This text appears across the admin experience for context.'
 };

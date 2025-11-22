@@ -561,7 +561,7 @@ const Pricing = () => {
                           name="phone"
                           value={scheduleForm.phone}
                           onChange={handleScheduleChange}
-                          placeholder="+91 95441 43072"
+                          placeholder="+91 79071 77841"
                         />
                       </div>
                       <div>
