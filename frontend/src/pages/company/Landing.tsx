@@ -407,8 +407,9 @@ const CompanyLanding = () => {
               </ul>
             </div>
           </div>
-          <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
             <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p className="text-sm">Made with love from Kerala ❤️</p>
           </div>
         </div>
       </footer>
