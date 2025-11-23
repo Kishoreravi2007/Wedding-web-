@@ -567,7 +567,7 @@ const Pricing = () => {
                             One-time payment • No recurring charges • All prices in INR
                           </p>
                         </div>
-                        <Link to="/contact" className="block">
+                        <Link to="/company/contact" className="block">
                           <Button
                             className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg py-6 shadow-lg hover:shadow-xl transition-all"
                             size="lg"
@@ -606,7 +606,7 @@ const Pricing = () => {
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
               Our team is here to help you build the perfect package for your special day
             </p>
-            <Link to="/contact">
+            <Link to="/company/contact">
               <Button 
                 size="lg" 
                 className="bg-white text-purple-600 hover:bg-slate-100 text-lg px-8 py-6"

@@ -185,6 +185,13 @@ const App = () => {
               <Route path="/company/pricing" element={<CompanyPricing />} />
               <Route path="/company/portfolio" element={<CompanyPortfolio />} />
               <Route path="/company/contact" element={<CompanyContact />} />
+              
+              {/* Company Route Redirects - Short URLs */}
+              <Route path="/about" element={<Navigate to="/company/about" replace />} />
+              <Route path="/services" element={<Navigate to="/company/services" replace />} />
+              <Route path="/pricing" element={<Navigate to="/company/pricing" replace />} />
+              <Route path="/portfolio" element={<Navigate to="/company/portfolio" replace />} />
+              <Route path="/contact" element={<Navigate to="/company/contact" replace />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
