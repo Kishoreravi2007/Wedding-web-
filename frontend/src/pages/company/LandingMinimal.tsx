@@ -1,99 +1,33 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
 
 const LandingMinimal = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-slate-200">
-        <div className="container mx-auto px-4 py-5 flex justify-between items-center">
-          <Link to="/company" className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-5 flex justify-center md:justify-between items-center">
+          <Link to="/" className="flex items-center gap-4">
             <img
               src="/logo.png"
               alt="WeddingWeb logo"
               className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
             />
-            <span className="text-3xl font-bold text-slate-900">
+            <span className="hidden md:block text-3xl font-bold text-slate-900">
               WeddingWeb
             </span>
           </Link>
           
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 items-center">
-            <Link to="/company" className="hover:text-rose-500">Home</Link>
-            <Link to="/company/about" className="hover:text-rose-500">About</Link>
-            <Link to="/company/services" className="hover:text-rose-500">Services</Link>
-            <Link to="/company/pricing" className="hover:text-rose-500">Pricing</Link>
-            <Link to="/company/portfolio" className="hover:text-rose-500">Portfolio</Link>
-            <Link to="/company/contact" className="hover:text-rose-500">Contact</Link>
+            <Link to="/" className="hover:text-rose-500">Home</Link>
+            <Link to="/about" className="hover:text-rose-500">About</Link>
+            <Link to="/services" className="hover:text-rose-500">Services</Link>
+            <Link to="/pricing" className="hover:text-rose-500">Pricing</Link>
+            <Link to="/portfolio" className="hover:text-rose-500">Portfolio</Link>
+            <Link to="/contact" className="hover:text-rose-500">Contact</Link>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
         </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-slate-200">
-            <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
-              <Link 
-                to="/company" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                Home
-              </Link>
-              <Link 
-                to="/company/about" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                About
-              </Link>
-              <Link 
-                to="/company/services" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                Services
-              </Link>
-              <Link 
-                to="/company/pricing" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                Pricing
-              </Link>
-              <Link 
-                to="/company/portfolio" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                Portfolio
-              </Link>
-              <Link 
-                to="/company/contact" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium hover:text-rose-500 transition-colors py-2"
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Hero Section */}
@@ -108,7 +42,7 @@ const LandingMinimal = () => {
             Build your own personalized wedding website with AI face detection, smart galleries, 
             live streaming, and more.
           </p>
-          <Link to="/company/contact">
+          <Link to="/contact">
             <Button size="lg" className="bg-gradient-to-r from-rose-500 to-purple-600 text-lg px-8 py-6">
               Get Started Free
             </Button>
