@@ -135,7 +135,8 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <LanguageSwitcher />
+          {/* LanguageSwitcher disabled - Malayalam removed */}
+          {/* <LanguageSwitcher /> */}
           {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
           {showBookButton && (
             <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
