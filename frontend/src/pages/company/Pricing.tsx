@@ -572,7 +572,7 @@ const Pricing = () => {
                             className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg py-6 shadow-lg hover:shadow-xl transition-all"
                             size="lg"
                           >
-                            Get Started Now
+                            Book a Slot
                           </Button>
                         </Link>
                         <Button
