@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, Mail, Settings as SettingsIcon, LogOut, Home, Save, RefreshCcw, Loader2 } from 'lucide-react';
+import { Users, Mail, Settings as SettingsIcon, LogOut, Home, Save, RefreshCcw, Loader2, MessageSquare } from 'lucide-react';
 
 const defaultGeneralSettings = {
   companyName: 'Wedding Website',
@@ -164,6 +164,12 @@ const AdminSettings: React.FC = () => {
                   <Button variant="ghost" size="sm">
                     <Mail className="mr-2 h-4 w-4" />
                     Messages
+                  </Button>
+                </Link>
+                <Link to="/admin/feedback">
+                  <Button variant="ghost" size="sm">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Feedbacks
                   </Button>
                 </Link>
                 <Link to="/">

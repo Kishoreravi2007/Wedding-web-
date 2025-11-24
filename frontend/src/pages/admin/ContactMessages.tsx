@@ -155,6 +155,12 @@ const ContactMessages: React.FC = () => {
                     Messages
                   </Button>
                 </Link>
+                <Link to="/admin/feedback">
+                  <Button variant="ghost" size="sm">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Feedbacks
+                  </Button>
+                </Link>
                 <Link to="/admin/call-schedules">
                   <Button variant="ghost" size="sm">
                     <CalendarClock className="mr-2 h-4 w-4" />
