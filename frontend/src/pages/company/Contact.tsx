@@ -3,6 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
 import { 
@@ -18,11 +25,47 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+// Common country codes
+const countryCodes = [
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+  { code: '+1', country: 'USA/Canada', flag: '🇺🇸' },
+  { code: '+44', country: 'UK', flag: '🇬🇧' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+971', country: 'UAE', flag: '🇦🇪' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+  { code: '+60', country: 'Malaysia', flag: '🇲🇾' },
+  { code: '+66', country: 'Thailand', flag: '🇹🇭' },
+  { code: '+86', country: 'China', flag: '🇨🇳' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+34', country: 'Spain', flag: '🇪🇸' },
+  { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+  { code: '+32', country: 'Belgium', flag: '🇧🇪' },
+  { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+  { code: '+46', country: 'Sweden', flag: '🇸🇪' },
+  { code: '+47', country: 'Norway', flag: '🇳🇴' },
+  { code: '+45', country: 'Denmark', flag: '🇩🇰' },
+  { code: '+358', country: 'Finland', flag: '🇫🇮' },
+  { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+  { code: '+353', country: 'Ireland', flag: '🇮🇪' },
+  { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+  { code: '+90', country: 'Turkey', flag: '🇹🇷' },
+  { code: '+7', country: 'Russia/Kazakhstan', flag: '🇷🇺' },
+];
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    countryCode: '+91', // Default to India
     eventDate: '',
     guestCount: '',
     message: ''
@@ -75,12 +118,23 @@ const Contact = () => {
 
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      
+      // Combine country code with phone number
+      const phoneWithCode = formData.phone 
+        ? `${formData.countryCode} ${formData.phone}`.trim()
+        : '';
+      
+      const payload = {
+        ...formData,
+        phone: phoneWithCode,
+      };
+      
       const response = await fetch(`${API_BASE_URL}/api/contact-messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       // Check if response is ok
@@ -100,6 +154,7 @@ const Contact = () => {
           name: '',
           email: '',
           phone: '',
+          countryCode: '+91',
           eventDate: '',
           guestCount: '',
           message: ''
@@ -234,13 +289,49 @@ const Contact = () => {
                         <label className="block text-sm font-semibold mb-2 text-slate-700">
                           Phone
                         </label>
-                        <Input
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+91 XXXXX XXXXX"
-                        />
+                        <div className="flex gap-2">
+                          <Select
+                            value={formData.countryCode}
+                            onValueChange={(value) => 
+                              setFormData({ ...formData, countryCode: value })
+                            }
+                          >
+                            <SelectTrigger className="w-[140px]">
+                              <SelectValue>
+                                {(() => {
+                                  const selected = countryCodes.find(c => c.code === formData.countryCode);
+                                  return selected ? (
+                                    <span className="flex items-center gap-1.5">
+                                      <span>{selected.flag}</span>
+                                      <span>{selected.code}</span>
+                                    </span>
+                                  ) : formData.countryCode;
+                                })()}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                              {countryCodes.map((country) => (
+                                <SelectItem key={country.code} value={country.code}>
+                                  <span className="flex items-center gap-2">
+                                    <span>{country.flag}</span>
+                                    <span className="font-medium">{country.code}</span>
+                                    <span className="text-xs text-slate-500 ml-1">
+                                      {country.country}
+                                    </span>
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            name="phone"
+                            type="tel"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="XXXXX XXXXX"
+                            className="flex-1"
+                          />
+                        </div>
                       </div>
                     </div>
 
