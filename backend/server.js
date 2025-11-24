@@ -57,6 +57,10 @@ app.use('/api/call-schedules', callSchedulesRouter);
 const feedbackRouter = require('./routes/feedback');
 app.use('/api/feedback', feedbackRouter);
 
+// N8N Integration endpoint
+const n8nRouter = require('./routes/n8n-integration');
+app.use('/api/n8n', n8nRouter);
+
 // Firebase wishes endpoint (commented out - keeping for future migration)
 // const wishesFirebaseRouter = require('./wishes');
 // app.use('/api/wishes', wishesFirebaseRouter);

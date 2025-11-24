@@ -1,0 +1,187 @@
+{
+  "name": "Customer Call Automation - Wedding Website",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "trigger-call",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "trigger-call"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "callId",
+              "name": "callId",
+              "value": "={{ $json.body.callId }}",
+              "type": "string"
+            },
+            {
+              "id": "phoneNumber",
+              "name": "phoneNumber",
+              "value": "={{ $json.body.phoneNumber }}",
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "reason",
+              "name": "reason",
+              "value": "={{ $json.body.reason }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-variables",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "makeCall",
+        "from": "={{ $env.TWILIO_PHONE_NUMBER }}",
+        "to": "={{ $json.phoneNumber }}",
+        "url": "={{ $env.BACKEND_URL }}/api/n8n/call-handler",
+        "method": "POST"
+      },
+      "id": "twilio-call",
+      "name": "Make Phone Call",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "twilioApi": {
+          "id": "twilio-credentials",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate call processing and generate summary\nconst callData = $input.all()[0].json;\n\n// In a real scenario, you would:\n// 1. Process the call transcript from Twilio\n// 2. Use AI to generate a summary\n// 3. Extract key information\n\n// For now, we'll create a basic summary\nconst summary = `Call completed with ${callData.name || 'customer'}.\n\nReason: ${callData.reason || 'General inquiry'}\nPhone: ${callData.phoneNumber}\nEmail: ${callData.email || 'Not provided'}\n\nSummary: Customer was contacted regarding their inquiry. The conversation was handled successfully.\n\nResolution: Customer inquiry addressed. Follow-up may be required.`;\n\nreturn {\n  callId: callData.callId,\n  phoneNumber: callData.phoneNumber,\n  name: callData.name,\n  email: callData.email,\n  reason: callData.reason,\n  duration: 120, // seconds\n  summary: summary,\n  transcript: `[Call transcript would be here in a real implementation]`,\n  status: 'completed',\n  resolution: 'Customer inquiry addressed successfully'\n};"
+      },
+      "id": "generate-summary",
+      "name": "Generate Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_URL }}/api/n8n/call-summary",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"callId\": \"{{ $json.callId }}\",\n  \"phoneNumber\": \"{{ $json.phoneNumber }}\",\n  \"duration\": {{ $json.duration }},\n  \"summary\": \"{{ $json.summary }}\",\n  \"transcript\": \"{{ $json.transcript }}\",\n  \"status\": \"{{ $json.status }}\",\n  \"resolution\": \"{{ $json.resolution }}\"\n}",
+        "options": {}
+      },
+      "id": "send-to-backend",
+      "name": "Send Summary to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Call processed successfully\",\n  \"callId\": \"{{ $json.callId }}\"\n}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Make Phone Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Phone Call": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary to Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Summary to Backend": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+
