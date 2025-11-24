@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Home, Users, Settings, LogOut, Star, MessageSquare, RefreshCw, Calendar, Mail, User, Tag, Trash2, Eye } from "lucide-react";
+import { Home, Users, Settings, LogOut, Star, MessageSquare, RefreshCw, Calendar, Mail, User, Tag, Trash2, Eye, Phone } from "lucide-react";
 import { API_BASE_URL } from '@/lib/api';
 
 interface Feedback {
@@ -26,6 +26,7 @@ const AdminFeedback: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [isCalling, setIsCalling] = useState(false);
 
   const fetchFeedbacks = async () => {
     setLoading(true);
@@ -140,6 +141,51 @@ const AdminFeedback: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const triggerCall = async (feedback: Feedback) => {
+    // Prompt for phone number if not available
+    let phoneNumber = prompt('Enter phone number to call (include country code, e.g., +1234567890):');
+    
+    if (!phoneNumber || !phoneNumber.trim()) {
+      return; // User cancelled
+    }
+
+    phoneNumber = phoneNumber.trim();
+
+    if (!confirm(`Call ${feedback.name || 'customer'} at ${phoneNumber}?`)) {
+      return;
+    }
+
+    setIsCalling(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/n8n/trigger-call`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber,
+          name: feedback.name || 'Anonymous',
+          email: feedback.email,
+          feedbackId: feedback.id,
+          reason: `Follow up on feedback: ${feedback.category}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Call initiated! Call ID: ${data.callId}\n\nYou will receive an email summary when the call is completed.`);
+      } else {
+        alert(`Failed to initiate call: ${data.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Error triggering call:', err);
+      alert('Failed to initiate call. Please check if n8n is configured.');
+    } finally {
+      setIsCalling(false);
+    }
   };
 
   const filteredFeedbacks = statusFilter === 'all' 
@@ -443,6 +489,15 @@ const AdminFeedback: React.FC = () => {
                       </div>
 
                       <div className="pt-4 border-t space-y-2">
+                        <Button 
+                          size="lg"
+                          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 mb-2"
+                          onClick={() => triggerCall(selectedFeedback)}
+                          disabled={isCalling}
+                        >
+                          <Phone className="w-4 h-4 mr-2" />
+                          {isCalling ? 'Calling...' : 'Call Customer'}
+                        </Button>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"

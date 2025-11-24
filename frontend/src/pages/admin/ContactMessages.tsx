@@ -40,6 +40,7 @@ const ContactMessages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [isCalling, setIsCalling] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
@@ -130,6 +131,47 @@ const ContactMessages: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const triggerCall = async (message: ContactMessage) => {
+    if (!message.phone) {
+      alert('No phone number available for this contact');
+      return;
+    }
+
+    if (!confirm(`Call ${message.name} at ${message.phone}?`)) {
+      return;
+    }
+
+    setIsCalling(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/n8n/trigger-call`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: message.phone,
+          name: message.name,
+          email: message.email,
+          messageId: message.id,
+          reason: 'Follow up on contact message',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Call initiated! Call ID: ${data.callId}\n\nYou will receive an email summary when the call is completed.`);
+      } else {
+        alert(`Failed to initiate call: ${data.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Error triggering call:', err);
+      alert('Failed to initiate call. Please check if n8n is configured.');
+    } finally {
+      setIsCalling(false);
+    }
   };
 
   return (
@@ -396,6 +438,17 @@ const ContactMessages: React.FC = () => {
                         </div>
                       </div>
 
+                      {selectedMessage.phone && (
+                        <Button 
+                          size="lg"
+                          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 mb-2"
+                          onClick={() => triggerCall(selectedMessage)}
+                          disabled={isCalling}
+                        >
+                          <Phone className="w-4 h-4 mr-2" />
+                          {isCalling ? 'Calling...' : 'Call Customer'}
+                        </Button>
+                      )}
                       <Button 
                         size="lg"
                         className="w-full bg-gradient-to-r from-rose-500 to-purple-600"
