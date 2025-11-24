@@ -30,7 +30,14 @@ router.get('/', async (req, res) => {
     
     const { data, error } = await query;
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      throw error;
+    }
     
     res.json({
       success: true,
@@ -39,11 +46,26 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching weddings:', error);
-    console.error('Full error details:', JSON.stringify(error, null, 2));
+    console.error('Error type:', typeof error);
+    console.error('Error constructor:', error?.constructor?.name);
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    
+    // Check if it's a table missing error
+    if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
+      return res.status(500).json({
+        success: false,
+        error: 'Table "weddings" does not exist. Please create it in Supabase.',
+        code: error.code,
+        hint: error.hint
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      error: error.message || 'Internal server error.',
-      details: error.code || error.hint || null
+      error: error?.message || error?.toString() || 'Internal server error.',
+      code: error?.code || null,
+      hint: error?.hint || null,
+      details: error?.details || null
     });
   }
 });
