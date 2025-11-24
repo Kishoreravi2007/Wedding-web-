@@ -16,7 +16,12 @@ router.get('/', async (req, res) => {
     res.json({ success: true, messages: data || [] });
   } catch (error) {
     console.error('Error fetching contact messages:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Full error details:', JSON.stringify(error, null, 2));
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Internal server error.',
+      details: error.code || error.hint || null
+    });
   }
 });
 
