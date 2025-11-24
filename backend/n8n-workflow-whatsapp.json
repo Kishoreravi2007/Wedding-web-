@@ -1,0 +1,239 @@
+{
+  "name": "WhatsApp Bot with ChatGPT - Wedding Website",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "trigger-whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "trigger-whatsapp"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "messageId",
+              "name": "messageId",
+              "value": "={{ $json.body.messageId || $json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "phoneNumber",
+              "name": "phoneNumber",
+              "value": "={{ $json.body.phoneNumber || $json.phoneNumber }}",
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $json.body.name || $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $json.body.email || $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "reason",
+              "name": "reason",
+              "value": "={{ $json.body.reason || $json.reason || 'General inquiry' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-variables",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a customer service representative EXCLUSIVELY for WeddingWeb, a wedding website platform. Your ONLY purpose is to help customers with WeddingWeb services.\n\nSTRICT RULES:\n1. ONLY answer questions about WeddingWeb services, features, pricing, and wedding websites\n2. DO NOT answer questions about other topics (general wedding planning, other companies, unrelated topics)\n3. If asked about something unrelated to WeddingWeb, politely redirect: \"I'm here to help you with WeddingWeb services. How can I assist you with your wedding website today?\"\n4. Keep responses focused on WeddingWeb's offerings:\n   - Wedding website creation\n   - Guest management\n   - RSVP features\n   - Photo galleries\n   - Event scheduling\n   - Pricing plans\n   - Demo calls\n   - Technical support\n\nCustomer Information:\n- Name: {{ $json.name }}\n- Email: {{ $json.email }}\n- Reason for contact: {{ $json.reason }}\n\nResponse Guidelines:\n- Be friendly, professional, and concise\n- Stay focused ONLY on WeddingWeb services\n- If the question is not about WeddingWeb, politely redirect to WeddingWeb services\n- Always end by asking if they need help with WeddingWeb or would like to schedule a demo call\n- Maximum 3-4 sentences per response"
+            },
+            {
+              "role": "user",
+              "content": "=Hi! I'm {{ $json.name }}. {{ $json.reason }}. Can you help me with information about WeddingWeb's wedding website services?"
+            }
+          ]
+        }
+      },
+      "id": "chatgpt-generate",
+      "name": "Generate Message with ChatGPT",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.phoneNumber }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $('Generate Message with ChatGPT').item.json.choices[0].message.content }}\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "url": "={{ $env.WHATSAPP_API_URL }}/messages",
+        "method": "POST"
+      },
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "whatsapp-credentials",
+          "name": "WhatsApp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate summary of the WhatsApp message sent\nconst messageData = $input.all()[0].json;\nconst chatgptResponse = $('Generate Message with ChatGPT').item.json;\n\nconst summary = `WhatsApp message sent to ${messageData.name || 'customer'}.\n\nPhone: ${messageData.phoneNumber}\nEmail: ${messageData.email || 'Not provided'}\nReason: ${messageData.reason || 'General inquiry'}\n\nMessage sent:\n${chatgptResponse.choices[0].message.content}\n\nStatus: Message sent successfully via WhatsApp.\n\nNext steps: Customer can reply via WhatsApp, and you can continue the conversation.`;\n\nreturn {\n  messageId: messageData.messageId || `msg_${Date.now()}`,\n  phoneNumber: messageData.phoneNumber,\n  name: messageData.name,\n  email: messageData.email,\n  reason: messageData.reason,\n  message: chatgptResponse.choices[0].message.content,\n  summary: summary,\n  status: 'sent',\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "generate-summary",
+      "name": "Generate Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_URL }}/api/n8n/whatsapp-summary",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messageId\": \"{{ $json.messageId }}\",\n  \"phoneNumber\": \"{{ $json.phoneNumber }}\",\n  \"name\": \"{{ $json.name }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"message\": \"{{ $json.message }}\",\n  \"summary\": \"{{ $json.summary }}\",\n  \"status\": \"{{ $json.status }}\"\n}",
+        "options": {}
+      },
+      "id": "send-to-backend",
+      "name": "Send Summary to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"WhatsApp message sent successfully\",\n  \"messageId\": \"{{ $json.messageId }}\"\n}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Generate Message with ChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message with ChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Message": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary to Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Summary to Backend": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+
