@@ -120,11 +120,11 @@ async function updateCallRecord(callId, updates) {
 }
 
 /**
- * POST /api/n8n/trigger-call
- * Trigger a call through n8n workflow
- * This endpoint is called by your application to initiate a call
+ * POST /api/n8n/trigger-whatsapp
+ * Trigger a WhatsApp message through n8n workflow with ChatGPT
+ * This endpoint is called by your application to send a WhatsApp message
  */
-router.post('/trigger-call', async (req, res) => {
+router.post('/trigger-whatsapp', async (req, res) => {
   try {
     const { phoneNumber, name, email, messageId, feedbackId, reason } = req.body;
 
@@ -136,10 +136,10 @@ router.post('/trigger-call', async (req, res) => {
       });
     }
 
-    // Create call record
-    const callId = `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const callRecord = {
-      id: callId,
+    // Create message record
+    const messageRecordId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const messageRecord = {
+      id: messageRecordId,
       phoneNumber,
       name: name || 'Unknown',
       email: email || null,
@@ -148,40 +148,43 @@ router.post('/trigger-call', async (req, res) => {
       reason: reason || 'General inquiry',
       status: 'pending',
       createdAt: new Date().toISOString(),
+      message: null,
       summary: null,
-      duration: null,
     };
 
-    callRecords.set(callId, callRecord);
+    callRecords.set(messageRecordId, messageRecord);
 
-    // Save to database
-    await saveCallRecord(callRecord);
+    // Save to database (reusing call_records table structure)
+    await saveCallRecord({
+      ...messageRecord,
+      callId: messageRecordId,
+      duration: null,
+    });
 
     // Return webhook URL for n8n to call
-    // The n8n workflow should be configured to call this webhook
-    const webhookUrl = process.env.N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/trigger-call';
+    const webhookUrl = process.env.N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/trigger-whatsapp';
     
     // Prepare data to send to n8n
     const n8nPayload = {
-      callId,
+      messageId: messageRecordId,
       phoneNumber,
-      name: callRecord.name,
-      email: callRecord.email,
-      reason: callRecord.reason,
-      messageId,
-      feedbackId,
+      name: messageRecord.name,
+      email: messageRecord.email,
+      reason: messageRecord.reason,
+      messageId: messageId,
+      feedbackId: feedbackId,
     };
 
     // Send webhook to n8n (if configured)
     let n8nResponse = null;
-    if (process.env.N8N_WEBHOOK_URL && process.env.N8N_WEBHOOK_URL !== 'https://your-n8n-instance.com/webhook/trigger-call') {
+    if (process.env.N8N_WEBHOOK_URL && process.env.N8N_WEBHOOK_URL !== 'https://your-n8n-instance.com/webhook/trigger-whatsapp') {
       try {
-        console.log('📞 Sending call trigger to n8n:', webhookUrl);
+        console.log('💬 Sending WhatsApp trigger to n8n:', webhookUrl);
         n8nResponse = await axios.post(webhookUrl, n8nPayload, {
           headers: {
             'Content-Type': 'application/json',
           },
-          timeout: 5000, // 5 second timeout
+          timeout: 10000, // 10 second timeout (ChatGPT may take longer)
         });
         console.log('✅ N8N webhook called successfully');
       } catch (error) {
@@ -189,33 +192,118 @@ router.post('/trigger-call', async (req, res) => {
         // Don't fail the request if n8n is unavailable
       }
     } else {
-      console.log('📞 Call triggered (n8n webhook not configured):', {
-        callId,
+      console.log('💬 WhatsApp message triggered (n8n webhook not configured):', {
+        messageId: messageRecordId,
         phoneNumber,
-        name: callRecord.name,
-        reason: callRecord.reason,
+        name: messageRecord.name,
+        reason: messageRecord.reason,
       });
       console.log('💡 To enable n8n integration, set N8N_WEBHOOK_URL in your .env file');
     }
 
     res.json({
       success: true,
-      message: 'Call triggered successfully',
-      callId,
+      message: 'WhatsApp message triggered successfully',
+      messageId: messageRecordId,
       webhookUrl: process.env.N8N_WEBHOOK_URL || 'Not configured',
       payload: n8nPayload,
       n8nResponse: n8nResponse?.data || null,
     });
   } catch (error) {
-    console.error('Error triggering call:', error);
+    console.error('Error triggering WhatsApp message:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
 /**
- * POST /api/n8n/call-summary
- * Receive call summary from n8n workflow
- * This endpoint is called by n8n after the call is completed
+ * POST /api/n8n/trigger-call (DEPRECATED - kept for backward compatibility)
+ * Use /api/n8n/trigger-whatsapp instead
+ */
+router.post('/trigger-call', async (req, res) => {
+  // Redirect to WhatsApp endpoint
+  req.url = '/trigger-whatsapp';
+  return router.handle(req, res);
+});
+
+/**
+ * POST /api/n8n/whatsapp-summary
+ * Receive WhatsApp message summary from n8n workflow
+ * This endpoint is called by n8n after the message is sent
+ */
+router.post('/whatsapp-summary', async (req, res) => {
+  try {
+    const { messageId, phoneNumber, name, email, message, summary, status } = req.body;
+
+    if (!messageId || !summary) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message ID and summary are required'
+      });
+    }
+
+    // Update message record
+    const messageRecord = callRecords.get(messageId);
+    const updates = {
+      status: status || 'sent',
+      summary: summary,
+      message: message || null,
+      completedAt: new Date().toISOString(),
+    };
+
+    if (messageRecord) {
+      Object.assign(messageRecord, updates);
+      callRecords.set(messageId, messageRecord);
+    }
+
+    // Update in database
+    await updateCallRecord(messageId, {
+      ...updates,
+      status: updates.status,
+      summary: updates.summary,
+      transcript: updates.message,
+    });
+
+    // Send email summary to admin
+    try {
+      const emailResult = await sendCallSummaryEmail({
+        ...messageRecord,
+        summary,
+        transcript: message,
+        duration: null,
+        status,
+        resolution: 'WhatsApp message sent successfully',
+      });
+      
+      if (emailResult.success) {
+        console.log('✅ WhatsApp summary email sent successfully');
+      } else {
+        console.warn('⚠️ Failed to send WhatsApp summary email:', emailResult.error);
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending WhatsApp summary email:', emailError);
+      // Don't fail the request if email fails
+    }
+
+    console.log('✅ WhatsApp summary received:', {
+      messageId,
+      phoneNumber,
+      status,
+    });
+
+    res.json({
+      success: true,
+      message: 'WhatsApp summary received and processed',
+      messageId,
+    });
+  } catch (error) {
+    console.error('Error processing WhatsApp summary:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/n8n/call-summary (DEPRECATED - kept for backward compatibility)
+ * Use /api/n8n/whatsapp-summary instead
  */
 router.post('/call-summary', async (req, res) => {
   try {
