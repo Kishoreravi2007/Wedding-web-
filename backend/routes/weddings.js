@@ -39,9 +39,11 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching weddings:', error);
+    console.error('Full error details:', JSON.stringify(error, null, 2));
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message || 'Internal server error.',
+      details: error.code || error.hint || null
     });
   }
 });
