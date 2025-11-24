@@ -3,20 +3,41 @@ const router = express.Router();
 const { supabase } = require('../lib/supabase');
 const { writeContactMessageToSheet, deleteContactMessageFromSheet } = require('../lib/google-sheets');
 
+// Helper to ensure Supabase is available
+const ensureSupabase = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized. Check SUPABASE_URL and service keys.');
+  }
+  return supabase;
+};
+
 // Get all contact messages (for admin)
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Supabase error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      console.error('Error details:', error.details);
-      console.error('Error hint:', error.hint);
+      console.error('❌ Supabase query error detected!');
+      console.error('Error object:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error keys:', Object.keys(error || {}));
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      console.error('Error details:', error?.details);
+      console.error('Error hint:', error?.hint);
+      console.error('Full error JSON:', JSON.stringify(error, null, 2));
+      
+      // Check for common Supabase errors
+      if (error?.code === '42P01') {
+        console.error('🔴 TABLE DOES NOT EXIST: contact_messages');
+      } else if (error?.code === 'PGRST116') {
+        console.error('🔴 TABLE NOT FOUND: contact_messages');
+      }
+      
       throw error;
     }
 
@@ -61,7 +82,8 @@ router.post('/', async (req, res) => {
     }
 
     // Insert message into Supabase
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('contact_messages')
       .insert([{
         name,
@@ -109,7 +131,8 @@ router.patch('/:id', async (req, res) => {
     if (status) updateData.status = status;
     if (response) updateData.response = response;
 
-    const { data, error } = await supabase
+    const client = ensureSupabase();
+    const { data, error } = await client
       .from('contact_messages')
       .update(updateData)
       .eq('id', id)
@@ -130,7 +153,8 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     // Get the message data before deleting (to find it in Google Sheets)
-    const { data: messageData, error: fetchError } = await supabase
+    const client = ensureSupabase();
+    const { data: messageData, error: fetchError } = await client
       .from('contact_messages')
       .select('*')
       .eq('id', id)
@@ -139,7 +163,7 @@ router.delete('/:id', async (req, res) => {
     if (fetchError) throw fetchError;
 
     // Delete from Supabase
-    const { error } = await supabase
+    const { error } = await client
       .from('contact_messages')
       .delete()
       .eq('id', id);
