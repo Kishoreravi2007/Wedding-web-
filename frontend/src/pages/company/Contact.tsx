@@ -83,6 +83,14 @@ const Contact = () => {
         body: JSON.stringify(formData),
       });
 
+      // Check if response is ok
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Network error or server not responding' }));
+        console.error('Server error:', errorData);
+        alert(`Error: ${errorData.error || 'Server error. Please check if the backend is running.'}`);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -97,11 +105,12 @@ const Contact = () => {
           message: ''
         });
       } else {
-        alert('Something went wrong. Please try again or email us directly.');
+        console.error('Form submission failed:', data);
+        alert(`Error: ${data.error || 'Something went wrong. Please try again or email us directly.'}`);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Something went wrong. Please try again or email us directly.');
+      alert('Network error: Could not connect to server. Please make sure the backend server is running on port 5001.');
     } finally {
       setIsSubmitting(false);
     }

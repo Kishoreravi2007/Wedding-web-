@@ -50,6 +50,7 @@ import CompanyContact from "./pages/company/Contact";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminContactMessages from "./pages/admin/ContactMessages";
+import AdminFeedback from "./pages/admin/Feedback";
 import AdminCallSchedules from "./pages/admin/CallSchedules";
 import AdminSettings from "./pages/admin/Settings";
 
@@ -199,6 +200,7 @@ const App = () => {
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
+              <Route path="/admin/feedback" element={<AdminFeedback />} />
               <Route path="/admin/call-schedules" element={<AdminCallSchedules />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
 
