@@ -1,4 +1,6 @@
-# 💬 WhatsApp Bot with ChatGPT Setup Guide
+# 💬 WhatsApp Bot with Google Gemini Setup Guide
+
+> **Note**: This guide has been updated to use **Google Gemini** instead of ChatGPT. Gemini offers a free tier and is more cost-effective!
 
 This guide will help you set up a WhatsApp bot that uses ChatGPT (OpenAI) to generate intelligent, personalized responses for your wedding website customers.
 

@@ -1,5 +1,5 @@
 {
-  "name": "WhatsApp Bot with ChatGPT - Wedding Website",
+  "name": "WhatsApp Bot with Google Gemini - Wedding Website",
   "nodes": [
     {
       "parameters": {
@@ -61,35 +61,25 @@
     },
     {
       "parameters": {
-        "model": "gpt-4",
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={{ $env.GEMINI_API_KEY }}",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"CRITICAL INSTRUCTIONS - YOU MUST FOLLOW THESE RULES STRICTLY:\\n\\nYou are a customer service bot EXCLUSIVELY for WeddingWeb. You are FORBIDDEN from answering ANY questions that are NOT about WeddingWeb.\\n\\nABSOLUTE RESTRICTIONS:\\n- DO NOT answer questions about: wedding venues, photographers, caterers, florists, wedding dresses, general wedding planning, other companies, or ANY topic unrelated to WeddingWeb\\n- DO NOT provide general advice, recommendations, or information outside WeddingWeb's services\\n- DO NOT engage in conversations about topics other than WeddingWeb\\n- If asked about ANYTHING not related to WeddingWeb, you MUST respond with EXACTLY this: 'I'm here exclusively to help you with WeddingWeb wedding website services. How can I assist you with creating or managing your wedding website today?'\\n\\nONLY ALLOWED TOPICS (WeddingWeb services only):\\n- Wedding website creation and setup\\n- Guest management features\\n- RSVP functionality\\n- Photo galleries\\n- Event scheduling\\n- Pricing plans and subscriptions\\n- Demo calls and consultations\\n- Technical support for WeddingWeb platform\\n- Account management\\n- Feature explanations\\n\\nCustomer Information:\\n- Name: {{ $json.name }}\\n- Email: {{ $json.email }}\\n- Reason: {{ $json.reason }}\\n\\nResponse Rules:\\n- Maximum 3-4 sentences\\n- Friendly and professional tone\\n- Focus ONLY on WeddingWeb\\n- End by asking if they need WeddingWeb help or want to schedule a demo\\n- If the customer's question is NOT about WeddingWeb, use the exact redirect message above\\n\\nGenerate a WhatsApp message for this customer. Remember: ONLY discuss WeddingWeb services. If their inquiry is not about WeddingWeb, redirect them using the exact message specified above.\\n\\nIMPORTANT: At the end of your message, you MUST ask: 'Would you like to speak with a WeddingWeb executive? Please reply YES if you'd like us to schedule a call with you.'\\n\\nCustomer inquiry: Hi! I'm {{ $json.name }}. {{ $json.reason }}. Can you help me with information about WeddingWeb's wedding website services?\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.3,\n    \"maxOutputTokens\": 400,\n    \"topP\": 0.8,\n    \"topK\": 20\n  },\n  \"safetySettings\": [\n    {\n      \"category\": \"HARM_CATEGORY_HARASSMENT\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    },\n    {\n      \"category\": \"HARM_CATEGORY_HATE_SPEECH\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    },\n    {\n      \"category\": \"HARM_CATEGORY_SEXUALLY_EXPLICIT\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    },\n    {\n      \"category\": \"HARM_CATEGORY_DANGEROUS_CONTENT\",\n      \"threshold\": \"BLOCK_MEDIUM_AND_ABOVE\"\n    }\n  ]\n}",
         "options": {
-          "temperature": 0.7,
-          "maxTokens": 500
-        },
-        "messages": {
-          "values": [
-            {
-              "role": "system",
-              "content": "=You are a customer service representative EXCLUSIVELY for WeddingWeb, a wedding website platform. Your ONLY purpose is to help customers with WeddingWeb services.\n\nSTRICT RULES:\n1. ONLY answer questions about WeddingWeb services, features, pricing, and wedding websites\n2. DO NOT answer questions about other topics (general wedding planning, other companies, unrelated topics)\n3. If asked about something unrelated to WeddingWeb, politely redirect: \"I'm here to help you with WeddingWeb services. How can I assist you with your wedding website today?\"\n4. Keep responses focused on WeddingWeb's offerings:\n   - Wedding website creation\n   - Guest management\n   - RSVP features\n   - Photo galleries\n   - Event scheduling\n   - Pricing plans\n   - Demo calls\n   - Technical support\n\nCustomer Information:\n- Name: {{ $json.name }}\n- Email: {{ $json.email }}\n- Reason for contact: {{ $json.reason }}\n\nResponse Guidelines:\n- Be friendly, professional, and concise\n- Stay focused ONLY on WeddingWeb services\n- If the question is not about WeddingWeb, politely redirect to WeddingWeb services\n- Always end by asking if they need help with WeddingWeb or would like to schedule a demo call\n- Maximum 3-4 sentences per response"
-            },
-            {
-              "role": "user",
-              "content": "=Hi! I'm {{ $json.name }}. {{ $json.reason }}. Can you help me with information about WeddingWeb's wedding website services?"
+          "response": {
+            "response": {
+              "responseFormat": "json"
             }
-          ]
+          }
         }
       },
-      "id": "chatgpt-generate",
-      "name": "Generate Message with ChatGPT",
-      "type": "n8n-nodes-base.openAi",
+      "id": "gemini-generate",
+      "name": "Generate Message with Gemini",
+      "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
-      "position": [650, 300],
-      "credentials": {
-        "openAiApi": {
-          "id": "openai-credentials",
-          "name": "OpenAI API"
-        }
-      }
+      "position": [650, 300]
     },
     {
       "parameters": {
@@ -97,7 +87,7 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"to\": \"{{ $json.phoneNumber }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $('Generate Message with ChatGPT').item.json.choices[0].message.content }}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.phoneNumber }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $('Generate Message with Gemini').item.json.candidates[0].content.parts[0].text }}\"\n  }\n}",
         "options": {
           "response": {
             "response": {
@@ -105,7 +95,7 @@
             }
           }
         },
-        "url": "={{ $env.WHATSAPP_API_URL }}/messages",
+        "url": "=https://graph.facebook.com/v18.0/875127749019884/messages",
         "method": "POST"
       },
       "id": "send-whatsapp",
@@ -122,7 +112,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Generate summary of the WhatsApp message sent\nconst messageData = $input.all()[0].json;\nconst chatgptResponse = $('Generate Message with ChatGPT').item.json;\n\nconst summary = `WhatsApp message sent to ${messageData.name || 'customer'}.\n\nPhone: ${messageData.phoneNumber}\nEmail: ${messageData.email || 'Not provided'}\nReason: ${messageData.reason || 'General inquiry'}\n\nMessage sent:\n${chatgptResponse.choices[0].message.content}\n\nStatus: Message sent successfully via WhatsApp.\n\nNext steps: Customer can reply via WhatsApp, and you can continue the conversation.`;\n\nreturn {\n  messageId: messageData.messageId || `msg_${Date.now()}`,\n  phoneNumber: messageData.phoneNumber,\n  name: messageData.name,\n  email: messageData.email,\n  reason: messageData.reason,\n  message: chatgptResponse.choices[0].message.content,\n  summary: summary,\n  status: 'sent',\n  timestamp: new Date().toISOString()\n};"
+        "jsCode": "// Generate summary of the WhatsApp message sent\nconst messageData = $input.all()[0].json;\nconst geminiResponse = $('Generate Message with Gemini').item.json;\n\n// Extract message from Gemini response\nconst messageText = geminiResponse.candidates[0].content.parts[0].text;\n\nconst summary = `WhatsApp message sent to ${messageData.name || 'customer'}.\n\nPhone: ${messageData.phoneNumber}\nEmail: ${messageData.email || 'Not provided'}\nReason: ${messageData.reason || 'General inquiry'}\n\nMessage sent:\n${messageText}\n\nStatus: Message sent successfully via WhatsApp.\n\nNext steps: Customer can reply via WhatsApp, and you can continue the conversation.`;\n\nreturn {\n  messageId: messageData.messageId || `msg_${Date.now()}`,\n  phoneNumber: messageData.phoneNumber,\n  name: messageData.name,\n  email: messageData.email,\n  reason: messageData.reason,\n  message: messageText,\n  summary: summary,\n  status: 'sent',\n  timestamp: new Date().toISOString()\n};"
       },
       "id": "generate-summary",
       "name": "Generate Summary",
@@ -144,6 +134,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BACKEND_URL }}/api/call-schedules",
+        "authentication": "none",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('Set Variables').item.json.name || 'Customer' }}\",\n  \"email\": \"{{ $('Set Variables').item.json.email || 'whatsapp-' + $('Set Variables').item.json.phoneNumber.replace(/[^0-9]/g, '') + '@weddingweb.local' }}\",\n  \"phone\": \"{{ $('Set Variables').item.json.phoneNumber }}\",\n  \"preferredDate\": \"{{ $now.toISO().split('T')[0] }}\",\n  \"message\": \"Customer inquiry via WhatsApp: {{ $('Set Variables').item.json.reason }}\",\n  \"source\": \"whatsapp-bot\"\n}",
+        "options": {}
+      },
+      "id": "save-call-schedule",
+      "name": "Save to Call Schedules",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 500]
     },
     {
       "parameters": {
@@ -174,14 +179,14 @@
       "main": [
         [
           {
-            "node": "Generate Message with ChatGPT",
+            "node": "Generate Message with Gemini",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate Message with ChatGPT": {
+    "Generate Message with Gemini": {
       "main": [
         [
           {
@@ -215,6 +220,22 @@
       ]
     },
     "Send Summary to Backend": {
+      "main": [
+        [
+          {
+            "node": "Save to Call Schedules",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Call Schedules": {
       "main": [
         [
           {
