@@ -1,21 +1,35 @@
-// This AuthContext has been modified to work with the new in-memory backend authentication.
-// User data will not be persistent across server restarts.
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
+import type { Session, SignUpResponse } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+interface ProfilePayload {
+  full_name?: string | null;
+  location?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+}
 
 interface User {
   id: string;
-  username: string;
-  role: string;
   email?: string | null;
+  profile?: ProfilePayload | null;
 }
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  signup: (username: string, password: string, role: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<SignUpResponse>;
   logout: () => Promise<void>;
+  refreshProfile?: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,86 +46,78 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const mapSessionToUser = (session: Session | null): User | null => {
+  if (!session) {
+    return null;
+  }
+
+  const metadata = session.user.user_metadata as ProfilePayload | undefined;
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    profile: metadata ?? null,
+  };
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      // In a real app, you would verify the token with the backend
-      // For this in-memory setup, we'll just decode it (not secure for production)
-      try {
-        const decodedUser = JSON.parse(atob(token.split('.')[1]));
-        setCurrentUser(decodedUser);
-      } catch (error) {
-        console.error('Failed to decode token:', error);
-        localStorage.removeItem('accessToken');
-      }
-    }
-    setLoading(false);
+  const hydrateUser = useCallback(async (session: Session | null) => {
+    setCurrentUser(mapSessionToUser(session));
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ identifier: email, password }),
+  const refreshProfile = useCallback(async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    setCurrentUser(mapSessionToUser(session));
+  }, []);
+  useEffect(() => {
+    let mounted = true;
+
+    const initialize = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!mounted) {
+        return;
+      }
+
+      await hydrateUser(session);
+      setLoading(false);
+    };
+
+    initialize();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      hydrateUser(session);
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [hydrateUser]);
+
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      throw error;
     }
-
-    const data = await response.json();
-    const accessToken = data.accessToken || data.token;
-
-    if (!accessToken) {
-      throw new Error('Authentication token missing. Please try again.');
-    }
-
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('token', accessToken);
-
-    if (typeof document !== 'undefined') {
-      const secureFlag = process.env.NODE_ENV === 'production' ? 'Secure; ' : '';
-      document.cookie = `weddingweb_token=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; ${secureFlag}`;
-    }
-
-    const decodedUser = JSON.parse(atob(accessToken.split('.')[1]));
-    setCurrentUser(decodedUser);
   };
 
-  const signup = async (username: string, password: string, role: string) => {
-    const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password, role }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Signup failed');
+  const signup = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      throw error;
     }
-
-    const data = await response.json();
-    // For signup, we don't automatically log in, just return success
-    console.log('User registered:', data);
+    return data;
   };
 
   const logout = async () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('token');
-    if (typeof document !== 'undefined') {
-      document.cookie = 'weddingweb_token=; path=/; max-age=0; SameSite=Lax;';
-    }
+    await supabase.auth.signOut();
     setCurrentUser(null);
   };
 
@@ -121,6 +127,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     logout,
+    refreshProfile,
+    resetPassword: async (email: string) => {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+    },
   };
 
   return (

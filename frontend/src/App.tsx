@@ -42,6 +42,10 @@ import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
 import CompanyLanding from "./pages/company/LandingMinimal";
+import CompanyLogin from "./pages/company/Login";
+import CompanySignup from "./pages/company/Signup";
+import CompanyAccount from "./pages/company/Account";
+import CompanyForgotPassword from "./pages/company/ForgotPassword";
 import CompanyAbout from "./pages/company/About";
 import CompanyServices from "./pages/company/Services";
 import CompanyPricing from "./pages/company/Pricing";
@@ -182,8 +186,12 @@ const App = () => {
           )}
             <AnimatePresence mode="wait">
               <Routes>
-              {/* Company Routes */}
-              <Route path="/company" element={<CompanyLanding />} />
+            {/* Company Routes */}
+            <Route path="/company/login" element={<CompanyLogin />} />
+            <Route path="/company/signup" element={<CompanySignup />} />
+            <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
+            <Route path="/company/account" element={<CompanyAccount />} />
+            <Route path="/company" element={<CompanyLanding />} />
               <Route path="/company/about" element={<CompanyAbout />} />
               <Route path="/company/services" element={<CompanyServices />} />
               <Route path="/company/pricing" element={<CompanyPricing />} />

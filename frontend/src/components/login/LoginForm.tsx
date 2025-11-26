@@ -99,7 +99,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
           </div>
 
           <div className="flex items-center justify-between text-sm text-white/70">
-            <Link to="/forgot-password" className="font-medium text-white underline-offset-4 hover:text-rose-200">
+          <Link to="/company/forgot-password" className="font-medium text-white underline-offset-4 hover:text-rose-200">
               Forgot password?
             </Link>
             <span className="text-xs uppercase tracking-[0.2em]">Secure</span>
@@ -116,7 +116,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
 
         <p className="text-center text-sm text-white/70">
           Don’t have an account?{" "}
-          <Link to="/company/contact" className="font-semibold text-rose-200 underline-offset-2 hover:text-white">
+          <Link to="/company/signup" className="font-semibold text-rose-200 underline-offset-2 hover:text-white">
             Sign up
           </Link>
         </p>
