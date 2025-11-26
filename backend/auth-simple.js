@@ -1,8 +1,3 @@
-/**
- * Simple Authentication Router
- * Basic auth without RPC functions - works with minimal users table
- */
-
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -10,52 +5,68 @@ const jwt = require('jsonwebtoken');
 const { supabase } = require('./lib/supabase');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
 
 /**
- * POST /api/auth/login
- * Simple login with just username/password check
+ * Helper: Lookup a user by either username or email
  */
+const findUserByField = async (field, value) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, username, password, role, email')
+    .eq(field, value)
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') {
+    throw error;
+  }
+
+  return data;
+};
+
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const identifier = (req.body.identifier || req.body.email || req.body.username || '').trim();
+    const password = req.body.password;
     
-    console.log('🔐 Login attempt for username:', username);
+    console.log('🔐 Login attempt for identifier:', identifier);
     
-    if (!username || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({ 
-        message: 'Username and password are required' 
+        message: 'Email/username and password are required' 
       });
     }
     
-    // Get user from database
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, username, password, role')
-      .eq('username', username)
-      .single();
-    
-    if (error || !user) {
-      console.log('❌ User not found:', username);
+    let user = await findUserByField('username', identifier);
+    if (!user) {
+      user = await findUserByField('email', identifier);
+    }
+
+    if (!user) {
+      console.log('❌ User not found:', identifier);
       return res.status(401).json({ 
         message: 'Invalid credentials' 
       });
     }
     
-    console.log('✅ User found:', username, '| Role:', user.role);
+    console.log('✅ User found:', user.username, '| Role:', user.role);
     
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
     
     if (!isValidPassword) {
-      console.log('❌ Invalid password for:', username);
+      console.log('❌ Invalid password for:', identifier);
       return res.status(401).json({ 
         message: 'Invalid credentials' 
       });
     }
     
-    console.log('✅ Password verified for:', username);
-    
-    // Generate JWT token
     const token = jwt.sign(
       { 
         id: user.id, 
@@ -63,22 +74,24 @@ router.post('/login', async (req, res) => {
         role: user.role 
       },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
+
+    res.cookie('weddingweb_token', token, cookieOptions);
     
-    console.log('✅ Login successful for:', username);
+    console.log('✅ Login successful for:', identifier);
     
     res.json({
       message: 'Login successful',
       accessToken: token,
-      token, // Keep for backwards compatibility
+      token,
       user: {
         id: user.id,
         username: user.username,
-        role: user.role
+        role: user.role,
+        email: user.email || null
       }
     });
-    
   } catch (error) {
     console.error('❌ Login error:', error);
     res.status(500).json({ 
@@ -94,7 +107,7 @@ router.post('/login', async (req, res) => {
  */
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, role = 'user' } = req.body;
+    const { username, password, role = 'user', email } = req.body;
     
     if (!username || !password) {
       return res.status(400).json({ 
@@ -112,7 +125,8 @@ router.post('/register', async (req, res) => {
         {
           username,
           password: hashedPassword,
-          role
+          role,
+          email: email || null
         }
       ])
       .select()

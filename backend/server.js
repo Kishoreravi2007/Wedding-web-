@@ -125,6 +125,10 @@ app.use('/api/process-faces', processFacesRouter);
 const liveSyncRouter = require('./routes/live-sync');
 app.use('/api/live', liveSyncRouter);
 
+// Premium membership & builder routes
+const premiumRouter = require('./routes/premium');
+app.use('/api/premium', premiumRouter);
+
 // Face recognition endpoint (for photo booth feature)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });

@@ -1,3 +1,4 @@
+import PremiumCheckout from "./pages/premium/PremiumCheckout";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { useLocation } from "react-router-dom";
 
 import Index from "./pages/Index";
+import LoginPage from "./pages/login/page";
 import NotFound from "./pages/NotFound";
 
 import ParvathyLayout from "./pages/sister-a/Layout";
@@ -220,6 +222,8 @@ const App = () => {
               } />
               <Route path="/" element={<Index />} />
               <Route path="/wishes" element={<Wishes />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/premium" element={<PremiumCheckout />} />
 
               {/* Wedding Site Routes */}
               <Route path="/parvathy" element={<ParvathyLayout />}>

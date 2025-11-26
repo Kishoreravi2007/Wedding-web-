@@ -1,0 +1,129 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+interface LoginFormProps {
+  redirectTo?: string;
+}
+
+const emailPattern = /^\S+@\S+\.\S+$/;
+
+const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage(null);
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage("Please enter your email and password.");
+      return;
+    }
+
+    if (!emailPattern.test(email.trim())) {
+      setErrorMessage("Please provide a valid email address.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await login(email.trim(), password);
+      navigate(redirectTo || "/", { replace: true });
+    } catch (error: any) {
+      setErrorMessage(error?.message || "Unable to sign you in right now.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Card className="bg-white/5 border border-white/30 shadow-[0_20px_120px_rgba(12,12,55,0.8)] backdrop-blur-xl">
+      <CardHeader className="space-y-3 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20 shadow-lg">
+          <img src="/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
+        </div>
+        <CardTitle className="text-3xl font-semibold text-white">Sign in to Wedding Web</CardTitle>
+        <p className="text-sm uppercase tracking-[0.3em] text-white/70">
+          Premium builder dashboard
+        </p>
+      </CardHeader>
+
+      <CardContent className="space-y-6 pt-2">
+        {errorMessage && (
+          <Alert variant="destructive" className="text-sm">
+            <AlertTitle className="text-base">Login failed</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <Label htmlFor="email" className="text-sm text-white/70">
+              Email address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              className="bg-white/10 text-white placeholder:text-white/50"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="password" className="text-sm text-white/70">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+              className="bg-white/10 text-white placeholder:text-white/50"
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-sm text-white/70">
+            <Link to="/forgot-password" className="font-medium text-white underline-offset-4 hover:text-rose-200">
+              Forgot password?
+            </Link>
+            <span className="text-xs uppercase tracking-[0.2em]">Secure</span>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-600 text-white font-semibold tracking-wide shadow-2xl shadow-rose-800/70"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Signing in…" : "Login"}
+          </Button>
+        </form>
+
+        <p className="text-center text-sm text-white/70">
+          Don’t have an account?{" "}
+          <Link to="/company/contact" className="font-semibold text-rose-200 underline-offset-2 hover:text-white">
+            Sign up
+          </Link>
+        </p>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default LoginForm;
+
