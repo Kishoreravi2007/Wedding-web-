@@ -31,6 +31,10 @@ import {
   Star
 } from "lucide-react";
 import { useState } from "react";
+import StreamingQualityModal, {
+  StreamingQuality,
+  streamingBasePrices
+} from "@/components/StreamingQualityModal";
 
 interface PricingFeature {
   id: string;
@@ -99,9 +103,9 @@ const pricingFeatures: PricingFeature[] = [
   },
   {
     id: 'live-streaming',
-    name: 'Live Streaming (HD)',
-    description: 'HD live streaming for up to 500 concurrent viewers',
-    basePrice: 6999,
+    name: 'Live Streaming',
+    description: 'Flexible live streaming with HD or 4K options',
+    basePrice: 0,
     icon: <Video className="w-5 h-5" />,
     category: 'features'
   },
@@ -187,14 +191,6 @@ const pricingFeatures: PricingFeature[] = [
     description: '24/7 priority customer support with dedicated manager',
     basePrice: 3999,
     icon: <Shield className="w-5 h-5" />,
-    category: 'addons'
-  },
-  {
-    id: 'extended-storage',
-    name: 'Extended Storage (5 years)',
-    description: 'Keep all photos accessible for 5 years',
-    basePrice: 4999,
-    icon: <Cloud className="w-5 h-5" />,
     category: 'addons'
   },
   {
@@ -306,6 +302,8 @@ const Pricing = () => {
   const [couponStatus, setCouponStatus] = useState<CouponStatus>('idle');
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [storageExtraGB, setStorageExtraGB] = useState(0);
+  const [selectedStreamingQuality, setSelectedStreamingQuality] = useState<StreamingQuality>('HD');
+  const [isStreamingModalOpen, setStreamingModalOpen] = useState(false);
 
   const STORAGE_STEP = 5;
   const STORAGE_RATE_PER_GB = 20;
@@ -342,16 +340,59 @@ const Pricing = () => {
     return Math.round(storageExtraGB * STORAGE_RATE_PER_GB * durationMultipliers[duration]);
   };
 
+  const getFeatureBasePrice = (feature: PricingFeature) => {
+    if (feature.id === "live-streaming") {
+      return streamingBasePrices[selectedStreamingQuality];
+    }
+    return feature.basePrice;
+  };
+
+  const calculateFeatureDisplayPrice = (feature: PricingFeature) => {
+    return calculatePrice(getFeatureBasePrice(feature), duration);
+  };
+
   const calculateSubtotal = () => {
     let subtotal = 0;
     selectedFeatures.forEach((featureId) => {
       const feature = pricingFeatures.find((f) => f.id === featureId);
       if (feature) {
-        subtotal += calculatePrice(feature.basePrice, duration);
+        subtotal += calculateFeatureDisplayPrice(feature);
       }
     });
     subtotal += getStorageExtraDurationCost();
     return subtotal;
+  };
+
+  const openStreamingModal = () => {
+    setStreamingModalOpen(true);
+  };
+
+  const closeStreamingModal = () => {
+    setStreamingModalOpen(false);
+  };
+
+  const handleStreamingQualitySelect = (quality: StreamingQuality) => {
+    setSelectedStreamingQuality(quality);
+    setSelectedFeatures((prev) => {
+      const updated = new Set(prev);
+      updated.add('live-streaming');
+      return updated;
+    });
+    closeStreamingModal();
+  };
+
+  const handleLiveStreamingCheckboxChange = (
+    checked: true | false | "indeterminate",
+  ) => {
+    if (checked === true) {
+      openStreamingModal();
+      return;
+    }
+    if (checked === false) {
+      const updated = new Set(selectedFeatures);
+      updated.delete('live-streaming');
+      setSelectedFeatures(updated);
+    }
   };
 
   const handleApplyCoupon = () => {
@@ -370,7 +411,7 @@ const Pricing = () => {
     selectedFeatures.forEach((featureId) => {
       const feature = pricingFeatures.find((f) => f.id === featureId);
       if (feature) {
-        base += feature.basePrice;
+        base += getFeatureBasePrice(feature);
       }
     });
     return base;
@@ -439,7 +480,7 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
                   {getFeaturesByCategory('core').map((feature) => {
-                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    const displayPrice = calculateFeatureDisplayPrice(feature);
                     return (
                       <div
                         key={feature.id}
@@ -545,7 +586,7 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
                   {getFeaturesByCategory('features').map((feature) => {
-                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    const displayPrice = calculateFeatureDisplayPrice(feature);
                     return (
                       <div
                         key={feature.id}
@@ -554,11 +595,28 @@ const Pricing = () => {
                             ? 'border-purple-500 bg-purple-50 shadow-md'
                             : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
                         }`}
-                        onClick={() => toggleFeature(feature.id)}
+                        onClick={() => {
+                          if (feature.id === 'live-streaming') {
+                            openStreamingModal();
+                            return;
+                          }
+                          toggleFeature(feature.id);
+                        }}
                       >
                         <Checkbox
                           checked={selectedFeatures.has(feature.id)}
-                          onCheckedChange={() => toggleFeature(feature.id)}
+                          onCheckedChange={(checked) => {
+                            if (feature.id === 'live-streaming') {
+                              handleLiveStreamingCheckboxChange(checked);
+                            } else {
+                              toggleFeature(feature.id);
+                            }
+                          }}
+                          onClick={(event) => {
+                            if (feature.id === 'live-streaming') {
+                              event.stopPropagation();
+                            }
+                          }}
                           className="mt-1"
                         />
                         <div className="flex-1">
@@ -570,6 +628,11 @@ const Pricing = () => {
                             )}
                           </div>
                           <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          {feature.id === 'live-streaming' && selectedFeatures.has('live-streaming') && (
+                            <p className="text-[12px] font-semibold text-slate-700">
+                              Selected: Live Streaming ({selectedStreamingQuality})
+                            </p>
+                          )}
                           <motion.p
                             key={`feature-${feature.id}-${duration}`}
                             initial={{ opacity: 0, y: 6 }}
@@ -604,7 +667,7 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
                   {getFeaturesByCategory('premium').map((feature) => {
-                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    const displayPrice = calculateFeatureDisplayPrice(feature);
                     return (
                       <div
                         key={feature.id}
@@ -659,7 +722,7 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
                   {getFeaturesByCategory('addons').map((feature) => {
-                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    const displayPrice = calculateFeatureDisplayPrice(feature);
                     return (
                       <div
                         key={feature.id}
@@ -730,7 +793,11 @@ const Pricing = () => {
                         {Array.from(selectedFeatures).map((featureId) => {
                           const feature = pricingFeatures.find((f) => f.id === featureId);
                           if (!feature) return null;
-                          const displayPrice = calculatePrice(feature.basePrice, duration);
+                          const displayPrice = calculateFeatureDisplayPrice(feature);
+                          const summaryLabel =
+                            feature.id === 'live-streaming'
+                              ? `Live Streaming (${selectedStreamingQuality})`
+                              : feature.name;
                           return (
                             <div
                               key={featureId}
@@ -738,7 +805,7 @@ const Pricing = () => {
                             >
                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                <span className="text-sm font-medium truncate">{feature.name}</span>
+                                <span className="text-sm font-medium truncate">{summaryLabel}</span>
                               </div>
                               <motion.span
                                 key={`summary-${featureId}-${duration}`}
@@ -893,6 +960,12 @@ const Pricing = () => {
           </motion.div>
         </div>
       </section>
+    <StreamingQualityModal
+      isOpen={isStreamingModalOpen}
+      onClose={closeStreamingModal}
+      selectedQuality={selectedStreamingQuality}
+      onSelect={handleStreamingQualitySelect}
+    />
     </div>
   );
 };
