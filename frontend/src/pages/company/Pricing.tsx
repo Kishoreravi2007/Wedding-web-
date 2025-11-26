@@ -56,7 +56,7 @@ const pricingFeatures: PricingFeature[] = [
   {
     id: 'photo-gallery',
     name: 'Photo Gallery',
-    description: 'Unlimited photo storage (up to 100GB) with organized galleries',
+    description: 'Photo storage (up to 15GB) with organized galleries',
     basePrice: 2999,
     icon: <Image className="w-5 h-5" />,
     category: 'core',
@@ -297,9 +297,19 @@ const BillingDurationSelector = ({
   </div>
 );
 
+type CouponStatus = 'idle' | 'applied' | 'invalid';
+
 const Pricing = () => {
   const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
   const [duration, setDuration] = useState<DurationKey>('1M');
+  const [couponCode, setCouponCode] = useState('');
+  const [couponStatus, setCouponStatus] = useState<CouponStatus>('idle');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [storageExtraGB, setStorageExtraGB] = useState(0);
+
+  const STORAGE_STEP = 5;
+  const STORAGE_RATE_PER_GB = 20;
+  const STORAGE_BASE = 15;
 
   const toggleFeature = (featureId: string) => {
     const newSelected = new Set(selectedFeatures);
@@ -309,6 +319,27 @@ const Pricing = () => {
       newSelected.add(featureId);
     }
     setSelectedFeatures(newSelected);
+    if (featureId === 'photo-gallery' && !newSelected.has('photo-gallery')) {
+      setStorageExtraGB(0);
+    }
+  };
+
+  const adjustStorageExtra = (delta: number) => {
+    setSelectedFeatures((prev) => {
+      const updated = new Set(prev);
+      if (!updated.has('photo-gallery')) {
+        updated.add('photo-gallery');
+      }
+      return updated;
+    });
+    setStorageExtraGB((prev) => Math.max(0, prev + delta));
+  };
+
+  const getStorageExtraDurationCost = () => {
+    if (!selectedFeatures.has('photo-gallery') || storageExtraGB === 0) {
+      return 0;
+    }
+    return Math.round(storageExtraGB * STORAGE_RATE_PER_GB * durationMultipliers[duration]);
   };
 
   const calculateSubtotal = () => {
@@ -319,7 +350,19 @@ const Pricing = () => {
         subtotal += calculatePrice(feature.basePrice, duration);
       }
     });
+    subtotal += getStorageExtraDurationCost();
     return subtotal;
+  };
+
+  const handleApplyCoupon = () => {
+    const normalized = couponCode.trim().toLowerCase();
+    if (normalized === 'dridhi') {
+      setCouponDiscount(0.25);
+      setCouponStatus('applied');
+    } else {
+      setCouponDiscount(0);
+      setCouponStatus('invalid');
+    }
   };
 
   const calculateBaseSubtotal = () => {
@@ -333,22 +376,19 @@ const Pricing = () => {
     return base;
   };
 
-  const calculateGST = (subtotalValue: number) => {
-    return Math.round(subtotalValue * 0.18);
-  };
-
   const getFeaturesByCategory = (category: 'core' | 'features' | 'addons' | 'premium') => {
     return pricingFeatures.filter((f) => f.category === category);
   };
 
   const baseSubtotal = calculateBaseSubtotal();
   const subtotal = calculateSubtotal();
-  const gst = calculateGST(subtotal);
-  const total = subtotal + gst;
+  const roundedTotal = Math.max(0, Math.round(subtotal * (1 - couponDiscount)));
+  const total = roundedTotal;
+  const storageExtraDurationCost = getStorageExtraDurationCost();
+  const discountAmount = Math.max(subtotal - total, 0);
   const activeDuration = durationOptions.find((option) => option.key === duration) ?? durationOptions[0];
   const undiscountedSubtotal = Math.round(baseSubtotal * activeDuration.months);
-  const gstWithoutDiscount = Math.round(undiscountedSubtotal * 0.18);
-  const totalWithoutDiscount = undiscountedSubtotal + gstWithoutDiscount;
+  const totalWithoutDiscount = undiscountedSubtotal;
   const savings = Math.max(totalWithoutDiscount - total, 0);
   const showSavings = duration !== '1M' && savings > 0;
 
@@ -424,6 +464,53 @@ const Pricing = () => {
                             )}
                           </div>
                           <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          {feature.id === 'photo-gallery' && (
+                            <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-[13px] text-slate-600">
+                              <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-slate-400">
+                                <span>Storage base</span>
+                                <span className="font-semibold text-slate-800">{STORAGE_BASE} GB included</span>
+                              </div>
+                              <p className="text-[11px] text-slate-500">
+                                Add {STORAGE_STEP} GB blocks at ₹{STORAGE_RATE_PER_GB}/GB (₹{(STORAGE_STEP * STORAGE_RATE_PER_GB).toLocaleString('en-IN')} per block).
+                              </p>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    adjustStorageExtra(-STORAGE_STEP);
+                                  }}
+                                  disabled={storageExtraGB === 0}
+                                  className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
+                                    storageExtraGB === 0
+                                      ? 'cursor-not-allowed border-slate-200 text-slate-400'
+                                      : 'border-rose-300 text-rose-600 hover:border-rose-400'
+                                  }`}
+                                >
+                                  -{STORAGE_STEP} GB
+                                </button>
+                                <span className="text-[12px] font-semibold text-slate-800">
+                                  Extra {storageExtraGB} GB
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    adjustStorageExtra(STORAGE_STEP);
+                                  }}
+                                  className="rounded-full border px-3 py-1 text-[11px] font-semibold text-rose-600 transition border-rose-300 hover:border-rose-400"
+                                >
+                                  +{STORAGE_STEP} GB
+                                </button>
+                              </div>
+                              {storageExtraDurationCost > 0 && (
+                                <p className="text-[12px] text-slate-500">
+                                  Extra storage adds ₹{storageExtraDurationCost.toLocaleString('en-IN')} for this
+                                  duration.
+                                </p>
+                              )}
+                            </div>
+                          )}
                           <motion.p
                             key={`core-${feature.id}-${duration}`}
                             initial={{ opacity: 0, y: 6 }}
@@ -674,13 +761,64 @@ const Pricing = () => {
                               ₹{subtotal.toLocaleString('en-IN')}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-base">
-                            <span className="text-slate-600">GST (18%)</span>
-                            <span className="font-semibold text-slate-800">
-                              ₹{gst.toLocaleString('en-IN')}
-                            </span>
-                          </div>
+                          {storageExtraDurationCost > 0 && (
+                            <div className="flex items-center justify-between text-base text-slate-600">
+                              <span>Extra storage</span>
+                              <span className="font-semibold text-slate-600">
+                                ₹{storageExtraDurationCost.toLocaleString('en-IN')}
+                              </span>
+                            </div>
+                          )}
+                          {couponDiscount > 0 && discountAmount > 0 && (
+                            <div className="flex items-center justify-between text-base text-rose-600">
+                              <span className="text-slate-600">Coupon discount (25%)</span>
+                              <span className="font-semibold text-rose-600">
+                                -₹{discountAmount.toLocaleString('en-IN')}
+                              </span>
+                            </div>
+                          )}
                         </div>
+                      <div className="border-slate-200 rounded-2xl border bg-slate-50/60 p-4 text-sm text-slate-700 shadow-sm">
+                        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-slate-500">
+                          <span>Coupon code</span>
+                          <span className="text-emerald-500">Coming soon perks</span>
+                        </div>
+                        <div className="mt-3 flex gap-2 flex-col sm:flex-row">
+                          <label className="sr-only" htmlFor="pricing-coupon">
+                            Enter coupon code
+                          </label>
+                          <input
+                            id="pricing-coupon"
+                            type="text"
+                            value={couponCode}
+                            onChange={(event) => {
+                              setCouponCode(event.target.value);
+                              setCouponStatus('idle');
+                              setCouponDiscount(0);
+                            }}
+                            placeholder="EG: WEDSAVE100"
+                            className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-100"
+                          />
+                          <Button
+                            size="sm"
+                            className="px-4 py-2 text-[11px] uppercase tracking-wide"
+                            onClick={handleApplyCoupon}
+                          >
+                            Apply
+                          </Button>
+                        </div>
+                        {couponStatus !== 'idle' && (
+                          <p
+                            className={`mt-2 text-[11px] ${
+                              couponStatus === 'applied' ? 'text-emerald-600' : 'text-rose-500'
+                            }`}
+                          >
+                            {couponStatus === 'applied'
+                              ? `Coupon "${couponCode}" applied. Enjoy 25% off!`
+                              : 'Coupon code invalid. Try DRIDHI (case-insensitive).'}
+                          </p>
+                        )}
+                      </div>
                         <div className="border-t-2 border-rose-200 pt-3">
                           <div className="flex items-center justify-between gap-3">
                             <span className="text-lg font-bold text-slate-900">Total Amount</span>
