@@ -7,6 +7,7 @@ interface User {
   id: string;
   username: string;
   role: string;
+  email?: string | null;
 }
 
 interface AuthContextType {
@@ -53,13 +54,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ identifier: email, password }),
     });
 
     if (!response.ok) {
@@ -68,9 +69,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     const data = await response.json();
-    localStorage.setItem('accessToken', data.accessToken);
-    // Decode token to get user info (for demonstration, not secure for production)
-    const decodedUser = JSON.parse(atob(data.accessToken.split('.')[1]));
+    const accessToken = data.accessToken || data.token;
+
+    if (!accessToken) {
+      throw new Error('Authentication token missing. Please try again.');
+    }
+
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('token', accessToken);
+
+    if (typeof document !== 'undefined') {
+      const secureFlag = process.env.NODE_ENV === 'production' ? 'Secure; ' : '';
+      document.cookie = `weddingweb_token=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; ${secureFlag}`;
+    }
+
+    const decodedUser = JSON.parse(atob(accessToken.split('.')[1]));
     setCurrentUser(decodedUser);
   };
 
@@ -95,6 +108,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    if (typeof document !== 'undefined') {
+      document.cookie = 'weddingweb_token=; path=/; max-age=0; SameSite=Lax;';
+    }
     setCurrentUser(null);
   };
 

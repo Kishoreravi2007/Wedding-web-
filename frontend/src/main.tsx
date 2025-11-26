@@ -4,6 +4,7 @@ import App from './App.tsx'
 import './globals.css'
 import './i18n.ts'
 import { MusicPlayerProvider } from './contexts/MusicPlayerContext.tsx'; // Import the provider
+import { AuthProvider } from './contexts/AuthContext';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -20,7 +21,9 @@ const Root = () => {
   return (
     <React.StrictMode>
       <MusicPlayerProvider initialTrackIndex={initialMusicTrack}>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MusicPlayerProvider>
     </React.StrictMode>
   );
