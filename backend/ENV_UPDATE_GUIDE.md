@@ -42,7 +42,8 @@ N8N_WEBHOOK_URL=https://weddingweb.app.n8n.cloud/webhook/trigger-whatsapp
 - `N8N_WEBHOOK_URL` - Change from `trigger-call` to `trigger-whatsapp`
 
 ### ❌ NOT Needed in Backend .env:
-- `OPENAI_API_KEY` - Configure this in **n8n** (not backend .env)
+- `GEMINI_API_KEY` - Configure this in **n8n** environment variables (not backend .env)
+- `OPENAI_API_KEY` - Not needed (using Gemini now)
 - `WHATSAPP_API_URL` - Configure this in **n8n** (not backend .env)
 - `WHATSAPP_API_KEY` - Configure this in **n8n** (not backend .env)
 

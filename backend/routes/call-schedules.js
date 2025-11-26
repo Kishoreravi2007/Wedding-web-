@@ -48,10 +48,13 @@ router.post('/', async (req, res) => {
       source
     } = req.body;
 
-    if (!name || !email || !preferredDate) {
+    // Make preferredDate optional - default to today if not provided
+    const defaultDate = preferredDate || new Date().toISOString().split('T')[0];
+    
+    if (!name || !email) {
       return res.status(400).json({
         success: false,
-        error: 'Name, email, and preferred date are required'
+        error: 'Name and email are required'
       });
     }
 
@@ -62,7 +65,7 @@ router.post('/', async (req, res) => {
           name,
           email,
           phone: phone || null,
-          preferred_date: preferredDate,
+          preferred_date: defaultDate,
           preferred_time: preferredTime || null,
           timezone: timezone || null,
           message: message || null,

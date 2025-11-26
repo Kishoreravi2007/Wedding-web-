@@ -36,7 +36,7 @@ interface PricingFeature {
   id: string;
   name: string;
   description: string;
-  price: number;
+  basePrice: number;
   icon: React.ReactNode;
   category: 'core' | 'features' | 'addons' | 'premium';
   popular?: boolean;
@@ -48,7 +48,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'website',
     name: 'Wedding Website',
     description: 'Beautiful, responsive wedding website with custom domain',
-    price: 4999,
+    basePrice: 4999,
     icon: <Globe className="w-5 h-5" />,
     category: 'core',
     popular: true
@@ -57,7 +57,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'photo-gallery',
     name: 'Photo Gallery',
     description: 'Unlimited photo storage (up to 100GB) with organized galleries',
-    price: 2999,
+    basePrice: 2999,
     icon: <Image className="w-5 h-5" />,
     category: 'core',
     popular: true
@@ -66,7 +66,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'event-schedule',
     name: 'Event Schedule',
     description: 'Interactive timeline with multiple events and RSVP',
-    price: 1999,
+    basePrice: 1999,
     icon: <Calendar className="w-5 h-5" />,
     category: 'core'
   },
@@ -74,7 +74,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'wishes',
     name: 'Digital Wishes',
     description: 'Guest wish collection with moderation and display',
-    price: 1499,
+    basePrice: 1499,
     icon: <MessageSquare className="w-5 h-5" />,
     category: 'core'
   },
@@ -82,7 +82,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'music-player',
     name: 'Music Player',
     description: 'Background music player with custom playlist',
-    price: 999,
+    basePrice: 999,
     icon: <Music className="w-5 h-5" />,
     category: 'core'
   },
@@ -92,7 +92,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'face-detection',
     name: 'AI Face Detection',
     description: 'Smart face recognition - guests find their photos instantly',
-    price: 4999,
+    basePrice: 4999,
     icon: <Sparkles className="w-5 h-5" />,
     category: 'features',
     popular: true
@@ -101,7 +101,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'live-streaming',
     name: 'Live Streaming (HD)',
     description: 'HD live streaming for up to 500 concurrent viewers',
-    price: 6999,
+    basePrice: 6999,
     icon: <Video className="w-5 h-5" />,
     category: 'features'
   },
@@ -109,7 +109,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'photographer-portal',
     name: 'Photographer Portal',
     description: 'Dedicated portal for photographers to upload & manage photos',
-    price: 3999,
+    basePrice: 3999,
     icon: <Camera className="w-5 h-5" />,
     category: 'features'
   },
@@ -117,7 +117,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'live-sync',
     name: 'Live Photo Sync',
     description: 'Real-time photo upload from cameras via desktop app',
-    price: 5999,
+    basePrice: 5999,
     icon: <Radio className="w-5 h-5" />,
     category: 'features'
   },
@@ -125,7 +125,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'photo-booth',
     name: 'Photo Booth',
     description: 'Interactive photo booth with instant sharing',
-    price: 3499,
+    basePrice: 3499,
     icon: <Camera className="w-5 h-5" />,
     category: 'features'
   },
@@ -133,7 +133,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'guest-management',
     name: 'Guest Management',
     description: 'Guest list management with RSVP tracking',
-    price: 2499,
+    basePrice: 2499,
     icon: <Users className="w-5 h-5" />,
     category: 'features'
   },
@@ -141,7 +141,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'notifications',
     name: 'Push Notifications',
     description: 'Send updates and reminders to guests',
-    price: 1999,
+    basePrice: 1999,
     icon: <Bell className="w-5 h-5" />,
     category: 'features'
   },
@@ -151,7 +151,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'custom-branding',
     name: 'Custom Branding',
     description: 'Fully customized design, colors, fonts, and logo',
-    price: 8999,
+    basePrice: 8999,
     icon: <Heart className="w-5 h-5" />,
     category: 'premium'
   },
@@ -159,7 +159,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'custom-domain',
     name: 'Custom Domain',
     description: 'Use your own domain (e.g., ourwedding.com)',
-    price: 1999,
+    basePrice: 1999,
     icon: <Globe className="w-5 h-5" />,
     category: 'premium'
   },
@@ -167,7 +167,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'mobile-app',
     name: 'Mobile App',
     description: 'Native iOS & Android app for your wedding',
-    price: 14999,
+    basePrice: 14999,
     icon: <Smartphone className="w-5 h-5" />,
     category: 'premium'
   },
@@ -175,7 +175,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'analytics',
     name: 'Advanced Analytics',
     description: 'Detailed insights, engagement reports, and visitor stats',
-    price: 2999,
+    basePrice: 2999,
     icon: <FileText className="w-5 h-5" />,
     category: 'premium'
   },
@@ -185,7 +185,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'priority-support',
     name: 'Priority Support',
     description: '24/7 priority customer support with dedicated manager',
-    price: 3999,
+    basePrice: 3999,
     icon: <Shield className="w-5 h-5" />,
     category: 'addons'
   },
@@ -193,7 +193,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'extended-storage',
     name: 'Extended Storage (5 years)',
     description: 'Keep all photos accessible for 5 years',
-    price: 4999,
+    basePrice: 4999,
     icon: <Cloud className="w-5 h-5" />,
     category: 'addons'
   },
@@ -201,7 +201,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'backup-restore',
     name: 'Backup & Restore',
     description: 'Automatic backups and easy data restoration',
-    price: 2499,
+    basePrice: 2499,
     icon: <Download className="w-5 h-5" />,
     category: 'addons'
   },
@@ -209,7 +209,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'email-marketing',
     name: 'Email Marketing',
     description: 'Send beautiful email invitations and updates',
-    price: 2999,
+    basePrice: 2999,
     icon: <Mail className="w-5 h-5" />,
     category: 'addons'
   },
@@ -217,7 +217,7 @@ const pricingFeatures: PricingFeature[] = [
     id: 'sms-notifications',
     name: 'SMS Notifications',
     description: 'Send SMS updates to guests (1000 messages)',
-    price: 1999,
+    basePrice: 1999,
     icon: <Phone className="w-5 h-5" />,
     category: 'addons'
   },
@@ -225,14 +225,81 @@ const pricingFeatures: PricingFeature[] = [
     id: 'gift-registry',
     name: 'Gift Registry',
     description: 'Create and manage your wedding gift registry',
-    price: 3499,
+    basePrice: 3499,
     icon: <Gift className="w-5 h-5" />,
     category: 'addons'
   }
 ];
 
+type DurationKey = '1M' | '3M' | '6M' | '8M' | '12M';
+
+const durationMultipliers: Record<DurationKey, number> = {
+  '1M': 1,
+  '3M': 2.5,
+  '6M': 4.5,
+  '8M': 5.5,
+  '12M': 7
+};
+
+interface DurationOption {
+  key: DurationKey;
+  label: string;
+  months: number;
+  multiplier: number;
+}
+
+const durationOptions: DurationOption[] = [
+  { key: '1M', label: '1 Month', months: 1, multiplier: durationMultipliers['1M'] },
+  { key: '3M', label: '3 Months', months: 3, multiplier: durationMultipliers['3M'] },
+  { key: '6M', label: '6 Months', months: 6, multiplier: durationMultipliers['6M'] },
+  { key: '8M', label: '8 Months', months: 8, multiplier: durationMultipliers['8M'] },
+  { key: '12M', label: '12 Months', months: 12, multiplier: durationMultipliers['12M'] }
+];
+
+const calculatePrice = (basePrice: number, duration: DurationKey) => {
+  const multiplier = durationMultipliers[duration];
+  return Math.round(basePrice * multiplier);
+};
+
+const BillingDurationSelector = ({
+  selectedDuration,
+  onChange
+}: {
+  selectedDuration: DurationKey;
+  onChange: (duration: DurationKey) => void;
+}) => (
+  <div className="w-full max-w-md">
+    <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
+      <span>Billing Duration</span>
+      <span className="text-xs text-slate-400">Auto-applied discounts</span>
+    </div>
+    <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {durationOptions.map((option) => {
+        const isActive = option.key === selectedDuration;
+        return (
+          <button
+            type="button"
+            key={option.key}
+            aria-pressed={isActive}
+            onClick={() => onChange(option.key)}
+            className={`flex flex-col items-center justify-center gap-1 rounded-xl border px-3 py-2 text-center text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-500 ${
+              isActive
+                ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-inner'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-rose-300'
+            }`}
+          >
+            <span className="text-[13px] leading-tight">{option.label}</span>
+            <span className="text-[10px] text-slate-400">{option.multiplier}x</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 const Pricing = () => {
   const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
+  const [duration, setDuration] = useState<DurationKey>('1M');
 
   const toggleFeature = (featureId: string) => {
     const newSelected = new Set(selectedFeatures);
@@ -249,29 +316,41 @@ const Pricing = () => {
     selectedFeatures.forEach((featureId) => {
       const feature = pricingFeatures.find((f) => f.id === featureId);
       if (feature) {
-        subtotal += feature.price;
+        subtotal += calculatePrice(feature.basePrice, duration);
       }
     });
     return subtotal;
   };
 
-  const calculateGST = (subtotal: number) => {
-    return Math.round(subtotal * 0.18);
+  const calculateBaseSubtotal = () => {
+    let base = 0;
+    selectedFeatures.forEach((featureId) => {
+      const feature = pricingFeatures.find((f) => f.id === featureId);
+      if (feature) {
+        base += feature.basePrice;
+      }
+    });
+    return base;
   };
 
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const gst = calculateGST(subtotal);
-    return subtotal + gst;
+  const calculateGST = (subtotalValue: number) => {
+    return Math.round(subtotalValue * 0.18);
   };
 
   const getFeaturesByCategory = (category: 'core' | 'features' | 'addons' | 'premium') => {
     return pricingFeatures.filter((f) => f.category === category);
   };
 
+  const baseSubtotal = calculateBaseSubtotal();
   const subtotal = calculateSubtotal();
   const gst = calculateGST(subtotal);
-  const total = calculateTotal();
+  const total = subtotal + gst;
+  const activeDuration = durationOptions.find((option) => option.key === duration) ?? durationOptions[0];
+  const undiscountedSubtotal = Math.round(baseSubtotal * activeDuration.months);
+  const gstWithoutDiscount = Math.round(undiscountedSubtotal * 0.18);
+  const totalWithoutDiscount = undiscountedSubtotal + gstWithoutDiscount;
+  const savings = Math.max(totalWithoutDiscount - total, 0);
+  const showSavings = duration !== '1M' && savings > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
@@ -319,36 +398,45 @@ const Pricing = () => {
                   <p className="text-slate-600 mt-2">Essential features for your wedding website</p>
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
-                  {getFeaturesByCategory('core').map((feature) => (
-                    <div
-                      key={feature.id}
-                      className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                        selectedFeatures.has(feature.id)
-                          ? 'border-rose-500 bg-rose-50 shadow-md'
-                          : 'border-slate-200 hover:border-rose-300 hover:bg-rose-50/50'
-                      }`}
-                      onClick={() => toggleFeature(feature.id)}
-                    >
-                      <Checkbox
-                        checked={selectedFeatures.has(feature.id)}
-                        onCheckedChange={() => toggleFeature(feature.id)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="text-rose-500">{feature.icon}</div>
-                          <h3 className="font-semibold text-lg">{feature.name}</h3>
-                          {feature.popular && (
-                            <Badge className="bg-rose-500 text-white text-xs">Popular</Badge>
-                          )}
+                  {getFeaturesByCategory('core').map((feature) => {
+                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    return (
+                      <div
+                        key={feature.id}
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                          selectedFeatures.has(feature.id)
+                            ? 'border-rose-500 bg-rose-50 shadow-md'
+                            : 'border-slate-200 hover:border-rose-300 hover:bg-rose-50/50'
+                        }`}
+                        onClick={() => toggleFeature(feature.id)}
+                      >
+                        <Checkbox
+                          checked={selectedFeatures.has(feature.id)}
+                          onCheckedChange={() => toggleFeature(feature.id)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="text-rose-500">{feature.icon}</div>
+                            <h3 className="font-semibold text-lg">{feature.name}</h3>
+                            {feature.popular && (
+                              <Badge className="bg-rose-500 text-white text-xs">Popular</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          <motion.p
+                            key={`core-${feature.id}-${duration}`}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xl font-bold text-rose-600"
+                          >
+                            ₹{displayPrice.toLocaleString('en-IN')}
+                          </motion.p>
                         </div>
-                        <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
-                        <p className="text-xl font-bold text-rose-600">
-                          ₹{feature.price.toLocaleString('en-IN')}
-                        </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             </motion.div>
@@ -369,36 +457,45 @@ const Pricing = () => {
                   <p className="text-slate-600 mt-2">Powerful features to enhance your wedding experience</p>
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
-                  {getFeaturesByCategory('features').map((feature) => (
-                    <div
-                      key={feature.id}
-                      className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                        selectedFeatures.has(feature.id)
-                          ? 'border-purple-500 bg-purple-50 shadow-md'
-                          : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
-                      }`}
-                      onClick={() => toggleFeature(feature.id)}
-                    >
-                      <Checkbox
-                        checked={selectedFeatures.has(feature.id)}
-                        onCheckedChange={() => toggleFeature(feature.id)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="text-purple-500">{feature.icon}</div>
-                          <h3 className="font-semibold text-lg">{feature.name}</h3>
-                          {feature.popular && (
-                            <Badge className="bg-purple-500 text-white text-xs">Popular</Badge>
-                          )}
+                  {getFeaturesByCategory('features').map((feature) => {
+                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    return (
+                      <div
+                        key={feature.id}
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                          selectedFeatures.has(feature.id)
+                            ? 'border-purple-500 bg-purple-50 shadow-md'
+                            : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
+                        }`}
+                        onClick={() => toggleFeature(feature.id)}
+                      >
+                        <Checkbox
+                          checked={selectedFeatures.has(feature.id)}
+                          onCheckedChange={() => toggleFeature(feature.id)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="text-purple-500">{feature.icon}</div>
+                            <h3 className="font-semibold text-lg">{feature.name}</h3>
+                            {feature.popular && (
+                              <Badge className="bg-purple-500 text-white text-xs">Popular</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          <motion.p
+                            key={`feature-${feature.id}-${duration}`}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xl font-bold text-purple-600"
+                          >
+                            ₹{displayPrice.toLocaleString('en-IN')}
+                          </motion.p>
                         </div>
-                        <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
-                        <p className="text-xl font-bold text-purple-600">
-                          ₹{feature.price.toLocaleString('en-IN')}
-                        </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             </motion.div>
@@ -419,33 +516,42 @@ const Pricing = () => {
                   <p className="text-slate-600 mt-2">Premium features for an extraordinary wedding experience</p>
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
-                  {getFeaturesByCategory('premium').map((feature) => (
-                    <div
-                      key={feature.id}
-                      className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                        selectedFeatures.has(feature.id)
-                          ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                          : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
-                      }`}
-                      onClick={() => toggleFeature(feature.id)}
-                    >
-                      <Checkbox
-                        checked={selectedFeatures.has(feature.id)}
-                        onCheckedChange={() => toggleFeature(feature.id)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="text-indigo-500">{feature.icon}</div>
-                          <h3 className="font-semibold text-lg">{feature.name}</h3>
+                  {getFeaturesByCategory('premium').map((feature) => {
+                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    return (
+                      <div
+                        key={feature.id}
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                          selectedFeatures.has(feature.id)
+                            ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                            : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
+                        }`}
+                        onClick={() => toggleFeature(feature.id)}
+                      >
+                        <Checkbox
+                          checked={selectedFeatures.has(feature.id)}
+                          onCheckedChange={() => toggleFeature(feature.id)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="text-indigo-500">{feature.icon}</div>
+                            <h3 className="font-semibold text-lg">{feature.name}</h3>
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          <motion.p
+                            key={`premium-${feature.id}-${duration}`}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xl font-bold text-indigo-600"
+                          >
+                            ₹{displayPrice.toLocaleString('en-IN')}
+                          </motion.p>
                         </div>
-                        <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
-                        <p className="text-xl font-bold text-indigo-600">
-                          ₹{feature.price.toLocaleString('en-IN')}
-                        </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             </motion.div>
@@ -465,33 +571,42 @@ const Pricing = () => {
                   <p className="text-slate-600 mt-2">Extra services to make your wedding even more special</p>
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
-                  {getFeaturesByCategory('addons').map((feature) => (
-                    <div
-                      key={feature.id}
-                      className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                        selectedFeatures.has(feature.id)
-                          ? 'border-slate-500 bg-slate-50 shadow-md'
-                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
-                      }`}
-                      onClick={() => toggleFeature(feature.id)}
-                    >
-                      <Checkbox
-                        checked={selectedFeatures.has(feature.id)}
-                        onCheckedChange={() => toggleFeature(feature.id)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="text-slate-500">{feature.icon}</div>
-                          <h3 className="font-semibold text-lg">{feature.name}</h3>
+                  {getFeaturesByCategory('addons').map((feature) => {
+                    const displayPrice = calculatePrice(feature.basePrice, duration);
+                    return (
+                      <div
+                        key={feature.id}
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                          selectedFeatures.has(feature.id)
+                            ? 'border-slate-500 bg-slate-50 shadow-md'
+                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                        }`}
+                        onClick={() => toggleFeature(feature.id)}
+                      >
+                        <Checkbox
+                          checked={selectedFeatures.has(feature.id)}
+                          onCheckedChange={() => toggleFeature(feature.id)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="text-slate-500">{feature.icon}</div>
+                            <h3 className="font-semibold text-lg">{feature.name}</h3>
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
+                          <motion.p
+                            key={`addon-${feature.id}-${duration}`}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xl font-bold text-slate-600"
+                          >
+                            ₹{displayPrice.toLocaleString('en-IN')}
+                          </motion.p>
                         </div>
-                        <p className="text-sm text-slate-600 mb-2">{feature.description}</p>
-                        <p className="text-xl font-bold text-slate-600">
-                          ₹{feature.price.toLocaleString('en-IN')}
-                        </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             </motion.div>
@@ -499,6 +614,9 @@ const Pricing = () => {
 
           {/* Summary Sidebar */}
           <div className="lg:col-span-1">
+            <div className="flex justify-end mb-4 px-2 lg:px-0">
+              <BillingDurationSelector selectedDuration={duration} onChange={setDuration} />
+            </div>
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -525,6 +643,7 @@ const Pricing = () => {
                         {Array.from(selectedFeatures).map((featureId) => {
                           const feature = pricingFeatures.find((f) => f.id === featureId);
                           if (!feature) return null;
+                          const displayPrice = calculatePrice(feature.basePrice, duration);
                           return (
                             <div
                               key={featureId}
@@ -534,9 +653,15 @@ const Pricing = () => {
                                 <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                                 <span className="text-sm font-medium truncate">{feature.name}</span>
                               </div>
-                              <span className="text-sm font-bold text-rose-600 ml-2 flex-shrink-0">
-                                ₹{feature.price.toLocaleString('en-IN')}
-                              </span>
+                              <motion.span
+                                key={`summary-${featureId}-${duration}`}
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="text-sm font-bold text-rose-600 ml-2 flex-shrink-0"
+                              >
+                                ₹{displayPrice.toLocaleString('en-IN')}
+                              </motion.span>
                             </div>
                           );
                         })}
@@ -557,11 +682,24 @@ const Pricing = () => {
                           </div>
                         </div>
                         <div className="border-t-2 border-rose-200 pt-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-3">
                             <span className="text-lg font-bold text-slate-900">Total Amount</span>
-                            <span className="text-3xl font-bold text-rose-600">
-                              ₹{total.toLocaleString('en-IN')}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              {showSavings && (
+                                <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] px-2 py-1 rounded-full shadow-sm">
+                                  You save ₹{savings.toLocaleString('en-IN')}
+                                </Badge>
+                              )}
+                              <motion.span
+                                key={`total-${duration}-${total}`}
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="text-3xl font-bold text-rose-600"
+                              >
+                                ₹{total.toLocaleString('en-IN')}
+                              </motion.span>
+                            </div>
                           </div>
                           <p className="text-xs text-slate-500 mt-2">
                             One-time payment • No recurring charges • All prices in INR
