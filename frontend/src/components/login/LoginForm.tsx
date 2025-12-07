@@ -48,13 +48,13 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
   };
 
   return (
-    <Card className="bg-white/5 border border-white/30 shadow-[0_20px_120px_rgba(12,12,55,0.8)] backdrop-blur-xl">
+    <Card className="bg-white border border-slate-200 shadow-xl">
       <CardHeader className="space-y-3 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20 shadow-lg">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 shadow-lg">
           <img src="/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
         </div>
-        <CardTitle className="text-3xl font-semibold text-white">Sign in to Wedding Web</CardTitle>
-        <p className="text-sm uppercase tracking-[0.3em] text-white/70">
+        <CardTitle className="text-3xl font-semibold text-slate-900">Sign in to Wedding Web</CardTitle>
+        <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
           Premium builder dashboard
         </p>
       </CardHeader>
@@ -69,7 +69,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <Label htmlFor="email" className="text-sm text-white/70">
+            <Label htmlFor="email" className="text-sm text-slate-700">
               Email address
             </Label>
             <Input
@@ -79,12 +79,12 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
-              className="bg-white/10 text-white placeholder:text-white/50"
+              className="bg-white text-slate-900 placeholder:text-slate-400"
             />
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="password" className="text-sm text-white/70">
+            <Label htmlFor="password" className="text-sm text-slate-700">
               Password
             </Label>
             <Input
@@ -94,29 +94,29 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
-              className="bg-white/10 text-white placeholder:text-white/50"
+              className="bg-white text-slate-900 placeholder:text-slate-400"
             />
           </div>
 
-          <div className="flex items-center justify-between text-sm text-white/70">
-          <Link to="/company/forgot-password" className="font-medium text-white underline-offset-4 hover:text-rose-200">
+          <div className="flex items-center justify-between text-sm text-slate-600">
+          <Link to="/company/forgot-password" className="font-medium text-slate-700 underline-offset-4 hover:text-rose-500">
               Forgot password?
             </Link>
-            <span className="text-xs uppercase tracking-[0.2em]">Secure</span>
+            <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Secure</span>
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-600 text-white font-semibold tracking-wide shadow-2xl shadow-rose-800/70"
+            className="w-full bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-600 text-white font-semibold tracking-wide shadow-lg"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Signing in…" : "Login"}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-white/70">
-          Don’t have an account?{" "}
-          <Link to="/company/signup" className="font-semibold text-rose-200 underline-offset-2 hover:text-white">
+        <p className="text-center text-sm text-slate-600">
+          Don't have an account?{" "}
+          <Link to="/company/signup" className="font-semibold text-rose-500 underline-offset-2 hover:text-rose-600">
             Sign up
           </Link>
         </p>
