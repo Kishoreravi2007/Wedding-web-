@@ -258,19 +258,30 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
 
 // Catch-all handler: serve React app for all non-API routes
 // This must be last, after all API routes
-app.get('*', (req, res) => {
+// Express 5.x compatible - use app.use() without path pattern as catch-all middleware
+app.use((req, res, next) => {
   // Skip API routes - they should have been handled above
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   
-  // Serve index.html for all other routes (SPA routing)
-  res.sendFile(path.join(__dirname, 'build', 'index.html'), (err) => {
-    if (err) {
-      console.error('Error serving index.html:', err);
-      res.status(500).send('Frontend build not found. Please run: npm run build');
-    }
-  });
+  // Skip static file requests that were already handled by express.static
+  // Static files with extensions should have been served already
+  // Only serve index.html for routes that don't have file extensions (SPA routing)
+  const hasFileExtension = /\.[^/]+$/.test(req.path.split('?')[0]); // Remove query string
+  
+  // Serve index.html for all GET requests without file extensions (SPA routing)
+  if (req.method === 'GET' && !hasFileExtension) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'), (err) => {
+      if (err) {
+        console.error('Error serving index.html:', err);
+        res.status(500).send('Frontend build not found. Please run: npm run build');
+      }
+    });
+  } else {
+    // For other requests, return 404
+    res.status(404).json({ error: 'Route not found' });
+  }
 });
 
 // Create HTTP server for WebSocket support
