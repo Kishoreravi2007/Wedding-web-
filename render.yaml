@@ -1,28 +1,16 @@
 services:
-  # Backend Service
+  # Combined Backend + Frontend Service
+  # Frontend is built and served from backend/build directory
   - type: web
     name: wedding-backend
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install
+    buildCommand: cd frontend && npm install && cd ../backend && npm install && npm run build
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
-
-  # Frontend Static Site
-  - type: web
-    name: wedding-frontend
-    env: static
-    region: oregon
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
 
