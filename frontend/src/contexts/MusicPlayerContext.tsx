@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useRef, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useRef, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface MusicPlayerContextType {
   isPlaying: boolean;
@@ -27,6 +28,7 @@ interface MusicPlayerProviderProps {
 }
 
 export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ children, initialTrackIndex = 0 }) => {
+  const location = useLocation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolumeState] = useState(0.3);
@@ -37,6 +39,13 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   const [hasError, setHasError] = useState(false);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
   const audioRef = useRef<HTMLAudioElement>(null);
+  // Track if music was playing before navigating to company page (for resume)
+  const wasPlayingBeforeCompanyPage = useRef(false);
+
+  // Check if we're on a company page - reactive to route changes
+  const isCompanyPage = useMemo(() => {
+    return location.pathname.startsWith('/company');
+  }, [location.pathname]);
 
   const musicSources = [
     { title: 'Wedding Music', src: '/wedding-music.mp3' },
@@ -44,6 +53,10 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   ];
 
   const playCurrentTrack = useCallback(async () => {
+    // NEVER play on company pages
+    if (isCompanyPage) {
+      return;
+    }
     if (!audioRef.current) return;
     try {
       await audioRef.current.play();
@@ -56,9 +69,46 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
         setHasError(true);
       }
     }
-  }, [hasUserInteracted]);
+  }, [hasUserInteracted, isCompanyPage]);
+
+  // Handle music pause/resume based on company page navigation
+  useEffect(() => {
+    if (isCompanyPage) {
+      // Navigating TO company page - pause music and remember state
+      if (isPlaying && audioRef.current) {
+        wasPlayingBeforeCompanyPage.current = true;
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+      // If music wasn't playing, don't change the flag (preserve previous state)
+    } else {
+      // Navigating AWAY from company page - resume if it was playing before
+      if (wasPlayingBeforeCompanyPage.current && audioRef.current) {
+        wasPlayingBeforeCompanyPage.current = false;
+        // Small delay to ensure audio is ready, then resume
+        const resumeTimer = setTimeout(() => {
+          if (hasUserInteracted) {
+            playCurrentTrack();
+          } else {
+            // Try to play even without interaction (user clicked a link, which counts as interaction)
+            audioRef.current?.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {
+              // If autoplay is blocked, wait for next user interaction
+            });
+          }
+        }, 100);
+        return () => clearTimeout(resumeTimer);
+      }
+    }
+  }, [isCompanyPage, isPlaying, hasUserInteracted, playCurrentTrack]);
 
   useEffect(() => {
+    // Don't auto-play on company pages
+    if (isCompanyPage) {
+      return;
+    }
+
     const tryAutoplay = async () => {
       if (audioRef.current) {
         if (hasUserInteracted) {
@@ -76,9 +126,14 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
 
     const timer = setTimeout(tryAutoplay, 100);
     return () => clearTimeout(timer);
-  }, [hasUserInteracted, playCurrentTrack]);
+  }, [hasUserInteracted, playCurrentTrack, isCompanyPage]);
 
   useEffect(() => {
+    // Don't auto-play on company pages even after user interaction
+    if (isCompanyPage) {
+      return;
+    }
+
     const handleFirstInteraction = async () => {
       if (!hasUserInteracted && audioRef.current) {
         setHasUserInteracted(true);
@@ -97,9 +152,13 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
         document.removeEventListener(event, handleFirstInteraction);
       });
     };
-  }, [hasUserInteracted, playCurrentTrack]);
+  }, [hasUserInteracted, playCurrentTrack, isCompanyPage]);
 
   const togglePlay = useCallback(async () => {
+    // Never allow play on company pages
+    if (isCompanyPage) {
+      return;
+    }
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
@@ -107,7 +166,7 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
     } else {
       playCurrentTrack();
     }
-  }, [isPlaying, playCurrentTrack]);
+  }, [isPlaying, playCurrentTrack, isCompanyPage]);
 
   const toggleMute = useCallback(() => {
     if (!audioRef.current) return;
@@ -137,11 +196,12 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
     setHasError(false);
     if (audioRef.current) {
       audioRef.current.volume = volume;
-      if (hasUserInteracted && !isPlaying) {
+      // Don't auto-play on company pages
+      if (hasUserInteracted && !isPlaying && !isCompanyPage) {
         playCurrentTrack();
       }
     }
-  }, [volume, hasUserInteracted, isPlaying, playCurrentTrack]);
+  }, [volume, hasUserInteracted, isPlaying, playCurrentTrack, isCompanyPage]);
 
   const handleError = useCallback(() => {
     setHasError(true);
@@ -150,6 +210,10 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   }, [currentTrackIndex]);
 
   const playTrack = useCallback((src: string) => { // Changed to accept src string
+    // Never allow play on company pages
+    if (isCompanyPage) {
+      return;
+    }
     const index = musicSources.findIndex(source => source.src === src);
     if (index === -1) {
       console.error(`Track with source ${src} not found.`);
@@ -163,7 +227,7 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
         playCurrentTrack();
       }
     }
-  }, [musicSources, hasUserInteracted, playCurrentTrack]); // Added musicSources to dependencies
+  }, [musicSources, hasUserInteracted, playCurrentTrack, isCompanyPage]); // Added musicSources to dependencies
 
   const goToPrevTrack = useCallback(() => {
     const prevIndex = (currentTrackIndex - 1 + musicSources.length) % musicSources.length;

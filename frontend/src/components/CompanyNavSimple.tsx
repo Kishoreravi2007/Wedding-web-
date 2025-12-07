@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 import { Menu } from "lucide-react";
 
 const CompanyNavSimple = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { currentUser } = useAuth();
 
   const navLinks = [
     { to: "/company", label: "Home" },
@@ -46,6 +49,32 @@ const CompanyNavSimple = () => {
               {link.label}
             </Link>
           ))}
+          <div className="ml-4">
+            {!currentUser ? (
+              <Link to="/company/login">
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-lg shadow-rose-500/50"
+                >
+                  Login
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/company/account" title="View or edit profile">
+                <Avatar className="h-10 w-10 border border-slate-200 bg-white shadow-lg">
+                  {currentUser.profile?.avatar_url ? (
+                    <AvatarImage src={currentUser.profile.avatar_url} alt={currentUser.profile.full_name || "Profile"} />
+                  ) : (
+                    <AvatarFallback>
+                      {(currentUser.profile?.full_name?.charAt(0) ||
+                        currentUser.email?.charAt(0) ||
+                        "U").toUpperCase()}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -81,6 +110,35 @@ const CompanyNavSimple = () => {
                   {link.label}
                 </Link>
               ))}
+              <div className="pt-4 border-t border-slate-200">
+                {!currentUser ? (
+                  <Link to="/company/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      size="sm"
+                      className="w-full bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-lg shadow-rose-500/50"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/company/account" onClick={() => setMobileMenuOpen(false)} title="View or edit profile">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border border-slate-200 bg-white shadow-lg">
+                        {currentUser.profile?.avatar_url ? (
+                          <AvatarImage src={currentUser.profile.avatar_url} alt={currentUser.profile.full_name || "Profile"} />
+                        ) : (
+                          <AvatarFallback>
+                            {(currentUser.profile?.full_name?.charAt(0) ||
+                              currentUser.email?.charAt(0) ||
+                              "U").toUpperCase()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <span className="text-slate-700 font-medium">Account</span>
+                    </div>
+                  </Link>
+                )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

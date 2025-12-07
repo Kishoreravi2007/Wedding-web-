@@ -36,7 +36,7 @@ const LandingMinimal = () => {
           </Link>
           
           {/* Desktop Menu */}
-          <div className="hidden md:flex flex-1 justify-center gap-6 items-center">
+          <div className="hidden md:flex gap-6 items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -51,7 +51,7 @@ const LandingMinimal = () => {
               </Link>
             ))}
           </div>
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 ml-6">
             {!currentUser ? (
               <Link to="/company/login">
                 <Button

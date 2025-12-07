@@ -112,12 +112,7 @@ const App = () => {
     return location.pathname.startsWith('/company');
   }, [location.pathname]);
 
-  // Pause music when on company pages
-  useEffect(() => {
-    if (isCompanyPage && isPlaying) {
-      togglePlay(); // Pause the music
-    }
-  }, [isCompanyPage]); // Only depend on isCompanyPage, not isPlaying or togglePlay to avoid loops
+  // Note: Music pause/resume is now handled globally in MusicPlayerContext
 
   // Scroll to top when route changes
   useEffect(() => {
