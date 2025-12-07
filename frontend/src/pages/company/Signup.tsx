@@ -62,23 +62,23 @@ const CompanySignup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#050816] via-[#1b0d3c] to-[#030512] px-4 py-12 text-white">
-      <div className="relative mx-auto flex max-w-5xl flex-col items-center justify-center gap-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_40px_120px_rgba(12,12,55,0.8)]">
-        <Card className="w-full bg-white/10 border-white/20 backdrop-blur-xl">
-          <CardHeader className="space-y-3 text-center text-white">
-            <CardTitle className="text-3xl font-semibold text-white">Create an account</CardTitle>
-            <p className="text-sm uppercase tracking-[0.3em] text-white/70">WeddingWeb partner portal</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900 px-4 py-12">
+      <div className="mx-auto flex max-w-5xl flex-col items-center justify-center gap-8">
+        <Card className="w-full border border-slate-200 shadow-xl">
+          <CardHeader className="space-y-3 text-center">
+            <CardTitle className="text-3xl font-semibold text-slate-900">Create an account</CardTitle>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">WeddingWeb partner portal</p>
           </CardHeader>
           <CardContent className="space-y-6">
             {error && (
-              <div className="rounded-lg border border-red-400 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              <div className="rounded-lg border border-red-400 bg-red-50 px-3 py-2 text-sm text-red-700">
                 {error}
               </div>
             )}
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <Label htmlFor="signup-email" className="text-white/70">
-                  Email address<span className="ml-1 text-rose-400">*</span>
+                <Label htmlFor="signup-email" className="text-slate-700">
+                  Email address<span className="ml-1 text-rose-500">*</span>
                 </Label>
                 <Input
                   id="signup-email"
@@ -86,13 +86,13 @@ const CompanySignup = () => {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="you@example.com"
-                  className="bg-white/10 text-white placeholder-white/50"
+                  className="bg-white text-slate-900 placeholder:text-slate-400"
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="signup-fullname" className="text-white/70">
-                  Full name<span className="ml-1 text-rose-400">*</span>
+                <Label htmlFor="signup-fullname" className="text-slate-700">
+                  Full name<span className="ml-1 text-rose-500">*</span>
                 </Label>
                 <Input
                   id="signup-fullname"
@@ -100,12 +100,12 @@ const CompanySignup = () => {
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
                   placeholder="Your name"
-                  className="bg-white/10 text-white placeholder-white/50"
+                  className="bg-white text-slate-900 placeholder:text-slate-400"
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="signup-location" className="text-white/70">
+                <Label htmlFor="signup-location" className="text-slate-700">
                   Location
                 </Label>
                 <Input
@@ -114,12 +114,11 @@ const CompanySignup = () => {
                   value={location}
                   onChange={(event) => setLocation(event.target.value)}
                   placeholder="Kerala, India"
-                  className="bg-white/10 text-white placeholder-white/50"
-                  required
+                  className="bg-white text-slate-900 placeholder:text-slate-400"
                 />
               </div>
               <div>
-                <Label htmlFor="signup-bio" className="text-white/70">
+                <Label htmlFor="signup-bio" className="text-slate-700">
                   Bio
                 </Label>
                 <Textarea
@@ -128,11 +127,11 @@ const CompanySignup = () => {
                   onChange={(event) => setBio(event.target.value)}
                   placeholder="Tell us a little about you."
                   rows={3}
-                  className="bg-white/10 text-white placeholder-white/50"
+                  className="bg-white text-slate-900 placeholder:text-slate-400"
                 />
               </div>
               <div>
-                <Label htmlFor="signup-photo" className="text-white/70">
+                <Label htmlFor="signup-photo" className="text-slate-700">
                   Profile photo
                 </Label>
                 <input
@@ -151,17 +150,17 @@ const CompanySignup = () => {
                     };
                     reader.readAsDataURL(file);
                   }}
-                  className="w-full rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white file:mr-3 file:rounded-full file:border-0 file:bg-rose-500/80 file:px-3 file:py-1 file:text-white"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 file:mr-3 file:rounded-full file:border-0 file:bg-rose-500 file:px-3 file:py-1 file:text-white"
                 />
                 {photo && (
-                  <div className="mt-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white">
+                  <div className="mt-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">
                     Photo selected
                   </div>
                 )}
               </div>
               <div>
-                <Label htmlFor="signup-password" className="text-white/70">
-                  Password<span className="ml-1 text-rose-400">*</span>
+                <Label htmlFor="signup-password" className="text-slate-700">
+                  Password<span className="ml-1 text-rose-500">*</span>
                 </Label>
                 <Input
                   id="signup-password"
@@ -169,7 +168,7 @@ const CompanySignup = () => {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Strong password"
-                  className="bg-white/10 text-white placeholder-white/50"
+                  className="bg-white text-slate-900 placeholder:text-slate-400"
                 />
               </div>
               <Button
@@ -180,9 +179,9 @@ const CompanySignup = () => {
                 {isSubmitting ? "Signing up…" : "Create account"}
               </Button>
             </form>
-            <p className="text-center text-sm text-white/70">
+            <p className="text-center text-sm text-slate-600">
               Already have an account?{" "}
-              <Link to="/company/login" className="text-white underline-offset-2 hover:text-rose-200">
+              <Link to="/company/login" className="text-rose-500 underline-offset-2 hover:text-rose-600">
                 Login
               </Link>
             </p>
