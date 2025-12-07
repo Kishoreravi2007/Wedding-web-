@@ -12,21 +12,34 @@ const { supabase } = require('./lib/supabase');
 const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
 
-// Configure CORS for frontend-backend communication (local + deployed)
+// Configure CORS for frontend-backend communication
+// Since frontend is now served from the same server, CORS is mainly for external API access
 app.use(cors({
-  origin: [
-    // Local development URLs
-    'http://localhost:3000', 
-    'http://localhost:3001', 
-    'http://localhost:3002', 
-    'http://localhost:3003', 
-    'http://localhost:5173',
-    // Deployed frontend URLs (add your deployed domain)
-    'https://weddingweb.co.in',
-    'https://www.weddingweb.co.in',
-    // Add any other deployed URLs you use
-    process.env.FRONTEND_URL, // Environment variable for dynamic URLs
-  ].filter(Boolean), // Remove undefined values
+  origin: (origin, callback) => {
+    // Allow requests with no origin (same-origin requests, mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      // Local development URLs (for external access if needed)
+      'http://localhost:3000', 
+      'http://localhost:3001', 
+      'http://localhost:3002', 
+      'http://localhost:3003', 
+      'http://localhost:5173',
+      // Deployed frontend URLs (add your deployed domain)
+      'https://weddingweb.co.in',
+      'https://www.weddingweb.co.in',
+      // Add any other deployed URLs you use
+      process.env.FRONTEND_URL, // Environment variable for dynamic URLs
+    ].filter(Boolean); // Remove undefined values
+    
+    // Allow same-origin requests (when frontend is served from this server)
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now (can be restricted if needed)
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -40,6 +53,11 @@ console.log('📁 Serving static files from:', path.join(__dirname, '../uploads'
 // Serve backend directory for face detection reference images and mappings
 app.use('/backend', express.static(path.join(__dirname)));
 console.log('📁 Serving backend files from:', path.join(__dirname));
+
+// Serve static frontend files from build directory
+const buildPath = path.join(__dirname, 'build');
+app.use(express.static(buildPath));
+console.log('📁 Serving frontend static files from:', buildPath);
 
 // Use Supabase wishes endpoint (switched back from Firebase)
 const wishesRouter = require('./wishes-supabase');
@@ -235,8 +253,24 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Backend is running!');
+// API routes should be handled before the catch-all route
+// All API routes are already defined above
+
+// Catch-all handler: serve React app for all non-API routes
+// This must be last, after all API routes
+app.get('*', (req, res) => {
+  // Skip API routes - they should have been handled above
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  
+  // Serve index.html for all other routes (SPA routing)
+  res.sendFile(path.join(__dirname, 'build', 'index.html'), (err) => {
+    if (err) {
+      console.error('Error serving index.html:', err);
+      res.status(500).send('Frontend build not found. Please run: npm run build');
+    }
+  });
 });
 
 // Create HTTP server for WebSocket support

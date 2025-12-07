@@ -40,7 +40,8 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     build: {
-      outDir: 'dist', // Output to a 'dist' directory within frontend
+      outDir: '../backend/build', // Output directly to backend/build directory
+      emptyOutDir: true, // Clear the build directory before building
       sourcemap: mode === 'development', // Source maps only in dev
       rollupOptions: {
         output: {
@@ -53,11 +54,12 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     // Define environment variables with fallbacks to prevent blank screens
+    // When served from same server, use empty string for relative URLs
     define: {
-      'process.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || 'http://localhost:5001'),
+      'process.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || ''),
       'process.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL || ''),
       'process.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY || ''),
-      'process.env.VITE_FRONTEND_URL': JSON.stringify(env.VITE_FRONTEND_URL || 'http://localhost:3000'),
+      'process.env.VITE_FRONTEND_URL': JSON.stringify(env.VITE_FRONTEND_URL || 'http://localhost:5001'),
     },
   };
 });

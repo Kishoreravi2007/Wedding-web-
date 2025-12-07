@@ -2,8 +2,8 @@
 // Auto-detect the backend URL based on current hostname
 // This ensures it works on both localhost and when accessed from other devices
 const getApiBaseUrl = () => {
-  // If explicitly set in environment, use that
-  if (import.meta.env.VITE_API_BASE_URL) {
+  // If explicitly set in environment, use that (empty string means same origin)
+  if (import.meta.env.VITE_API_BASE_URL !== undefined) {
     return import.meta.env.VITE_API_BASE_URL;
   }
   
@@ -11,12 +11,12 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
-    // Backend runs on port 5000
-    return `${protocol}//${hostname}:5000`;
+    // Backend runs on port 5001
+    return `${protocol}//${hostname}:5001`;
   }
   
   // Fallback for SSR
-  return 'http://localhost:5000';
+  return 'http://localhost:5001';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
