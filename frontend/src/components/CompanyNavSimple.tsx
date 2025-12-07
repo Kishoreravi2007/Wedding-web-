@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 const CompanyNavSimple = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,6 +47,43 @@ const CompanyNavSimple = () => {
             </Link>
           ))}
         </div>
+
+        {/* Mobile Menu Button */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-6 w-6 text-slate-900" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="WeddingWeb logo"
+                  className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
+                />
+                <span className="text-slate-900 text-xl font-semibold">WeddingWeb</span>
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 mt-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-lg font-medium transition-colors py-2 ${
+                    isActive(link.to)
+                      ? "text-rose-500 font-bold"
+                      : "hover:text-rose-500 text-slate-700"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </nav>
   );
