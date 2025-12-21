@@ -11,6 +11,7 @@ numpy>=1.26.4
 # DeepFace and face recognition
 deepface>=0.0.90
 retina-face>=0.0.17
+tf-keras>=2.20.0  # Required for TensorFlow 2.20+ with RetinaFace
 
 # Optional but recommended
 tqdm>=4.66.1
