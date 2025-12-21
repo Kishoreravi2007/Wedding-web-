@@ -1,5 +1,18 @@
 node_modules/
 
+# Python virtual environments
+venv/
+venv_*/
+env/
+ENV/
+.venv/
+*.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
 # Google Service Account credentials
 google-service-account.json
 *-service-account.json
