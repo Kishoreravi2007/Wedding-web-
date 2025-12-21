@@ -65,7 +65,9 @@ def main():
         print()
     
     # Visualize results
-    output_path = image_path.replace('.', '_annotated.')
+    # Create output filename by inserting _annotated before the file extension
+    path_parts = os.path.splitext(image_path)
+    output_path = f"{path_parts[0]}_annotated{path_parts[1]}"
     print(f"Creating annotated image: {output_path}")
     processor.visualize_faces(
         image_path,

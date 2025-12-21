@@ -29,10 +29,10 @@ import {
   Download,
   Eye
 } from 'lucide-react';
-import * as faceapi from 'face-api.js';
 import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 interface FaceMatch {
   id: string;
@@ -59,7 +59,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // State management
-  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(true); // DeepFace runs on backend, always available
   const [isSearching, setIsSearching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [searchResults, setSearchResults] = useState<FaceMatch[]>([]);
@@ -68,93 +68,67 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
-  // Load face-api.js models
+  // DeepFace runs on backend, no models to load
   useEffect(() => {
-    const loadModels = async () => {
-      try {
-        console.log('🔄 Loading face-api.js models for face search...');
-        
-        // Load all required models for face recognition
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-          faceapi.nets.faceExpressionNet.loadFromUri('/models')
-        ]);
-        
-        console.log('✅ Face search models loaded successfully');
-        setIsModelLoaded(true);
-      } catch (error) {
-        console.error('❌ Error loading face search models:', error);
-        setError('Failed to load face detection models. Please refresh the page.');
-      }
-    };
-
-    loadModels();
+    console.log('✅ Using DeepFace + RetinaFace backend API for face search');
+    setIsModelLoaded(true);
   }, []);
 
-  // Extract face descriptor from image
-  const extractFaceDescriptor = useCallback(async (imageElement: HTMLImageElement): Promise<Float32Array | null> => {
-    if (!isModelLoaded) {
-      setError('Face detection models are still loading. Please wait...');
-      return null;
-    }
-
+  // Extract face descriptor from image using DeepFace API
+  const extractFaceDescriptor = useCallback(async (file: File): Promise<number[] | null> => {
     try {
-      console.log('🔍 Extracting face descriptor...');
+      console.log('🔍 Extracting face descriptor using DeepFace + RetinaFace...');
       
-      // Detect face and extract descriptor
-      const detection = await faceapi
-        .detectSingleFace(imageElement, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
+      // Create FormData to send file to DeepFace API
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('return_landmarks', 'false');
+      formData.append('return_age_gender', 'false');
+      formData.append('enforce_detection', 'false');
 
-      if (detection) {
-        console.log('✅ Face descriptor extracted successfully');
-        return detection.descriptor;
-      } else {
+      // Call DeepFace API
+      const response = await fetch(`${DEEPFACE_API_URL}/api/faces/detect`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ DeepFace API error:', errorText);
+        throw new Error(`DeepFace API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.faces || result.faces.length === 0) {
         console.log('⚠️ No face detected in the image');
         setError('No face detected in the uploaded image. Please ensure your face is clearly visible.');
         return null;
       }
+
+      // Use the first detected face
+      const face = result.faces[0];
+      console.log('✅ Face descriptor extracted successfully using DeepFace + RetinaFace');
+      return face.embedding; // 512-dim embedding
+
     } catch (error) {
       console.error('❌ Error extracting face descriptor:', error);
       setError('Failed to extract face features. Please try again.');
       return null;
     }
-  }, [isModelLoaded]);
-
-  // Calculate face similarity using cosine similarity
-  const calculateSimilarity = useCallback((descriptor1: Float32Array, descriptor2: Float32Array): number => {
-    // Calculate cosine similarity
-    let dotProduct = 0;
-    let norm1 = 0;
-    let norm2 = 0;
-
-    for (let i = 0; i < descriptor1.length; i++) {
-      dotProduct += descriptor1[i] * descriptor2[i];
-      norm1 += descriptor1[i] * descriptor1[i];
-      norm2 += descriptor2[i] * descriptor2[i];
-    }
-
-    const similarity = dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
-    return Math.max(0, similarity); // Ensure non-negative similarity
   }, []);
 
   // Search for matching faces in stored photos
-  const searchForMatches = useCallback(async (queryDescriptor: Float32Array) => {
+  const searchForMatches = useCallback(async (queryDescriptor: number[]) => {
     try {
       console.log('🔍 Searching for matching faces...');
       setIsSearching(true);
       setError('');
       setSuccess('');
 
-      // Convert Float32Array to regular array
-      const descriptorArray = Array.from(queryDescriptor);
-
-      // Call backend API for face matching
+      // Call backend API for face matching (descriptor is already an array)
       const response = await axios.post(`${BACKEND_URL}/api/faces/find-similar`, {
-        descriptor: descriptorArray,
+        descriptor: queryDescriptor, // 512-dim DeepFace embedding
         limit: 50,
         threshold: 0.6
       });
@@ -220,7 +194,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
     } finally {
       setIsSearching(false);
     }
-  }, [eventId, calculateSimilarity]);
+  }, [eventId]);
 
   // Handle file upload
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -244,28 +218,22 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       setError('');
       setSuccess('');
 
-      // Create image element
-      const img = new Image();
-      img.onload = async () => {
-        try {
-          // Display uploaded image
-          const imageUrl = URL.createObjectURL(file);
-          setUploadedImage(imageUrl);
+      // Display uploaded image
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImage(imageUrl);
 
-          // Extract face descriptor
-          const descriptor = await extractFaceDescriptor(img);
-          
-          if (descriptor) {
-            setDetectedFace({ descriptor, image: img });
-            setSuccess('Face detected! Click "Search Photos" to find matches.');
-          }
-        } catch (error) {
-          console.error('❌ Error processing uploaded image:', error);
-          setError('Failed to process the uploaded image. Please try again.');
-        } finally {
-          setIsUploading(false);
-        }
-      };
+      // Extract face descriptor using DeepFace API
+      const descriptor = await extractFaceDescriptor(file);
+      
+      if (descriptor) {
+        // Create image element for display
+        const img = new Image();
+        img.src = imageUrl;
+        setDetectedFace({ descriptor, image: img });
+        setSuccess('Face detected! Click "Search Photos" to find matches.');
+      }
+      
+      setIsUploading(false);
 
       img.onerror = () => {
         setError('Failed to load the uploaded image. Please try again.');

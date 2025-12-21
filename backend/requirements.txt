@@ -1,20 +1,30 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-opencv-python==4.8.1.78
-python-multipart==0.0.6
-numpy==1.26.4
-pandas==2.1.4
-tqdm==4.66.1
-gdown==5.2.0
-Pillow==10.2.0
-Flask==3.0.0
-deepface==0.0.90
-mtcnn==0.1.1
-retina-face==0.0.17
-fire==0.7.1
-gunicorn==23.0.0
-tf-keras==2.16.0
-face_recognition==1.3.0
-dlib==19.24.2
-insightface==0.7.3
-onnxruntime>=1.15.0
+# Core FastAPI dependencies
+fastapi>=0.104.1
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+
+# Image processing
+opencv-python>=4.8.1.78
+Pillow>=10.2.0
+numpy>=1.26.4
+
+# DeepFace and face recognition
+deepface>=0.0.90
+retina-face>=0.0.17
+
+# Optional but recommended
+tqdm>=4.66.1
+requests>=2.28.0
+
+# Legacy dependencies (optional - for backward compatibility)
+# pandas>=2.2.0  # Updated for Python 3.14 compatibility
+# mtcnn==0.1.1
+# face_recognition==1.3.0
+# dlib==19.24.2
+# insightface==0.7.3
+# onnxruntime>=1.15.0
+# Flask==3.0.0
+# gdown==5.2.0
+# fire==0.7.1
+# gunicorn==23.0.0
+# tf-keras==2.16.0

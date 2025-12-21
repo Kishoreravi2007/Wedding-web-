@@ -1,31 +1,56 @@
-import * as faceapi from 'face-api.js';
+/**
+ * Face Detection Utility using DeepFace + RetinaFace
+ * 
+ * Provides face detection from image/video elements using DeepFace API
+ * Superior performance for small faces, side profiles, low light, and crowded scenes
+ */
 
-const MODEL_URL = '/models'; // Path to the models directory in public
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
-let modelsLoaded = false;
+let modelsLoaded = true; // DeepFace runs on backend, always available
 
 export async function loadFaceDetectionModels() {
-  if (modelsLoaded) {
-    return;
-  }
-  try {
-    await faceapi.nets.tinyFaceDetector.load(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.load(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.load(MODEL_URL);
-    await faceapi.nets.faceExpressionNet.load(MODEL_URL);
-    modelsLoaded = true;
-    console.log('Face detection models loaded successfully!');
-  } catch (error) {
-    console.error('Failed to load face detection models:', error);
-  }
+  // DeepFace runs on the backend, no models to load on frontend
+  console.log('✅ Using DeepFace + RetinaFace backend API for face detection');
+  modelsLoaded = true;
+  return Promise.resolve();
 }
 
 export interface FaceDetectionResult {
-  detection: faceapi.FaceDetection;
-  landmarks: faceapi.FaceLandmarks68;
-  expressions: faceapi.FaceExpressions;
-  descriptor: Float32Array;
+  detection: {
+    box: { x: number; y: number; width: number; height: number };
+    score: number;
+  };
+  landmarks?: number[][];
+  expressions?: { [key: string]: number };
+  descriptor: number[]; // 512-dim DeepFace embedding
   box: { x: number; y: number; width: number; height: number };
+}
+
+/**
+ * Convert image/video element to blob for API call
+ */
+async function elementToBlob(element: HTMLImageElement | HTMLVideoElement): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  canvas.width = element instanceof HTMLVideoElement ? element.videoWidth : element.width;
+  canvas.height = element instanceof HTMLVideoElement ? element.videoHeight : element.height;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('Could not get canvas context');
+  }
+  
+  ctx.drawImage(element, 0, 0);
+  
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error('Failed to convert element to blob'));
+      }
+    }, 'image/jpeg', 0.95);
+  });
 }
 
 export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElement): Promise<FaceDetectionResult[]> {
@@ -34,22 +59,60 @@ export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElem
     await loadFaceDetectionModels();
   }
 
-  const detections = await faceapi.detectAllFaces(
-    imageElement,
-    new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 }) // Lowered threshold for increased sensitivity
-  ).withFaceLandmarks().withFaceExpressions().withFaceDescriptors();
+  try {
+    // Convert element to blob
+    const blob = await elementToBlob(imageElement);
+    const file = new File([blob], 'detection.jpg', { type: 'image/jpeg' });
 
-  // Map to our custom interface
-  return detections.map(detection => ({
-    detection: detection.detection,
-    landmarks: detection.landmarks,
-    expressions: detection.expressions,
-    descriptor: detection.descriptor,
-    box: {
-      x: detection.detection.box.x,
-      y: detection.detection.box.y,
-      width: detection.detection.box.width,
-      height: detection.detection.box.height
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('return_landmarks', 'true');
+    formData.append('return_age_gender', 'false');
+    formData.append('enforce_detection', 'false');
+
+    // Call DeepFace API
+    const response = await fetch(`${DEEPFACE_API_URL}/api/faces/detect`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ DeepFace API error:', errorText);
+      return [];
     }
-  }));
+
+    const result = await response.json();
+
+    if (!result.faces || result.faces.length === 0) {
+      return [];
+    }
+
+    // Map DeepFace response to our interface
+    return result.faces.map((face: any) => ({
+      detection: {
+        box: {
+          x: face.bbox[0],
+          y: face.bbox[1],
+          width: face.bbox[2],
+          height: face.bbox[3]
+        },
+        score: face.det_score || 0.9
+      },
+      landmarks: face.landmark || undefined,
+      expressions: undefined, // DeepFace doesn't provide expressions in this endpoint
+      descriptor: face.embedding, // 512-dim embedding
+      box: {
+        x: face.bbox[0],
+        y: face.bbox[1],
+        width: face.bbox[2],
+        height: face.bbox[3]
+      }
+    }));
+
+  } catch (error) {
+    console.error('❌ Error detecting faces with DeepFace:', error);
+    return [];
+  }
 }

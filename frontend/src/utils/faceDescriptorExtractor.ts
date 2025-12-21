@@ -2,49 +2,26 @@
  * Face Descriptor Extractor Utility
  * 
  * Extracts face descriptors from images during upload
- * for automatic face detection
+ * using DeepFace + RetinaFace backend for superior performance in:
+ * - Small faces
+ * - Side profiles
+ * - Low light conditions
+ * - Crowded wedding halls
  */
 
-import * as faceapi from 'face-api.js';
-
-let modelsLoaded = false;
-let loadingPromise: Promise<void> | null = null;
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 /**
- * Load face-api models (only once)
+ * Load DeepFace API (no client-side models needed)
  */
 export async function loadFaceModels(): Promise<void> {
-  if (modelsLoaded) {
-    return;
-  }
-
-  if (loadingPromise) {
-    return loadingPromise;
-  }
-
-  loadingPromise = (async () => {
-    try {
-      console.log('🔄 Loading face-api models for upload processing...');
-      
-      await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        faceapi.nets.faceRecognitionNet.loadFromUri('/models')
-      ]);
-      
-      modelsLoaded = true;
-      console.log('✅ Face-api models loaded for upload');
-    } catch (error) {
-      console.error('❌ Failed to load face-api models:', error);
-      throw error;
-    }
-  })();
-
-  return loadingPromise;
+  // DeepFace runs on the backend, no models to load on frontend
+  console.log('✅ Using DeepFace + RetinaFace backend API');
+  return Promise.resolve();
 }
 
 /**
- * Extract face descriptors from an image file
+ * Extract face descriptors from an image file using DeepFace + RetinaFace
  */
 export async function extractFaceDescriptors(file: File): Promise<{
   faces: Array<{
@@ -55,77 +32,63 @@ export async function extractFaceDescriptors(file: File): Promise<{
   count: number;
 }> {
   try {
-    // Ensure models are loaded
-    await loadFaceModels();
+    console.log(`🔍 Extracting face descriptors using DeepFace + RetinaFace for ${file.name}`);
 
-    // Create image element from file
-    const img = await createImageFromFile(file);
+    // Create FormData to send file to DeepFace API
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('return_landmarks', 'false');
+    formData.append('return_age_gender', 'false');
+    formData.append('enforce_detection', 'false');
 
-    // Detect faces and extract descriptors
-    const detections = await faceapi
-      .detectAllFaces(
-        img,
-        new faceapi.TinyFaceDetectorOptions({
-          inputSize: 608,
-          scoreThreshold: 0.2
-        })
-      )
-      .withFaceLandmarks()
-      .withFaceDescriptors();
+    // Call DeepFace API
+    const response = await fetch(`${DEEPFACE_API_URL}/api/faces/detect`, {
+      method: 'POST',
+      body: formData
+    });
 
-    console.log(`Found ${detections.length} face(s) in ${file.name}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ DeepFace API error:', errorText);
+      throw new Error(`DeepFace API error: ${response.status} ${errorText}`);
+    }
 
-    if (detections.length === 0) {
+    const result = await response.json();
+
+    if (!result.faces || result.faces.length === 0) {
+      console.log(`⚠️ No faces detected in ${file.name}`);
       return { faces: [], count: 0 };
     }
 
-    // Convert to plain objects for JSON serialization
-    const faces = detections.map(detection => ({
-      descriptor: Array.from(detection.descriptor),
+    console.log(`✅ Found ${result.faces.length} face(s) in ${file.name} using DeepFace + RetinaFace`);
+
+    // Convert DeepFace response to our format
+    // DeepFace returns bbox as [x, y, width, height]
+    const faces = result.faces.map((face: any) => ({
+      descriptor: face.embedding, // 512-dim embedding from VGG-Face
       boundingBox: {
-        x: detection.detection.box.x,
-        y: detection.detection.box.y,
-        width: detection.detection.box.width,
-        height: detection.detection.box.height
+        x: face.bbox[0],
+        y: face.bbox[1],
+        width: face.bbox[2],
+        height: face.bbox[3]
       },
-      confidence: detection.detection.score
+      confidence: face.det_score || 0.9
     }));
 
     return { faces, count: faces.length };
 
   } catch (error) {
-    console.error('Error extracting face descriptors:', error);
+    console.error('❌ Error extracting face descriptors with DeepFace:', error);
     // Return empty array instead of failing upload
     return { faces: [], count: 0 };
   }
 }
 
-/**
- * Create an Image element from a File
- */
-function createImageFromFile(file: File): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    
-    img.onload = () => {
-      URL.revokeObjectURL(img.src);
-      resolve(img);
-    };
-    
-    img.onerror = () => {
-      URL.revokeObjectURL(img.src);
-      reject(new Error('Failed to load image'));
-    };
-    
-    img.src = URL.createObjectURL(file);
-  });
-}
 
 /**
- * Check if models are loaded
+ * Check if models are loaded (always true for DeepFace API)
  */
 export function areModelsLoaded(): boolean {
-  return modelsLoaded;
+  return true; // DeepFace runs on backend, always available
 }
 

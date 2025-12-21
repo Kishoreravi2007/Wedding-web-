@@ -2,14 +2,21 @@
  * Face Recognition Service
  * 
  * Provides face matching and recognition functionality using
- * face descriptors (128-dimensional vectors from face-api.js)
+ * face descriptors (512-dimensional vectors from DeepFace + RetinaFace)
+ * 
+ * DeepFace + RetinaFace provides superior performance for:
+ * - Small faces
+ * - Side profiles
+ * - Low light conditions
+ * - Crowded wedding halls
  */
 
 const { FaceDescriptorDB } = require('./supabase-db');
 
 /**
  * Calculate Euclidean distance between two face descriptors
- * Face descriptors are 128-dimensional vectors
+ * Face descriptors are 512-dimensional vectors from DeepFace + RetinaFace
+ * DeepFace embeddings are normalized (unit vectors), so we can also use cosine distance
  */
 function euclideanDistance(descriptor1, descriptor2) {
   if (!Array.isArray(descriptor1) || !Array.isArray(descriptor2)) {
@@ -30,13 +37,47 @@ function euclideanDistance(descriptor1, descriptor2) {
 }
 
 /**
+ * Calculate cosine distance (1 - cosine similarity)
+ * For normalized descriptors, this can be more accurate
+ */
+function cosineDistance(descriptor1, descriptor2) {
+  if (!Array.isArray(descriptor1) || !Array.isArray(descriptor2)) {
+    throw new Error('Descriptors must be arrays');
+  }
+  
+  if (descriptor1.length !== descriptor2.length) {
+    throw new Error('Descriptors must have the same length');
+  }
+  
+  let dotProduct = 0;
+  let norm1 = 0;
+  let norm2 = 0;
+  
+  for (let i = 0; i < descriptor1.length; i++) {
+    dotProduct += descriptor1[i] * descriptor2[i];
+    norm1 += descriptor1[i] * descriptor1[i];
+    norm2 += descriptor2[i] * descriptor2[i];
+  }
+  
+  const similarity = dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+  return 1 - similarity; // Convert similarity to distance
+}
+
+/**
  * Match a face descriptor against all known faces
  * Returns matches sorted by distance (most similar first)
- * @param {Array} descriptor - Face descriptor (128-dimensional array)
+ * @param {Array} descriptor - Face descriptor (512-dimensional array from DeepFace + RetinaFace)
  * @param {number} threshold - Distance threshold for matching
  * @param {string} weddingName - Optional: filter by wedding ('sister-a' or 'sister-b')
  */
 async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`🔍 FACE MATCHING DEBUG`);
+  console.log(`${'='.repeat(60)}`);
+  console.log(`Threshold: ${threshold} (${((1 - threshold) * 100).toFixed(0)}%+ confidence required)`);
+  console.log(`Wedding filter: ${weddingName || 'None (all weddings)'}`);
+  console.log(`Descriptor length: ${descriptor.length} dimensions`);
+  console.log(`Descriptor sample (first 5 values): [${descriptor.slice(0, 5).map(v => v.toFixed(4)).join(', ')}...]`);
   try {
     // Get face descriptors, optionally filtered by wedding
     let allDescriptors;
@@ -97,8 +138,13 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
     }
     
     // Calculate distances to all known faces
+    // Try both euclidean and cosine distance, use the better one
     const matches = allDescriptors.map(faceDesc => {
-      const distance = euclideanDistance(descriptor, faceDesc.descriptor);
+      const euclideanDist = euclideanDistance(descriptor, faceDesc.descriptor);
+      const cosineDist = cosineDistance(descriptor, faceDesc.descriptor);
+      
+      // Use the smaller distance (better match)
+      const distance = Math.min(euclideanDist, cosineDist);
       const confidence = Math.max(0, 1 - distance); // Convert distance to confidence
       
       return {
@@ -108,19 +154,22 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
         personRole: faceDesc.person?.role,
         distance,
         confidence,
-        photoId: faceDesc.photo_id
+        photoId: faceDesc.photo_id,
+        euclideanDist, // For debugging
+        cosineDist // For debugging
       };
     });
     
     // Sort by distance (closest first)
     matches.sort((a, b) => a.distance - b.distance);
 
-    console.log('🎯 Face match distances:', matches.slice(0, 10).map(m => ({
-      photoId: m.photoId,
-      distance: Number(m.distance.toFixed(4)),
-      confidence: Number(m.confidence.toFixed(4)),
-      person: m.personName || null
-    })));
+    console.log('🎯 Face match distances (top 10):');
+    matches.slice(0, 10).forEach((m, i) => {
+      console.log(`   ${i + 1}. Photo ${m.photoId?.substring(0, 8)}... | Distance: ${m.distance.toFixed(4)} (${(m.confidence * 100).toFixed(1)}% confidence) | Person: ${m.personName || 'Unknown'}`);
+      if (m.euclideanDist !== undefined && m.cosineDist !== undefined) {
+        console.log(`      Euclidean: ${m.euclideanDist.toFixed(4)} | Cosine: ${m.cosineDist.toFixed(4)}`);
+      }
+    });
     
     // Filter by threshold - STRICT: only accept matches below threshold
     const goodMatches = matches.filter(m => m.distance <= threshold);
@@ -137,6 +186,13 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
     
     if (goodMatches.length === 0) {
       console.log(`⚠️  No matches found within threshold ${threshold}`);
+      if (matches.length > 0) {
+        console.log(`📊 Closest matches (top 5):`);
+        matches.slice(0, 5).forEach((m, i) => {
+          console.log(`   ${i + 1}. Distance: ${m.distance.toFixed(4)} (${((1 - m.distance) * 100).toFixed(1)}% confidence) | Photo: ${m.photoId?.substring(0, 8)}...`);
+        });
+        console.log(`💡 Tip: If closest distance is close to ${threshold}, consider adjusting threshold or re-processing photos`);
+      }
       return {
         matches: [],
         bestMatch: null
@@ -151,9 +207,9 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
       const distanceDiff = secondBest.distance - bestMatch.distance;
       const improvementRatio = distanceDiff / secondBest.distance;
       
-      // Require at least 15% improvement over second best match
+      // Require at least 20% improvement over second best match (increased from 15%)
       // This ensures we're matching to the correct person, not just a similar face
-      if (improvementRatio < 0.15) {
+      if (improvementRatio < 0.20) {
         console.log(`⚠️  Best match too close to second best (${bestMatch.distance.toFixed(4)} vs ${secondBest.distance.toFixed(4)}, improvement: ${(improvementRatio * 100).toFixed(1)}%)`);
         console.log(`   Rejecting match to prevent false positive`);
         return {
@@ -163,10 +219,11 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
       }
     }
     
-    // ADDITIONAL VALIDATION: Best match must have good confidence
-    // Distance < 0.4 = excellent match (>60% confidence)
-    // Distance 0.4-0.45 = good match (55-60% confidence)
-    if (bestMatch.distance > threshold * 0.9) {
+    // BALANCED VALIDATION: Require good confidence but not too strict
+    // Distance < 0.5 = excellent match (50%+ confidence) - always accept
+    // Distance 0.5-0.6 = good match (40-50% confidence) - accept with validation
+    // Reject matches that are too close to threshold (within 97% of threshold)
+    if (bestMatch.distance > threshold * 0.97) {
       // Match is too close to threshold - might be false positive
       console.log(`⚠️  Best match distance (${bestMatch.distance.toFixed(4)}) too close to threshold (${threshold})`);
       console.log(`   Rejecting to prevent false positive`);
@@ -174,6 +231,33 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
         matches: [],
         bestMatch: null
       };
+    }
+    
+    // ADDITIONAL CHECK: If best match is borderline (>0.5), require it to be clearly better than second best
+    if (goodMatches.length > 1 && bestMatch.distance > 0.5) {
+      const secondBest = goodMatches[1];
+      const improvementRatio = (secondBest.distance - bestMatch.distance) / secondBest.distance;
+      // For borderline matches (>0.5), require at least 15% improvement
+      if (improvementRatio < 0.15) {
+        console.log(`⚠️  Borderline match (${bestMatch.distance.toFixed(4)}) not clearly better than second best`);
+        console.log(`   Improvement: ${(improvementRatio * 100).toFixed(1)}% (need 25%+)`);
+        console.log(`   Rejecting to prevent false positive`);
+        return {
+          matches: [],
+          bestMatch: null
+        };
+      }
+    }
+    
+    // FINAL CHECK: Log all match details for debugging
+    console.log(`🎯 Final match validation:`);
+    console.log(`   Best match distance: ${bestMatch.distance.toFixed(4)}`);
+    console.log(`   Best match confidence: ${((1 - bestMatch.distance) * 100).toFixed(1)}%`);
+    console.log(`   Best match person: ${bestMatch.personName || 'Unknown'}`);
+    console.log(`   Best match photo ID: ${bestMatch.photoId}`);
+    if (goodMatches.length > 1) {
+      console.log(`   Second best distance: ${goodMatches[1].distance.toFixed(4)}`);
+      console.log(`   Improvement: ${((goodMatches[1].distance - bestMatch.distance) / goodMatches[1].distance * 100).toFixed(1)}%`);
     }
     
     // Group by person and get best match per person
@@ -207,8 +291,14 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
     // Prefer person matches if available, otherwise use photo matches
     const finalMatches = uniquePersonMatches.length > 0 ? uniquePersonMatches : uniquePhotoMatches;
     
-    // Limit to top 10 matches to prevent showing too many false positives
-    const limitedMatches = finalMatches.slice(0, 10);
+    // Limit to top 10 matches, but filter out borderline matches
+    // Keep matches that are clearly good (distance < 0.5) or at least 3% better than threshold
+    const limitedMatches = finalMatches
+      .filter(m => {
+        // Accept if excellent match (< 0.5) OR at least 3% better than threshold
+        return m.distance < 0.5 || m.distance < threshold * 0.97;
+      })
+      .slice(0, 10); // Limit to top 10
     
     console.log(`✅ Found ${limitedMatches.length} valid match(es) after strict filtering`);
     console.log(`   Best match distance: ${limitedMatches[0].distance.toFixed(4)} (confidence: ${((1 - limitedMatches[0].distance) * 100).toFixed(1)}%)`);
@@ -240,7 +330,8 @@ async function matchFaces(descriptors, threshold = 0.6) {
 
 /**
  * Validate a face descriptor
- * Should be array of 128 numbers
+ * Should be array of 512 numbers (DeepFace + RetinaFace embeddings)
+ * Also supports legacy 128-dim descriptors for backward compatibility
  */
 function validateDescriptor(descriptor) {
   if (!Array.isArray(descriptor)) {
@@ -250,10 +341,11 @@ function validateDescriptor(descriptor) {
     };
   }
   
-  if (descriptor.length !== 128) {
+  // Support both 512-dim (DeepFace) and 128-dim (legacy face-api.js) descriptors
+  if (descriptor.length !== 512 && descriptor.length !== 128) {
     return {
       valid: false,
-      error: 'Descriptor must have exactly 128 dimensions'
+      error: `Descriptor must have exactly 512 dimensions (DeepFace) or 128 dimensions (legacy). Got ${descriptor.length}`
     };
   }
   

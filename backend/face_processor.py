@@ -142,7 +142,7 @@ class FaceProcessor:
             face_locations = face_recognition.face_locations(
                 image, 
                 model=self.model,
-                number_of_times_to_upsample=1  # Upsample once for better small face detection
+                number_of_times_to_upsample=2  # Upsample twice for better small face detection (especially faces in back of wedding hall)
             )
             
             if not face_locations:
