@@ -15,8 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Camera, RotateCcw, AlertCircle, CheckCircle, Users, Wrench, Search, Image as ImageIcon, Lightbulb } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api'; // Import API_BASE_URL
 
-// Import face-api.js
-import * as faceapi from 'face-api.js';
+// Import DeepFace face detection utility
+import { detectFaces as detectFacesWithDeepFace, loadFaceDetectionModels } from '../utils/faceDetection';
 import { faceDetectionDiagnostic } from '../utils/faceDetectionDiagnostic';
 import PhotoBoothDiagnostic from './PhotoBoothDiagnostic';
 import FaceSearchResults from './FaceSearchResults';
@@ -103,64 +103,35 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     }
   }, [diagnosticInfo]);
 
-  // Load face-api.js models
+  // Load DeepFace API (no models to load, API is always available)
   useEffect(() => {
     const loadModels = async () => {
       try {
-        console.log('🔄 Loading face-api.js models for Photo Booth...');
-        setUserGuidance('Loading face detection models...');
+        console.log('🔄 Initializing DeepFace + RetinaFace API for Photo Booth...');
+        setUserGuidance('Connecting to face detection service...');
         
-        // Load models sequentially with progress feedback
-        console.log('Loading TinyFaceDetector...');
-        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        // Load DeepFace API (just verifies connection)
+        await loadFaceDetectionModels();
         
-        console.log('Loading FaceLandmark68Net...');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-        
-        console.log('Loading FaceRecognitionNet...');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-        
-        console.log('Loading FaceExpressionNet...');
-        await faceapi.nets.faceExpressionNet.loadFromUri('/models');
-        
-        // Verify models are loaded
-        const modelsLoaded = {
-          tinyFaceDetector: faceapi.nets.tinyFaceDetector.isLoaded,
-          faceLandmark68Net: faceapi.nets.faceLandmark68Net.isLoaded,
-          faceRecognitionNet: faceapi.nets.faceRecognitionNet.isLoaded,
-          faceExpressionNet: faceapi.nets.faceExpressionNet.isLoaded
-        };
-        
-        console.log('Model loading status:', modelsLoaded);
-        
-        const allLoaded = Object.values(modelsLoaded).every(loaded => loaded);
-        
-        if (allLoaded) {
-          console.log('✅ Photo Booth models loaded successfully');
-          setIsModelLoaded(true);
-          setUserGuidance('Models loaded! Click "Start Camera" to begin.');
-          setDiagnosticInfo('All models loaded successfully');
-        } else {
-          throw new Error('Some models failed to load: ' + JSON.stringify(modelsLoaded));
-        }
-      } catch (error) {
-        console.error('❌ Error loading Photo Booth models:', error);
-        setUserGuidance('Failed to load face detection models. Check console for details.');
+        console.log('✅ DeepFace + RetinaFace API ready');
+        setIsModelLoaded(true);
+        setUserGuidance('Face detection ready! Click "Start Camera" to begin.');
+        setDiagnosticInfo('DeepFace + RetinaFace API connected');
+      } catch (error: any) {
+        console.error('❌ Error connecting to DeepFace API:', error);
+        setUserGuidance('Failed to connect to face detection service. Check console for details.');
         setDetectionStatus('error');
-        setDiagnosticInfo(`Model loading failed: ${error.message}`);
-        
-        // Run diagnostic to get more details
-        setTimeout(runDiagnostic, 1000);
+        setDiagnosticInfo(`API connection failed: ${error.message || 'Unknown error'}`);
       }
     };
 
     loadModels();
-  }, [runDiagnostic]);
+  }, []);
 
-  // Enhanced face detection with multiple attempts
+  // Enhanced face detection with DeepFace + RetinaFace
   const detectFaces = useCallback(async (imageElement: HTMLImageElement | HTMLVideoElement) => {
     if (!isModelLoaded) {
-      setUserGuidance('Models are still loading. Please wait...');
+      setUserGuidance('Face detection service is still connecting. Please wait...');
       return;
     }
 
@@ -169,35 +140,18 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Detecting faces... Please hold still.');
 
     try {
-      // Use optimized detection options for better accuracy
-      const options = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 608,
-        scoreThreshold: 0.25
-      });
-
-      // Try multiple detection methods
-      let detections = await faceapi.detectAllFaces(imageElement, options);
+      // Use DeepFace + RetinaFace API for detection
+      const faceResults = await detectFacesWithDeepFace(imageElement);
       
-      // If no faces detected, try with more sensitive settings
-      if (detections.length === 0) {
-        console.log('No faces detected, trying with more sensitive settings...');
-        const sensitiveOptions = new faceapi.TinyFaceDetectorOptions({
-          inputSize: 416,
-          scoreThreshold: 0.15
-        });
-        detections = await faceapi.detectAllFaces(imageElement, sensitiveOptions);
-      }
-
-      // If still no faces, try with landmarks for better detection
-      if (detections.length === 0) {
-        console.log('Trying with landmarks...');
-        const detectionsWithLandmarks = await faceapi
-          .detectAllFaces(imageElement, options)
-          .withFaceLandmarks();
-        detections = detectionsWithLandmarks.map(d => d.detection);
-      }
-
-      if (detections.length > 0) {
+      if (faceResults.length > 0) {
+        // Convert to format expected by PhotoBooth
+        const detections = faceResults.map(result => ({
+          detection: {
+            box: result.box,
+            score: result.detection.score
+          }
+        }));
+        
         setDetectionResults(detections);
         setDetectionStatus('success');
         setUserGuidance(`Great! Found ${detections.length} face(s). You can now take a photo!`);
@@ -362,17 +316,18 @@ useEffect(() => {
           }
           setLastDetectionTime(now);
 
-          // Detect faces with ultra-stable settings for video stream AND extract descriptors
-          let detections = await faceapi
-            .detectAllFaces(
-              video,
-              new faceapi.TinyFaceDetectorOptions({
-                inputSize: 608,
-                scoreThreshold: 0.12 // Lower threshold so smaller faces are picked up, especially for groups
-              })
-            )
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+          // Detect faces with DeepFace + RetinaFace API
+          const faceResults = await detectFacesWithDeepFace(video);
+          
+          // Convert to format expected by PhotoBooth
+          let detections = faceResults.map(result => ({
+            detection: {
+              box: result.box,
+              score: result.detection.score
+            },
+            landmarks: result.landmarks,
+            descriptor: result.descriptor
+          }));
 
           // Filter detections by very high confidence to eliminate flickering
           detections = detections.filter(detection => getDetectionScore(detection) >= MIN_VIDEO_DETECTION_SCORE);

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection - Wedding Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        /* Custom styles for better face detection visualization */
+        .detection-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .face-box {
+            border: 2px solid #00ff00;
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .confidence-text {
+            position: absolute;
+            background: rgba(0, 255, 0, 0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .face-number {
+            position: absolute;
+            background: white;
+            color: #00ff00;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Face Detection</h1>
+            <p class="text-gray-600">Upload a photo or use your webcam to detect faces in real-time</p>
+        </div>
+
+        <!-- Main Detection Card -->
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Real-time Face Detection
+                </h2>
+                <p class="text-blue-100 mt-2">Powered by face-api.js with TensorFlow.js</p>
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-6">
+                <!-- Model Status -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div id="model-status" class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <span id="model-text" class="text-sm text-gray-600">Loading face detection models...</span>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button id="upload-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Upload Photo
+                    </button>
+                    
+                    <button id="webcam-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <span id="webcam-text">Start Webcam</span>
+                    </button>
+                    
+                    <button id="clear-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Clear
+                    </button>
+                    
+                    <button id="download-btn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hidden">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download
+                    </button>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+
+                <!-- Detection Area -->
+                <div class="relative bg-gray-100 rounded-lg overflow-hidden mb-6">
+                    <!-- Video element for webcam -->
+                    <video id="video" class="w-full h-auto hidden" autoplay muted playsinline></video>
+                    
+                    <!-- Image display area -->
+                    <div id="image-container" class="relative hidden">
+                        <img id="detection-image" class="w-full h-auto" alt="Detection target">
+                        <canvas id="detection-canvas" class="detection-canvas"></canvas>
+                    </div>
+                    
+                    <!-- Placeholder when no image/video -->
+                    <div id="placeholder" class="flex items-center justify-center h-64 text-gray-500">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <p>Upload a photo or start webcam to begin face detection</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Statistics -->
+                <div id="stats-container" class="hidden">
+                    <h3 class="text-lg font-semibold mb-4">Detection Results</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-900">Faces Detected</h4>
+                            <p id="face-count" class="text-2xl font-bold text-blue-600">0</p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-green-900">Avg Confidence</h4>
+                            <p id="avg-confidence" class="text-2xl font-bold text-green-600">0%</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-purple-900">Processing Time</h4>
+                            <p id="processing-time" class="text-2xl font-bold text-purple-600">0ms</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Details -->
+                <div id="details-container" class="hidden">
+                    <h3 class="text-lg font-semibold mb-4">Face Details</h3>
+                    <div id="face-details" class="space-y-2"></div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="hidden flex items-center justify-center py-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+                        <span class="text-gray-600">Detecting faces...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-500">
+            <p>Face Detection powered by <a href="https://github.com/justadudewhohacks/face-api.js" class="text-blue-500 hover:underline">face-api.js</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Face Detection Application
+        class FaceDetectionApp {
+            constructor() {
+                this.isModelLoaded = false;
+                this.isDetecting = false;
+                this.isWebcamActive = false;
+                this.detectionResults = [];
+                this.currentImage = null;
+                
+                // DOM elements
+                this.elements = {
+                    modelStatus: document.getElementById('model-status'),
+                    modelText: document.getElementById('model-text'),
+                    progressBar: document.getElementById('progress-bar'),
+                    uploadBtn: document.getElementById('upload-btn'),
+                    webcamBtn: document.getElementById('webcam-btn'),
+                    webcamText: document.getElementById('webcam-text'),
+                    clearBtn: document.getElementById('clear-btn'),
+                    downloadBtn: document.getElementById('download-btn'),
+                    fileInput: document.getElementById('file-input'),
+                    video: document.getElementById('video'),
+                    imageContainer: document.getElementById('image-container'),
+                    detectionImage: document.getElementById('detection-image'),
+                    detectionCanvas: document.getElementById('detection-canvas'),
+                    placeholder: document.getElementById('placeholder'),
+                    statsContainer: document.getElementById('stats-container'),
+                    faceCount: document.getElementById('face-count'),
+                    avgConfidence: document.getElementById('avg-confidence'),
+                    processingTime: document.getElementById('processing-time'),
+                    detailsContainer: document.getElementById('details-container'),
+                    faceDetails: document.getElementById('face-details'),
+                    loading: document.getElementById('loading')
+                };
+                
+                this.init();
+            }
+            
+            // Initialize the application
+            async init() {
+                console.log('🚀 Initializing Face Detection App...');
+                this.setupEventListeners();
+                await this.loadModels();
+            }
+            
+            // Setup event listeners
+            setupEventListeners() {
+                this.elements.uploadBtn.addEventListener('click', () => this.elements.fileInput.click());
+                this.elements.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                this.elements.webcamBtn.addEventListener('click', () => this.toggleWebcam());
+                this.elements.clearBtn.addEventListener('click', () => this.clearDetections());
+                this.elements.downloadBtn.addEventListener('click', () => this.downloadResults());
+            }
+            
+            // Load face-api.js models
+            async loadModels() {
+                try {
+                    console.log('🔄 Loading face-api.js models...');
+                    
+                    // Update progress
+                    this.updateProgress(10, 'Loading TinyFaceDetector...');
+                    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+                    
+                    this.updateProgress(30, 'Loading FaceLandmark68Net...');
+                    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+                    
+                    this.updateProgress(60, 'Loading FaceRecognitionNet...');
+                    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+                    
+                    this.updateProgress(80, 'Loading FaceExpressionNet...');
+                    await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+                    
+                    this.updateProgress(100, 'Models loaded successfully!');
+                    
+                    // Enable controls
+                    this.elements.uploadBtn.disabled = false;
+                    this.elements.webcamBtn.disabled = false;
+                    
+                    // Update status
+                    this.elements.modelStatus.className = 'w-3 h-3 rounded-full bg-green-500';
+                    this.elements.modelText.textContent = 'Models loaded successfully';
+                    this.isModelLoaded = true;
+                    
+                    console.log('✅ Face-api.js models loaded successfully');
+                    
+                } catch (error) {
+                    console.error('❌ Error loading face-api.js models:', error);
+                    this.elements.modelStatus.className = 'w-3 h-3 rounded-full bg-red-500';
+                    this.elements.modelText.textContent = 'Failed to load models';
+                    alert('Failed to load face detection models. Please check if model files are available at /models/');
+                }
+            }
+            
+            // Update progress bar and text
+            updateProgress(percentage, text) {
+                this.elements.progressBar.style.width = `${percentage}%`;
+                this.elements.modelText.textContent = text;
+            }
+            
+            // Handle file upload
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    return;
+                }
+                
+                // Create image element and load file
+                const img = new Image();
+                img.onload = () => {
+                    this.processImage(img);
+                };
+                img.onerror = () => {
+                    alert('Failed to load image. Please try again.');
+                };
+                img.src = URL.createObjectURL(file);
+            }
+            
+            // Process image for face detection
+            async processImage(image) {
+                if (!this.isModelLoaded) {
+                    alert('Face detection models are still loading. Please wait...');
+                    return;
+                }
+                
+                this.isDetecting = true;
+                this.showLoading(true);
+                const startTime = performance.now();
+                
+                try {
+                    // Set up canvas
+                    const canvas = this.elements.detectionCanvas;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas dimensions to match image
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    
+                    // Display image
+                    this.elements.detectionImage.src = image.src;
+                    this.elements.detectionImage.style.width = '100%';
+                    this.elements.detectionImage.style.height = 'auto';
+                    this.elements.imageContainer.classList.remove('hidden');
+                    this.elements.placeholder.classList.add('hidden');
+                    
+                    // Detect faces with all features
+                    const detections = await faceapi
+                        .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks()
+                        .withFaceExpressions()
+                        .withFaceDescriptors();
+                    
+                    const endTime = performance.now();
+                    const processingTime = endTime - startTime;
+                    
+                    // Store results
+                    this.detectionResults = detections;
+                    this.currentImage = image;
+                    
+                    // Calculate statistics
+                    const faceCount = detections.length;
+                    const averageConfidence = faceCount > 0 
+                        ? detections.reduce((sum, det) => sum + det.detection.score, 0) / faceCount 
+                        : 0;
+                    
+                    // Update UI
+                    this.updateStats(faceCount, averageConfidence, processingTime);
+                    this.drawDetections(detections);
+                    this.updateDetails(detections);
+                    
+                    console.log(`✅ Detected ${faceCount} faces in ${processingTime.toFixed(2)}ms`);
+                    
+                } catch (error) {
+                    console.error('❌ Face detection error:', error);
+                    alert('Face detection failed. Please try again.');
+                } finally {
+                    this.isDetecting = false;
+                    this.showLoading(false);
+                }
+            }
+            
+            // Draw bounding boxes and labels on canvas
+            drawDetections(detections) {
+                const canvas = this.elements.detectionCanvas;
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw each detection
+                detections.forEach((detection, index) => {
+                    const { x, y, width, height } = detection.detection.box;
+                    const confidence = detection.detection.score;
+                    
+                    // Draw bounding box
+                    ctx.strokeStyle = '#00ff00';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, width, height);
+                    
+                    // Draw confidence score
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(
+                        `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
+                        x,
+                        y - 5
+                    );
+                    
+                    // Draw face number
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(
+                        `${index + 1}`,
+                        x + width / 2 - 8,
+                        y + height / 2 + 6
+                    );
+                });
+            }
+            
+            // Toggle webcam
+            async toggleWebcam() {
+                if (this.isWebcamActive) {
+                    this.stopWebcam();
+                } else {
+                    await this.startWebcam();
+                }
+            }
+            
+            // Start webcam
+            async startWebcam() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: 640, 
+                            height: 480,
+                            facingMode: 'user'
+                        } 
+                    });
+                    
+                    this.elements.video.srcObject = stream;
+                    this.elements.video.play();
+                    this.elements.video.classList.remove('hidden');
+                    this.elements.placeholder.classList.add('hidden');
+                    this.elements.imageContainer.classList.add('hidden');
+                    
+                    this.isWebcamActive = true;
+                    this.elements.webcamText.textContent = 'Stop Webcam';
+                    this.elements.webcamBtn.className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2';
+                    
+                    // Start continuous detection
+                    this.detectFacesInVideo();
+                    
+                } catch (error) {
+                    console.error('❌ Webcam access error:', error);
+                    alert('Failed to access webcam. Please check permissions.');
+                }
+            }
+            
+            // Stop webcam
+            stopWebcam() {
+                const video = this.elements.video;
+                if (video.srcObject) {
+                    const stream = video.srcObject;
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+                
+                this.isWebcamActive = false;
+                this.elements.video.classList.add('hidden');
+                this.elements.placeholder.classList.remove('hidden');
+                this.elements.webcamText.textContent = 'Start Webcam';
+                this.elements.webcamBtn.className = 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2';
+                
+                // Clear detections
+                this.clearDetections();
+            }
+            
+            // Detect faces in video stream
+            async detectFacesInVideo() {
+                if (!this.isWebcamActive) return;
+                
+                try {
+                    const video = this.elements.video;
+                    const canvas = this.elements.detectionCanvas;
+                    
+                    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                        requestAnimationFrame(() => this.detectFacesInVideo());
+                        return;
+                    }
+                    
+                    // Set canvas dimensions to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // Detect faces in video frame
+                    const detections = await faceapi
+                        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks()
+                        .withFaceExpressions();
+                    
+                    // Update results
+                    this.detectionResults = detections;
+                    
+                    // Calculate statistics
+                    const faceCount = detections.length;
+                    const averageConfidence = faceCount > 0 
+                        ? detections.reduce((sum, det) => sum + det.detection.score, 0) / faceCount 
+                        : 0;
+                    
+                    // Update UI
+                    this.updateStats(faceCount, averageConfidence, 0);
+                    this.drawDetections(detections);
+                    this.updateDetails(detections);
+                    
+                } catch (error) {
+                    console.error('Webcam detection error:', error);
+                }
+                
+                // Continue detection loop
+                if (this.isWebcamActive) {
+                    requestAnimationFrame(() => this.detectFacesInVideo());
+                }
+            }
+            
+            // Update statistics display
+            updateStats(faceCount, averageConfidence, processingTime) {
+                this.elements.faceCount.textContent = faceCount;
+                this.elements.avgConfidence.textContent = `${(averageConfidence * 100).toFixed(1)}%`;
+                this.elements.processingTime.textContent = `${processingTime.toFixed(0)}ms`;
+                this.elements.statsContainer.classList.remove('hidden');
+            }
+            
+            // Update face details
+            updateDetails(detections) {
+                const detailsContainer = this.elements.faceDetails;
+                detailsContainer.innerHTML = '';
+                
+                detections.forEach((detection, index) => {
+                    const confidence = detection.detection.score;
+                    const expressions = detection.expressions;
+                    
+                    const detailDiv = document.createElement('div');
+                    detailDiv.className = 'bg-gray-50 p-3 rounded-lg';
+                    
+                    let expressionsText = '';
+                    if (expressions) {
+                        const topExpressions = Object.entries(expressions)
+                            .filter(([_, value]) => value > 0.1)
+                            .sort(([,a], [,b]) => b - a)
+                            .slice(0, 3)
+                            .map(([emotion, value]) => `${emotion}: ${(value * 100).toFixed(1)}%`)
+                            .join(', ');
+                        
+                        expressionsText = topExpressions || 'Neutral';
+                    }
+                    
+                    detailDiv.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">Face ${index + 1}</span>
+                            <span class="text-sm text-gray-600">
+                                Confidence: ${(confidence * 100).toFixed(1)}%
+                            </span>
+                        </div>
+                        ${expressionsText ? `
+                            <div class="mt-2 text-sm">
+                                <p class="text-gray-600">Expressions: ${expressionsText}</p>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    detailsContainer.appendChild(detailDiv);
+                });
+                
+                this.elements.detailsContainer.classList.remove('hidden');
+            }
+            
+            // Clear all detections
+            clearDetections() {
+                this.detectionResults = [];
+                this.currentImage = null;
+                
+                // Clear canvas
+                const canvas = this.elements.detectionCanvas;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Hide containers
+                this.elements.statsContainer.classList.add('hidden');
+                this.elements.detailsContainer.classList.add('hidden');
+                this.elements.downloadBtn.classList.add('hidden');
+                this.elements.imageContainer.classList.add('hidden');
+                this.elements.placeholder.classList.remove('hidden');
+            }
+            
+            // Download detection results
+            downloadResults() {
+                const canvas = this.elements.detectionCanvas;
+                const link = document.createElement('a');
+                link.download = `face-detection-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+            
+            // Show/hide loading state
+            showLoading(show) {
+                if (show) {
+                    this.elements.loading.classList.remove('hidden');
+                } else {
+                    this.elements.loading.classList.add('hidden');
+                }
+            }
+        }
+        
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new FaceDetectionApp();
+        });
+    </script>
+</body>
+</html>
