@@ -295,9 +295,11 @@ const FaceDescriptorDB = {
 
   /**
    * Get all face descriptors (for face matching)
+   * @param {Object} filters - Optional filters
+   * @param {Array} filters.photo_ids - Filter by photo IDs
    */
-  async findAll() {
-    const { data, error } = await supabase
+  async findAll(filters = {}) {
+    let query = supabase
       .from('face_descriptors')
       .select(`
         *,
@@ -307,6 +309,13 @@ const FaceDescriptorDB = {
           role
         )
       `);
+    
+    // Filter by photo IDs if provided
+    if (filters.photo_ids && filters.photo_ids.length > 0) {
+      query = query.in('photo_id', filters.photo_ids);
+    }
+    
+    const { data, error } = await query;
     
     if (error) throw error;
     return data;
