@@ -1,473 +1,358 @@
-# 🎭 Wedding Photo Gallery - Face Recognition System
+# Face Recognition Processor - Wedding Web
 
-## Overview
+A high-performance face recognition system using `face_recognition` (dlib) library with CNN model for optimal accuracy, especially for detecting faces in background areas of Kerala wedding halls.
 
-A robust, production-ready face detection and recognition system for automatically identifying people in wedding photos. This system uses state-of-the-art machine learning models to detect faces, match them against a database of known individuals, and create personalized photo galleries for each wedding guest.
+## Features
 
-## ✨ Key Features
+- ✅ **High Accuracy**: Uses CNN model for superior face detection
+- ✅ **Gallery Indexing**: Scans folders and indexes all faces
+- ✅ **Face Search**: Finds guest photos using selfie
+- ✅ **Persistent Storage**: Saves index as JSON or Pickle
+- ✅ **Error Handling**: Robust handling of edge cases
+- ✅ **Modular Design**: Easy-to-use Processor class
 
-### 🔍 Automatic Face Detection
-- **Real-time detection** during photo upload
-- **Multiple faces** per photo supported (up to 50)
-- **Quality validation** to ensure accurate detection
-- **Client-side processing** for instant feedback
+## Installation
 
-### 👤 Intelligent Face Recognition
-- **128-dimensional face encodings** for accurate matching
-- **Euclidean distance algorithm** for face comparison
-- **Confidence scoring** for match reliability
-- **Multi-person database** support
+### Prerequisites
 
-### 📸 Person-Specific Galleries
-- **Automatic photo grouping** by person
-- **Confidence filtering** to show best matches
-- **Event-based filtering** (ceremony, reception, etc.)
-- **Download and share** capabilities
+- Python 3.7+
+- CMake (required for dlib)
+- Visual Studio Build Tools (Windows) or build-essential (Linux/Mac)
 
-### ✅ Manual Verification System
-- **Review unidentified faces** easily
-- **Search and assign** people manually
-- **Bulk verification** operations
-- **Threshold adjustment** for reprocessing
-
-### 📊 Analytics Dashboard
-- **Processing statistics** and metrics
-- **Success/error rates** tracking
-- **Person coverage** analysis
-- **Quality reports** for improvements
-
-### ⚡ Performance Optimized
-- **Batch processing** for large libraries
-- **Concurrent uploads** support
-- **Background processing** queue
-- **Efficient database** queries
-
-## 🏗️ System Architecture
-
-```
-┌──────────────────────────────────────────────────┐
-│                                                  │
-│  Frontend (React + TypeScript)                   │
-│  • Face detection with face-api.js              │
-│  • Real-time processing feedback                │
-│  • Person galleries & verification UI           │
-│                                                  │
-└──────────────┬───────────────────────────────────┘
-               │ REST API
-┌──────────────▼───────────────────────────────────┐
-│                                                  │
-│  Backend (Node.js + Express)                     │
-│  • Face matching algorithms                      │
-│  • Batch processing service                      │
-│  • Queue management                              │
-│                                                  │
-└──────────────┬───────────────────────────────────┘
-               │ PostgreSQL
-┌──────────────▼───────────────────────────────────┐
-│                                                  │
-│  Database (Supabase)                             │
-│  • Photos & metadata                             │
-│  • People & face descriptors                     │
-│  • Detection results                             │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
-
-## 🚀 Quick Start
-
-### Installation
+### Install Dependencies
 
 ```bash
-# Install dependencies
-npm install
-
-# Run database migrations
 cd backend
-node supabase/run-migration.js
-
-# Start backend server
-npm start
-
-# In another terminal, start frontend
-cd frontend
-npm run dev
+pip install -r requirements.txt
 ```
 
-### Basic Usage
+**Note**: Installing `dlib` and `face_recognition` can be tricky. If you encounter issues:
 
-```javascript
-// 1. Upload photos with automatic face detection
-<PhotoUploadEnhanced
-  sister="sister-a"
-  onUploadComplete={handleComplete}
-/>
-
-// 2. View person-specific gallery
-<PersonGallery
-  personId="person-uuid"
-  personName="John Doe"
-/>
-
-// 3. Verify unidentified faces
-<FaceVerificationPanel />
-
-// 4. Monitor system performance
-<FaceRecognitionAnalytics />
+**macOS:**
+```bash
+brew install cmake
+pip install dlib face_recognition
 ```
 
-## 📖 Documentation
-
-- **[Full Documentation](./FACE_RECOGNITION_SYSTEM.md)** - Complete system documentation
-- **[Quick Start Guide](./FACE_RECOGNITION_QUICKSTART.md)** - Get started in 5 minutes
-- **[API Reference](./FACE_RECOGNITION_SYSTEM.md#-api-endpoints)** - All API endpoints
-- **[Best Practices](./FACE_RECOGNITION_SYSTEM.md#-best-practices)** - Tips for optimal use
-
-## 🎯 Core Components
-
-### Backend Services
-
-#### Face Processing Service
-```javascript
-// backend/services/face-processing-service.js
-const result = await faceProcessingService.processSinglePhoto(
-  photoId,
-  faceDescriptors,
-  {
-    confidenceThreshold: 0.6,
-    minFaceSize: 0.02,
-    maxFaces: 50
-  }
-);
+**Linux:**
+```bash
+sudo apt-get install cmake libopenblas-dev liblapack-dev
+pip install dlib face_recognition
 ```
 
-#### Face Recognition API
-```javascript
-// backend/faces.js
-POST /api/faces/match           // Match a face descriptor
-GET  /api/faces/people          // Get all people
-POST /api/faces/people          // Add new person
-GET  /api/faces/people/:id      // Get person details
+**Windows:**
+```bash
+# Install Visual Studio Build Tools first
+# Then install CMake from https://cmake.org/download/
+pip install dlib face_recognition
 ```
 
-#### Enhanced Photos API
-```javascript
-// backend/photos-enhanced.js
-POST /api/photos-enhanced/upload              // Upload with face detection
-POST /api/photos-enhanced/upload-batch        // Batch upload
-GET  /api/photos-enhanced/by-person/:id       // Get person's photos
-GET  /api/photos-enhanced/unidentified-faces  // Get unidentified faces
-POST /api/photos-enhanced/reprocess-faces     // Reprocess with new threshold
+## Quick Start
+
+### 1. Index a Gallery
+
+```python
+from face_processor import FaceProcessor
+
+# Initialize processor with CNN model
+processor = FaceProcessor(
+    index_file='face_index.json',
+    model='cnn',  # Use CNN for better accuracy
+    tolerance=0.6
+)
+
+# Index all photos in a folder
+stats = processor.index_gallery('uploads/wedding_gallery/sister_a')
+print(f"Indexed {stats['faces_found']} faces from {stats['processed']} photos")
 ```
 
-### Frontend Components
+### 2. Search for a Guest
 
-#### PhotoUploadEnhanced
-Enhanced photo upload with automatic face detection and quality validation.
+```python
+# Search for guest using their selfie
+matches = processor.search_face('guest_selfie.jpg')
 
-```tsx
-<PhotoUploadEnhanced
-  sister="sister-a"
-  onUploadComplete={(results) => console.log(results)}
-  enableBatchUpload={true}
-  maxFiles={20}
-/>
+# Returns list of filenames where guest was found
+for filename in matches:
+    print(f"Found guest in: {filename}")
 ```
 
-#### PersonGallery
-Person-specific photo gallery with filtering and management.
+### 3. Command Line Usage
 
-```tsx
-<PersonGallery
-  personId="uuid"
-  personName="John Doe"
-  personRole="Friend"
-/>
+```bash
+# Index a gallery
+python face_processor.py --index uploads/wedding_gallery/sister_a --index-file face_index.json --model cnn
+
+# Search for a face
+python face_processor.py --search guest_selfie.jpg --index-file face_index.json
+
+# Show statistics
+python face_processor.py --stats --index-file face_index.json
 ```
 
-#### FaceVerificationPanel
-Manual face verification and identification management.
+## API Reference
 
-```tsx
-<FaceVerificationPanel />
+### FaceProcessor Class
+
+#### Initialization
+
+```python
+FaceProcessor(
+    index_file: str = 'face_index.json',
+    model: str = 'cnn',  # 'cnn' or 'hog'
+    tolerance: float = 0.6  # Match tolerance (lower = stricter)
+)
 ```
 
-#### FaceRecognitionAnalytics
-Comprehensive analytics and system insights.
+**Parameters:**
+- `index_file`: Path to JSON/Pickle file for storing face encodings
+- `model`: Detection model - `'cnn'` (accurate, slower) or `'hog'` (faster, less accurate)
+- `tolerance`: Face matching tolerance (0.0-1.0). Lower values = stricter matches
 
-```tsx
-<FaceRecognitionAnalytics />
+#### Methods
+
+##### `index_gallery(gallery_folder, recursive=True, update_existing=False)`
+
+Scans a folder of photos and indexes all detected faces.
+
+**Parameters:**
+- `gallery_folder`: Path to folder containing wedding photos
+- `recursive`: Whether to scan subdirectories (default: True)
+- `update_existing`: Whether to re-index already indexed photos (default: False)
+
+**Returns:**
+```python
+{
+    'processed': int,    # Number of photos processed
+    'faces_found': int,  # Total faces detected
+    'errors': int,       # Number of errors
+    'skipped': int       # Number of photos skipped (already indexed)
+}
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-
-**Backend:**
-```env
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_anon_key
-PORT=5000
+**Example:**
+```python
+stats = processor.index_gallery('uploads/wedding_gallery/sister_a')
 ```
 
-**Frontend:**
-```env
-VITE_API_BASE_URL=http://localhost:5000
-VITE_SUPABASE_URL=your_supabase_url
+##### `search_face(guest_selfie_path, return_scores=False)`
+
+Searches for a guest's face in the indexed gallery.
+
+**Parameters:**
+- `guest_selfie_path`: Path to guest's selfie image
+- `return_scores`: If True, returns tuples (filename, distance) instead of just filenames
+
+**Returns:**
+- If `return_scores=False`: `List[str]` - List of matching filenames
+- If `return_scores=True`: `List[Tuple[str, float]]` - List of (filename, match_distance)
+
+**Example:**
+```python
+# Get just filenames
+matches = processor.search_face('guest_selfie.jpg')
+# ['photo1.jpg', 'photo2.jpg', ...]
+
+# Get filenames with match scores
+matches = processor.search_face('guest_selfie.jpg', return_scores=True)
+# [('photo1.jpg', 0.45), ('photo2.jpg', 0.52), ...]
 ```
 
-### Face Detection Settings
+##### `get_index_stats()`
 
-```javascript
-// Adjust detection sensitivity
-new faceapi.TinyFaceDetectorOptions({
-  inputSize: 416,        // Image size (128, 160, 224, 320, 416, 512, 608)
-  scoreThreshold: 0.3    // Detection threshold (0.1 - 0.9)
-})
+Returns statistics about the indexed gallery.
 
-// Adjust matching threshold
-const matchResult = await matchFace(descriptor, 0.6); // 0.3 - 0.95
+**Returns:**
+```python
+{
+    'total_photos': int,
+    'total_faces': int,
+    'average_faces_per_photo': float,
+    'index_file': str,
+    'model': str,
+    'tolerance': float
+}
 ```
 
-## 📊 Performance
+##### `remove_from_index(filename)`
 
-### Expected Metrics
+Removes a photo from the index.
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Face Detection | 500-2000ms | Per photo (client-side) |
-| Face Matching | 50-200ms | Per face (server-side) |
-| Batch Processing | 3-5 photos/sec | Concurrency = 3 |
-| Memory Usage | ~200MB | Face-api.js models |
-| Success Rate | 85-95% | With good quality photos |
+**Parameters:**
+- `filename`: Path to photo to remove
 
-### Scalability
+**Returns:** `bool` - True if removed, False if not found
 
-Designed to handle:
-- ✅ **10,000+** photos
-- ✅ **500+** people
-- ✅ **50,000+** detected faces
-- ✅ **50+** concurrent users
+##### `clear_index()`
 
-## 🎨 User Workflows
+Clears all indexed faces from memory and saves empty index.
 
-### Photographer Workflow
+### Convenience Functions
 
-```
-1. Add people to database
-   └─> Name, role, reference photos
+#### `index_gallery(gallery_folder, index_file='face_index.json', model='cnn', recursive=True)`
 
-2. Upload event photos
-   └─> Select event type
-   └─> Drag & drop photos
-   └─> Automatic face detection
+Quick function to index a gallery without creating a processor instance.
 
-3. Review identifications
-   └─> Check analytics dashboard
-   └─> Verify unidentified faces
-   └─> Correct misidentifications
+#### `search_face(guest_selfie_path, index_file='face_index.json', model='cnn', tolerance=0.6, return_scores=False)`
 
-4. Share galleries
-   └─> Generate person-specific links
-   └─> Enable guest downloads
+Quick function to search for a face without creating a processor instance.
+
+## Usage Examples
+
+### Example 1: Basic Workflow
+
+```python
+from face_processor import FaceProcessor
+
+# Initialize
+processor = FaceProcessor(index_file='my_index.json', model='cnn')
+
+# Index gallery
+processor.index_gallery('wedding_photos/')
+
+# Search for guest
+matches = processor.search_face('guest_selfie.jpg')
+print(f"Found in {len(matches)} photos")
 ```
 
-### Guest Workflow
+### Example 2: Custom Tolerance
 
-```
-1. Visit gallery
-   └─> Search by name
+```python
+# Stricter matching (lower tolerance)
+processor = FaceProcessor(tolerance=0.5)  # Only very close matches
 
-2. View photos
-   └─> Filter by event
-   └─> Filter by confidence
-   └─> Sort by date
-
-3. Download/Share
-   └─> Individual photos
-   └─> Bulk download
-   └─> Social sharing
+# More lenient matching (higher tolerance)
+processor = FaceProcessor(tolerance=0.7)  # More matches, less accurate
 ```
 
-## 🔒 Security & Privacy
+### Example 3: Using HOG Model (Faster)
 
-### Data Protection
-- ✅ Face descriptors stored (not actual images)
-- ✅ Row-level security policies
-- ✅ JWT authentication
-- ✅ HTTPS encryption
-
-### Privacy Features
-- ✅ Opt-in identification
-- ✅ Manual verification required
-- ✅ Cascade delete on removal
-- ✅ Transparent confidence scores
-
-## 🧪 Testing
-
-### Test with Sample Data
-
-```javascript
-// Add test people
-const testPeople = [
-  { name: 'John Doe', role: 'groom' },
-  { name: 'Jane Doe', role: 'bride' }
-];
-
-// Upload test photos
-const testPhotos = [
-  'ceremony_001.jpg',
-  'ceremony_002.jpg'
-];
-
-// Verify results
-const stats = await getProcessingStats();
-console.log('Success rate:', stats.successCount / stats.totalProcessed);
+```python
+# HOG is faster but less accurate than CNN
+processor = FaceProcessor(model='hog')
+processor.index_gallery('wedding_photos/')
 ```
 
-### Quality Assurance
+### Example 4: Get Match Scores
 
-1. **Face Detection**: Verify faces are detected accurately
-2. **Recognition**: Check identification accuracy
-3. **Performance**: Monitor processing times
-4. **Errors**: Review error logs and rates
-5. **User Experience**: Test all UI workflows
+```python
+matches = processor.search_face('guest_selfie.jpg', return_scores=True)
 
-## 📈 Optimization Tips
+for filename, distance in matches:
+    similarity = (1 - distance) * 100
+    print(f"{filename}: {similarity:.1f}% similar")
+```
 
-### For Better Accuracy
+### Example 5: Update Existing Index
 
-1. **Upload high-quality photos**
-   - Good lighting
-   - Clear faces
-   - Minimum 50x50px face size
+```python
+# Re-index photos (useful if photos were updated)
+processor.index_gallery('wedding_photos/', update_existing=True)
+```
 
-2. **Add reference photos**
-   - 3-5 clear photos per person
-   - Various angles
-   - Different lighting
+## Model Comparison
 
-3. **Verify regularly**
-   - Review unidentified faces
-   - Correct misidentifications
-   - Update thresholds
+### CNN Model (Recommended)
+- ✅ **Accuracy**: Excellent, especially for background faces
+- ✅ **Small faces**: Detects faces even in crowded backgrounds
+- ⚠️ **Speed**: Slower processing (~10-30s per photo)
+- ⚠️ **GPU**: Benefits from GPU acceleration
+- **Best for**: Production use, high-resolution photos, Kerala wedding halls
 
-### For Better Performance
+### HOG Model
+- ✅ **Speed**: Fast processing (~1-3s per photo)
+- ⚠️ **Accuracy**: Good for frontal faces, struggles with small/background faces
+- ✅ **CPU**: Works well on CPU
+- **Best for**: Quick testing, frontal portraits, lower resolution
 
-1. **Batch processing**
-   - Upload in groups of 10-20
-   - Use concurrent processing
-   - Monitor queue status
+## Tolerance Tuning
 
-2. **Database optimization**
-   - Regular VACUUM
-   - Update statistics
-   - Monitor index usage
+The `tolerance` parameter controls how strict face matching is:
 
-3. **Resource management**
-   - Clean up temporary files
-   - Revoke object URLs
-   - Clear canvas buffers
+- **0.4-0.5**: Very strict - only very similar faces match
+- **0.6** (default): Balanced - good accuracy with reasonable matches
+- **0.7-0.8**: Lenient - more matches, may include false positives
 
-## 🐛 Troubleshooting
+**Recommendation**: Start with 0.6 and adjust based on results.
 
-### Common Issues
+## Error Handling
 
-**No faces detected?**
-- Check if models are loaded
-- Verify photo quality
-- Lower scoreThreshold
+The processor handles various edge cases:
 
-**Wrong identifications?**
-- Add more reference photos
-- Verify existing matches
-- Adjust confidence threshold
+- ✅ Photos with no faces detected
+- ✅ Invalid image files
+- ✅ Corrupted images
+- ✅ Missing files
+- ✅ Multiple faces in selfie (uses first face)
+- ✅ Empty galleries
 
-**Slow processing?**
-- Reduce batch size
-- Lower concurrency
-- Optimize images
+All errors are logged and don't crash the indexing process.
 
-**High memory usage?**
-- Process smaller batches
-- Clean up resources
-- Restart services
+## Performance Tips
 
-See [Full Troubleshooting Guide](./FACE_RECOGNITION_SYSTEM.md#-troubleshooting)
+1. **Use CNN for production**: Better accuracy for background faces
+2. **Index in batches**: Process galleries in smaller chunks
+3. **Use Pickle format**: Faster loading than JSON (especially for large indexes)
+4. **GPU acceleration**: dlib supports GPU for CNN model (requires CUDA setup)
+5. **Cache results**: Don't re-index unchanged photos (default behavior)
 
-## 🗺️ Roadmap
+## Integration with Wedding Web
 
-### Version 1.0 (Current)
-- ✅ Automatic face detection
-- ✅ Face recognition
-- ✅ Person galleries
-- ✅ Manual verification
-- ✅ Analytics dashboard
-- ✅ Batch processing
+### FastAPI Endpoint Example
 
-### Version 1.1 (Planned)
-- ⏳ Real-time detection preview
-- ⏳ Advanced clustering
-- ⏳ Model retraining
-- ⏳ Mobile app
-- ⏳ Multi-language support
+```python
+from fastapi import FastAPI, File, UploadFile
+from face_processor import FaceProcessor
 
-### Version 2.0 (Future)
-- 📋 Video face detection
-- 📋 Age estimation
-- 📋 Emotion detection
-- 📋 Group photo analysis
-- 📋 Smart recommendations
+app = FastAPI()
+processor = FaceProcessor(index_file='face_index.json', model='cnn')
 
-## 🤝 Contributing
+@app.post("/api/search-face")
+async def search_face_endpoint(
+    selfie: UploadFile = File(...),
+    wedding_id: str = None
+):
+    # Save uploaded selfie
+    selfie_path = f"temp/{selfie.filename}"
+    with open(selfie_path, "wb") as f:
+        f.write(await selfie.read())
+    
+    # Search for face
+    matches = processor.search_face(selfie_path)
+    
+    return {"matches": matches, "count": len(matches)}
+```
 
-Contributions are welcome! Please:
+## Troubleshooting
 
-1. Read the documentation
-2. Fork the repository
-3. Create a feature branch
-4. Write tests
-5. Submit a pull request
+### "No module named 'face_recognition'"
+```bash
+pip install face_recognition
+```
 
-## 📝 License
+### "CMake not found" (dlib installation)
+Install CMake: https://cmake.org/download/
 
-This project is part of the Wedding Photo Gallery system.
+### "No faces detected"
+- Check image quality and lighting
+- Ensure faces are clearly visible
+- Try using CNN model instead of HOG
+- Adjust image resolution (too high/low can cause issues)
 
-## 🙏 Acknowledgments
+### "Low accuracy / Too many false positives"
+- Lower the tolerance value (e.g., 0.5)
+- Ensure good quality selfie
+- Use CNN model for better accuracy
 
-- **face-api.js** - TensorFlow.js-based face recognition
-- **Supabase** - Backend infrastructure
-- **React** - Frontend framework
-- **shadcn/ui** - UI components
+### Slow processing
+- Use HOG model for faster processing (less accurate)
+- Process images in smaller batches
+- Consider GPU acceleration for CNN
 
-## 📞 Support
+## License
 
-- 📚 [Documentation](./FACE_RECOGNITION_SYSTEM.md)
-- 🚀 [Quick Start](./FACE_RECOGNITION_QUICKSTART.md)
-- 🐛 [Troubleshooting](./FACE_RECOGNITION_SYSTEM.md#-troubleshooting)
-- 💬 [Community Forum](https://github.com/your-repo/discussions)
+Part of Wedding Web platform.
 
-## 🌟 Features Highlight
+## Support
 
-### What Makes This System Special?
-
-1. **Fully Automated** - Upload photos and faces are automatically detected and identified
-2. **High Accuracy** - Advanced algorithms ensure reliable face matching
-3. **User-Friendly** - Intuitive interfaces for photographers and guests
-4. **Production-Ready** - Tested, optimized, and scalable
-5. **Privacy-Focused** - Only stores mathematical representations, not faces
-6. **Comprehensive** - Complete solution from upload to gallery
-
-### Real-World Performance
-
-- ✅ Processed **10,000+ photos**
-- ✅ Identified **50,000+ faces**
-- ✅ **95% accuracy** in good lighting
-- ✅ **< 2 seconds** per photo
-- ✅ **Zero downtime** in production
-
----
-
-**Built with ❤️ for creating personalized wedding photo experiences**
-
-*For more details, see the [Complete Documentation](./FACE_RECOGNITION_SYSTEM.md)*
-
+For issues or questions, refer to the main Wedding Web documentation.

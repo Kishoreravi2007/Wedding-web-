@@ -22,7 +22,7 @@ interface FaceSearchResultsProps {
   capturedFaceImage: string | null;
   searchResults: string[];
   onClose: () => void;
-  weddingName: 'sister_a' | 'sister_b';
+  weddingName: 'sister_a' | 'sister_b' | 'sister-a' | 'sister-b';
   searchError: string | null;
 }
 
@@ -33,7 +33,9 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
   weddingName,
   searchError
 }) => {
-  const weddingTitle = weddingName === 'sister_a' ? "Parvathy's Wedding" : "Sreedevi's Wedding";
+  // Handle both formats: 'sister-a'/'sister-b' (from API) and 'sister_a'/'sister_b' (legacy)
+  const normalizedWedding = weddingName?.replace('-', '_') || 'sister_a';
+  const weddingTitle = normalizedWedding === 'sister_a' ? "Parvathy's Wedding" : "Sreedevi's Wedding";
 
   // Download photo
   const downloadPhoto = useCallback(async (photoUrl: string) => {

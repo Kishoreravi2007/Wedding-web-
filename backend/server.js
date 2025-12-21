@@ -187,9 +187,15 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
     }
     
     console.log(`🔍 Face recognition request with descriptor length: ${descriptor.length}`);
+    if (weddingName) {
+      console.log(`🎯 Filtering matches to wedding: ${weddingName}`);
+    }
     
-    // Match the face against known faces (threshold 0.6 = 60% similarity)
-    const matchResult = await matchFace(descriptor, 0.6);
+    // Match the face against known faces, filtered by wedding if provided
+    // Use ULTRA strict threshold (0.35) to minimize false positives
+    // Only matches with distance < 0.35 (65%+ confidence) are accepted
+    // This is very strict but prevents showing wrong people's photos
+    const matchResult = await matchFace(descriptor, 0.35, weddingName);
     
     if (!matchResult.matches || matchResult.matches.length === 0) {
       console.log('❌ No matching faces found');
@@ -204,28 +210,58 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
     // Get unique photo IDs from matches
     const photoIds = [...new Set(matchResult.matches.map(m => m.photoId).filter(Boolean))];
     
-    // Fetch photo details
+    // Fetch photo details with STRICT wedding filtering
     const photos = [];
+    console.log(`🔍 Step 3: Fetching ${photoIds.length} photo details...`);
+    
     for (const photoId of photoIds) {
       try {
         const photo = await PhotoDB.findById(photoId);
-        if (photo) {
-          // If a wedding is specified, only include photos from that wedding
-          if (weddingName && photo.sister !== weddingName) {
-            console.log(`⏭️  Skipping photo ${photo.filename} (belongs to ${photo.sister}, requested ${weddingName})`);
-            continue;
-          }
-
-          photos.push({
-            id: photo.id,
-            url: photo.public_url,
-            filename: photo.filename,
-            title: photo.title,
-            sister: photo.sister
-          });
+        if (!photo) {
+          console.log(`⚠️  Photo ${photoId} not found`);
+          continue;
         }
+        
+        // CRITICAL: Strict wedding check - reject if doesn't match
+        if (weddingName && photo.sister !== weddingName) {
+          console.error(`❌ REJECTING photo ${photo.filename} (belongs to ${photo.sister}, requested ${weddingName})`);
+          console.error(`   This should not happen - wedding filter should have prevented this!`);
+          continue;
+        }
+        
+        // Verify photo has valid fields
+        if (!photo.public_url) {
+          console.warn(`⚠️  Photo ${photo.filename} missing public_url, skipping`);
+          continue;
+        }
+        
+        console.log(`✅ Including photo ${photo.filename} from ${photo.sister || 'unknown'}`);
+
+        photos.push({
+          id: photo.id,
+          url: photo.public_url,
+          filename: photo.filename,
+          title: photo.title,
+          sister: photo.sister
+        });
       } catch (err) {
-        console.error(`Error fetching photo ${photoId}:`, err);
+        console.error(`❌ Error fetching photo ${photoId}:`, err);
+      }
+    }
+    
+    // FINAL VERIFICATION: Ensure all returned photos belong to correct wedding
+    if (weddingName) {
+      const wrongWeddingPhotos = photos.filter(p => p.sister !== weddingName);
+      if (wrongWeddingPhotos.length > 0) {
+        console.error(`❌ CRITICAL ERROR: Returning ${wrongWeddingPhotos.length} photos from wrong wedding!`);
+        wrongWeddingPhotos.forEach(p => {
+          console.error(`   Photo ${p.filename}: sister=${p.sister}, expected=${weddingName}`);
+        });
+        // Filter them out
+        const correctPhotos = photos.filter(p => p.sister === weddingName);
+        console.log(`✅ Filtered to ${correctPhotos.length} correct photos`);
+        photos.length = 0;
+        photos.push(...correctPhotos);
       }
     }
     
