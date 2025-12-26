@@ -40,7 +40,9 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     build: {
-      outDir: '../backend/build', // Output directly to backend/build directory
+      // Output to 'dist' for static site deployment (Render, Netlify, Vercel, etc.)
+      // For combined server deployment, set BUILD_FOR_BACKEND=true to output to ../backend/build
+      outDir: process.env.BUILD_FOR_BACKEND === 'true' ? '../backend/build' : 'dist',
       emptyOutDir: true, // Clear the build directory before building
       sourcemap: mode === 'development', // Source maps only in dev
       rollupOptions: {
