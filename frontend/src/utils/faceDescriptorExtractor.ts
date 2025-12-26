@@ -2,11 +2,7 @@
  * Face Descriptor Extractor Utility
  * 
  * Extracts face descriptors from images during upload
- * using DeepFace + RetinaFace backend for superior performance in:
- * - Small faces
- * - Side profiles
- * - Low light conditions
- * - Crowded wedding halls
+ * using DeepFace + YOLOv8-face backend for fast and accurate face detection
  */
 
 const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
@@ -16,12 +12,12 @@ const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localh
  */
 export async function loadFaceModels(): Promise<void> {
   // DeepFace runs on the backend, no models to load on frontend
-  console.log('✅ Using DeepFace + RetinaFace backend API');
+  console.log('✅ Using DeepFace + YOLOv8-face backend API');
   return Promise.resolve();
 }
 
 /**
- * Extract face descriptors from an image file using DeepFace + RetinaFace
+ * Extract face descriptors from an image file using DeepFace + YOLOv8-face
  */
 export async function extractFaceDescriptors(file: File): Promise<{
   faces: Array<{
@@ -32,7 +28,7 @@ export async function extractFaceDescriptors(file: File): Promise<{
   count: number;
 }> {
   try {
-    console.log(`🔍 Extracting face descriptors using DeepFace + RetinaFace for ${file.name}`);
+    console.log(`🔍 Extracting face descriptors using DeepFace + YOLOv8-face for ${file.name}`);
 
     // Create FormData to send file to DeepFace API
     const formData = new FormData();
@@ -60,7 +56,7 @@ export async function extractFaceDescriptors(file: File): Promise<{
       return { faces: [], count: 0 };
     }
 
-    console.log(`✅ Found ${result.faces.length} face(s) in ${file.name} using DeepFace + RetinaFace`);
+    console.log(`✅ Found ${result.faces.length} face(s) in ${file.name} using DeepFace + YOLOv8-face`);
 
     // Convert DeepFace response to our format
     // DeepFace returns bbox as [x, y, width, height]

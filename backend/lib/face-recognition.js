@@ -78,6 +78,42 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
   console.log(`Wedding filter: ${weddingName || 'None (all weddings)'}`);
   console.log(`Descriptor length: ${descriptor.length} dimensions`);
   console.log(`Descriptor sample (first 5 values): [${descriptor.slice(0, 5).map(v => v.toFixed(4)).join(', ')}...]`);
+  
+  // Handle nested arrays (descriptor might be array of arrays)
+  let flatDescriptor = descriptor;
+  if (Array.isArray(descriptor[0]) && typeof descriptor[0][0] === 'number') {
+    console.warn(`⚠️  Descriptor appears to be nested array, flattening...`);
+    flatDescriptor = descriptor.flat();
+    console.log(`   Flattened descriptor length: ${flatDescriptor.length} dimensions`);
+  }
+  
+  // Validate descriptor dimension
+  if (flatDescriptor.length !== 512 && flatDescriptor.length !== 128) {
+    // Check if it's a multiple of 512 or 128 (might be concatenated)
+    if (flatDescriptor.length % 512 === 0) {
+      const numFaces = flatDescriptor.length / 512;
+      console.warn(`⚠️  Descriptor appears to contain ${numFaces} concatenated 512-dim embeddings (total: ${flatDescriptor.length} dims).`);
+      console.warn(`   This might indicate multiple faces were concatenated. Using first 512 dimensions.`);
+      flatDescriptor = flatDescriptor.slice(0, 512);
+    } else if (flatDescriptor.length % 128 === 0) {
+      const numFaces = flatDescriptor.length / 128;
+      console.warn(`⚠️  Descriptor appears to contain ${numFaces} concatenated 128-dim embeddings (total: ${flatDescriptor.length} dims).`);
+      console.warn(`   This might indicate multiple faces were concatenated. Using first 128 dimensions.`);
+      flatDescriptor = flatDescriptor.slice(0, 128);
+    } else {
+      const error = `Invalid descriptor dimension: ${descriptor.length}. Expected 512 (DeepFace) or 128 (face-api.js) dimensions. Got ${descriptor.length} dimensions.`;
+      console.error(`❌ ${error}`);
+      console.error(`   Descriptor type: ${typeof descriptor}, isArray: ${Array.isArray(descriptor)}`);
+      if (descriptor.length > 0) {
+        console.error(`   First element type: ${typeof descriptor[0]}, isArray: ${Array.isArray(descriptor[0])}`);
+      }
+      throw new Error(error);
+    }
+  }
+  
+  // Use the flattened/validated descriptor
+  descriptor = flatDescriptor;
+  
   try {
     // Get face descriptors, optionally filtered by wedding
     let allDescriptors;
@@ -137,9 +173,49 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
       };
     }
     
-    // Calculate distances to all known faces
+    // Filter descriptors to only compare those with matching dimensions
+    const queryDimension = descriptor.length;
+    console.log(`🔍 Query descriptor dimension: ${queryDimension}`);
+    
+    const compatibleDescriptors = allDescriptors.filter(faceDesc => {
+      const descDimension = faceDesc.descriptor?.length || 0;
+      return descDimension === queryDimension;
+    });
+    
+    // Log dimension distribution for debugging
+    const dimensionCounts = {};
+    allDescriptors.forEach(desc => {
+      const dim = desc.descriptor?.length || 0;
+      dimensionCounts[dim] = (dimensionCounts[dim] || 0) + 1;
+    });
+    console.log(`📊 Descriptor dimension distribution: ${JSON.stringify(dimensionCounts)}`);
+    
+    if (compatibleDescriptors.length === 0) {
+      const dimensionCounts = {};
+      allDescriptors.forEach(desc => {
+        const dim = desc.descriptor?.length || 0;
+        dimensionCounts[dim] = (dimensionCounts[dim] || 0) + 1;
+      });
+      console.warn(`⚠️  No compatible descriptors found!`);
+      console.warn(`   Query descriptor: ${queryDimension} dimensions`);
+      console.warn(`   Available descriptors: ${JSON.stringify(dimensionCounts)}`);
+      console.warn(`   Tip: Make sure you're using the same face detection system (DeepFace=512dim or face-api.js=128dim)`);
+      return {
+        matches: [],
+        bestMatch: null
+      };
+    }
+    
+    if (compatibleDescriptors.length < allDescriptors.length) {
+      const skipped = allDescriptors.length - compatibleDescriptors.length;
+      console.warn(`⚠️  Skipped ${skipped} descriptor(s) with incompatible dimensions (query: ${queryDimension}dim)`);
+    }
+    
+    console.log(`✅ Comparing with ${compatibleDescriptors.length} compatible descriptor(s) (${queryDimension} dimensions)`);
+    
+    // Calculate distances to all known faces with matching dimensions
     // Try both euclidean and cosine distance, use the better one
-    const matches = allDescriptors.map(faceDesc => {
+    const matches = compatibleDescriptors.map(faceDesc => {
       const euclideanDist = euclideanDistance(descriptor, faceDesc.descriptor);
       const cosineDist = cosineDistance(descriptor, faceDesc.descriptor);
       
@@ -171,8 +247,21 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
       }
     });
     
-    // Filter by threshold - STRICT: only accept matches below threshold
-    const goodMatches = matches.filter(m => m.distance <= threshold);
+    // Filter by threshold - Use lenient threshold for better matching
+    // For DeepFace 512-dim embeddings, typical good matches are 0.3-0.6 distance
+    // For face-api.js 128-dim embeddings, typical good matches are 0.4-0.7 distance
+    const lenientThreshold = threshold * 1.1; // 10% more lenient
+    const goodMatches = matches.filter(m => m.distance <= lenientThreshold);
+    
+    if (goodMatches.length === 0 && matches.length > 0) {
+      // If no matches with lenient threshold, try even more lenient for debugging
+      const veryLenientThreshold = threshold * 1.3;
+      const veryLenientMatches = matches.filter(m => m.distance <= veryLenientThreshold);
+      if (veryLenientMatches.length > 0) {
+        console.log(`⚠️  No matches with threshold ${threshold}, but found ${veryLenientMatches.length} with very lenient threshold ${veryLenientThreshold.toFixed(3)}`);
+        console.log(`   Best match distance: ${veryLenientMatches[0].distance.toFixed(4)}`);
+      }
+    }
     
     console.log(`📊 Match statistics:`);
     console.log(`   Total faces compared: ${matches.length}`);
@@ -187,11 +276,21 @@ async function matchFace(descriptor, threshold = 0.6, weddingName = null) {
     if (goodMatches.length === 0) {
       console.log(`⚠️  No matches found within threshold ${threshold}`);
       if (matches.length > 0) {
-        console.log(`📊 Closest matches (top 5):`);
-        matches.slice(0, 5).forEach((m, i) => {
+        console.log(`📊 Closest matches (top 10):`);
+        matches.slice(0, 10).forEach((m, i) => {
           console.log(`   ${i + 1}. Distance: ${m.distance.toFixed(4)} (${((1 - m.distance) * 100).toFixed(1)}% confidence) | Photo: ${m.photoId?.substring(0, 8)}...`);
         });
-        console.log(`💡 Tip: If closest distance is close to ${threshold}, consider adjusting threshold or re-processing photos`);
+        const closestDistance = matches[0].distance;
+        const distanceFromThreshold = closestDistance - threshold;
+        console.log(`💡 Closest match distance: ${closestDistance.toFixed(4)}, threshold: ${threshold}`);
+        console.log(`💡 Distance from threshold: ${distanceFromThreshold.toFixed(4)} (${(distanceFromThreshold / threshold * 100).toFixed(1)}% over threshold)`);
+        
+        // If closest match is very close to threshold, suggest using it anyway
+        if (closestDistance <= threshold * 1.2) {
+          console.log(`💡 Closest match is within 20% of threshold. Consider using lenient matching.`);
+        }
+      } else {
+        console.log(`❌ No faces to compare against! Make sure photos have been processed with face detection.`);
       }
       return {
         matches: [],

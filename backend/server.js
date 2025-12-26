@@ -238,12 +238,10 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
     }
     
     // Match the face against known faces, filtered by wedding if provided
-    // Using very lenient threshold (0.7) to diagnose the issue
-    // Distance < 0.7 = 30%+ confidence (very lenient for testing)
-    // If this still shows no matches, the descriptors likely don't match at all
-    console.log(`🔍 Matching face with very lenient threshold: 0.7 (30%+ confidence required)`);
-    console.log(`   This is a diagnostic threshold - if no matches, descriptors likely don't match`);
-    const matchResult = await matchFace(descriptor, 0.7, weddingName);
+    // Using lenient threshold (0.75) for better matching
+    // Distance < 0.75 = 25%+ confidence (lenient for wedding photos)
+    console.log(`🔍 Matching face with threshold: 0.75 (25%+ confidence required)`);
+    const matchResult = await matchFace(descriptor, 0.75, weddingName);
     
     if (!matchResult.matches || matchResult.matches.length === 0) {
       console.log('❌ No matching faces found');

@@ -107,16 +107,16 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   useEffect(() => {
     const loadModels = async () => {
       try {
-        console.log('🔄 Initializing DeepFace + RetinaFace API for Photo Booth...');
+        console.log('🔄 Initializing DeepFace + YOLOv8-face API for Photo Booth...');
         setUserGuidance('Connecting to face detection service...');
         
         // Load DeepFace API (just verifies connection)
         await loadFaceDetectionModels();
         
-        console.log('✅ DeepFace + RetinaFace API ready');
+        console.log('✅ DeepFace + YOLOv8-face API ready');
         setIsModelLoaded(true);
         setUserGuidance('Face detection ready! Click "Start Camera" to begin.');
-        setDiagnosticInfo('DeepFace + RetinaFace API connected');
+        setDiagnosticInfo('DeepFace + YOLOv8-face API connected');
       } catch (error: any) {
         console.error('❌ Error connecting to DeepFace API:', error);
         setUserGuidance('Failed to connect to face detection service. Check console for details.');
@@ -128,7 +128,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     loadModels();
   }, []);
 
-  // Enhanced face detection with DeepFace + RetinaFace
+  // Enhanced face detection with DeepFace + YOLOv8-face
   const detectFaces = useCallback(async (imageElement: HTMLImageElement | HTMLVideoElement) => {
     if (!isModelLoaded) {
       setUserGuidance('Face detection service is still connecting. Please wait...');
@@ -140,17 +140,29 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     setUserGuidance('Detecting faces... Please hold still.');
 
     try {
-      // Use DeepFace + RetinaFace API for detection
+      // Use DeepFace + YOLOv8-face API for detection
+      console.log('🔍 Starting face detection...');
       const faceResults = await detectFacesWithDeepFace(imageElement);
+      console.log(`✅ Face detection complete: ${faceResults.length} face(s) found`);
       
       if (faceResults.length > 0) {
-        // Convert to format expected by PhotoBooth
-        const detections = faceResults.map(result => ({
-          detection: {
-            box: result.box,
-            score: result.detection.score
+        // Convert to format expected by PhotoBooth - IMPORTANT: Include descriptor!
+        const detections = faceResults.map((result, index) => {
+          if (!result.descriptor) {
+            console.warn(`⚠️ Face ${index} missing descriptor`);
           }
-        }));
+          return {
+            detection: {
+              box: result.box,
+              score: result.detection.score
+            },
+            descriptor: result.descriptor, // Include the descriptor for face matching
+            box: result.box,
+            landmarks: result.landmarks
+          };
+        });
+        
+        console.log(`✅ Processed ${detections.length} detection(s) with descriptors`);
         
         setDetectionResults(detections);
         setDetectionStatus('success');
@@ -169,9 +181,11 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       }
 
     } catch (error) {
-      console.error('Face detection error:', error);
+      console.error('❌ Face detection error:', error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
       setDetectionStatus('error');
-      setUserGuidance('Face detection failed. Please try again.');
+      const errorMsg = error instanceof Error ? error.message : 'Face detection failed';
+      setUserGuidance(`Face detection failed: ${errorMsg}. Please check if DeepFace API is running.`);
     } finally {
       setIsDetecting(false);
     }
@@ -316,18 +330,29 @@ useEffect(() => {
           }
           setLastDetectionTime(now);
 
-          // Detect faces with DeepFace + RetinaFace API
+          // Detect faces with DeepFace + YOLOv8-face API
           const faceResults = await detectFacesWithDeepFace(video);
+          console.log(`🔍 Face detection result: ${faceResults.length} face(s) detected`);
           
-          // Convert to format expected by PhotoBooth
-          let detections = faceResults.map(result => ({
-            detection: {
-              box: result.box,
-              score: result.detection.score
-            },
-            landmarks: result.landmarks,
-            descriptor: result.descriptor
-          }));
+          if (faceResults.length === 0) {
+            console.log('⚠️ No faces detected in video frame');
+          }
+          
+          // Convert to format expected by PhotoBooth - IMPORTANT: Include all required properties!
+          let detections = faceResults.map((result, index) => {
+            if (!result.descriptor) {
+              console.warn(`⚠️ Face ${index} missing descriptor`);
+            }
+            return {
+              detection: {
+                box: result.box,
+                score: result.detection.score
+              },
+              box: result.box, // Top-level box for drawing
+              landmarks: result.landmarks,
+              descriptor: result.descriptor // Include descriptor for face matching
+            };
+          });
 
           // Filter detections by very high confidence to eliminate flickering
           detections = detections.filter(detection => getDetectionScore(detection) >= MIN_VIDEO_DETECTION_SCORE);
@@ -385,6 +410,7 @@ useEffect(() => {
           } else {
             setDetectionStatus('error');
             setUserGuidance('No face detected. Please position your face in the center and ensure good lighting.');
+            console.log('⚠️ No faces detected in video frame');
             
             // Only clear after a longer period of no detections
             if (detectionHistory.length > 5 && detectionHistory.slice(-5).every(dets => dets.length === 0)) {
@@ -397,7 +423,10 @@ useEffect(() => {
             }
           }
         } catch (error) {
-          console.error('Detection loop error:', error);
+          console.error('❌ Detection loop error:', error);
+          console.error('Error details:', error instanceof Error ? error.message : String(error));
+          // Don't stop detection loop, just log the error
+          // This allows detection to continue even if one frame fails
         }
 
         // Continue detection loop with ultra-stable frequency (eliminate flickering)
@@ -559,9 +588,47 @@ useEffect(() => {
         throw new Error('No face descriptor available. Please ensure face is detected before searching.');
       }
 
-      // Get the 128-dimensional face descriptor from the stored detection
-      const faceDescriptor = Array.from(faceToSearch.descriptor);
-      console.log('✅ Using stored face descriptor:', faceDescriptor.length, 'dimensions');
+      // Get the face descriptor from the stored detection
+      let faceDescriptor = faceToSearch.descriptor;
+      
+      // Handle different descriptor formats
+      if (Array.isArray(faceDescriptor)) {
+        // If it's already an array, use it directly
+        faceDescriptor = Array.from(faceDescriptor);
+      } else if (faceDescriptor && typeof faceDescriptor === 'object') {
+        // If it's an object, try to extract the array
+        faceDescriptor = Array.from(faceDescriptor.values || []);
+      }
+      
+      // Validate descriptor
+      if (!faceDescriptor || faceDescriptor.length === 0) {
+        throw new Error('Face descriptor is empty or invalid');
+      }
+      
+      // If descriptor is too long (concatenated), extract the correct portion
+      // For 512-dim descriptors, if we have 4096 (8 faces), extract the selected face
+      if (faceDescriptor.length === 4096 && selectedFaceIndex < 8) {
+        console.warn(`⚠️  Descriptor appears concatenated (4096 dims). Extracting face ${selectedFaceIndex}...`);
+        const startIndex = selectedFaceIndex * 512;
+        faceDescriptor = faceDescriptor.slice(startIndex, startIndex + 512);
+        console.log(`✅ Extracted 512-dim descriptor for face ${selectedFaceIndex}`);
+      } else if (faceDescriptor.length > 512 && faceDescriptor.length % 512 === 0) {
+        // Multiple 512-dim faces concatenated
+        const numFaces = faceDescriptor.length / 512;
+        const faceIndex = Math.min(selectedFaceIndex, numFaces - 1);
+        const startIndex = faceIndex * 512;
+        faceDescriptor = faceDescriptor.slice(startIndex, startIndex + 512);
+        console.log(`✅ Extracted 512-dim descriptor from ${numFaces} concatenated faces (using face ${faceIndex})`);
+      } else if (faceDescriptor.length > 128 && faceDescriptor.length % 128 === 0) {
+        // Multiple 128-dim faces concatenated
+        const numFaces = faceDescriptor.length / 128;
+        const faceIndex = Math.min(selectedFaceIndex, numFaces - 1);
+        const startIndex = faceIndex * 128;
+        faceDescriptor = faceDescriptor.slice(startIndex, startIndex + 128);
+        console.log(`✅ Extracted 128-dim descriptor from ${numFaces} concatenated faces (using face ${faceIndex})`);
+      }
+      
+      console.log('✅ Using face descriptor:', faceDescriptor.length, 'dimensions');
       
       setUserGuidance('Searching for matching faces in wedding photos...');
 

@@ -1,8 +1,8 @@
 /**
- * Face Detection Utility using DeepFace + RetinaFace
+ * Face Detection Utility using DeepFace + YOLOv8-face
  * 
- * Provides face detection from image/video elements using DeepFace API
- * Superior performance for small faces, side profiles, low light, and crowded scenes
+ * Provides face detection from image/video elements using DeepFace API with YOLOv8-face detector
+ * Fast and accurate face detection with confidence threshold 0.25-0.3 and image size 1280+
  */
 
 const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
@@ -11,7 +11,7 @@ let modelsLoaded = true; // DeepFace runs on backend, always available
 
 export async function loadFaceDetectionModels() {
   // DeepFace runs on the backend, no models to load on frontend
-  console.log('✅ Using DeepFace + RetinaFace backend API for face detection');
+  console.log('✅ Using DeepFace + YOLOv8-face backend API for face detection');
   modelsLoaded = true;
   return Promise.resolve();
 }
@@ -64,11 +64,11 @@ export async function detectFaces(imageElement: HTMLImageElement | HTMLVideoElem
     const blob = await elementToBlob(imageElement);
     const file = new File([blob], 'detection.jpg', { type: 'image/jpeg' });
 
-    // Create FormData
+    // Create FormData - only request what we need for speed
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('return_landmarks', 'true');
-    formData.append('return_age_gender', 'false');
+    formData.append('return_landmarks', 'false');  // Skip landmarks for speed
+    formData.append('return_age_gender', 'false');  // Skip age/gender for speed
     formData.append('enforce_detection', 'false');
 
     // Call DeepFace API

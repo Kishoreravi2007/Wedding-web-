@@ -70,14 +70,14 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
   // DeepFace runs on backend, no models to load
   useEffect(() => {
-    console.log('✅ Using DeepFace + RetinaFace backend API for face search');
+    console.log('✅ Using DeepFace + YOLOv8-face backend API for face search');
     setIsModelLoaded(true);
   }, []);
 
   // Extract face descriptor from image using DeepFace API
   const extractFaceDescriptor = useCallback(async (file: File): Promise<number[] | null> => {
     try {
-      console.log('🔍 Extracting face descriptor using DeepFace + RetinaFace...');
+      console.log('🔍 Extracting face descriptor using DeepFace + YOLOv8-face...');
       
       // Create FormData to send file to DeepFace API
       const formData = new FormData();
@@ -108,7 +108,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       // Use the first detected face
       const face = result.faces[0];
-      console.log('✅ Face descriptor extracted successfully using DeepFace + RetinaFace');
+      console.log('✅ Face descriptor extracted successfully using DeepFace + YOLOv8-face');
       return face.embedding; // 512-dim embedding
 
     } catch (error) {

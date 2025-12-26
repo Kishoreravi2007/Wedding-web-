@@ -1,10 +1,11 @@
 """
 FastAPI endpoints for DeepFace face detection and embedding extraction.
-Uses DeepFace with RetinaFace backend for superior performance in:
-- Small faces
-- Side profiles
-- Low light conditions
-- Crowded wedding halls
+Uses YOLOv8-face model with advanced filtering to reduce false positives:
+- CLAHE lighting normalization for wedding stage lighting
+- Confidence threshold 0.45 to filter low-confidence detections
+- Size-based filtering (discards < 40px detections)
+- DeepFace verification for each YOLO detection
+- Image size 1280+ for better accuracy
 """
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form
@@ -20,6 +21,79 @@ from deepface import DeepFace
 from PIL import Image
 import io
 
+# Try to import YOLOv8 for face detection
+YOLOV8_AVAILABLE = False
+try:
+    from ultralytics import YOLO
+    YOLOV8_AVAILABLE = True
+except ImportError:
+    pass
+
+# Global YOLOv8-face model
+yolov8_face_model = None
+yolov8_init_error = None
+
+def get_yolov8_face_model():
+    """Initialize and return YOLOv8-face model."""
+    global yolov8_face_model, yolov8_init_error
+    
+    if not YOLOV8_AVAILABLE:
+        return None
+    
+    if yolov8_face_model is not None:
+        return yolov8_face_model
+    
+    if yolov8_init_error is not None:
+        return None  # Already tried and failed
+    
+    try:
+        logger.info("Initializing YOLOv8-face model...")
+        # YOLOv8-face model - will download automatically on first use
+        # Using yolov8n-face.pt (nano) for speed, or yolov8s-face.pt (small) for better accuracy
+        yolov8_face_model = YOLO('yolov8n-face.pt')  # or 'yolov8s-face.pt' for better accuracy
+        logger.info("✅ YOLOv8-face model initialized successfully")
+        return yolov8_face_model
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize YOLOv8-face: {e}")
+        yolov8_init_error = str(e)
+        return None
+
+# Try to import InsightFace for SCRFD detector
+INSIGHTFACE_AVAILABLE = False
+try:
+    from insightface.app import FaceAnalysis
+    INSIGHTFACE_AVAILABLE = True
+except ImportError:
+    pass
+
+# Global InsightFace app for SCRFD detection
+insightface_app = None
+insightface_init_error = None
+
+def get_insightface_app():
+    """Initialize and return InsightFace app with SCRFD detector."""
+    global insightface_app, insightface_init_error
+    
+    if not INSIGHTFACE_AVAILABLE:
+        return None
+    
+    if insightface_app is not None:
+        return insightface_app
+    
+    if insightface_init_error is not None:
+        return None  # Already tried and failed
+    
+    try:
+        logger.info("Initializing InsightFace SCRFD detector...")
+        insightface_app = FaceAnalysis(providers=['CPUExecutionProvider', 'CUDAExecutionProvider'])
+        insightface_app.prepare(ctx_id=0, det_size=(640, 640))
+        logger.info("✅ InsightFace SCRFD detector initialized successfully")
+        return insightface_app
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize InsightFace: {e}")
+        insightface_init_error = str(e)
+        return None
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,7 +101,7 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="DeepFace Face Detection API",
-    description="Face detection and embedding extraction using DeepFace with RetinaFace backend",
+    description="Face detection and embedding extraction using YOLOv8-face model",
     version="1.0.0"
 )
 
@@ -47,7 +121,7 @@ async def root():
     return {
         "status": "ok",
         "service": "DeepFace Face Detection API",
-        "backend": "RetinaFace",
+        "backend": "YOLOv8-face",
         "embedding_dimension": 512,
         "model": "VGG-Face"
     }
@@ -61,7 +135,7 @@ async def health_check():
         test_img = np.zeros((100, 100, 3), dtype=np.uint8)
         return {
             "status": "healthy",
-            "backend": "RetinaFace",
+            "backend": "YOLOv8-face",
             "embedding_dimension": 512,
             "model": "VGG-Face"
         }
@@ -72,8 +146,16 @@ async def health_check():
         }
 
 
-async def process_image_file(file: UploadFile) -> np.ndarray:
-    """Convert uploaded file to numpy array."""
+async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe: bool = True) -> np.ndarray:
+    """
+    Convert uploaded file to numpy array, apply CLAHE for lighting normalization,
+    and resize to optimal size for YOLOv8-face.
+    
+    Args:
+        file: Uploaded file
+        min_size: Minimum width or height in pixels (default: 1280 for YOLOv8-face accuracy)
+        apply_clahe: Whether to apply CLAHE for lighting normalization (default: True)
+    """
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -84,6 +166,39 @@ async def process_image_file(file: UploadFile) -> np.ndarray:
             detail="Could not decode image. Please ensure the file is a valid image."
         )
     
+    # Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to normalize harsh lighting
+    # This helps reduce false positives from bright spots (e.g., wedding stage lights)
+    if apply_clahe:
+        # Convert to LAB color space
+        lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        # Apply CLAHE to the L-channel (lightness)
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+        cl = clahe.apply(l)
+        # Merge back
+        limg = cv2.merge((cl, a, b))
+        img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+        logger.info("Applied CLAHE for lighting normalization")
+    
+    # Resize to optimal size for YOLOv8-face (1280+ for better accuracy)
+    height, width = img.shape[:2]
+    min_dimension = min(width, height)
+    
+    if min_dimension < min_size:
+        # Upscale smaller images to improve detection accuracy
+        scale = min_size / min_dimension
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
+        logger.info(f"Upscaled image from {width}x{height} to {new_width}x{new_height} for YOLOv8-face accuracy")
+    elif min_dimension > 1920:
+        # Downscale very large images to prevent memory issues
+        scale = 1920 / min_dimension
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
+        logger.info(f"Downscaled image from {width}x{height} to {new_width}x{new_height}")
+    
     return img
 
 
@@ -91,18 +206,22 @@ async def process_image_file(file: UploadFile) -> np.ndarray:
 async def detect_faces(
     file: UploadFile = File(...),
     return_landmarks: bool = Form(False),
-    return_age_gender: bool = Form(True),
+    return_age_gender: bool = Form(False),  # Changed default to False for speed
     min_confidence: Optional[float] = Form(None),
-    enforce_detection: bool = Form(False)
+    enforce_detection: bool = Form(False),
+    detector_backend: Optional[str] = Form("yolov8"),  # Use YOLOv8-face for fast and accurate detection
+    conf_threshold: Optional[float] = Form(0.5),  # Confidence threshold for YOLOv8 (0.5 for high certainty, reduces false positives)
+    imgsz: Optional[int] = Form(1280)  # Image size for YOLOv8 (1280+ for better accuracy)
 ):
     """
     Detect all faces in an uploaded image and extract 512-dimension embeddings.
     
-    Uses DeepFace with RetinaFace backend for superior performance in:
-    - Small faces
-    - Side profiles
-    - Low light conditions
-    - Crowded wedding halls
+    Uses YOLOv8-face model with advanced filtering to reduce false positives:
+    - CLAHE lighting normalization: Normalizes harsh wedding stage lighting to reduce glare
+    - Confidence threshold: 0.5 (default) to filter low-confidence detections
+    - Size-based filtering: Discards detections smaller than 40px (background noise)
+    - DeepFace verification: Double-checks each YOLO detection to ensure it's actually a face
+    - Image size 1280+ for better accuracy
     
     Args:
         file: Image file (JPEG, PNG, etc.)
@@ -110,6 +229,9 @@ async def detect_faces(
         return_age_gender: Whether to return age and gender estimates
         min_confidence: Minimum detection confidence threshold (0-1)
         enforce_detection: If True, raises error if no faces detected
+        detector_backend: Detector backend ("yolov8" default)
+        conf_threshold: YOLOv8 confidence threshold (default: 0.5 for high certainty, reduces false positives)
+        imgsz: YOLOv8 image size (1280+ for better accuracy, default: 1280)
     
     Returns:
         JSON with detected faces, each containing:
@@ -121,8 +243,18 @@ async def detect_faces(
         - gender: Estimated gender (if available)
     """
     try:
-        # Read uploaded image
-        img = await process_image_file(file)
+        # Use min_confidence if provided, otherwise use conf_threshold parameter
+        if min_confidence is not None:
+            conf_threshold = min_confidence
+        
+        # Ensure conf_threshold is in valid range (0.5 default for high certainty, reduces false positives)
+        conf_threshold = max(0.1, min(0.9, conf_threshold))  # Clamp between 0.1 and 0.9
+        
+        # Ensure imgsz is at least 1280
+        imgsz = max(1280, imgsz)
+        
+        # Read uploaded image (resize to optimal size for YOLOv8)
+        img = await process_image_file(file, min_size=imgsz)
         
         logger.info(f"Processing image: {file.filename}, size: {img.shape}")
         
@@ -131,29 +263,313 @@ async def detect_faces(
         cv2.imwrite(temp_path, img)
         
         try:
-            # Use DeepFace with RetinaFace backend
-            # RetinaFace is better for small faces, side profiles, and low light
+            # Use YOLOv8-face for fast and accurate face detection
+            if detector_backend not in ["opencv", "retinaface", "mtcnn", "ssd", "dlib", "scrfd", "yolov8"]:
+                detector_backend = "yolov8"  # Default to YOLOv8-face
+            
+            logger.info(f"Using detector backend: {detector_backend}, conf={conf_threshold}, imgsz={imgsz}")
+            
+            # If YOLOv8 is requested and available, use YOLOv8-face detector
+            if detector_backend == "yolov8" and YOLOV8_AVAILABLE:
+                yolov8_model = get_yolov8_face_model()
+                if yolov8_model:
+                    # Use YOLOv8-face for detection with agnostic NMS and IOU threshold
+                    # agnostic_nms=True prevents multiple overlapping boxes on high-detail background patterns
+                    # iou=0.3 is more aggressive in merging/removing overlapping detections
+                    results = yolov8_model(
+                        img, 
+                        conf=conf_threshold, 
+                        imgsz=imgsz, 
+                        iou=0.3,
+                        agnostic_nms=True,
+                        verbose=False
+                    )
+                    
+                    if len(results) == 0 or len(results[0].boxes) == 0:
+                        if enforce_detection:
+                            raise ValueError("No face detected")
+                        face_objs = []
+                    else:
+                        # Extract faces detected by YOLOv8 with filtering and verification
+                        face_objs = []
+                        total_detections = 0
+                        size_filtered = 0
+                        aspect_ratio_filtered = 0
+                        brightness_filtered = 0
+                        center_color_filtered = 0
+                        texture_filtered = 0
+                        skin_color_filtered = 0
+                        verification_failed = 0
+                        
+                        for result in results:
+                            boxes = result.boxes
+                            total_detections += len(boxes)
+                            
+                            for box in boxes:
+                                # Get bounding box coordinates
+                                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int)
+                                conf = float(box.conf[0].cpu().numpy())
+                                
+                                # Calculate box dimensions
+                                box_width = x2 - x1
+                                box_height = y2 - y1
+                                
+                                # Size-based filtering: Discard detections smaller than 40px
+                                # Wedding faces are usually larger than this, while background noise is tiny
+                                if box_width < 40 or box_height < 40:
+                                    size_filtered += 1
+                                    logger.debug(f"Filtered out small detection: {box_width}x{box_height}px (confidence: {conf:.3f})")
+                                    continue
+                                
+                                # Aspect Ratio Check: Discard if too wide or too tall
+                                # Faces typically have aspect ratio between 0.75 and 1.6
+                                aspect_ratio = box_height / box_width if box_width > 0 else 0
+                                if aspect_ratio < 0.75 or aspect_ratio > 1.6:
+                                    aspect_ratio_filtered += 1
+                                    logger.debug(f"Filtered out invalid aspect ratio: {aspect_ratio:.2f} ({box_width}x{box_height}px)")
+                                    continue
+                                
+                                # Crop face region for further analysis
+                                face_crop = img[y1:y2, x1:x2]
+                                
+                                # Ensure crop is valid
+                                if face_crop.size == 0:
+                                    logger.warning(f"Invalid face crop at ({x1}, {y1}, {x2}, {y2})")
+                                    continue
+                                
+                                # Saturation/Brightness Filter: Discard over-exposed detections
+                                # Average brightness > 230 indicates stage lights or over-exposed areas
+                                gray_crop = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
+                                avg_brightness = np.mean(gray_crop)
+                                if avg_brightness > 230:
+                                    brightness_filtered += 1
+                                    logger.debug(f"Filtered out over-exposed detection: brightness={avg_brightness:.1f} (likely stage light)")
+                                    continue
+                                
+                                # Center-Point Verification: Check center 30% for skin texture/color
+                                # Crop center 30% of the detected box
+                                center_x_start = int(box_width * 0.35)
+                                center_x_end = int(box_width * 0.65)
+                                center_y_start = int(box_height * 0.35)
+                                center_y_end = int(box_height * 0.65)
+                                
+                                center_crop = face_crop[center_y_start:center_y_end, center_x_start:center_x_end]
+                                
+                                if center_crop.size > 0:
+                                    # Convert to HSV for better color analysis
+                                    hsv_center = cv2.cvtColor(center_crop, cv2.COLOR_BGR2HSV)
+                                    
+                                    # Calculate average hue, saturation, and value
+                                    avg_hue = np.mean(hsv_center[:, :, 0])
+                                    avg_saturation = np.mean(hsv_center[:, :, 1])
+                                    avg_value = np.mean(hsv_center[:, :, 2])
+                                    
+                                    # Check for neon colors (high saturation, specific hue ranges)
+                                    # Neon colors typically have high saturation (> 150) and specific hue ranges
+                                    is_neon = avg_saturation > 150 and (
+                                        (avg_hue < 20) or  # Red/Orange neon
+                                        (avg_hue > 160 and avg_hue < 180)  # Magenta/Pink neon
+                                    )
+                                    
+                                    # Check for lack of texture (very uniform color = likely not skin)
+                                    # Skin has texture variation, uniform colors suggest lights or solid backgrounds
+                                    gray_center = cv2.cvtColor(center_crop, cv2.COLOR_BGR2GRAY)
+                                    std_dev = np.std(gray_center)
+                                    
+                                    # If it's neon-colored or lacks texture (low std dev), discard
+                                    if is_neon or std_dev < 10:
+                                        center_color_filtered += 1
+                                        logger.debug(f"Filtered out center color issue: neon={is_neon}, std_dev={std_dev:.1f}")
+                                        continue
+                                
+                                # Edge Density (Texture) Check: Laplacian Variance
+                                # Real faces have specific smoothness. Background artifacts (intricate fabrics, flowers)
+                                # contain too many sharp edges. High variance = high-contrast pattern (noise)
+                                gray_face = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
+                                laplacian_var = cv2.Laplacian(gray_face, cv2.CV_64F).var()
+                                
+                                # Discard if variance is too high (>500) - indicates high-detail background pattern
+                                # or too low (<10) - indicates flat wall or blur
+                                if laplacian_var > 500 or laplacian_var < 10:
+                                    texture_filtered += 1
+                                    logger.debug(f"Filtered out texture issue: Laplacian variance={laplacian_var:.1f}")
+                                    continue
+                                
+                                # Skin-Color Probability (YCbCr Check)
+                                # Background objects often mimic face shapes but rarely have the same skin-color density
+                                # Human skin pixels fall into a narrow range: Cb: 77-127, Cr: 133-173
+                                ycbcr_face = cv2.cvtColor(face_crop, cv2.COLOR_BGR2YCrCb)
+                                
+                                # OpenCV YCrCb format: Channel 0=Y, Channel 1=Cr, Channel 2=Cb
+                                cr_channel = ycbcr_face[:, :, 1]  # Cr (red-difference)
+                                cb_channel = ycbcr_face[:, :, 2]  # Cb (blue-difference)
+                                
+                                # Skin color range: Cb: 77-127, Cr: 133-173
+                                skin_mask = cv2.inRange(cb_channel, 77, 127) & cv2.inRange(cr_channel, 133, 173)
+                                
+                                # Calculate percentage of skin pixels
+                                total_pixels = face_crop.shape[0] * face_crop.shape[1]
+                                skin_pixels = np.sum(skin_mask > 0)
+                                skin_percentage = (skin_pixels / total_pixels) * 100 if total_pixels > 0 else 0
+                                
+                                # Discard if less than 35% of the box is actual skin color
+                                if skin_percentage < 35:
+                                    skin_color_filtered += 1
+                                    logger.debug(f"Filtered out low skin color: {skin_percentage:.1f}% skin pixels")
+                                    continue
+                                
+                                # Save cropped face temporarily for verification and embedding extraction
+                                # (face_crop was already created above for filtering checks)
+                                face_temp_path = f"/tmp/yolov8_face_{len(face_objs)}_{file.filename}"
+                                cv2.imwrite(face_temp_path, face_crop)
+                                
+                                try:
+                                    # DeepFace Double-Check: Verify this is actually a face
+                                    # DeepFace.extract_faces is more cautious than YOLO
+                                    try:
+                                        verified_faces = DeepFace.extract_faces(
+                                            img_path=face_temp_path,
+                                            detector_backend="opencv",
+                                            enforce_detection=True,  # Stricter verification - must detect face
+                                            align=False
+                                        )
+                                        
+                                        # If DeepFace doesn't find a face, skip this detection
+                                        if not verified_faces or len(verified_faces) == 0:
+                                            verification_failed += 1
+                                            logger.debug(f"DeepFace verification failed for detection at ({x1}, {y1})")
+                                            continue
+                                        
+                                        logger.debug(f"DeepFace verified face at ({x1}, {y1}, {x2}, {y2})")
+                                    except Exception as verify_error:
+                                        # If verification fails, skip this detection
+                                        verification_failed += 1
+                                        logger.debug(f"DeepFace verification error: {verify_error}")
+                                        continue
+                                    
+                                    # Get embedding from DeepFace (face is verified, now extract embedding)
+                                    embedding_obj = DeepFace.represent(
+                                        img_path=face_temp_path,
+                                        model_name="VGG-Face",
+                                        detector_backend="opencv",  # Fast for already-cropped faces
+                                        enforce_detection=False,
+                                        align=False
+                                    )
+                                    
+                                    if embedding_obj and len(embedding_obj) > 0:
+                                        face_obj = embedding_obj[0]
+                                        face_obj["facial_area"] = {
+                                            "x": int(x1),
+                                            "y": int(y1),
+                                            "w": int(box_width),
+                                            "h": int(box_height)
+                                        }
+                                        face_obj["face_confidence"] = conf
+                                        face_objs.append(face_obj)
+                                        logger.debug(f"Added verified face: {box_width}x{box_height}px, conf={conf:.3f}")
+                                    else:
+                                        verification_failed += 1
+                                        logger.debug(f"No embedding extracted for verified face at ({x1}, {y1})")
+                                        
+                                except Exception as e:
+                                    logger.warning(f"Failed to process face detection: {e}")
+                                finally:
+                                    if os.path.exists(face_temp_path):
+                                        os.remove(face_temp_path)
+                        
+                        logger.info(
+                            f"YOLOv8-face: {total_detections} detections → "
+                            f"{size_filtered} size-filtered → "
+                            f"{aspect_ratio_filtered} aspect-ratio-filtered → "
+                            f"{brightness_filtered} brightness-filtered → "
+                            f"{center_color_filtered} center-color-filtered → "
+                            f"{texture_filtered} texture-filtered → "
+                            f"{skin_color_filtered} skin-color-filtered → "
+                            f"{verification_failed} verification-failed → "
+                            f"{len(face_objs)} verified faces"
+                        )
+                else:
+                    # Fallback to DeepFace with opencv if YOLOv8 model not available
+                    logger.warning("YOLOv8-face model not available, falling back to opencv")
+                    detector_backend = "opencv"
+                    face_objs = DeepFace.represent(
+                        img_path=temp_path,
+                        model_name="VGG-Face",
+                        detector_backend=detector_backend,
+                        enforce_detection=enforce_detection,
+                        align=False
+                    )
+            # If SCRFD is requested and InsightFace is available, use InsightFace's SCRFD detector
+            elif detector_backend == "scrfd" and INSIGHTFACE_AVAILABLE:
+                insightface_app = get_insightface_app()
+                if insightface_app:
+                    # Use InsightFace SCRFD for detection and embedding extraction
+                    faces = insightface_app.get(img)
+                    
+                    if len(faces) == 0:
+                        if enforce_detection:
+                            raise ValueError("No face detected")
+                        face_objs = []
+                    else:
+                        # Convert InsightFace results to DeepFace format
+                        face_objs = []
+                        for face in faces:
+                            bbox = face.bbox.astype(int)
+                            x1, y1, x2, y2 = bbox[0], bbox[1], bbox[2], bbox[3]
+                            
+                            # Create DeepFace-compatible format
+                            face_obj = {
+                                "embedding": face.normed_embedding.tolist(),  # 512-dim embedding from InsightFace
+                                "facial_area": {
+                                    "x": int(x1),
+                                    "y": int(y1),
+                                    "w": int(x2 - x1),
+                                    "h": int(y2 - y1)
+                                },
+                                "face_confidence": float(face.det_score) if hasattr(face, 'det_score') else 0.9
+                            }
+                            
+                            # Add landmarks if available
+                            if hasattr(face, 'landmark') and face.landmark is not None:
+                                face_obj["facial_landmarks"] = face.landmark.tolist()
+                            
+                            face_objs.append(face_obj)
+                    
+                    logger.info(f"SCRFD (InsightFace) detected {len(faces)} face(s) and extracted embeddings")
+                else:
+                    # Fallback to DeepFace with opencv if InsightFace not available
+                    logger.warning("InsightFace SCRFD not available, falling back to opencv")
+                    detector_backend = "opencv"
+                    face_objs = DeepFace.represent(
+                        img_path=temp_path,
+                        model_name="VGG-Face",
+                        detector_backend=detector_backend,
+                        enforce_detection=enforce_detection,
+                        align=False
+                    )
+            else:
+                # Use DeepFace with specified backend
             face_objs = DeepFace.represent(
                 img_path=temp_path,
                 model_name="VGG-Face",  # 512-dim embeddings
-                detector_backend="retinaface",  # Best for wedding photos
+                    detector_backend=detector_backend,
                 enforce_detection=enforce_detection,
-                align=True
+                    align=False  # Disable alignment for speed (only needed for recognition, not detection)
             )
             
-            # Also get detailed face analysis for age/gender/landmarks
-            if return_age_gender or return_landmarks:
+            # Only get detailed face analysis if explicitly requested
+            # This is slow, so skip it unless needed
+            face_analyses = []
+            if return_age_gender:
                 try:
                     face_analyses = DeepFace.analyze(
                         img_path=temp_path,
-                        actions=['age', 'gender', 'emotion'],
-                        detector_backend="retinaface",
+                        actions=['age', 'gender'],  # Removed 'emotion' for speed
+                        detector_backend=detector_backend,
                         enforce_detection=False,
                         silent=True
                     )
                 except:
-                    face_analyses = []
-            else:
                 face_analyses = []
             
         finally:
@@ -184,7 +600,7 @@ async def detect_faces(
             w = face_region.get("w", 0)
             h = face_region.get("h", 0)
             
-            # Detection confidence (RetinaFace provides this)
+            # Detection confidence (SCRFD provides this)
             det_score = face_obj.get("face_confidence", 0.9)
             
             # Filter by confidence if threshold provided
@@ -205,13 +621,15 @@ async def detect_faces(
                 if "gender" in analysis:
                     face_response["gender"] = analysis["gender"].lower()
             
-            # Add landmarks if requested (RetinaFace provides 5-point landmarks)
+            # Add landmarks if requested
+            # Note: SCRFD provides landmarks, but we skip them for speed unless requested
             if return_landmarks:
-                # RetinaFace landmarks are embedded in the detection
-                # We can extract them if needed
                 landmarks = face_obj.get("facial_landmarks", None)
                 if landmarks:
                     face_response["landmark"] = landmarks
+                else:
+                    # Landmarks not available with opencv backend
+                    logger.debug("Landmarks requested but not available with current detector backend")
             
             response_faces.append(face_response)
         
@@ -279,28 +697,30 @@ async def detect_faces_batch(
             cv2.imwrite(temp_path, img)
             
             try:
+                # Use SCRFD for batch processing (fast and accurate)
+                detector_backend = "scrfd"
+                
                 # Detect faces
                 face_objs = DeepFace.represent(
                     img_path=temp_path,
                     model_name="VGG-Face",
-                    detector_backend="retinaface",
+                    detector_backend=detector_backend,
                     enforce_detection=False,
-                    align=True
+                    align=False  # Disable alignment for speed
                 )
                 
-                # Get analysis if needed
+                # Get analysis if needed (skip for speed)
+                face_analyses = []
                 if return_age_gender:
                     try:
                         face_analyses = DeepFace.analyze(
                             img_path=temp_path,
                             actions=['age', 'gender'],
-                            detector_backend="retinaface",
+                            detector_backend=detector_backend,
                             enforce_detection=False,
                             silent=True
                         )
                     except:
-                        face_analyses = []
-                else:
                     face_analyses = []
                 
             finally:
@@ -402,7 +822,7 @@ async def compare_faces(
                 img1_path=temp1,
                 img2_path=temp2,
                 model_name="VGG-Face",
-                detector_backend="retinaface",
+                detector_backend="scrfd",
                 enforce_detection=False
             )
             
@@ -415,13 +835,13 @@ async def compare_faces(
             faces1 = DeepFace.represent(
                 img_path=temp1,
                 model_name="VGG-Face",
-                detector_backend="retinaface",
+                detector_backend="scrfd",
                 enforce_detection=False
             )
             faces2 = DeepFace.represent(
                 img_path=temp2,
                 model_name="VGG-Face",
-                detector_backend="retinaface",
+                detector_backend="scrfd",
                 enforce_detection=False
             )
             
