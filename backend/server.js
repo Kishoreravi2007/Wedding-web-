@@ -13,38 +13,89 @@ const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
 
 // Configure CORS for frontend-backend communication
-// Since frontend is now served from the same server, CORS is mainly for external API access
+// Backend supports frontend running on separate ports/domains
+const allowedOrigins = [
+  // Local development URLs (Vite dev server and common ports)
+  'http://localhost:3000', 
+  'http://localhost:3001', 
+  'http://localhost:3002', 
+  'http://localhost:3003', 
+  'http://localhost:5173', // Vite default port
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'http://127.0.0.1:3002',
+  'http://127.0.0.1:3003',
+  'http://127.0.0.1:5173',
+  // Deployed frontend URLs
+  'https://weddingweb.co.in',
+  'https://www.weddingweb.co.in',
+  // Environment variable for dynamic URLs
+  process.env.FRONTEND_URL,
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (same-origin requests, mobile apps, etc.)
-    if (!origin) return callback(null, true);
+    // Allow requests with no origin (same-origin requests, mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    const allowedOrigins = [
-      // Local development URLs (for external access if needed)
-      'http://localhost:3000', 
-      'http://localhost:3001', 
-      'http://localhost:3002', 
-      'http://localhost:3003', 
-      'http://localhost:5173',
-      // Deployed frontend URLs (add your deployed domain)
-      'https://weddingweb.co.in',
-      'https://www.weddingweb.co.in',
-      // Add any other deployed URLs you use
-      process.env.FRONTEND_URL, // Environment variable for dynamic URLs
-    ].filter(Boolean); // Remove undefined values
-    
-    // Allow same-origin requests (when frontend is served from this server)
-    if (allowedOrigins.includes(origin) || !origin) {
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // Allow all origins for now (can be restricted if needed)
+      // In development, allow all origins for flexibility
+      // In production, you may want to restrict this
+      if (process.env.NODE_ENV === 'production') {
+        console.warn(`⚠️  CORS: Blocked request from origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      } else {
+        // Development: allow all origins
+        callback(null, true);
+      }
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours
 }));
 app.use(express.json());
+
+// Health check endpoint - useful for frontend to verify backend connectivity
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Backend API is running',
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// API info endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Wedding Website API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      photos: '/api/photos',
+      photosLocal: '/api/photos-local',
+      wishes: '/api/wishes',
+      weddings: '/api/weddings',
+      contact: '/api/contact-messages',
+      feedback: '/api/feedback',
+      recognize: '/api/recognize'
+    },
+    cors: {
+      enabled: true,
+      allowedOrigins: allowedOrigins.length > 0 ? 'configured' : 'all (development)'
+    }
+  });
+});
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -53,11 +104,6 @@ console.log('📁 Serving static files from:', path.join(__dirname, '../uploads'
 // Serve backend directory for face detection reference images and mappings
 app.use('/backend', express.static(path.join(__dirname)));
 console.log('📁 Serving backend files from:', path.join(__dirname));
-
-// Serve static frontend files from build directory
-const buildPath = path.join(__dirname, 'build');
-app.use(express.static(buildPath));
-console.log('📁 Serving frontend static files from:', buildPath);
 
 // Use Supabase wishes endpoint (switched back from Firebase)
 const wishesRouter = require('./wishes-supabase');
@@ -294,32 +340,27 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
 // API routes should be handled before the catch-all route
 // All API routes are already defined above
 
-// Catch-all handler: serve React app for all non-API routes
-// This must be last, after all API routes
-// Express 5.x compatible - use app.use() without path pattern as catch-all middleware
-app.use((req, res, next) => {
+// Root endpoint - simple status message
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Backend is running'
+  });
+});
+
+// Catch-all handler: return 404 for non-API routes
+// Frontend should be served separately (e.g., Vite dev server or separate hosting)
+app.use((req, res) => {
   // Skip API routes - they should have been handled above
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   
-  // Skip static file requests that were already handled by express.static
-  // Static files with extensions should have been served already
-  // Only serve index.html for routes that don't have file extensions (SPA routing)
-  const hasFileExtension = /\.[^/]+$/.test(req.path.split('?')[0]); // Remove query string
-  
-  // Serve index.html for all GET requests without file extensions (SPA routing)
-  if (req.method === 'GET' && !hasFileExtension) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'), (err) => {
-      if (err) {
-        console.error('Error serving index.html:', err);
-        res.status(500).send('Frontend build not found. Please run: npm run build');
-      }
-    });
-  } else {
-    // For other requests, return 404
-    res.status(404).json({ error: 'Route not found' });
-  }
+  // For non-API routes, return 404
+  res.status(404).json({ 
+    error: 'Route not found',
+    message: 'This is an API-only server. Frontend should be accessed separately.',
+    availableEndpoints: '/api'
+  });
 });
 
 // Create HTTP server for WebSocket support
@@ -333,12 +374,16 @@ const io = initializeWebSocketServer(httpServer);
 app.locals.io = io;
 
 httpServer.listen(PORT, async () => {
-  console.log(`✅ Backend server running on http://localhost:${PORT}`);
+  console.log(`✅ Backend API server running on http://localhost:${PORT}`);
+  console.log(`📋 API Info: http://localhost:${PORT}/api`);
+  console.log(`💚 Health Check: http://localhost:${PORT}/api/health`);
   console.log(`📸 Upload endpoint: http://localhost:${PORT}/api/photos`);
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
   console.log(`📡 Live sync endpoint: http://localhost:${PORT}/api/live/uploadPhoto`);
   console.log(`🔌 WebSocket server: ws://localhost:${PORT}`);
   console.log(`💾 Using Supabase for photo storage`);
+  console.log(`🌐 CORS enabled for frontend support`);
+  console.log(`   Allowed origins: ${allowedOrigins.length > 0 ? allowedOrigins.join(', ') : 'All (development mode)'}`);
   
   // Check Supabase connection
   if (supabase) {
