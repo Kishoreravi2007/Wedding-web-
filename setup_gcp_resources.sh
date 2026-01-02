@@ -2,7 +2,7 @@
 
 # Configuration
 PROJECT_ID=$(gcloud config get-value project)
-REGION="us-central1"
+REGION="asia-south1"
 BUCKET_NAME="wedding-web-photos-${PROJECT_ID}"
 SQL_INSTANCE_NAME="wedding-web-db"
 DB_NAME="wedding_web"
@@ -25,7 +25,7 @@ echo "========================================================"
 
 # Enable required APIs
 echo " enabling APIs..."
-gcloud services enable storage.googleapis.com sqladmin.googleapis.com run.googleapis.com cloudbuild.googleapis.com
+gcloud services enable storage.googleapis.com sqladmin.googleapis.com run.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com --quiet
 
 # Create GCS Bucket
 echo "Creating Storage Bucket..."
@@ -49,7 +49,8 @@ else
         --tier=db-f1-micro \
         --region=$REGION \
         --storage-auto-increase \
-        --availability-type=ZONAL 
+        --availability-type=ZONAL \
+        --quiet
     echo "Instance created."
 fi
 
@@ -58,7 +59,7 @@ echo "Creating Database..."
 if gcloud sql databases list --instance=$SQL_INSTANCE_NAME | grep $DB_NAME > /dev/null; then
     echo "Database $DB_NAME already exists."
 else
-    gcloud sql databases create $DB_NAME --instance=$SQL_INSTANCE_NAME
+    gcloud sql databases create $DB_NAME --instance=$SQL_INSTANCE_NAME --quiet
     echo "Database created."
 fi
 
@@ -66,9 +67,9 @@ fi
 echo "Creating User..."
 if gcloud sql users list --instance=$SQL_INSTANCE_NAME | grep $DB_USER > /dev/null; then
     echo "User $DB_USER already exists. Updating password..."
-    gcloud sql users set-password $DB_USER --instance=$SQL_INSTANCE_NAME --password="$DB_PASSWORD"
+    gcloud sql users set-password $DB_USER --instance=$SQL_INSTANCE_NAME --password="$DB_PASSWORD" --quiet
 else
-    gcloud sql users create $DB_USER --instance=$SQL_INSTANCE_NAME --password="$DB_PASSWORD"
+    gcloud sql users create $DB_USER --instance=$SQL_INSTANCE_NAME --password="$DB_PASSWORD" --quiet
     echo "User created."
 fi
 
