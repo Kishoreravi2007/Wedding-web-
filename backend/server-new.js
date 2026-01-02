@@ -10,7 +10,8 @@ require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require('@supabase/supabase-js'); // Keeping import or removing if unused?
+// const { createClient } = require('@supabase/supabase-js');
 
 // =============================================================================
 // FIREBASE INITIALIZATION (for wishes only)
@@ -36,38 +37,38 @@ try {
 }
 
 // =============================================================================
-// SUPABASE INITIALIZATION (for photos and face recognition)
+// SUPABASE INITIALIZATION (REMOVED - Migrated to Cloud SQL & GCS)
 // =============================================================================
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+// const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Error: SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env file');
-  console.error('   Photos and face recognition will not work without Supabase configuration');
-  process.exit(1);
-}
+// if (!supabaseUrl || !supabaseAnonKey) {
+//   console.error('❌ Error: SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env file');
+//   console.error('   Photos and face recognition will not work without Supabase configuration');
+//   process.exit(1);
+// }
 
-// Create Supabase client with anon key for general operations
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// // Create Supabase client with anon key for general operations
+// const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Create admin client with service role key for admin operations
-const supabaseAdmin = supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null;
+// // Create admin client with service role key for admin operations
+// const supabaseAdmin = supabaseServiceKey 
+//   ? createClient(supabaseUrl, supabaseServiceKey)
+//   : null;
 
-console.log('✅ Supabase initialized successfully');
-console.log(`   URL: ${supabaseUrl}`);
+// console.log('✅ Supabase initialized successfully');
+// console.log(`   URL: ${supabaseUrl}`);
 
-// Export supabase clients for use in other modules
-module.exports.supabase = supabase;
-module.exports.supabaseAdmin = supabaseAdmin;
+// // Export supabase clients for use in other modules
+// module.exports.supabase = null; // supabase;
+// module.exports.supabaseAdmin = null; // supabaseAdmin;
 
 // =============================================================================
 // EXPRESS APP SETUP
 // =============================================================================
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
@@ -118,15 +119,13 @@ app.get('/health', async (req, res) => {
     health.status = 'degraded';
   }
 
-  // Check Supabase
+  // Check Database (Cloud SQL)
   try {
-    const { error } = await supabase.from('photos').select('count').limit(1);
-    if (error && error.code !== 'PGRST116') { // PGRST116 = table doesn't exist yet
-      throw error;
-    }
-    health.services.supabase = { status: 'connected', purpose: 'photos, faces' };
+    const { query } = require('./lib/db-gcp');
+    await query('SELECT 1');
+    health.services.database = { status: 'connected', purpose: 'photos, faces, profiles, auth' };
   } catch (error) {
-    health.services.supabase = { status: 'error', error: error.message };
+    health.services.database = { status: 'error', error: error.message };
     health.status = 'degraded';
   }
 

@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+// import { supabase } from "@/lib/supabase";
 
 const CompanySignup = () => {
   const { signup } = useAuth();
@@ -31,22 +31,34 @@ const CompanySignup = () => {
 
     try {
       setIsSubmitting(true);
+      // Signup (still uses Supabase Auth for now, will migrate AuthContext next)
       const { data, error: signupError } = await signup(email.trim(), password);
       if (signupError) {
         throw signupError;
       }
 
       if (data?.user?.id) {
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          user_id: data.user.id,
-          full_name: fullName.trim() || null,
-          location: location.trim() || null,
-          bio: bio.trim() || null,
-          avatar_url: photo,
-          email: email.trim(),
+        // Use Backend API instead of Supabase Client
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: data.user.id,
+            email: email.trim(),
+            full_name: fullName.trim() || null,
+            location: location.trim() || null,
+            bio: bio.trim() || null,
+            avatar_url: photo,
+          }),
         });
-        if (profileError) {
-          console.warn("Failed to save profile info after signup", profileError);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.warn("Failed to save profile info after signup", errorData);
+          // Not throwing here to allow the signup flow to "complete" even if profile details fail, 
+          // but normally you might want to handle this better.
         }
       }
       toast({

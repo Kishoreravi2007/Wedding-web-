@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { detectFaces, loadFaceDetectionModels } from "@/utils/faceDetection";
-import { supabase } from "@/lib/supabase";
+// import { supabase } from "@/lib/supabase";
 
 interface ProfileData {
   fullName: string;
@@ -320,20 +320,46 @@ const CompanyAccount = () => {
     }
 
     setIsSaving(true);
+    const token = localStorage.getItem('auth_token');
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        email: formState.email,
-        data: {
+      // 1. Update Profile Data (Profiles table)
+      const profileResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          email: formState.email, // Storing email in profiles too
           full_name: formState.fullName,
           location: formState.location,
           bio: formState.bio,
-          avatar_url: formState.photo,
-        },
+          avatar_url: formState.photo
+        })
       });
 
-      if (error) {
-        throw error;
+      if (!profileResponse.ok) {
+        throw new Error('Failed to update profile details');
+      }
+
+      // 2. Update Auth Data (Users table) - if email/username changed
+      // Note: Changing sensitivity fields might require re-login or password check in a real app
+      if (formState.email !== currentUser.email) {
+        const authResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/auth/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            username: formState.email // Usage of email as username
+          })
+        });
+        if (!authResponse.ok) {
+          console.warn('Failed to update auth username');
+        }
       }
 
       toast({

@@ -1,5 +1,5 @@
 // Supabase for storage (switched back from Firebase)
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase';
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
 // Firebase imports (commented out - keeping for future migration)
@@ -93,27 +93,27 @@ export async function uploadFiles(
 ): Promise<UploadResult> {
   try {
     const uploadedFiles: UploadedFile[] = [];
-    
+
     // Check if user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('Authentication required. Please login to upload photos.');
     }
-    
+
     // Upload files one by one
     for (const file of files) {
       const formData = new FormData();
       formData.append('photo', file);
       formData.append('sister', sister);
-      
+
       if (options?.eventType) {
         formData.append('eventType', options.eventType);
       }
-      
+
       if (options?.tags?.length) {
         formData.append('tags', JSON.stringify(options.tags));
       }
-      
+
       // Add face descriptors if available
       if (faceData && faceData.faces && faceData.faces.length > 0) {
         formData.append('face_descriptors', JSON.stringify(faceData.faces));
@@ -126,7 +126,7 @@ export async function uploadFiles(
 
       // Always use Firebase-backed photos endpoint
       const uploadEndpoint = `${API_BASE_URL}/api/photos`;
-      
+
       const response = await fetch(uploadEndpoint, {
         method: 'POST',
         headers: {
@@ -140,11 +140,11 @@ export async function uploadFiles(
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Upload error:', errorData);
-        
+
         if (response.status === 401 || response.status === 403) {
           throw new Error('Authentication failed. Please login again.');
         }
-        
+
         throw new Error(errorData.message || `Upload failed with status ${response.status}`);
       }
 
@@ -167,101 +167,102 @@ export async function uploadFiles(
   }
 }
 
-// New function to upload audio blobs for wishes using Supabase
+// New function to upload audio blobs for wishes using Backend API
 export async function uploadAudioWish(audioBlob: Blob, recipient: string): Promise<string> {
   try {
-    const fileExtension = audioBlob.type.split('/').pop() || 'webm';
-    const fileName = generateFileName(`audio_wish.${fileExtension}`, recipient);
-    const storagePath = getDirectoryPath(recipient, 'audio-wish'); // Use recipient as eventType for directory
-    const filePath = `${storagePath}/${fileName}`;
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('wedding-photos')
-      .upload(filePath, audioBlob, {
-        contentType: audioBlob.type,
-        cacheControl: '3600',
-        upsert: false
-      });
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'audio-wish.webm');
+    formData.append('recipient', recipient);
+    formData.append('type', 'audio-wish');
 
-    if (error) {
-      console.error("Error uploading audio wish to Supabase:", error);
-      throw error;
+    // Use specific endpoint or generic upload? 
+    // Assuming we extend /api/photos or create a new one. 
+    // For now, let's assume /api/photos handles it if we send the right data, 
+    // OR creates a new simple endpoint.
+    // Let's use a new endpoint /api/wishes/audio which I might need to create, 
+    // OR just use /api/photos if it fits. 
+    // The previous code uploaded to 'wedding-photos' bucket. 
+    // Let's rely on the generic upload endpoint but I need to make sure backend handles it.
+
+    // Simplest: POST to /api/photos with a flag
+    const response = await fetch(`${API_BASE_URL}/api/photos/audio-wish`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload audio wish');
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(filePath);
-
-    console.log("Audio wish uploaded successfully to Supabase:", publicUrl);
-    return publicUrl;
+    const data = await response.json();
+    return data.publicUrl;
   } catch (error) {
     console.error("Error uploading audio wish:", error);
     throw error;
   }
 }
 
-// Get all uploaded files from Supabase
+// Get all uploaded files from Backend
 export async function getUploadedFiles(): Promise<UploadedFile[]> {
   try {
-    const { data, error } = await supabase
-      .from('photos')
-      .select('*')
-      .order('uploaded_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error getting uploaded files from Supabase:', error);
-      return [];
-    }
-    
-    // Map Supabase data to UploadedFile format
-    const files: UploadedFile[] = (data || []).map((photo: any) => ({
-      id: photo.id,
-      originalName: photo.filename,
-      fileName: photo.file_path,
-      filePath: photo.file_path,
-      publicUrl: photo.public_url,
-      size: photo.size,
-      type: photo.mimetype,
-      eventType: photo.event_type || 'other',
-      uploadedAt: photo.uploaded_at,
-      fileCategory: photo.mimetype.startsWith('image/') ? 'image' : 'music'
-    }));
-    
-    return files;
-  } catch (error) {
-    console.error('Error getting uploaded files:', error);
-    return [];
-  }
-}
-
-// Delete uploaded file from Supabase Storage and Database
-export async function deleteUploadedFile(fileId: string, filePath: string): Promise<boolean> {
-  try {
-    // Delete from Supabase Storage
-    const { error: storageError } = await supabase.storage
-      .from('wedding-photos')
-      .remove([filePath]);
-
-    if (storageError) {
-      console.error('Error deleting from Supabase Storage:', storageError);
-    }
-
-    // Delete metadata from Supabase DB using backend API
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/api/photos/${fileId}`, {
-      method: 'DELETE',
+    const response = await fetch(`${API_BASE_URL}/api/photos`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete photo metadata');
+      console.error('Error getting uploaded files from Backend');
+      return [];
     }
 
-    console.log(`Deleted file with ID: ${fileId} and path: ${filePath} from Supabase`);
+    const data = await response.json();
+
+    // Map Backend data to UploadedFile format
+    // Backend returns objects that should align, but let's map safely
+    return (data.photos || []).map((photo: any) => ({
+      id: photo.id,
+      originalName: photo.filename, // Backend sends filename
+      fileName: photo.filename,
+      filePath: photo.filename, // Using filename as path for now
+      publicUrl: photo.publicUrl || photo.url, // Backend should return signed or public URL
+      size: photo.size || 0,
+      type: photo.mimetype || 'unknown',
+      eventType: photo.event_type || 'other',
+      uploadedAt: photo.created_at,
+      fileCategory: (photo.mimetype && photo.mimetype.startsWith('image/')) ? 'image' : 'music'
+    }));
+  } catch (error) {
+    console.error('Error getting uploaded files:', error);
+    return [];
+  }
+}
+
+// Delete uploaded file using Backend API
+export async function deleteUploadedFile(fileId: string, filePath: string): Promise<boolean> {
+  try {
+    // Backend handles both DB and Storage deletion
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/api/photos/${fileId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete file');
+    }
+
+    console.log(`Deleted file with ID: ${fileId}`);
     return true;
   } catch (error) {
     console.error('Error deleting file:', error);
@@ -281,7 +282,7 @@ export function getFileStats(files: UploadedFile[]) {
   files.forEach(file => {
     // Count by event type
     stats.byEventType[file.eventType] = (stats.byEventType[file.eventType] || 0) + 1;
-    
+
     // Count by date
     const date = new Date(file.uploadedAt).toDateString();
     stats.byDate[date] = (stats.byDate[date] || 0) + 1;
@@ -293,11 +294,11 @@ export function getFileStats(files: UploadedFile[]) {
 // Format file size
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 

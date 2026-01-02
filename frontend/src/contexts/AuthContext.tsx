@@ -6,8 +6,11 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import type { Session, SignUpResponse } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+
+import { API_BASE_URL } from "@/lib/api";
+
+// Backend URL from environment or default
+// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
 
 interface ProfilePayload {
   full_name?: string | null;
@@ -19,6 +22,8 @@ interface ProfilePayload {
 interface User {
   id: string;
   email?: string | null;
+  username: string;
+  role: string;
   profile?: ProfilePayload | null;
 }
 
@@ -26,7 +31,7 @@ interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<SignUpResponse>;
+  signup: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -46,79 +51,148 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const mapSessionToUser = (session: Session | null): User | null => {
-  if (!session) {
-    return null;
-  }
-
-  const metadata = session.user.user_metadata as ProfilePayload | undefined;
-  return {
-    id: session.user.id,
-    email: session.user.email,
-    profile: metadata ?? null,
-  };
-};
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const hydrateUser = useCallback(async (session: Session | null) => {
-    setCurrentUser(mapSessionToUser(session));
-  }, []);
-
-  const refreshProfile = useCallback(async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    setCurrentUser(mapSessionToUser(session));
-  }, []);
-  useEffect(() => {
-    let mounted = true;
-
-    const initialize = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!mounted) {
-        return;
+  // Helper to fetch user profile
+  const fetchUserProfile = useCallback(async (userId: string, token: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profiles/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        return await response.json();
       }
+      return null;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+  }, []);
 
-      await hydrateUser(session);
-      setLoading(false);
-    };
+  // Hydrate user from local storage token
+  const hydrateUser = useCallback(async () => {
+    const token = localStorage.getItem('auth_token');
+    const storedUser = localStorage.getItem('auth_user');
 
-    initialize();
+    if (token && storedUser) {
+      try {
+        // Verify token with backend (optional but recommended for security on load)
+        // For now, optimistic loading from local storage to be fast
+        const parsedUser = JSON.parse(storedUser);
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      hydrateUser(session);
-    });
+        // Fetch latest profile
+        const profile = await fetchUserProfile(parsedUser.id, token);
 
-    return () => {
-      mounted = false;
-      listener.subscription.unsubscribe();
-    };
+        setCurrentUser({
+          ...parsedUser,
+          profile: profile
+        });
+      } catch (e) {
+        console.error('Error hydrating user', e);
+        // If error, maybe clear storage
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+      }
+    }
+    setLoading(false);
+  }, [fetchUserProfile]);
+
+  useEffect(() => {
+    hydrateUser();
   }, [hydrateUser]);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    try {
+      // NOTE: Backend expects 'username' but UI uses 'email'. 
+      // Adjust backend or frontend to match. 
+      // Assuming for this migration we treat email as username or update backend.
+      // Let's send email as username for now as that's what backend likely expects if migrated 1:1
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      const { token, user } = data;
+
+      // Save to local storage
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(user));
+
+      // Fetch profile
+      const profile = await fetchUserProfile(user.id, token);
+
+      setCurrentUser({
+        ...user,
+        email: email, // explicit email if not in user object from backend
+        profile
+      });
+
+    } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   };
 
   const signup = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      throw error;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: email,
+          password,
+          role: 'company' // Default role for signup
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Signup failed');
+      }
+
+      // Auto login often handled here, or return data
+      // Supabase returns session data usually.
+      // We'll mimic the shape expected by Signup page roughly or return what we have.
+      return { data: { user: data.user }, error: null };
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { data: null, error };
     }
-    return data;
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
     setCurrentUser(null);
+  };
+
+  const refreshProfile = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (currentUser && token) {
+      const profile = await fetchUserProfile(currentUser.id, token);
+      setCurrentUser(prev => prev ? ({ ...prev, profile }) : null);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    // Implement forgot password flow logic here
+    // Likely call backend endpoint
+    console.log('Reset password request for:', email);
+    alert('Password reset functionality not yet implemented in migration.');
   };
 
   const value: AuthContextType = {
@@ -128,10 +202,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     logout,
     refreshProfile,
-    resetPassword: async (email: string) => {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-      if (error) throw error;
-    },
+    resetPassword,
   };
 
   return (
