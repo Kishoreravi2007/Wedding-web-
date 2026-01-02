@@ -285,7 +285,7 @@ const SisterBSchedule = () => {
 
       <div className="relative w-full h-64 mb-4 overflow-hidden rounded-lg shadow-lg">
         <img
-          src="/sister-b-schedule-banner.jpg"
+          src="./sister-b-schedule-banner.jpg"
           alt={t('sisterBScheduleBanner')}
           className="w-full h-full object-cover object-center"
         />

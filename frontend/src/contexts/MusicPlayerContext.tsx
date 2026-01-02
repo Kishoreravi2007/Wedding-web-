@@ -17,7 +17,7 @@ interface MusicPlayerContextType {
   goToNextTrack: () => void;
   goToPrevTrack: () => void;
   playTrack: (src: string) => void; // Changed to accept src string
-  musicSources: { title: string; src: string;}[];
+  musicSources: { title: string; src: string; }[];
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -48,8 +48,8 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   }, [location.pathname]);
 
   const musicSources = [
-    { title: 'Wedding Music', src: '/wedding-music.mp3' },
-    { title: 'Another Song', src: '/another-song.mp3' },
+    { title: 'Wedding Music', src: './wedding-music.mp3' },
+    { title: 'Another Song', src: './another-song.mp3' },
   ];
 
   const playCurrentTrack = useCallback(async () => {

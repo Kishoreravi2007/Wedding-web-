@@ -26,7 +26,7 @@ const LandingMinimal = () => {
         <div className="container mx-auto px-4 py-5 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-4">
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="WeddingWeb logo"
               className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
             />
@@ -89,7 +89,7 @@ const LandingMinimal = () => {
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-3">
                   <img
-                    src="/logo.png"
+                    src="./logo.png"
                     alt="WeddingWeb logo"
                     className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
                   />

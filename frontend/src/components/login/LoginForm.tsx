@@ -51,7 +51,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
     <Card className="bg-white border border-slate-200 shadow-xl">
       <CardHeader className="space-y-3 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 shadow-lg">
-          <img src="/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
+          <img src="./logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
         </div>
         <CardTitle className="text-3xl font-semibold text-slate-900">Sign in to Wedding Web</CardTitle>
         <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
