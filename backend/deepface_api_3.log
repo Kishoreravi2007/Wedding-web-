@@ -1,0 +1,428 @@
+INFO:     Will watch for changes in these directories: ['/Users/kishoreravi/Desktop/projects/Wedding-web-1/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+INFO:     Started reloader process [58848] using StatReload
+INFO:     Started server process [58918]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 1024x682 to 1921x1280 (scale: 1.88)
+INFO:deepface_api:Processing image: uploaded_image_1767375314455.jpg, size: (1280, 1921, 3), scale: 1.88, original: 1024x682
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+INFO:deepface_api:Initializing YOLOv8-face model...
+ERROR:deepface_api:❌ Failed to initialize YOLOv8-face: could not find MARK
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:55896 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56365 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+INFO:deepface_api:Applied CLAHE for lighting normalization
+INFO:deepface_api:Upscaled image from 640x480 to 1706x1280 (scale: 2.67)
+INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale: 2.67, original: 640x480
+INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
+WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
+INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK

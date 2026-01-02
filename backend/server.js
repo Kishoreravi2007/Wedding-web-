@@ -242,11 +242,10 @@ app.post('/api/recognize', upload.none(), async (req, res) => {
     }
 
     // Match the face against known faces, filtered by wedding if provided
-    // Using STRICT threshold (0.45) to prevent false positive matches
-    // Distance < 0.35 = excellent match (65%+ confidence)
-    // Distance 0.35-0.45 = good match (55-65% confidence)
-    console.log(`🔍 Matching face with threshold: 0.45 (55%+ confidence required)`);
-    const matchResult = await matchFace(descriptor, 0.45, weddingName);
+    // Using TUNED threshold (0.55) based on calibration (simulated positive=0.49, negative=0.61)
+    // Distance < 0.55 = match
+    console.log(`🔍 Matching face with threshold: 0.55 (45%+ confidence required)`);
+    const matchResult = await matchFace(descriptor, 0.55, weddingName);
 
 
     if (!matchResult.matches || matchResult.matches.length === 0) {

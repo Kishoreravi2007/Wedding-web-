@@ -41,8 +41,8 @@ router.post('/store-descriptors', authenticateToken, async (req, res) => {
           continue;
         }
 
-        if (faceData.descriptor.length !== 128) {
-          console.warn(`Invalid descriptor length: ${faceData.descriptor.length}, expected 128`);
+        if (faceData.descriptor.length !== 128 && faceData.descriptor.length !== 512 && faceData.descriptor.length !== 2622 && faceData.descriptor.length !== 4096) {
+          console.warn(`Invalid descriptor length: ${faceData.descriptor.length}, expected 128, 512, 2622, or 4096`);
           continue;
         }
 

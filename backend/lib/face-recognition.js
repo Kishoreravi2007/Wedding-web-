@@ -70,7 +70,7 @@ function cosineDistance(descriptor1, descriptor2) {
  * @param {number} threshold - Distance threshold for matching
  * @param {string} weddingName - Optional: filter by wedding ('sister-a' or 'sister-b')
  */
-async function matchFace(descriptor, threshold = 0.45, weddingName = null) {
+async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🔍 FACE MATCHING DEBUG`);
   console.log(`${'='.repeat(60)}`);
@@ -88,7 +88,7 @@ async function matchFace(descriptor, threshold = 0.45, weddingName = null) {
   }
 
   // Validate descriptor dimension
-  if (flatDescriptor.length !== 512 && flatDescriptor.length !== 128) {
+  if (flatDescriptor.length !== 512 && flatDescriptor.length !== 128 && flatDescriptor.length !== 2622 && flatDescriptor.length !== 4096) {
     // Check if it's a multiple of 512 or 128 (might be concatenated)
     if (flatDescriptor.length % 512 === 0) {
       const numFaces = flatDescriptor.length / 512;
@@ -101,7 +101,7 @@ async function matchFace(descriptor, threshold = 0.45, weddingName = null) {
       console.warn(`   This might indicate multiple faces were concatenated. Using first 128 dimensions.`);
       flatDescriptor = flatDescriptor.slice(0, 128);
     } else {
-      const error = `Invalid descriptor dimension: ${descriptor.length}. Expected 512 (DeepFace) or 128 (face-api.js) dimensions. Got ${descriptor.length} dimensions.`;
+      const error = `Invalid descriptor dimension: ${descriptor.length}. Expected 512, 2622, or 4096 (DeepFace) or 128 (face-api.js) dimensions. Got ${descriptor.length} dimensions.`;
       console.error(`❌ ${error}`);
       console.error(`   Descriptor type: ${typeof descriptor}, isArray: ${Array.isArray(descriptor)}`);
       if (descriptor.length > 0) {
@@ -442,10 +442,10 @@ function validateDescriptor(descriptor) {
   }
 
   // Support both 512-dim (DeepFace) and 128-dim (legacy face-api.js) descriptors
-  if (descriptor.length !== 512 && descriptor.length !== 128) {
+  if (descriptor.length !== 512 && descriptor.length !== 128 && descriptor.length !== 2622 && descriptor.length !== 4096) {
     return {
       valid: false,
-      error: `Descriptor must have exactly 512 dimensions (DeepFace) or 128 dimensions (legacy). Got ${descriptor.length}`
+      error: `Descriptor must have exactly 512, 2622, or 4096 dimensions (DeepFace) or 128 dimensions (legacy). Got ${descriptor.length}`
     };
   }
 

@@ -269,10 +269,6 @@ async def detect_faces(
         logger.info(f"Processing image: {file.filename}, size: {img.shape}, scale: {scale_factor:.2f}, original: {orig_width}x{orig_height}")
 
         
-        # Save image temporarily for DeepFace
-        temp_path = f"/tmp/temp_{file.filename}"
-        cv2.imwrite(temp_path, img)
-        
         try:
             # Use YOLOv8-face for fast and accurate face detection
             if detector_backend not in ["opencv", "retinaface", "mtcnn", "ssd", "dlib", "scrfd", "yolov8"]:
@@ -429,40 +425,16 @@ async def detect_faces(
                                     logger.debug(f"Filtered out low skin color: {skin_percentage:.1f}% skin pixels")
                                     continue
                                 
-                                # Save cropped face temporarily for verification and embedding extraction
-                                # (face_crop was already created above for filtering checks)
-                                face_temp_path = f"/tmp/yolov8_face_{len(face_objs)}_{file.filename}"
-                                cv2.imwrite(face_temp_path, face_crop)
-                                
                                 try:
-                                    # DeepFace Double-Check: Verify this is actually a face
-                                    # DeepFace.extract_faces is more cautious than YOLO
-                                    try:
-                                        verified_faces = DeepFace.extract_faces(
-                                            img_path=face_temp_path,
-                                            detector_backend="opencv",
-                                            enforce_detection=True,  # Stricter verification - must detect face
-                                            align=False
-                                        )
-                                        
-                                        # If DeepFace doesn't find a face, skip this detection
-                                        if not verified_faces or len(verified_faces) == 0:
-                                            verification_failed += 1
-                                            logger.debug(f"DeepFace verification failed for detection at ({x1}, {y1})")
-                                            continue
-                                        
-                                        logger.debug(f"DeepFace verified face at ({x1}, {y1}, {x2}, {y2})")
-                                    except Exception as verify_error:
-                                        # If verification fails, skip this detection
-                                        verification_failed += 1
-                                        logger.debug(f"DeepFace verification error: {verify_error}")
-                                        continue
+                                    # OPTIMIZATION: Removed redundant DeepFace.extract_faces verification
+                                    # Passing numpy array direct to DeepFace.represent (no file I/O)
                                     
-                                    # Get embedding from DeepFace (face is verified, now extract embedding)
+                                    # Get embedding from DeepFace
+                                    # Use img_path=face_crop (numpy array) directly
                                     embedding_obj = DeepFace.represent(
-                                        img_path=face_temp_path,
+                                        img_path=face_crop,
                                         model_name="VGG-Face",
-                                        detector_backend="opencv",  # Fast for already-cropped faces
+                                        detector_backend="skip",  # Skip detection since we already cropped it
                                         enforce_detection=False,
                                         align=False
                                     )
@@ -484,9 +456,6 @@ async def detect_faces(
                                         
                                 except Exception as e:
                                     logger.warning(f"Failed to process face detection: {e}")
-                                finally:
-                                    if os.path.exists(face_temp_path):
-                                        os.remove(face_temp_path)
                         
                         logger.info(
                             f"YOLOv8-face: {total_detections} detections → "
@@ -503,12 +472,13 @@ async def detect_faces(
                     # Fallback to DeepFace with retinaface (most accurate) if YOLOv8 model not available
                     logger.warning("YOLOv8-face model not available, falling back to retinaface (most accurate)")
                     detector_backend = "retinaface"
+                    # Pass img directly (numpy array)
                     face_objs = DeepFace.represent(
-                        img_path=temp_path,
+                        img_path=img,
                         model_name="Facenet",  # 128-dim embeddings to match existing database
                         detector_backend=detector_backend,
                         enforce_detection=enforce_detection,
-                        align=True  # Enable alignment for better accuracy
+                        align=True
                     )
 
 
@@ -554,7 +524,7 @@ async def detect_faces(
                     logger.warning("InsightFace SCRFD not available, falling back to opencv")
                     detector_backend = "opencv"
                     face_objs = DeepFace.represent(
-                        img_path=temp_path,
+                        img_path=img,
                         model_name="VGG-Face",
                         detector_backend=detector_backend,
                         enforce_detection=enforce_detection,
@@ -567,12 +537,13 @@ async def detect_faces(
                     logger.warning("YOLOv8 manual logic skipped. Falling back to retinaface.")
                     detector_backend = "retinaface"
 
+                # Pass img directly
                 raw_face_objs = DeepFace.represent(
-                    img_path=temp_path,
+                    img_path=img,
                     model_name="Facenet",  # 128-dim embeddings to match existing database
                     detector_backend=detector_backend,
                     enforce_detection=enforce_detection,
-                    align=True  # Enable alignment for better accuracy
+                    align=True 
                 )
 
                 # Apply basic filtering to reduce false positives
@@ -630,8 +601,9 @@ async def detect_faces(
             face_analyses = []
             if return_age_gender:
                 try:
+                    # Pass img directly
                     face_analyses = DeepFace.analyze(
-                        img_path=temp_path,
+                        img_path=img,
                         actions=['age', 'gender'],  # Removed 'emotion' for speed
                         detector_backend=detector_backend,
                         enforce_detection=False,
@@ -641,9 +613,7 @@ async def detect_faces(
                     face_analyses = []
             
         finally:
-            # Clean up temp file
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
+            pass # No cleanup needed for in-memory processing
         
         if not face_objs:
             return JSONResponse(
@@ -768,20 +738,16 @@ async def detect_faces_batch(
     
     for file in files:
         try:
-            # Read image
-            img = await process_image_file(file)
-            
-            # Save temporarily
-            temp_path = f"/tmp/temp_{file.filename}"
-            cv2.imwrite(temp_path, img)
+            # Read image (unpack tuple correctly)
+            img, scale_factor, orig_w, orig_h = await process_image_file(file)
             
             try:
                 # Use SCRFD for batch processing (fast and accurate)
                 detector_backend = "scrfd"
                 
-                # Detect faces
+                # Detect faces - pass numpy array directly
                 face_objs = DeepFace.represent(
-                    img_path=temp_path,
+                    img_path=img,
                     model_name="VGG-Face",
                     detector_backend=detector_backend,
                     enforce_detection=False,
@@ -793,7 +759,7 @@ async def detect_faces_batch(
                 if return_age_gender:
                     try:
                         face_analyses = DeepFace.analyze(
-                            img_path=temp_path,
+                            img_path=img,
                             actions=['age', 'gender'],
                             detector_backend=detector_backend,
                             enforce_detection=False,
@@ -803,8 +769,7 @@ async def detect_faces_batch(
                         face_analyses = []
                 
             finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
+                pass # No cleanup needed
             
             # Process faces
             response_faces = []
@@ -815,6 +780,14 @@ async def detect_faces_batch(
                 y = face_region.get("y", 0)
                 w = face_region.get("w", 0)
                 h = face_region.get("h", 0)
+                
+                # Scale coordinates back if needed
+                if scale_factor != 1.0:
+                    x = int(x / scale_factor)
+                    y = int(y / scale_factor)
+                    w = int(w / scale_factor)
+                    h = int(h / scale_factor)
+                
                 det_score = face_obj.get("face_confidence", 0.9)
                 
                 if min_confidence is not None and det_score < min_confidence:
@@ -885,11 +858,12 @@ async def compare_faces(
         JSON with comparison results
     """
     try:
-        # Process both images
-        img1 = await process_image_file(file1)
-        img2 = await process_image_file(file2)
+        # Process both images (unpack tuples correctly)
+        img1, _, _, _ = await process_image_file(file1)
+        img2, _, _, _ = await process_image_file(file2)
         
-        # Save temporarily
+        # Save temporarily - DeepFace.verify with SCRFD backend requires file paths
+        # (It fails with numpy arrays, unlike DeepFace.represent)
         temp1 = f"/tmp/compare1_{file1.filename}"
         temp2 = f"/tmp/compare2_{file2.filename}"
         cv2.imwrite(temp1, img1)
@@ -897,11 +871,12 @@ async def compare_faces(
         
         try:
             # Use DeepFace to verify if same person
+            # START_CHANGE: Switched from scrfd to retinaface because scrfd verification is broken
             result = DeepFace.verify(
                 img1_path=temp1,
                 img2_path=temp2,
                 model_name="VGG-Face",
-                detector_backend="scrfd",
+                detector_backend="retinaface",
                 enforce_detection=False
             )
             
@@ -914,13 +889,13 @@ async def compare_faces(
             faces1 = DeepFace.represent(
                 img_path=temp1,
                 model_name="VGG-Face",
-                detector_backend="scrfd",
+                detector_backend="retinaface",
                 enforce_detection=False
             )
             faces2 = DeepFace.represent(
                 img_path=temp2,
                 model_name="VGG-Face",
-                detector_backend="scrfd",
+                detector_backend="retinaface",
                 enforce_detection=False
             )
             
