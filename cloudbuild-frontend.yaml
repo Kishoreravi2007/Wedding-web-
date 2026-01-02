@@ -25,6 +25,7 @@ steps:
       - '-c'
       - |
         gsutil -m cp -r frontend/dist/* gs://$PROJECT_ID-wedding-frontend/
+        gsutil -m setmeta -h "Cache-Control:private, max-age=0, no-transform" gs://$PROJECT_ID-wedding-frontend/**/*.html
     waitFor: ['build-frontend']
 
 options:
