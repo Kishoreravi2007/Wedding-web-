@@ -14,6 +14,7 @@ const admin = require('firebase-admin');
 // =============================================================================
 // FIREBASE INITIALIZATION (for wishes only)
 // =============================================================================
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
 if (serviceAccountPath) {
   try {
     const serviceAccount = require(serviceAccountPath);

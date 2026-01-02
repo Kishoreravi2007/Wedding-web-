@@ -1,12 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const admin = require('firebase-admin');
-const db = admin.firestore();
+// Helper to get DB only after initialization
+const getDB = () => {
+  if (admin.apps.length === 0) {
+    return null;
+  }
+  return admin.firestore();
+};
 
 // GET wishes by recipient or all wishes if no recipient specified
 router.get('/', async (req, res) => {
   const { recipient } = req.query;
   try {
+    const db = getDB();
+    if (!db) {
+      return res.status(503).json({ message: 'Wishes service unavailable (Firebase not configured).' });
+    }
     let wishesRef = db.collection('wishes');
     if (recipient) {
       wishesRef = wishesRef.where('recipient', '==', recipient);
@@ -35,6 +45,11 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    const db = getDB();
+    if (!db) {
+      return res.status(503).json({ message: 'Wishes service unavailable (Firebase not configured).' });
+    }
+
     const newWish = {
       name,
       wish: wish || null, // Store wish as null if not provided
