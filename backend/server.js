@@ -33,6 +33,8 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   // Cloud Storage hosting origin
   'https://storage.googleapis.com',
+  'https://weddingweb.co.in',
+  'https://www.weddingweb.co.in',
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
