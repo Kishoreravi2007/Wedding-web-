@@ -52,7 +52,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Create admin client with service role key for admin operations
-const supabaseAdmin = supabaseServiceKey 
+const supabaseAdmin = supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null;
 
@@ -108,7 +108,7 @@ app.get('/health', async (req, res) => {
     timestamp: new Date().toISOString(),
     services: {}
   };
-  
+
   // Check Firebase
   try {
     await admin.firestore().collection('wishes').limit(1).get();
@@ -117,7 +117,7 @@ app.get('/health', async (req, res) => {
     health.services.firebase = { status: 'error', error: error.message };
     health.status = 'degraded';
   }
-  
+
   // Check Supabase
   try {
     const { error } = await supabase.from('photos').select('count').limit(1);
@@ -129,7 +129,7 @@ app.get('/health', async (req, res) => {
     health.services.supabase = { status: 'error', error: error.message };
     health.status = 'degraded';
   }
-  
+
   res.status(health.status === 'healthy' ? 200 : 503).json(health);
 });
 
@@ -148,6 +148,10 @@ app.use('/api/photos', authenticateToken, photosRouter);
 // Face recognition routes (Supabase)
 const facesRouter = require('./faces');
 app.use('/api/faces', authenticateToken, facesRouter);
+
+// Profile routes (Cloud SQL)
+const profilesRouter = require('./routes/profiles');
+app.use('/api/profiles', profilesRouter);
 
 // =============================================================================
 // ERROR HANDLING
@@ -177,11 +181,11 @@ app.use((req, res) => {
 // Global error handler
 app.use((error, req, res, next) => {
   console.error('❌ Unhandled error:', error);
-  
+
   res.status(error.status || 500).json({
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' 
-      ? error.message 
+    message: process.env.NODE_ENV === 'development'
+      ? error.message
       : 'An unexpected error occurred',
     ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
   });

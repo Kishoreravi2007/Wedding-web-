@@ -1,23 +1,24 @@
 /**
- * Photos API - Refactored for Supabase
+ * Photos API - Cloud SQL & GCS Version
  * 
  * This module handles photo uploads, retrieval, and deletion using:
- * - Supabase Storage for file storage
- * - Supabase PostgreSQL for metadata
+ * - Google Cloud Storage for file storage
+ * - Cloud SQL (PostgreSQL) for metadata
  * - Face recognition integration
  */
 
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { supabase } = require('./server');
-const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/supabase-db');
+// const { supabase } = require('./server'); // Removed Supabase usage
+const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
+const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Use GCS implementation
 const { matchFace, validateDescriptor } = require('./lib/face-recognition');
 
 // Multer configuration for in-memory storage
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { 
+  limits: {
     fileSize: 10 * 1024 * 1024, // 10MB file size limit
     files: 1 // One file at a time
   },
@@ -38,7 +39,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const { sister, eventType, tags, personId, limit, offset } = req.query;
-    
+
     const filters = {
       sister,
       eventType,
@@ -47,13 +48,13 @@ router.get('/', async (req, res) => {
       limit: limit ? parseInt(limit) : 50,
       offset: offset ? parseInt(offset) : 0
     };
-    
+
     // Get photos from database
     const photos = await PhotoDB.findAll(filters);
-    
+
     // Get total count
     const total = await PhotoDB.count({ sister, eventType });
-    
+
     // Format response
     const formattedPhotos = photos.map(photo => ({
       id: photo.id,
@@ -79,7 +80,7 @@ router.get('/', async (req, res) => {
         } : null
       }))
     }));
-    
+
     res.json({
       photos: formattedPhotos,
       total,
@@ -89,9 +90,9 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting photos:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving photos',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -104,11 +105,11 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const photo = await PhotoDB.findById(id);
-    
+
     if (!photo) {
       return res.status(404).json({ message: 'Photo not found' });
     }
-    
+
     res.json({
       id: photo.id,
       filename: photo.filename,
@@ -135,9 +136,9 @@ router.get('/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting photo:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving photo',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -151,16 +152,16 @@ router.post('/', upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded' });
   }
-  
+
   const { sister, title, description, eventType, tags, faces } = req.body;
-  
+
   // Validate required fields
   if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
-    return res.status(400).json({ 
-      message: 'Invalid or missing sister identifier. Must be "sister-a" or "sister-b"' 
+    return res.status(400).json({
+      message: 'Invalid or missing sister identifier. Must be "sister-a" or "sister-b"'
     });
   }
-  
+
   // Parse tags
   let parsedTags = [];
   if (tags) {
@@ -170,12 +171,12 @@ router.post('/', upload.single('photo'), async (req, res) => {
         throw new Error('Tags must be an array');
       }
     } catch (parseError) {
-      return res.status(400).json({ 
-        message: 'Invalid tags format. Must be a JSON array' 
+      return res.status(400).json({
+        message: 'Invalid tags format. Must be a JSON array'
       });
     }
   }
-  
+
   // Parse faces
   let parsedFaces = [];
   if (faces) {
@@ -184,54 +185,36 @@ router.post('/', upload.single('photo'), async (req, res) => {
       if (!Array.isArray(parsedFaces)) {
         throw new Error('Faces must be an array');
       }
-      
+
       // Validate face descriptors
       for (const face of parsedFaces) {
         if (face.descriptor) {
           const validation = validateDescriptor(face.descriptor);
           if (!validation.valid) {
-            return res.status(400).json({ 
-              message: `Invalid face descriptor: ${validation.error}` 
+            return res.status(400).json({
+              message: `Invalid face descriptor: ${validation.error}`
             });
           }
         }
       }
     } catch (parseError) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'Invalid faces format',
-        error: parseError.message 
+        error: parseError.message
       });
     }
   }
-  
+
+  const file = req.file;
+  const timestamp = Date.now();
+  const cleanFileName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const fileName = `${sister}/${timestamp}_${cleanFileName}`;
+
   try {
-    const file = req.file;
-    const timestamp = Date.now();
-    const fileName = `${sister}/${timestamp}_${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('wedding-photos')
-      .upload(fileName, file.buffer, {
-        contentType: file.mimetype,
-        upsert: false
-      });
-    
-    if (uploadError) {
-      console.error('Supabase storage upload error:', uploadError);
-      return res.status(500).json({ 
-        message: 'Error uploading photo to storage',
-        error: uploadError.message 
-      });
-    }
-    
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(fileName);
-    
-    const publicUrl = urlData.publicUrl;
-    
+
+    // Upload to GCS
+    const publicUrl = await uploadFile(fileName, file.buffer, file.mimetype);
+
     // Create photo record in database
     const photoData = {
       filename: file.originalname,
@@ -244,12 +227,12 @@ router.post('/', upload.single('photo'), async (req, res) => {
       description: description || '',
       event_type: eventType || '',
       tags: parsedTags,
-      storage_provider: 'supabase',
+      storage_provider: 'gcs', // Changed from supabase
       photographer_id: req.user?.id || null // From authentication middleware
     };
-    
+
     const photo = await PhotoDB.create(photoData);
-    
+
     // Process faces if provided
     const processedFaces = [];
     if (parsedFaces.length > 0) {
@@ -262,7 +245,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
             photo_id: photo.id,
             confidence: faceData.confidence || 0.8
           });
-          
+
           // Match face to known people if no person assigned
           let matchedPerson = null;
           if (!faceData.personId && faceData.descriptor) {
@@ -275,7 +258,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
               };
             }
           }
-          
+
           // Create photo face record
           const photoFace = await PhotoFaceDB.create({
             photo_id: photo.id,
@@ -285,7 +268,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
             confidence: matchedPerson?.confidence || faceData.confidence || 0.8,
             is_verified: !!faceData.personId // Verified if manually tagged
           });
-          
+
           processedFaces.push({
             id: photoFace.id,
             boundingBox: photoFace.bounding_box,
@@ -298,7 +281,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
         }
       }
     }
-    
+
     // Return created photo with face data
     res.status(201).json({
       id: photo.id,
@@ -315,22 +298,22 @@ router.post('/', upload.single('photo'), async (req, res) => {
       faces: processedFaces,
       message: 'Photo uploaded successfully'
     });
-    
+
   } catch (error) {
     console.error('Error uploading photo:', error);
-    
+
     // Cleanup: try to delete uploaded file if database operations failed
     if (fileName) {
       try {
-        await supabase.storage.from('wedding-photos').remove([fileName]);
+        await deleteFile(fileName);
       } catch (cleanupError) {
         console.error('Error cleaning up file:', cleanupError);
       }
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Error uploading photo',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -341,42 +324,40 @@ router.post('/', upload.single('photo'), async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     // Get photo metadata
     const photo = await PhotoDB.findById(id);
-    
+
     if (!photo) {
       return res.status(404).json({ message: 'Photo not found' });
     }
-    
+
     // Check permissions (optional: implement user-based access control)
     // if (req.user?.id && photo.photographer_id !== req.user.id) {
     //   return res.status(403).json({ message: 'Unauthorized to delete this photo' });
     // }
-    
-    // Delete from Supabase Storage
-    const { error: storageError } = await supabase.storage
-      .from('wedding-photos')
-      .remove([photo.file_path]);
-    
-    if (storageError) {
+
+    // Delete from Storage
+    try {
+      await deleteFile(photo.file_path);
+    } catch (storageError) {
       console.error('Error deleting from storage:', storageError);
       // Continue with database deletion even if storage delete fails
     }
-    
+
     // Delete from database (cascades to photo_faces and face_descriptors)
     await PhotoDB.delete(id);
-    
-    res.status(200).json({ 
+
+    res.status(200).json({
       message: 'Photo deleted successfully',
-      id 
+      id
     });
   } catch (error) {
     console.error('Error deleting photo:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error deleting photo',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -388,19 +369,19 @@ router.delete('/:id', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   const { id } = req.params;
   const { title, description, eventType, tags } = req.body;
-  
+
   try {
     const updates = {};
-    
+
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
     if (eventType !== undefined) updates.event_type = eventType;
     if (tags !== undefined) {
       updates.tags = Array.isArray(tags) ? tags : JSON.parse(tags);
     }
-    
+
     const photo = await PhotoDB.update(id, updates);
-    
+
     res.json({
       id: photo.id,
       ...updates,
@@ -408,9 +389,9 @@ router.patch('/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating photo:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error updating photo',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -423,7 +404,7 @@ router.get('/:id/faces', async (req, res) => {
   try {
     const { id } = req.params;
     const faces = await PhotoFaceDB.findByPhotoId(id);
-    
+
     res.json({
       photoId: id,
       faces: faces.map(face => ({
@@ -440,9 +421,9 @@ router.get('/:id/faces', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting photo faces:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving faces',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -453,20 +434,20 @@ router.get('/:id/faces', async (req, res) => {
 router.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ 
-        message: 'File too large. Maximum size is 10MB' 
+      return res.status(400).json({
+        message: 'File too large. Maximum size is 10MB'
       });
     }
     if (error.code === 'LIMIT_UNEXPECTED_FILE') {
-      return res.status(400).json({ 
-        message: 'Too many files. Upload one photo at a time' 
+      return res.status(400).json({
+        message: 'Too many files. Upload one photo at a time'
       });
     }
   }
-  
-  res.status(500).json({ 
+
+  res.status(500).json({
     message: 'Internal server error',
-    error: error.message 
+    error: error.message
   });
 });
 

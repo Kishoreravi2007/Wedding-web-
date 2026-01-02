@@ -1,28 +1,13 @@
 /**
- * Secure Authentication System
+ * Secure Authentication System - Cloud SQL Version
  * 
- * This module provides secure authentication using Supabase service role
- * with proper RLS policies and audit logging.
+ * This module provides secure authentication using Cloud SQL
+ * replacing the previous Supabase implementation.
  */
 
-const { createClient } = require('@supabase/supabase-js');
+const { query } = require('./db-gcp');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-// Initialize Supabase client with service role for backend operations
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for secure authentication');
-}
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
 
 /**
  * Secure User Database Operations
@@ -34,37 +19,34 @@ const SecureUserDB = {
   async createUser(userData) {
     try {
       const { username, password, role } = userData;
-      
+
       // Validate input
       if (!username || !password || !role) {
         throw new Error('Username, password, and role are required');
       }
-      
+
       // Check if user already exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('username', username)
-        .single();
-      
-      if (existingUser) {
+      const checkQuery = 'SELECT id FROM users WHERE username = $1';
+      const { rows: existingUsers } = await query(checkQuery, [username]);
+
+      if (existingUsers.length > 0) {
         throw new Error('Username already exists');
       }
-      
+
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 12);
-      
-      // Use the secure function to create user
-      const { data, error } = await supabase.rpc('create_user', {
-        p_username: username,
-        p_password: hashedPassword,
-        p_role: role
-      });
-      
-      if (error) throw error;
-      
-      return { id: data, username, role };
-      
+
+      // Create user
+      const insertQuery = `
+        INSERT INTO users (username, password, role, is_active, created_at)
+        VALUES ($1, $2, $3, true, NOW())
+        RETURNING id
+      `;
+
+      const { rows } = await query(insertQuery, [username, hashedPassword, role]);
+
+      return { id: rows[0].id, username, role };
+
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
@@ -76,59 +58,68 @@ const SecureUserDB = {
    */
   async authenticateUser(username, password) {
     try {
-      // Check if user is locked
-      const { data: isLocked } = await supabase.rpc('is_user_locked', {
-        username
-      });
-      
-      if (isLocked) {
-        throw new Error('Account is temporarily locked due to too many failed attempts');
-      }
-      
-      // Get user data
-      const { data: user, error: fetchError } = await supabase
-        .from('users')
-        .select('id, username, password, role, is_active, login_attempts')
-        .eq('username', username)
-        .single();
-      
-      if (fetchError || !user) {
-        // Log failed attempt
-        await this.logAuthAttempt(null, 'login_failed', false, { username, reason: 'user_not_found' });
+      // Get user data including security fields
+      const { rows } = await query(
+        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until FROM users WHERE username = $1',
+        [username]
+      );
+
+      const user = rows[0];
+
+      if (!user) {
+        // Log failed attempt (generic user_not_found)
+        // await this.logAuthAttempt(null, 'login_failed', false, { username, reason: 'user_not_found' });
         throw new Error('Invalid credentials');
       }
-      
+
+      // Check if locked
+      if (user.locked_until && new Date() < new Date(user.locked_until)) {
+        throw new Error('Account is temporarily locked due to too many failed attempts');
+      }
+
       if (!user.is_active) {
         await this.logAuthAttempt(user.id, 'login_failed', false, { username, reason: 'account_inactive' });
         throw new Error('Account is deactivated');
       }
-      
+
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);
-      
+
       if (!isValidPassword) {
-        // Increment login attempts
-        await supabase.rpc('increment_login_attempts', { username });
+        // Increment login attempts and lock if necessary
+        const newAttempts = (user.login_attempts || 0) + 1;
+        let lockQuery = 'UPDATE users SET login_attempts = $1, last_login_attempt = NOW() WHERE id = $2';
+        const params = [newAttempts, user.id];
+
+        if (newAttempts >= 5) {
+          // Lock for 15 minutes
+          lockQuery = 'UPDATE users SET login_attempts = $1, last_login_attempt = NOW(), locked_until = NOW() + INTERVAL \'15 minutes\' WHERE id = $2';
+        }
+        await query(lockQuery, params);
+
         await this.logAuthAttempt(user.id, 'login_failed', false, { username, reason: 'invalid_password' });
         throw new Error('Invalid credentials');
       }
-      
-      // Update login info
-      await supabase.rpc('update_login_info', { user_id: user.id });
-      
+
+      // Success: Reset attempts and update login info
+      await query(
+        'UPDATE users SET login_attempts = 0, last_login_attempt = NOW(), locked_until = NULL WHERE id = $1',
+        [user.id]
+      );
+
       // Log successful login
       await this.logAuthAttempt(user.id, 'login_success', true, { username });
-      
+
       return {
         id: user.id,
         username: user.username,
         role: user.role,
         is_active: user.is_active
       };
-      
+
     } catch (error) {
       console.error('Authentication error:', error);
-      throw error;
+      throw error; // Re-throw for controller to handle
     }
   },
 
@@ -137,19 +128,15 @@ const SecureUserDB = {
    */
   async logAuthAttempt(userId, action, success, details = {}) {
     try {
-      await supabase
-        .from('auth_audit_log')
-        .insert({
-          user_id: userId,
-          action,
-          success,
-          details,
-          ip_address: details.ip_address || null,
-          user_agent: details.user_agent || null
-        });
+      // Ensure auth_audit_log table exists or is created
+      await query(
+        `INSERT INTO auth_audit_log (user_id, action, success, details, ip_address, user_agent, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+        [userId, action, success, details, details.ip_address || null, details.user_agent || null]
+      );
     } catch (error) {
       console.error('Error logging auth attempt:', error);
-      // Don't throw - logging failures shouldn't break authentication
+      // Don't throw
     }
   },
 
@@ -158,14 +145,11 @@ const SecureUserDB = {
    */
   async getUserById(id) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, username, role, is_active')
-        .eq('id', id)
-        .single();
-      
-      if (error) throw error;
-      return data;
+      const { rows } = await query(
+        'SELECT id, username, role, is_active FROM users WHERE id = $1',
+        [id]
+      );
+      return rows[0];
     } catch (error) {
       console.error('Error getting user:', error);
       throw error;
@@ -177,29 +161,33 @@ const SecureUserDB = {
    */
   async updateUserProfile(id, updates) {
     try {
-      // Only allow safe fields to be updated
       const allowedFields = ['username'];
       const safeUpdates = {};
-      
-      for (const [key, value] of Object.entries(updates)) {
+
+      const setParts = [];
+      const values = [];
+
+      Object.keys(updates).forEach(key => {
         if (allowedFields.includes(key)) {
-          safeUpdates[key] = value;
+          setParts.push(`${key} = $${values.length + 1}`);
+          values.push(updates[key]);
         }
-      }
-      
-      if (Object.keys(safeUpdates).length === 0) {
+      });
+
+      if (setParts.length === 0) {
         throw new Error('No valid fields to update');
       }
-      
-      const { data, error } = await supabase
-        .from('users')
-        .update(safeUpdates)
-        .eq('id', id)
-        .select('id, username, role, is_active')
-        .single();
-      
-      if (error) throw error;
-      return data;
+
+      values.push(id);
+      const text = `
+        UPDATE users 
+        SET ${setParts.join(', ')}
+        WHERE id = $${values.length}
+        RETURNING id, username, role, is_active
+      `;
+
+      const { rows } = await query(text, values);
+      return rows[0];
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -211,33 +199,42 @@ const SecureUserDB = {
    */
   async getAuditLogs(filters = {}) {
     try {
-      let query = supabase
-        .from('auth_audit_log')
-        .select(`
-          *,
-          users!inner(username, role)
-        `)
-        .order('created_at', { ascending: false });
-      
+      let text = `
+        SELECT a.*, u.username, u.role
+        FROM auth_audit_log a
+        JOIN users u ON a.user_id = u.id
+      `;
+      const params = [];
+      const conditions = [];
+
       if (filters.user_id) {
-        query = query.eq('user_id', filters.user_id);
+        conditions.push(`a.user_id = $${params.length + 1}`);
+        params.push(filters.user_id);
       }
-      
+
       if (filters.action) {
-        query = query.eq('action', filters.action);
+        conditions.push(`a.action = $${params.length + 1}`);
+        params.push(filters.action);
       }
-      
+
       if (filters.success !== undefined) {
-        query = query.eq('success', filters.success);
+        conditions.push(`a.success = $${params.length + 1}`);
+        params.push(filters.success);
       }
-      
+
+      if (conditions.length > 0) {
+        text += ' WHERE ' + conditions.join(' AND ');
+      }
+
+      text += ' ORDER BY a.created_at DESC';
+
       if (filters.limit) {
-        query = query.limit(filters.limit);
+        text += ` LIMIT $${params.length + 1}`;
+        params.push(filters.limit);
       }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
+
+      const { rows } = await query(text, params);
+      return rows;
     } catch (error) {
       console.error('Error getting audit logs:', error);
       throw error;
@@ -259,8 +256,8 @@ const TokenManager = {
       role: user.role,
       iat: Math.floor(Date.now() / 1000)
     };
-    
-    return jwt.sign(payload, process.env.JWT_SECRET, {
+
+    return jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret-do-not-use-in-prod', {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d'
     });
   },
@@ -270,15 +267,15 @@ const TokenManager = {
    */
   async verifyToken(token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-do-not-use-in-prod');
+
       // Verify user still exists and is active
       const user = await SecureUserDB.getUserById(decoded.id);
-      
+
       if (!user || !user.is_active) {
         throw new Error('User not found or inactive');
       }
-      
+
       return user;
     } catch (error) {
       throw new Error('Invalid token');
@@ -295,13 +292,15 @@ const authMiddleware = {
    */
   async verifyToken(req, res, next) {
     try {
+      if (req.method === 'OPTIONS') return next();
+
       const authHeader = req.headers['authorization'];
       const token = authHeader && authHeader.split(' ')[1];
-      
+
       if (!token) {
         return res.status(401).json({ message: 'Access token required' });
       }
-      
+
       const user = await TokenManager.verifyToken(token);
       req.user = user;
       next();
@@ -318,11 +317,11 @@ const authMiddleware = {
       if (!req.user) {
         return res.status(401).json({ message: 'Authentication required' });
       }
-      
+
       if (!roles.includes(req.user.role)) {
         return res.status(403).json({ message: 'Insufficient permissions' });
       }
-      
+
       next();
     };
   }
@@ -332,5 +331,5 @@ module.exports = {
   SecureUserDB,
   TokenManager,
   authMiddleware,
-  supabase
+  // supabase // Removed Supabase export
 };
