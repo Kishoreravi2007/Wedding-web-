@@ -38,7 +38,7 @@ steps:
       - '--allow-unauthenticated'
       - '--memory'
       - '512Mi'
-      - '--set-env-vars'
+      - '--update-env-vars'
       - 'NODE_ENV=production'
     waitFor: ['push-backend']
 
