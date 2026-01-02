@@ -124,8 +124,10 @@ ipcMain.handle('start-watching', async (_, folderPath: string) => {
         stats: getQueueStats(),
       });
 
-      // Start processing queue
-      processQueue(config);
+      // Start processing queue if apiKey is set
+      if (config.apiKey) {
+        processQueue(config as any);
+      }
     });
 
     return { success: true };
@@ -170,7 +172,9 @@ ipcMain.handle('get-queue-stats', async () => {
 ipcMain.handle('retry-failed', async () => {
   retryFailed();
   const config = getConfig();
-  processQueue(config);
+  if (config.apiKey) {
+    processQueue(config as any);
+  }
   return { success: true };
 });
 
@@ -182,8 +186,11 @@ ipcMain.handle('clear-completed', async () => {
 // Test upload
 ipcMain.handle('test-upload', async (_, filePath: string) => {
   const config = getConfig();
+  if (!config.apiKey) {
+    return { success: false, error: 'API key not configured' };
+  }
   try {
-    const result = await uploadPhoto(filePath, config);
+    const result = await uploadPhoto(filePath, config as any);
     return { success: true, result };
   } catch (error: any) {
     return { success: false, error: error.message };

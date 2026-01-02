@@ -1,0 +1,7 @@
+name: wedding-web-deploy-trigger
+description: Auto deploy Wedding Web on push to main
+filename: cloudbuild.yaml
+repositoryEventConfig:
+  repository: projects/sub-projects-483107/locations/asia-south1/connections/wedding-github-connection/repositories/wedding-web-repo
+  push:
+    branch: "^main$"
