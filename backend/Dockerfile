@@ -7,6 +7,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
+# Install build tools for native modules (canvas, etc.)
+RUN apk add --no-cache python3 make g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
 RUN npm install --production
 
 # Copy source code
