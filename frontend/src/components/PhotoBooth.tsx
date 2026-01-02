@@ -20,6 +20,8 @@ import { detectFaces as detectFacesWithDeepFace, loadFaceDetectionModels } from 
 import { faceDetectionDiagnostic } from '../utils/faceDetectionDiagnostic';
 import PhotoBoothDiagnostic from './PhotoBoothDiagnostic';
 import FaceSearchResults from './FaceSearchResults';
+import LiveModeIndicator from './LiveModeIndicator';
+import { useLiveSync } from '../hooks/useLiveSync';
 
 interface PhotoBoothProps {
   className?: string;
@@ -39,8 +41,8 @@ const getDetectionScore = (detection: any) =>
 const getDetectionBox = (detection: any) =>
   detection?.detection?.box ?? detection?.box;
 
-const PhotoBooth: React.FC<PhotoBoothProps> = ({ 
-  className = '', 
+const PhotoBooth: React.FC<PhotoBoothProps> = ({
+  className = '',
   primaryColor = '#3B82F6',
   buttonClass = 'bg-blue-500 hover:bg-blue-600 text-white',
   overlayImageSrc,
@@ -49,7 +51,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   // Refs for canvas and video elements
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   // State management
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
@@ -70,7 +72,32 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const [searchResults, setSearchResults] = useState<string[]>([]); // New state for search results
   const [searchError, setSearchError] = useState<string | null>(null); // New state for search errors
   const [showFacePreview, setShowFacePreview] = useState(false); // Show detected face preview before searching
-  
+
+  // Live Mode state
+  const [isLiveMode, setIsLiveMode] = useState(false);
+  const [storedEmbedding, setStoredEmbedding] = useState<number[] | null>(null);
+  const [liveMatchedPhotos, setLiveMatchedPhotos] = useState<string[]>([]);
+  const [newPhotoNotification, setNewPhotoNotification] = useState<string | null>(null);
+
+  // Live sync WebSocket hook
+  const {
+    isConnected: isWebSocketConnected,
+    matchingPhotoCount,
+    matchingPhotos: livePhotos
+  } = useLiveSync({
+    sister: selectedWedding as 'sister-a' | 'sister-b',
+    enabled: isLiveMode && !!storedEmbedding,
+    faceEmbedding: storedEmbedding,
+    onNewMatchingPhoto: (photo, score) => {
+      console.log('🎉 New matching photo found!', photo.filename, score);
+      setNewPhotoNotification(`New photo of you found! (${(score * 100).toFixed(0)}% match)`);
+      setLiveMatchedPhotos(prev => [photo.public_url, ...prev]);
+
+      // Clear notification after 5 seconds
+      setTimeout(() => setNewPhotoNotification(null), 5000);
+    }
+  });
+
   // Add state for ultra-smooth detection
   const [lastDetectionTime, setLastDetectionTime] = useState(0);
   const [detectionHistory, setDetectionHistory] = useState<any[][]>([]);
@@ -89,7 +116,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   const runDiagnostic = useCallback(async () => {
     try {
       const diagnostic = await faceDetectionDiagnostic.runDiagnostic();
-      
+
       if (diagnostic.errors.length > 0) {
         const errorMessage = diagnostic.errors[0];
         setDiagnosticInfo(faceDetectionDiagnostic.getErrorMessage(errorMessage));
@@ -109,10 +136,10 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       try {
         console.log('🔄 Initializing DeepFace + YOLOv8-face API for Photo Booth...');
         setUserGuidance('Connecting to face detection service...');
-        
+
         // Load DeepFace API (just verifies connection)
         await loadFaceDetectionModels();
-        
+
         console.log('✅ DeepFace + YOLOv8-face API ready');
         setIsModelLoaded(true);
         setUserGuidance('Face detection ready! Click "Start Camera" to begin.');
@@ -144,7 +171,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       console.log('🔍 Starting face detection...');
       const faceResults = await detectFacesWithDeepFace(imageElement);
       console.log(`✅ Face detection complete: ${faceResults.length} face(s) found`);
-      
+
       if (faceResults.length > 0) {
         // Convert to format expected by PhotoBooth - IMPORTANT: Include descriptor!
         const detections = faceResults.map((result, index) => {
@@ -161,9 +188,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             landmarks: result.landmarks
           };
         });
-        
+
         console.log(`✅ Processed ${detections.length} detection(s) with descriptors`);
-        
+
         setDetectionResults(detections);
         setDetectionStatus('success');
         setUserGuidance(`Great! Found ${detections.length} face(s). You can now take a photo!`);
@@ -172,7 +199,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       } else {
         setDetectionAttempts(prev => prev + 1);
         setDetectionStatus('error');
-        
+
         if (detectionAttempts < maxAttempts - 1) {
           setUserGuidance(`No face detected (attempt ${detectionAttempts + 1}/${maxAttempts}). Please adjust your position and try again.`);
         } else {
@@ -223,11 +250,11 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         gradient.addColorStop(0, '#00ff00');
         gradient.addColorStop(1, '#00aa00');
       }
-      
+
       ctx.strokeStyle = gradient;
       ctx.lineWidth = index === selectedFaceIndex ? 3 : 2; // Highlight selected face
       ctx.strokeRect(x, y, width, height);
-      
+
       // Add subtle shadow for better visibility
       ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
       ctx.shadowBlur = 2;
@@ -238,7 +265,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (confidence >= MIN_DISPLAY_CONFIDENCE) {
         ctx.fillStyle = 'rgba(0, 255, 0, 0.9)';
         ctx.fillRect(x, y - 22, 90, 18);
-        
+
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'left';
@@ -255,7 +282,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       ctx.beginPath();
       ctx.arc(x + width / 2, y + height / 2, 12, 0, 2 * Math.PI);
       ctx.fill();
-      
+
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
@@ -265,29 +292,29 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         y + height / 2 + 4
       );
     });
-    
+
     // Reset text alignment for other canvas operations
     ctx.textAlign = 'left';
   }, [selectedFaceIndex]);
 
-useEffect(() => {
-  if (detectionResults.length > 0) {
-    drawDetections(detectionResults);
-  }
-}, [selectedFaceIndex, detectionResults, drawDetections]);
+  useEffect(() => {
+    if (detectionResults.length > 0) {
+      drawDetections(detectionResults);
+    }
+  }, [selectedFaceIndex, detectionResults, drawDetections]);
 
   // Start webcam with enhanced error handling
   const startWebcam = useCallback(async () => {
     console.log('startWebcam called');
     try {
       setUserGuidance('Starting camera... Please allow camera access.');
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
           width: { ideal: 640 },
           height: { ideal: 480 },
           facingMode: 'user'
-        } 
+        }
       });
       console.log('getUserMedia success');
 
@@ -333,11 +360,11 @@ useEffect(() => {
           // Detect faces with DeepFace + YOLOv8-face API
           const faceResults = await detectFacesWithDeepFace(video);
           console.log(`🔍 Face detection result: ${faceResults.length} face(s) detected`);
-          
+
           if (faceResults.length === 0) {
             console.log('⚠️ No faces detected in video frame');
           }
-          
+
           // Convert to format expected by PhotoBooth - IMPORTANT: Include all required properties!
           let detections = faceResults.map((result, index) => {
             if (!result.descriptor) {
@@ -360,17 +387,17 @@ useEffect(() => {
           // Add to detection history for smoothing
           setDetectionHistory(prev => {
             const newHistory = [...prev, detections].slice(-5); // Keep last 5 detections
-            
+
             // Calculate ultra-stable detections (faces that appear very consistently)
             const stableCount = Math.max(3, Math.floor(newHistory.length * 0.8)); // Require 80% consistency
             const faceCountHistory = newHistory.map(dets => dets.length);
             const avgFaceCount = Math.round(faceCountHistory.reduce((a, b) => a + b, 0) / faceCountHistory.length);
-            
+
             // Use ultra-stable detection count to completely eliminate flickering
             const stable = avgFaceCount > 0 && faceCountHistory.filter(count => count > 0).length >= stableCount
               ? detections.slice(0, Math.min(avgFaceCount, detections.length)) // Keep as many consistent faces as detected
               : [];
-            
+
             setStableDetections(stable);
             return newHistory;
           });
@@ -411,7 +438,7 @@ useEffect(() => {
             setDetectionStatus('error');
             setUserGuidance('No face detected. Please position your face in the center and ensure good lighting.');
             console.log('⚠️ No faces detected in video frame');
-            
+
             // Only clear after a longer period of no detections
             if (detectionHistory.length > 5 && detectionHistory.slice(-5).every(dets => dets.length === 0)) {
               const ctx = canvas.getContext('2d');
@@ -466,7 +493,7 @@ useEffect(() => {
       if ((video as any).stopDetection) {
         (video as any).stopDetection();
       }
-      
+
       // Stop video stream
       if (video.srcObject) {
         const stream = video.srcObject as MediaStream;
@@ -474,7 +501,7 @@ useEffect(() => {
         video.srcObject = null;
       }
     }
-    
+
     // Clear canvas
     const canvas = canvasRef.current;
     if (canvas) {
@@ -483,7 +510,7 @@ useEffect(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
-    
+
     setIsWebcamActive(false);
     setDetectionResults([]);
     setDetectionStatus('idle');
@@ -497,7 +524,7 @@ useEffect(() => {
     console.log('Video ref:', videoRef.current ? 'Available' : 'Not available');
     console.log('Models loaded:', isModelLoaded);
     console.log('Detection results:', detectionResults.length, 'selected index:', selectedFaceIndex);
-    
+
     const video = videoRef.current;
     if (!video) {
       setUserGuidance('Camera not available. Please start the camera first.');
@@ -530,7 +557,7 @@ useEffect(() => {
 
       // Use the currently selected face (fallback to first if out of range)
       const faceToCapture = detectionResults[selectedFaceIndex] || detectionResults[0];
-      
+
       const box = getDetectionBox(faceToCapture);
       const { x, y, width, height } = box;
 
@@ -551,15 +578,15 @@ useEffect(() => {
       // Get the image data as a base64 string
       const imageData = tempCanvas.toDataURL('image/jpeg', 0.9);
       setCapturedFaceImage(imageData); // Store for display
-      
+
       console.log('✅ Face captured - showing preview modal');
       console.log('Captured face image size:', imageData.length, 'bytes');
-      
+
       setShowFacePreview(true); // Show preview for user confirmation
       setUserGuidance('Is this your face? Click "Confirm & Search" or "Retry" if wrong.');
-      
+
       // Don't search yet - wait for user to confirm via the preview modal
-      
+
     } catch (error) {
       console.error('❌ Face capture error:', error);
       setSearchError(error instanceof Error ? error.message : 'Failed to capture face');
@@ -583,14 +610,14 @@ useEffect(() => {
     try {
       // STEP 1: Use the face descriptor from the selected detected face
       const faceToSearch = detectionResults[selectedFaceIndex] || detectionResults[0];
-      
+
       if (!faceToSearch || !faceToSearch.descriptor) {
         throw new Error('No face descriptor available. Please ensure face is detected before searching.');
       }
 
       // Get the face descriptor from the stored detection
       let faceDescriptor = faceToSearch.descriptor;
-      
+
       // Handle different descriptor formats
       if (Array.isArray(faceDescriptor)) {
         // If it's already an array, use it directly
@@ -599,12 +626,12 @@ useEffect(() => {
         // If it's an object, try to extract the array
         faceDescriptor = Array.from(faceDescriptor.values || []);
       }
-      
+
       // Validate descriptor
       if (!faceDescriptor || faceDescriptor.length === 0) {
         throw new Error('Face descriptor is empty or invalid');
       }
-      
+
       // If descriptor is too long (concatenated), extract the correct portion
       // For 512-dim descriptors, if we have 4096 (8 faces), extract the selected face
       if (faceDescriptor.length === 4096 && selectedFaceIndex < 8) {
@@ -627,10 +654,15 @@ useEffect(() => {
         faceDescriptor = faceDescriptor.slice(startIndex, startIndex + 128);
         console.log(`✅ Extracted 128-dim descriptor from ${numFaces} concatenated faces (using face ${faceIndex})`);
       }
-      
+
       console.log('✅ Using face descriptor:', faceDescriptor.length, 'dimensions');
-      
+
+      // Store the face embedding for live mode feature
+      setStoredEmbedding(faceDescriptor);
+      console.log('💾 Face embedding stored for live mode');
+
       setUserGuidance('Searching for matching faces in wedding photos...');
+
 
       // STEP 2: Send face descriptor to backend for matching
       const formData = new FormData();
@@ -640,7 +672,7 @@ useEffect(() => {
       console.log('🔍 Calling Find My Photos API with face descriptor...');
       console.log('Wedding:', selectedWedding);
       console.log('Descriptor length:', faceDescriptor.length);
-      
+
       // Use API_BASE_URL from config (works in both local and deployed)
       const response = await fetch(`${API_BASE_URL}/api/recognize`, {
         method: 'POST',
@@ -648,7 +680,7 @@ useEffect(() => {
       });
 
       console.log('📡 Response status:', response.status, response.statusText);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ API Error:', response.status, errorText);
@@ -663,16 +695,16 @@ useEffect(() => {
       // Normalize matches into array of URLs for the results modal
       const normalizedMatches = Array.isArray(data.matches)
         ? data.matches
-            .map((match: any) => {
-              if (!match) return null;
-              if (typeof match === 'string') return match;
-              return match.url || match.public_url || match.publicUrl || match.photo_url || null;
-            })
-            .filter((url: string | null): url is string => typeof url === 'string' && url.length > 0)
+          .map((match: any) => {
+            if (!match) return null;
+            if (typeof match === 'string') return match;
+            return match.url || match.public_url || match.publicUrl || match.photo_url || null;
+          })
+          .filter((url: string | null): url is string => typeof url === 'string' && url.length > 0)
         : [];
 
       console.log('🔁 Normalized match URLs:', normalizedMatches);
-      
+
       // Always show results modal (even if no matches)
       if (normalizedMatches.length > 0) {
         console.log('📸 Found photos:', normalizedMatches);
@@ -686,9 +718,9 @@ useEffect(() => {
         setShowFaceSearch(true); // Show modal even with no results
         setUserGuidance('No matching photos found.');
       }
-      
-      console.log('🖼️ Results modal state:', { 
-        showFaceSearch: true, 
+
+      console.log('🖼️ Results modal state:', {
+        showFaceSearch: true,
         resultsCount: data.matches?.length || 0,
         hasError: !!data.message
       });
@@ -697,7 +729,7 @@ useEffect(() => {
       console.error('❌ Face search error:', error);
       console.error('❌ Error type:', typeof error);
       console.error('❌ Error message:', error?.message);
-      
+
       const errorMsg = error?.message || 'Network error or API unavailable';
       setSearchError(errorMsg);
       setUserGuidance(`Search failed: ${errorMsg}`);
@@ -738,27 +770,15 @@ useEffect(() => {
         const detections = detectionResults;
         detections.forEach((detection, index) => {
           const box = getDetectionBox(detection);
-          const confidence = getDetectionScore(detection);
           const { x, y, width, height } = box;
 
-          // Draw bounding box
+          // Draw bounding box only (no text labels for clean photos)
           photoCtx.strokeStyle = '#00ff00';
           photoCtx.lineWidth = 3;
           photoCtx.strokeRect(x, y, width, height);
-
-          // Draw confidence
-          photoCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-          photoCtx.fillRect(x, y - 25, 120, 20);
-          
-          photoCtx.fillStyle = '#ffffff';
-          photoCtx.font = 'bold 14px Arial';
-          photoCtx.fillText(
-            `Face ${index + 1}: ${(confidence * 100).toFixed(1)}%`,
-            x + 5,
-            y - 8
-          );
         });
-        
+
+
         setUserGuidance(`Photo saved successfully! Found ${detections.length} face(s). You can take another photo.`);
       } else {
         // No faces detected, but still save the photo
@@ -772,9 +792,9 @@ useEffect(() => {
       link.click();
 
       setDetectionStatus('success');
-      
+
       console.log(`✅ Photo saved with ${detectionResults.length} face(s) detected`);
-      
+
     } catch (error) {
       console.error('❌ Error taking photo:', error);
       setUserGuidance('Failed to take photo. Please try again.');
@@ -789,8 +809,8 @@ useEffect(() => {
     setDetectionStatus('idle');
     setUserGuidance('Detection reset. Position your face and try again.');
     setSelectedFaceIndex(0);
-    
-      const canvas = canvasRef.current;
+
+    const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
@@ -839,30 +859,17 @@ useEffect(() => {
             Photo Booth
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
-          {/* Important Notice */}
-          {isWebcamActive && (
-            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-blue-900">Camera is Active</p>
-                  <p className="text-sm text-blue-700 mt-1">
-                    You can now take photos! Face detection is optional - the "Take Photo" button works with or without detected faces.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+
+
 
           {/* Face Detection Status - Prominent Visual Indicator */}
           {isWebcamActive && (
-            <div className={`p-6 rounded-lg border-3 transition-all duration-300 ${
-              detectionResults.length > 0 
-                ? 'bg-green-50 border-green-500 shadow-lg shadow-green-200' 
-                : 'bg-amber-50 border-amber-400'
-            }`}>
+            <div className={`p-6 rounded-lg border-3 transition-all duration-300 ${detectionResults.length > 0
+              ? 'bg-green-50 border-green-500 shadow-lg shadow-green-200'
+              : 'bg-amber-50 border-amber-400'
+              }`}>
               <div className="flex items-center justify-center gap-4">
                 {detectionResults.length > 0 ? (
                   <>
@@ -914,13 +921,13 @@ useEffect(() => {
               muted
               playsInline
             />
-            
+
             <canvas
               ref={canvasRef}
               className="absolute top-0 left-0 w-full h-full pointer-events-none"
               style={{ display: isWebcamActive ? 'block' : 'none' }}
             />
-            
+
             {!isWebcamActive && (
               <div className="flex items-center justify-center h-64 text-gray-500">
                 <div className="text-center">
@@ -952,7 +959,7 @@ useEffect(() => {
                   <Search className="w-5 h-5 mr-2" />
                   Find My Photos
                 </Button>
-                
+
                 <Button
                   onClick={resetDetection}
                   variant="outline"
@@ -961,7 +968,7 @@ useEffect(() => {
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retry Detection
                 </Button>
-                
+
                 <Button
                   onClick={stopWebcam}
                   variant="destructive"
@@ -980,8 +987,8 @@ useEffect(() => {
                 <Users className="w-5 h-5 text-green-600" />
                 <span className="font-medium text-green-800">
                   {detectionResults.length} Face(s) Detected
-            </span>
-          </div>
+                </span>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 {detectionResults.map((detection, index) => {
                   const confidence = getDetectionScore(detection);
@@ -991,11 +998,10 @@ useEffect(() => {
                       key={index}
                       type="button"
                       onClick={() => setSelectedFaceIndex(index)}
-                      className={`text-left bg-white p-3 rounded border transition-all ${
-                        isSelected
-                          ? 'border-blue-500 shadow-md shadow-blue-100'
-                          : 'border-transparent hover:border-blue-200 hover:shadow-sm'
-                      }`}
+                      className={`text-left bg-white p-3 rounded border transition-all ${isSelected
+                        ? 'border-blue-500 shadow-md shadow-blue-100'
+                        : 'border-transparent hover:border-blue-200 hover:shadow-sm'
+                        }`}
                     >
                       <div className="font-medium flex items-center gap-2">
                         Face {index + 1}
@@ -1014,9 +1020,9 @@ useEffect(() => {
                     </button>
                   );
                 })}
-          </div>
-        </div>
-      )}
+              </div>
+            </div>
+          )}
 
           {/* Tips for Better Detection */}
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -1032,19 +1038,77 @@ useEffect(() => {
               <li>• Keep your face at a reasonable distance</li>
             </ul>
           </div>
+
+          {/* Live Mode Section */}
+          {storedEmbedding && (
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-medium text-purple-900 flex items-center gap-2">
+                  📡 Real-Time Photo Updates
+                </h4>
+                <LiveModeIndicator
+                  isActive={isLiveMode}
+                  isConnected={isWebSocketConnected}
+                  photoCount={searchResults.length + liveMatchedPhotos.length}
+                  newPhotoNotification={newPhotoNotification}
+                  onToggle={() => setIsLiveMode(!isLiveMode)}
+                />
+              </div>
+
+              {isLiveMode && (
+                <div className="space-y-3">
+                  <p className="text-sm text-purple-700">
+                    Keep this page open! When photographers upload new photos, we'll automatically
+                    check if you appear in them and notify you.
+                  </p>
+
+                  {/* Live matched photos preview */}
+                  {liveMatchedPhotos.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-sm font-medium text-purple-800 mb-2">
+                        🆕 New Photos Found ({liveMatchedPhotos.length}):
+                      </p>
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {liveMatchedPhotos.slice(0, 5).map((url, index) => (
+                          <img
+                            key={index}
+                            src={url}
+                            alt={`New photo ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded-lg border-2 border-green-400 shadow-md"
+                          />
+                        ))}
+                        {liveMatchedPhotos.length > 5 && (
+                          <div className="w-20 h-20 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 font-medium">
+                            +{liveMatchedPhotos.length - 5}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!isLiveMode && (
+                <p className="text-sm text-purple-600">
+                  Click "Go Live" to get real-time notifications when new photos of you are uploaded!
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
+
       {/* Face Preview Confirmation Modal */}
       {(() => {
-        console.log('🖼️ Modal render check:', { 
-          showFacePreview, 
+        console.log('🖼️ Modal render check:', {
+          showFacePreview,
           hasCapturedImage: !!capturedFaceImage,
-          imageLength: capturedFaceImage?.length || 0 
+          imageLength: capturedFaceImage?.length || 0
         });
         return null;
       })()}
-      
+
       {showFacePreview && capturedFaceImage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
           <Card className="w-full max-w-md shadow-2xl">
@@ -1057,20 +1121,20 @@ useEffect(() => {
             <CardContent className="space-y-4">
               {/* Show captured face */}
               <div className="flex justify-center">
-                <img 
-                  src={capturedFaceImage} 
-                  alt="Captured face" 
+                <img
+                  src={capturedFaceImage}
+                  alt="Captured face"
                   className="rounded-lg border-4 border-blue-500 max-w-full h-auto"
                   style={{ maxHeight: '300px' }}
                   onError={() => console.error('Image failed to render')}
                   onLoad={() => console.log('✅ Preview image loaded successfully')}
                 />
               </div>
-              
+
               <p className="text-center text-gray-600">
                 Verify this is your face before searching for photos
               </p>
-              
+
               {/* Action buttons */}
               <div className="grid grid-cols-2 gap-3">
                 <Button
@@ -1110,7 +1174,7 @@ useEffect(() => {
 
       {/* Face Search Results Modal */}
       {(() => {
-        console.log('🔍 Results modal render check:', { 
+        console.log('🔍 Results modal render check:', {
           showFaceSearch,
           resultsCount: searchResults.length,
           hasError: !!searchError,
@@ -1118,7 +1182,7 @@ useEffect(() => {
         });
         return null;
       })()}
-      
+
       {showFaceSearch && (
         <div>
           {console.log('✅ Rendering FaceSearchResults component')}

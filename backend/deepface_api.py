@@ -146,7 +146,7 @@ async def health_check():
         }
 
 
-async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe: bool = True) -> np.ndarray:
+async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe: bool = True) -> tuple:
     """
     Convert uploaded file to numpy array, apply CLAHE for lighting normalization,
     and resize to optimal size for YOLOv8-face.
@@ -155,6 +155,10 @@ async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe
         file: Uploaded file
         min_size: Minimum width or height in pixels (default: 1280 for YOLOv8-face accuracy)
         apply_clahe: Whether to apply CLAHE for lighting normalization (default: True)
+    
+    Returns:
+        tuple: (processed_image, scale_factor, original_width, original_height)
+        - scale_factor is used to convert detection coordinates back to original image space
     """
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
@@ -165,6 +169,10 @@ async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe
             status_code=400,
             detail="Could not decode image. Please ensure the file is a valid image."
         )
+    
+    # Store original dimensions
+    original_height, original_width = img.shape[:2]
+    scale_factor = 1.0
     
     # Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to normalize harsh lighting
     # This helps reduce false positives from bright spots (e.g., wedding stage lights)
@@ -180,26 +188,28 @@ async def process_image_file(file: UploadFile, min_size: int = 1280, apply_clahe
         img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
         logger.info("Applied CLAHE for lighting normalization")
     
-    # Resize to optimal size for YOLOv8-face (1280+ for better accuracy)
+    # Resize to optimal size for face detection
     height, width = img.shape[:2]
     min_dimension = min(width, height)
     
     if min_dimension < min_size:
         # Upscale smaller images to improve detection accuracy
-        scale = min_size / min_dimension
-        new_width = int(width * scale)
-        new_height = int(height * scale)
+        scale_factor = min_size / min_dimension
+        new_width = int(width * scale_factor)
+        new_height = int(height * scale_factor)
         img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
-        logger.info(f"Upscaled image from {width}x{height} to {new_width}x{new_height} for YOLOv8-face accuracy")
+        logger.info(f"Upscaled image from {width}x{height} to {new_width}x{new_height} (scale: {scale_factor:.2f})")
     elif min_dimension > 1920:
         # Downscale very large images to prevent memory issues
-        scale = 1920 / min_dimension
-        new_width = int(width * scale)
-        new_height = int(height * scale)
+        scale_factor = 1920 / min_dimension
+        new_width = int(width * scale_factor)
+        new_height = int(height * scale_factor)
         img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
-        logger.info(f"Downscaled image from {width}x{height} to {new_width}x{new_height}")
+        logger.info(f"Downscaled image from {width}x{height} to {new_width}x{new_height} (scale: {scale_factor:.2f})")
     
-    return img
+    return img, scale_factor, original_width, original_height
+
+
 
 
 @app.post("/api/faces/detect")
@@ -209,7 +219,7 @@ async def detect_faces(
     return_age_gender: bool = Form(False),  # Changed default to False for speed
     min_confidence: Optional[float] = Form(None),
     enforce_detection: bool = Form(False),
-    detector_backend: Optional[str] = Form("yolov8"),  # Use YOLOv8-face for fast and accurate detection
+    detector_backend: Optional[str] = Form("yolov8"),  # Use YOLOv8-face by default
     conf_threshold: Optional[float] = Form(0.5),  # Confidence threshold for YOLOv8 (0.5 for high certainty, reduces false positives)
     imgsz: Optional[int] = Form(1280)  # Image size for YOLOv8 (1280+ for better accuracy)
 ):
@@ -253,10 +263,11 @@ async def detect_faces(
         # Ensure imgsz is at least 1280
         imgsz = max(1280, imgsz)
         
-        # Read uploaded image (resize to optimal size for YOLOv8)
-        img = await process_image_file(file, min_size=imgsz)
+        # Read uploaded image (resize to optimal size for detection)
+        img, scale_factor, orig_width, orig_height = await process_image_file(file, min_size=imgsz)
         
-        logger.info(f"Processing image: {file.filename}, size: {img.shape}")
+        logger.info(f"Processing image: {file.filename}, size: {img.shape}, scale: {scale_factor:.2f}, original: {orig_width}x{orig_height}")
+
         
         # Save image temporarily for DeepFace
         temp_path = f"/tmp/temp_{file.filename}"
@@ -489,16 +500,18 @@ async def detect_faces(
                             f"{len(face_objs)} verified faces"
                         )
                 else:
-                    # Fallback to DeepFace with opencv if YOLOv8 model not available
-                    logger.warning("YOLOv8-face model not available, falling back to opencv")
-                    detector_backend = "opencv"
+                    # Fallback to DeepFace with retinaface (most accurate) if YOLOv8 model not available
+                    logger.warning("YOLOv8-face model not available, falling back to retinaface (most accurate)")
+                    detector_backend = "retinaface"
                     face_objs = DeepFace.represent(
                         img_path=temp_path,
-                        model_name="VGG-Face",
+                        model_name="Facenet",  # 128-dim embeddings to match existing database
                         detector_backend=detector_backend,
                         enforce_detection=enforce_detection,
-                        align=False
+                        align=True  # Enable alignment for better accuracy
                     )
+
+
             # If SCRFD is requested and InsightFace is available, use InsightFace's SCRFD detector
             elif detector_backend == "scrfd" and INSIGHTFACE_AVAILABLE:
                 insightface_app = get_insightface_app()
@@ -548,14 +561,64 @@ async def detect_faces(
                         align=False
                     )
             else:
-                # Use DeepFace with specified backend
-            face_objs = DeepFace.represent(
-                img_path=temp_path,
-                model_name="VGG-Face",  # 512-dim embeddings
+                # Use DeepFace with specified backend and apply basic filtering
+                raw_face_objs = DeepFace.represent(
+                    img_path=temp_path,
+                    model_name="Facenet",  # 128-dim embeddings to match existing database
                     detector_backend=detector_backend,
-                enforce_detection=enforce_detection,
-                    align=False  # Disable alignment for speed (only needed for recognition, not detection)
-            )
+                    enforce_detection=enforce_detection,
+                    align=True  # Enable alignment for better accuracy
+                )
+
+                # Apply basic filtering to reduce false positives
+                face_objs = []
+                for face_obj in raw_face_objs:
+                    face_region = face_obj.get("facial_area", {})
+                    x = face_region.get("x", 0)
+                    y = face_region.get("y", 0)
+                    w = face_region.get("w", 0)
+                    h = face_region.get("h", 0)
+
+                    # Skip if dimensions are invalid
+                    if w <= 0 or h <= 0:
+                        continue
+
+                    # Filter out detections that are too large (covering >50% of image)
+                    # These are usually false positives on geometric shapes
+                    img_area = img.shape[0] * img.shape[1]
+                    face_area = w * h
+                    if face_area > img_area * 0.5:
+                        logger.debug(f"Filtered out oversized detection: {w}x{h} ({face_area/img_area:.1%} of image)")
+                        continue
+
+                    # Filter out detections that are too small (< 2% of image)
+                    if face_area < img_area * 0.02:
+                        logger.debug(f"Filtered out tiny detection: {w}x{h} ({face_area/img_area:.3%} of image)")
+                        continue
+
+                    # Tighter aspect ratio check - faces are roughly square (0.8 to 1.3)
+                    # This filters out tall rectangles like shoulders/body
+                    aspect_ratio = h / w if w > 0 else 0
+                    if aspect_ratio < 0.7 or aspect_ratio > 1.5:
+                        logger.debug(f"Filtered out bad aspect ratio: {aspect_ratio:.2f} ({w}x{h})")
+                        continue
+                    
+                    # Position check: Real faces in selfies are usually in upper 2/3 of frame
+                    # If center of detection is in bottom 40% of image, likely a body part
+                    face_center_y = y + h / 2
+                    img_height = img.shape[0]
+                    if face_center_y > img_height * 0.7:
+                        logger.debug(f"Filtered out detection in bottom of frame (y_center={face_center_y:.0f}, img_h={img_height})")
+                        continue
+
+                    # Add confidence if not present
+                    if "face_confidence" not in face_obj:
+                        face_obj["face_confidence"] = 0.9
+
+                    face_objs.append(face_obj)
+
+                logger.info(f"{detector_backend}: {len(raw_face_objs)} raw detections → {len(face_objs)} filtered faces")
+
             
             # Only get detailed face analysis if explicitly requested
             # This is slow, so skip it unless needed
@@ -570,7 +633,7 @@ async def detect_faces(
                         silent=True
                     )
                 except:
-                face_analyses = []
+                    face_analyses = []
             
         finally:
             # Clean up temp file
@@ -600,6 +663,15 @@ async def detect_faces(
             w = face_region.get("w", 0)
             h = face_region.get("h", 0)
             
+            # CRITICAL: Scale coordinates back to original image dimensions
+            # The image was scaled up/down for detection, so we need to convert back
+            if scale_factor != 1.0:
+                x = int(x / scale_factor)
+                y = int(y / scale_factor)
+                w = int(w / scale_factor)
+                h = int(h / scale_factor)
+                logger.debug(f"Scaled bbox from detection space to original: ({x}, {y}, {w}, {h})")
+            
             # Detection confidence (SCRFD provides this)
             det_score = face_obj.get("face_confidence", 0.9)
             
@@ -608,10 +680,11 @@ async def detect_faces(
                 continue
             
             face_response = {
-                "bbox": [x, y, w, h],  # [x, y, width, height]
+                "bbox": [x, y, w, h],  # [x, y, width, height] in ORIGINAL image coordinates
                 "embedding": embedding,
                 "det_score": float(det_score)
             }
+
             
             # Add age and gender if available
             if return_age_gender and i < len(face_analyses):
@@ -638,11 +711,12 @@ async def detect_faces(
             content={
                 "faces": response_faces,
                 "count": len(response_faces),
-                "embedding_dimension": 512,
-                "model": "VGG-Face",
+                "embedding_dimension": 128,
+                "model": "Facenet",
                 "backend": "RetinaFace"
             }
         )
+
         
     except ValueError as e:
         # DeepFace raises ValueError when no faces detected
@@ -721,7 +795,7 @@ async def detect_faces_batch(
                             silent=True
                         )
                     except:
-                    face_analyses = []
+                        face_analyses = []
                 
             finally:
                 if os.path.exists(temp_path):
@@ -884,4 +958,3 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
-
