@@ -10,30 +10,25 @@ require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const { createClient } = require('@supabase/supabase-js'); // Keeping import or removing if unused?
-// const { createClient } = require('@supabase/supabase-js');
 
 // =============================================================================
 // FIREBASE INITIALIZATION (for wishes only)
 // =============================================================================
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
-if (!serviceAccountPath) {
-  console.error('❌ Error: FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable not set.');
-  process.exit(1);
-}
-
-try {
-  const serviceAccount = require(serviceAccountPath);
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-    });
+if (serviceAccountPath) {
+  try {
+    const serviceAccount = require(serviceAccountPath);
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+      });
+    }
+    console.log('✅ Firebase initialized successfully (for wishes)');
+  } catch (error) {
+    console.warn('⚠️ Warning: Firebase initialization failed. Wishes feature might not work:', error.message);
   }
-  console.log('✅ Firebase initialized successfully (for wishes)');
-} catch (error) {
-  console.error('❌ Error initializing Firebase:', error);
-  process.exit(1);
+} else {
+  console.log('ℹ️ Firebase service account path not provided. Skipping Firebase initialization.');
 }
 
 // =============================================================================
@@ -95,8 +90,8 @@ app.get('/', (req, res) => {
     status: 'running',
     version: '2.0.0',
     services: {
-      firebase: '✓ (wishes)',
-      supabase: '✓ (photos, faces)',
+      firebase: admin.apps.length > 0 ? '✓' : '✗',
+      gcp_sql: '✓ (photos, faces)',
     },
     timestamp: new Date().toISOString()
   });
