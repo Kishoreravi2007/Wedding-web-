@@ -5,7 +5,7 @@ import './globals.css'
 import './i18n.ts'
 import { MusicPlayerProvider } from './contexts/MusicPlayerContext.tsx'; // Import the provider
 import { AuthProvider } from './contexts/AuthContext';
-import { HashRouter, useLocation } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useMemo } from 'react';
 
 const Root = () => {
@@ -30,7 +30,7 @@ const Root = () => {
 };
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <HashRouter>
+  <BrowserRouter>
     <Root />
-  </HashRouter>
+  </BrowserRouter>
 );
