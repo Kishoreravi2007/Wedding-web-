@@ -562,6 +562,11 @@ async def detect_faces(
                     )
             else:
                 # Use DeepFace with specified backend and apply basic filtering
+                # Fallback check: If backend is "yolov8" here, it means manual logic failed/skipped.
+                if detector_backend == "yolov8":
+                    logger.warning("YOLOv8 manual logic skipped. Falling back to retinaface.")
+                    detector_backend = "retinaface"
+
                 raw_face_objs = DeepFace.represent(
                     img_path=temp_path,
                     model_name="Facenet",  # 128-dim embeddings to match existing database
