@@ -31,6 +31,8 @@ const allowedOrigins = [
   'https://www.weddingweb.co.in',
   // Environment variable for dynamic URLs
   process.env.FRONTEND_URL,
+  // Cloud Storage hosting origin
+  'https://storage.googleapis.com',
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
