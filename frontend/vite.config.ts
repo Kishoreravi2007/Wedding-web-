@@ -7,11 +7,11 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 export default defineConfig(async ({ mode }) => {
   // Load env file based on mode
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   const { default: dyadComponentTagger } = await import("@dyad-sh/react-vite-component-tagger");
   return {
     root: './', // Explicitly set root to the frontend directory
-    base: '/', // Use absolute paths for better routing support
+    base: './', // Use relative paths for flexible hosting (e.g. GCS bucket)
     publicDir: 'public',
     server: {
       host: "::",
