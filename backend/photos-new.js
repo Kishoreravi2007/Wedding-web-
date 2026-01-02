@@ -13,7 +13,7 @@ const multer = require('multer');
 // const { supabase } = require('./server'); // Removed Supabase usage
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
 const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Use GCS implementation
-const { matchFace, validateDescriptor } = require('./lib/face-recognition');
+const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
 
 // Multer configuration for in-memory storage
 const upload = multer({

@@ -6,8 +6,6 @@
 
 const express = require('express');
 const router = express.Router();
-const express = require('express');
-const router = express.Router();
 const { FaceDescriptorDB, PhotoFaceDB, PeopleDB } = require('./lib/sql-db'); // Use SQL implementation
 const {
   matchFace,
@@ -15,7 +13,7 @@ const {
   addPersonWithFaces,
   getStatistics,
   findSimilarFaces
-} = require('./lib/face-recognition');
+} = require('./lib/face-recognition-logic');
 
 // People DB operations - Now using SQL implementation imported above
 // const { db } = require('./lib/firebase'); // Removed Firebase dependency for People
