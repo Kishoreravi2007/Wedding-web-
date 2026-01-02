@@ -119,9 +119,5 @@ images:
 # Build timeout
 timeout: '1800s'
 
-# Substitution variables
-substitutions:
-  _REGION: 'asia-south1'
-
 options:
   logging: CLOUD_LOGGING_ONLY

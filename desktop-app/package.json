@@ -1,33 +1,33 @@
 {
-  "name": "weddingweb-desktop-app",
+  "name": "weddingweb-desktop",
   "version": "1.0.0",
   "description": "WeddingWeb Desktop App for Live Photo Sync",
-  "main": "electron.js",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:electron\" \"npm run dev:react\"",
-    "dev:electron": "electron .",
     "dev:react": "vite",
-    "build": "npm run build:ts && npm run build:react && npm run build:electron",
-    "build:ts": "tsc",
+    "dev:electron": "tsc -p tsconfig.electron.json && electron .",
+    "build": "npm run build:react && npm run build:electron",
     "build:react": "vite build",
-    "build:electron": "electron-builder",
-    "build:mac": "electron-builder --mac",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux",
-    "pack": "electron-builder --dir",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:win": "npm run build && electron-builder --win",
+    "build:linux": "npm run build && electron-builder --linux",
+    "pack": "npm run build && electron-builder --dir",
     "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
     "wedding",
     "photo",
     "sync",
-    "camera"
+    "camera",
+    "electron"
   ],
   "author": "WeddingWeb",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.12.2",
-    "chokidar": "^3.6.0",
+    "axios": "^1.6.0",
+    "chokidar": "^3.5.3",
     "electron-updater": "^6.1.7",
     "form-data": "^4.0.0"
   },
@@ -40,6 +40,7 @@
     "concurrently": "^8.2.2",
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
+    "lucide-react": "^0.468.0",
     "postcss": "^8.4.47",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -51,31 +52,41 @@
     "appId": "com.weddingweb.desktop",
     "productName": "WeddingWeb Desktop",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "assets"
     },
     "files": [
       "dist/**/*",
-      "node_modules/**/*"
+      "dist-electron/**/*",
+      "node_modules/**/*",
+      "!node_modules/**/README*",
+      "!node_modules/**/*.md"
     ],
     "mac": {
       "category": "public.app-category.photography",
+      "icon": "assets/icon.icns",
       "target": [
         "dmg",
         "zip"
       ]
     },
     "win": {
+      "icon": "assets/icon.ico",
       "target": [
         "nsis",
         "portable"
       ]
     },
     "linux": {
+      "icon": "assets/icon.png",
       "target": [
         "AppImage",
         "deb"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   }
 }
-
