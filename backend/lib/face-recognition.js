@@ -11,7 +11,7 @@
  * - Crowded wedding halls
  */
 
-const { FaceDescriptorDB } = require('./supabase-db');
+const { FaceDescriptorDB } = require('./sql-db');
 
 /**
  * Calculate Euclidean distance between two face descriptors
@@ -120,7 +120,7 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
 
     if (weddingName) {
       // STRICT FILTERING: Filter face descriptors by wedding through photo relationship
-      const { PhotoDB } = require('./supabase-db');
+      const { PhotoDB } = require('./sql-db');
 
       console.log(`🔍 Step 1: Getting photos for wedding: ${weddingName}`);
 
@@ -464,7 +464,7 @@ function validateDescriptor(descriptor) {
  */
 async function addPersonWithFaces(personData, faceDescriptors, photoIds) {
   try {
-    const { PeopleDB } = require('./supabase-db');
+    const { PeopleDB } = require('./sql-db');
 
     // Validate all descriptors first
     for (const desc of faceDescriptors) {
@@ -501,32 +501,24 @@ async function addPersonWithFaces(personData, faceDescriptors, photoIds) {
  */
 async function getStatistics() {
   try {
-    const { PeopleDB } = require('./supabase-db');
-    const { supabase } = require('../server');
+    const { query } = require('./db-gcp');
 
-    // Get counts
-    const { count: totalPeople } = await supabase
-      .from('people')
-      .select('*', { count: 'exact', head: true });
+    // Get counts via SQL
+    const { rows: personRows } = await query('SELECT COUNT(*) as count FROM people');
+    const { rows: descriptorRows } = await query('SELECT COUNT(*) as count FROM face_descriptors');
+    const { rows: faceRows } = await query('SELECT COUNT(*) as count FROM photo_faces');
+    const { rows: verifiedRows } = await query('SELECT COUNT(*) as count FROM photo_faces WHERE is_verified = true');
 
-    const { count: totalDescriptors } = await supabase
-      .from('face_descriptors')
-      .select('*', { count: 'exact', head: true });
-
-    const { count: totalFaces } = await supabase
-      .from('photo_faces')
-      .select('*', { count: 'exact', head: true });
-
-    const { count: verifiedFaces } = await supabase
-      .from('photo_faces')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_verified', true);
+    const totalPeople = parseInt(personRows[0].count);
+    const totalDescriptors = parseInt(descriptorRows[0].count);
+    const totalFaces = parseInt(faceRows[0].count);
+    const verifiedFaces = parseInt(verifiedRows[0].count);
 
     return {
-      totalPeople: totalPeople || 0,
-      totalDescriptors: totalDescriptors || 0,
-      totalFaces: totalFaces || 0,
-      verifiedFaces: verifiedFaces || 0,
+      totalPeople,
+      totalDescriptors,
+      totalFaces,
+      verifiedFaces,
       averageDescriptorsPerPerson: totalPeople > 0
         ? (totalDescriptors / totalPeople).toFixed(2)
         : 0
@@ -550,7 +542,7 @@ async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6) {
     }
 
     // Get all photo faces for the matched person
-    const { PhotoFaceDB } = require('./supabase-db');
+    const { PhotoFaceDB } = require('./sql-db');
     const photoFaces = await PhotoFaceDB.findByPersonId(matchResult.bestMatch.personId);
 
     return photoFaces.slice(0, limit);
