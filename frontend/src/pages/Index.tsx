@@ -91,7 +91,7 @@ const Index = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('./WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
+          backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'
@@ -136,7 +136,7 @@ const Index = () => {
                 <motion.div 
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 group-hover:opacity-30 transition-opacity duration-500"
                   style={{
-                    backgroundImage: "url('./couple-frame-placeholder.png')",
+                    backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/couple-frame-placeholder.png')",
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
