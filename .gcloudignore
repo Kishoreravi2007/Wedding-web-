@@ -1,0 +1,14 @@
+frontend/
+desktop-app/
+archive/
+node_modules/
+backend/node_modules/
+backend/venv*
+backend/models/
+backend/build/
+.git/
+.DS_Store
+*.mp4
+*.MOV
+*.zip
+*.tar.gz

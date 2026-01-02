@@ -37,9 +37,9 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--memory'
-      - '2Gi'
+      - '4Gi'
       - '--cpu'
-      - '2'
+      - '4'
       - '--timeout'
       - '300s'
     waitFor: ['push-deepface']
