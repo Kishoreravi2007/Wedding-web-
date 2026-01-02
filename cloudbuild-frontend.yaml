@@ -10,6 +10,10 @@ steps:
       - |
         npm install
         npm run build
+    env:
+      - 'VITE_API_BASE_URL=https://wedding-backend-979970479540.asia-south1.run.app'
+      - 'VITE_BACKEND_URL=https://wedding-backend-979970479540.asia-south1.run.app'
+      - 'VITE_DEEPFACE_API_URL=https://wedding-deepface-rst3dulcnq-el.a.run.app'
 
   # Step 2: Deploy to Cloud Storage
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
