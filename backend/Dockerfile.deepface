@@ -1,0 +1,32 @@
+# DeepFace API Python Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install system dependencies for OpenCV and face detection
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY deepface_api.py ./
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variable
+ENV PORT=8080
+
+# Start the application
+CMD ["uvicorn", "deepface_api:app", "--host", "0.0.0.0", "--port", "8080"]
