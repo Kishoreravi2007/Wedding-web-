@@ -334,7 +334,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ isPhotographerView = false,
         }
         const fetchedBackendPhotos = await response.json();
 
-        const mappedPhotos: PhotoType[] = fetchedBackendPhotos.map(mapApiPhotoToPhotoType);
+        // Handle object response from new API version
+        const photosArray = Array.isArray(fetchedBackendPhotos) ? fetchedBackendPhotos : (fetchedBackendPhotos.photos || []);
+
+        const mappedPhotos: PhotoType[] = photosArray.map(mapApiPhotoToPhotoType);
         setPhotos(mappedPhotos);
       } catch (error) {
         console.error('Error fetching photos:', error);

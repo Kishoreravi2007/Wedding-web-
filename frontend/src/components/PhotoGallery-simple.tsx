@@ -68,7 +68,7 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
   }, [currentIndex, onClose, onNext, onPrev]);
 
   return (
-    <motion.div 
+    <motion.div
       className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -109,7 +109,7 @@ const PhotoViewer: React.FC<PhotoViewerProps> = ({ photos, currentIndex, onClose
       )}
 
       {/* Main image */}
-      <motion.div 
+      <motion.div
         className="relative max-w-7xl max-h-[90vh] p-4"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -185,36 +185,39 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   useEffect(() => {
     const fetchPhotos = async () => {
       if (!galleryPath) return;
-      
+
       try {
         // Determine sister parameter from gallery path
         const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
-        
+
         const photosEndpoint = `${API_BASE_URL}/api/photos?sister=${sister}`;
-        
+
         const response = await fetch(photosEndpoint);
-        
+
         if (!response.ok) {
           console.error('Failed to fetch photos:', response.status);
           return;
         }
-        
+
         const photosData = await response.json();
-        
-        const mappedPhotos = photosData.map(mapApiPhotoToPhotoType);
-        
+
+        // Handle object response from new API version
+        const photosArray = Array.isArray(photosData) ? photosData : (photosData.photos || []);
+
+        const mappedPhotos = photosArray.map(mapApiPhotoToPhotoType);
+
         setPhotos(mappedPhotos);
       } catch (error) {
         console.error('Error fetching photos:', error);
       }
     };
-    
+
     // Initial fetch
     fetchPhotos();
-    
+
     // Auto-refresh every 30 seconds to check for new photos
     const intervalId = setInterval(fetchPhotos, 30000);
-    
+
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
   }, [galleryPath]);
@@ -285,15 +288,15 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   const handleDownloadPhoto = async (photo: Photo) => {
     try {
       console.log('Downloading photo:', photo);
-      
+
       // Add to downloading set
       setDownloadingPhotos(prev => new Set(prev).add(photo.id));
-      
+
       // Create a temporary anchor element for download
       const link = document.createElement('a');
       link.href = photo.url;
       link.download = `${photo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.jpg`;
-      
+
       // For uploaded photos, we need to handle the URL differently
       if (photo.isUploaded) {
         // If it's an uploaded photo, try to fetch it first
@@ -302,12 +305,12 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
           if (response.ok) {
             const blob = await response.blob();
             const blobUrl = URL.createObjectURL(blob);
-            
+
             link.href = blobUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             // Clean up the blob URL
             URL.revokeObjectURL(blobUrl);
           } else {
@@ -329,16 +332,16 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         link.click();
         document.body.removeChild(link);
       }
-      
+
       // Update download count (in a real app, this would be sent to backend)
-      setPhotos(prevPhotos => 
-        prevPhotos.map(p => 
-          p.id === photo.id 
+      setPhotos(prevPhotos =>
+        prevPhotos.map(p =>
+          p.id === photo.id
             ? { ...p, downloads: p.downloads + 1 }
             : p
         )
       );
-      
+
       // Mark as downloaded and remove from downloading
       setDownloadedPhotos(prev => new Set(prev).add(photo.id));
       setDownloadingPhotos(prev => {
@@ -346,10 +349,10 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         newSet.delete(photo.id);
         return newSet;
       });
-      
+
       // Show success feedback
       console.log(`Downloaded: ${photo.title}`);
-      
+
       // Remove the downloaded indicator after 3 seconds
       setTimeout(() => {
         setDownloadedPhotos(prev => {
@@ -358,17 +361,17 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
           return newSet;
         });
       }, 3000);
-      
+
     } catch (error) {
       console.error('Error downloading photo:', error);
-      
+
       // Remove from downloading set on error
       setDownloadingPhotos(prev => {
         const newSet = new Set(prev);
         newSet.delete(photo.id);
         return newSet;
       });
-      
+
       // In a real app, you might want to show a toast notification here
       alert('Failed to download photo. Please try again.');
     }
@@ -398,14 +401,14 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="space-y-6"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       {/* Search and Filters */}
-      <motion.div 
+      <motion.div
         className="flex flex-col sm:flex-row gap-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -435,7 +438,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
       </motion.div>
 
       {/* Photo Grid */}
-      <motion.div 
+      <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         variants={containerVariants}
       >
@@ -448,18 +451,18 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }}
-              whileHover={{ 
-                scale: 1.05, 
+              whileHover={{
+                scale: 1.05,
                 y: -5,
                 transition: { duration: 0.2 }
               }}
               whileTap={{ scale: 0.95 }}
             >
-              <Card 
+              <Card
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => handleViewPhoto(index)}
               >
-                <motion.div 
+                <motion.div
                   className="aspect-square relative"
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
@@ -496,7 +499,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                   </AnimatePresence>
                 </motion.div>
                 <CardContent className="p-3">
-                  <motion.h3 
+                  <motion.h3
                     className="font-semibold text-sm mb-1 truncate"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -538,7 +541,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                   </motion.div>
 
                   {photo.event && (
-                    <motion.div 
+                    <motion.div
                       className="flex items-center justify-between text-xs text-gray-500 mb-2"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -548,21 +551,21 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                     </motion.div>
                   )}
 
-                  <motion.div 
+                  <motion.div
                     className="flex items-center justify-between"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
                   >
                     <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <motion.span 
+                      <motion.span
                         className="flex items-center gap-1"
                         whileHover={{ scale: 1.1 }}
                       >
                         <Eye className="w-3 h-3" />
                         {photo.views}
                       </motion.span>
-                      <motion.span 
+                      <motion.span
                         className="flex items-center gap-1"
                         whileHover={{ scale: 1.1 }}
                       >
@@ -570,8 +573,8 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
                         {photo.downloads}
                       </motion.span>
                     </div>
-                    
-                    <motion.div 
+
+                    <motion.div
                       className="flex gap-1"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -656,14 +659,14 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
 
       <AnimatePresence>
         {filteredPhotos.length === 0 && (
-          <motion.div 
+          <motion.div
             className="text-center py-8"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3 }}
           >
-            <motion.p 
+            <motion.p
               className="text-gray-500"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -677,7 +680,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
 
       {/* Debug Info */}
       {isPhotographerView && (
-        <motion.div 
+        <motion.div
           className="mt-4 p-4 bg-gray-100 rounded-lg"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
