@@ -146,12 +146,12 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
           ...item,
           status: 'completed',
           progress: 100,
-          faceCount: faceEmbeddings.length,
+          faceCount: detectedFaces.length,
           photoId: photoData.id
         } : item
       ));
 
-      console.log(`✅ Successfully processed ${filename} with ${faceEmbeddings.length} faces`);
+      console.log(`✅ Successfully processed ${filename} with ${detectedFaces.length} faces`);
 
     } catch (error) {
       console.error(`❌ Error processing ${filename}:`, error);

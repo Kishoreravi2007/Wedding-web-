@@ -693,7 +693,7 @@ async def detect_faces(
             content={
                 "faces": response_faces,
                 "count": len(response_faces),
-                "embedding_dimension": 4096 if detector_backend == "yolov8" else 128,
+                "embedding_dimension": 512,  # VGG-Face produces 512-dimensional embeddings
                 "model": "VGG-Face" if detector_backend == "yolov8" else "Facenet",
                 "backend": "YOLOv8-face" if detector_backend == "yolov8" else "RetinaFace"
             }
