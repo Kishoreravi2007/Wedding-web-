@@ -259,7 +259,7 @@ const SisterASchedule = () => {
 
       <div className="relative w-full h-64 mb-4 overflow-hidden rounded-lg shadow-lg">
         <img
-          src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/sister-a-schedule-banner.jpg"
+          src="/sister-a-schedule-banner.jpg"
           alt={t('sisterAScheduleBanner')}
           className="w-full h-full object-cover object-center"
         />

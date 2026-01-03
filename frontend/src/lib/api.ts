@@ -2,24 +2,25 @@
 // Auto-detect the backend URL based on current hostname
 // This ensures it works on both localhost and when accessed from other devices
 const getApiBaseUrl = () => {
-  // If explicitly set in environment, use that (empty string means same origin)
-  if (import.meta.env.VITE_API_BASE_URL !== undefined) {
+  // 1. Check for environment variable (Vite replaces this at build time)
+  if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
 
-  // For browser environment, use the current hostname
+  // 2. Check if we're on localhost
   if (typeof window !== 'undefined') {
-    const protocol = window.location.protocol;
     const hostname = window.location.hostname;
-    // Backend runs on port 5001
-    return `${protocol}//${hostname}:5001`;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `http://localhost:5001`;
+    }
   }
 
-  // Fallback for SSR
-  return 'http://localhost:5001';
+  // 3. Fallback to production backend URL for weddingweb.co.in
+  return 'https://wedding-backend-979970479540.asia-south1.run.app';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {

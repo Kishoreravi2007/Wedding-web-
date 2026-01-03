@@ -91,7 +91,7 @@ const Index = () => {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
+          backgroundImage: "url('/WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'
@@ -126,7 +126,7 @@ const Index = () => {
 
       <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-12 relative z-10" variants={containerVariants}>
         <motion.div variants={cardVariants}>
-          <Link to="/parvathy" className="group" onClick={() => playTrack('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/wedding-music.mp3')}>
+          <Link to="/parvathy" className="group" onClick={() => playTrack('/wedding-music.mp3')}>
             <motion.div
               whileHover="hover"
               variants={cardVariants}
@@ -136,7 +136,7 @@ const Index = () => {
                 <motion.div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 group-hover:opacity-30 transition-opacity duration-500"
                   style={{
-                    backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/couple-frame-placeholder.png')",
+                    backgroundImage: "url('/couple-frame-placeholder.png')",
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -177,7 +177,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div variants={cardVariants}>
-          <Link to="/sreedevi" className="group" onClick={() => playTrack('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/another-song.mp3')}> {/* Add onClick handler */}
+          <Link to="/sreedevi" className="group" onClick={() => playTrack('/another-song.mp3')}> {/* Add onClick handler */}
             <motion.div
               whileHover="hover"
               variants={cardVariants}

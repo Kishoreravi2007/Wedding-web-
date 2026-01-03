@@ -26,7 +26,7 @@ const LandingMinimal = () => {
         <div className="container mx-auto px-4 py-5 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-4">
             <img
-              src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/logo.png"
+              src="/logo.png"
               alt="WeddingWeb logo"
               className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
             />
@@ -34,18 +34,17 @@ const LandingMinimal = () => {
               WeddingWeb
             </span>
           </Link>
-          
+
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`transition-colors ${
-                  location.pathname === link.to
+                className={`transition-colors ${location.pathname === link.to
                     ? "text-rose-500 font-semibold"
                     : "hover:text-rose-500"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -89,7 +88,7 @@ const LandingMinimal = () => {
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-3">
                   <img
-                    src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/logo.png"
+                    src="/logo.png"
                     alt="WeddingWeb logo"
                     className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
                   />
@@ -102,11 +101,10 @@ const LandingMinimal = () => {
                     key={link.to}
                     to={link.to}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`text-lg font-medium transition-colors py-2 ${
-                      location.pathname === link.to
+                    className={`text-lg font-medium transition-colors py-2 ${location.pathname === link.to
                         ? "text-rose-500 font-bold"
                         : "hover:text-rose-500 text-slate-700"
-                    }`}
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -155,7 +153,7 @@ const LandingMinimal = () => {
             Into a Digital Experience
           </h1>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-            Build your own personalized wedding website with AI face detection, smart galleries, 
+            Build your own personalized wedding website with AI face detection, smart galleries,
             live streaming, and more.
           </p>
           <div className="flex flex-wrap justify-center gap-3">

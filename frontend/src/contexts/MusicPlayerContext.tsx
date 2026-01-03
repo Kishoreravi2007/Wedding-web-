@@ -48,8 +48,8 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   }, [location.pathname]);
 
   const musicSources = [
-    { title: 'Wedding Music', src: 'https://storage.googleapis.com/sub-projects-483107-wedding-frontend/wedding-music.mp3' },
-    { title: 'Another Song', src: 'https://storage.googleapis.com/sub-projects-483107-wedding-frontend/another-song.mp3' },
+    { title: 'Wedding Music', src: '/wedding-music.mp3' },
+    { title: 'Another Song', src: '/another-song.mp3' },
   ];
 
   const playCurrentTrack = useCallback(async () => {

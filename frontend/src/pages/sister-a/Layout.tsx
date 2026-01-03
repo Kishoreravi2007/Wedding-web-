@@ -7,7 +7,7 @@ const SisterALayout = () => {
   return (
     <div
       className="font-sans min-h-screen text-[#8C3B3B] bg-cover bg-center bg-fixed"
-      style={{ backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/sister-a-background.png')" }}
+      style={{ backgroundImage: "url('/sister-a-background.png')" }}
     >
       <div className="bg-[#FFF8E1]/50 min-h-screen">
         <main className="py-12 px-4 sm:px-6 lg:px-8">

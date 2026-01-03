@@ -51,7 +51,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
     <Card className="bg-white border border-slate-200 shadow-xl">
       <CardHeader className="space-y-3 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 shadow-lg">
-          <img src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
+          <img src="/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
         </div>
         <CardTitle className="text-3xl font-semibold text-slate-900">Sign in to Wedding Web</CardTitle>
         <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
@@ -99,7 +99,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
           </div>
 
           <div className="flex items-center justify-between text-sm text-slate-600">
-          <Link to="/company/forgot-password" className="font-medium text-slate-700 underline-offset-4 hover:text-rose-500">
+            <Link to="/company/forgot-password" className="font-medium text-slate-700 underline-offset-4 hover:text-rose-500">
               Forgot password?
             </Link>
             <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Secure</span>

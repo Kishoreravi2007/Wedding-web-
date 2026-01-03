@@ -27,24 +27,23 @@ const CompanyNav = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/company" className="flex items-center gap-4">
           <img
-            src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/logo.png"
+            src="/logo.png"
             alt="WeddingWeb logo"
             className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
           />
           <span className="text-3xl font-bold text-slate-900">WeddingWeb</span>
         </Link>
-        
+
         {/* Desktop Navigation */}
         <div className="hidden md:flex gap-6 items-center">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`transition-colors ${
-                isActive(link.to)
+              className={`transition-colors ${isActive(link.to)
                   ? "text-rose-500 font-semibold"
                   : "hover:text-rose-500"
-              }`}
+                }`}
             >
               {link.label}
             </Link>
@@ -88,7 +87,7 @@ const CompanyNav = () => {
             <SheetHeader>
               <SheetTitle className="flex items-center gap-3">
                 <img
-                  src="https://storage.googleapis.com/sub-projects-483107-wedding-frontend/logo.png"
+                  src="/logo.png"
                   alt="WeddingWeb logo"
                   className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
                 />
@@ -101,11 +100,10 @@ const CompanyNav = () => {
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-lg font-medium transition-colors py-2 ${
-                    isActive(link.to)
+                  className={`text-lg font-medium transition-colors py-2 ${isActive(link.to)
                       ? "text-rose-500 font-bold"
                       : "hover:text-rose-500"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>

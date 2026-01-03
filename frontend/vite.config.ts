@@ -11,7 +11,7 @@ export default defineConfig(async ({ mode }) => {
   const { default: dyadComponentTagger } = await import("@dyad-sh/react-vite-component-tagger");
   return {
     root: './', // Explicitly set root to the frontend directory
-    base: './', // Use relative paths for flexible hosting (e.g. GCS bucket)
+    base: '/', // Use absolute path to ensure correct asset loading from subpaths
     publicDir: 'public',
     server: {
       host: "::",

@@ -5,7 +5,7 @@ const SisterBLayout = () => {
   return (
     <div
       className="font-sans min-h-screen text-[#1B5E20] bg-cover bg-center bg-fixed"
-      style={{ backgroundImage: "url('https://storage.googleapis.com/sub-projects-483107-wedding-frontend/sister-b-wedding-illustration.png')" }}
+      style={{ backgroundImage: "url('/sister-b-wedding-illustration.png')" }}
     >
       <div className="bg-[#E8F5E9]/50 min-h-screen">
         <main className="py-12 px-4 sm:px-6 lg:px-8">
