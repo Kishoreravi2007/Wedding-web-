@@ -1,4 +1,5 @@
-frontend/
+# Removed frontend/ from ignore list to allow Cloud Build
+# frontend/
 desktop-app/
 archive/
 node_modules/

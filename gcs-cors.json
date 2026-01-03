@@ -1,0 +1,24 @@
+[
+    {
+        "origin": [
+            "https://weddingweb.co.in",
+            "https://sub-projects-483107.web.app",
+            "http://localhost:5173",
+            "http://localhost:8080"
+        ],
+        "method": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE",
+            "HEAD",
+            "OPTIONS"
+        ],
+        "responseHeader": [
+            "Content-Type",
+            "Access-Control-Allow-Origin",
+            "Authorization"
+        ],
+        "maxAgeSeconds": 3600
+    }
+]

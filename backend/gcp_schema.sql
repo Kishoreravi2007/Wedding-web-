@@ -10,6 +10,22 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     role TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    login_attempts INTEGER DEFAULT 0,
+    last_login_attempt TIMESTAMP WITH TIME ZONE,
+    locked_until TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1b. Audit log table
+CREATE TABLE IF NOT EXISTS auth_audit_log (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    success BOOLEAN NOT NULL,
+    details JSONB DEFAULT '{}',
+    ip_address TEXT,
+    user_agent TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
