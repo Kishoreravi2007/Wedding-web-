@@ -533,7 +533,7 @@ async function getStatistics() {
  * Find similar faces across all photos
  * Useful for finding all photos containing the same person
  */
-async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6) {
+async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6, sister = null) {
   try {
     const matchResult = await matchFace(descriptor, threshold);
 
@@ -543,7 +543,7 @@ async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6) {
 
     // Get all photo faces for the matched person
     const { PhotoFaceDB } = require('./sql-db');
-    const photoFaces = await PhotoFaceDB.findByPersonId(matchResult.bestMatch.personId);
+    const photoFaces = await PhotoFaceDB.findByPersonId(matchResult.bestMatch.personId, sister);
 
     return photoFaces.slice(0, limit);
   } catch (error) {

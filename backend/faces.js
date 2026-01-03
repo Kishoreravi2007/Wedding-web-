@@ -14,6 +14,7 @@ const {
   getStatistics,
   findSimilarFaces
 } = require('./lib/face-recognition-logic');
+const { authenticateToken } = require('./auth');
 
 // People DB operations - Now using SQL implementation imported above
 // const { db } = require('./lib/firebase'); // Removed Firebase dependency for People
@@ -114,7 +115,7 @@ router.post('/match-batch', async (req, res) => {
  */
 router.post('/find-similar', async (req, res) => {
   try {
-    const { descriptor, limit, threshold } = req.body;
+    const { descriptor, limit, threshold, wedding_name, sister } = req.body;
 
     if (!descriptor) {
       return res.status(400).json({ message: 'Face descriptor is required' });
@@ -131,11 +132,13 @@ router.post('/find-similar', async (req, res) => {
     const similarFaces = await findSimilarFaces(
       descriptor,
       limit || 10,
-      threshold || 0.6
+      threshold || 0.6,
+      wedding_name || sister || null
     );
 
     res.json({
       faces: similarFaces,
+      matches: similarFaces.map(f => f.photo), // Compatibility with some frontend components
       total: similarFaces.length
     });
   } catch (error) {
@@ -144,6 +147,46 @@ router.post('/find-similar', async (req, res) => {
       message: 'Error finding similar faces',
       error: error.message
     });
+  }
+});
+
+/**
+ * POST /api/faces/recognize
+ * Legacy alias for find-similar (used by some frontend versions)
+ */
+router.post('/recognize', async (req, res) => {
+  // Handle both JSON and FormData-like bodies
+  let descriptor = req.body.face_descriptor || req.body.descriptor;
+  const wedding_name = req.body.wedding_name || req.body.sister;
+
+  if (typeof descriptor === 'string') {
+    try {
+      descriptor = JSON.parse(descriptor);
+    } catch (e) {
+      // Not JSON, maybe comma separated or similar
+    }
+  }
+
+  if (!descriptor) {
+    return res.status(400).json({ message: 'Face descriptor is required' });
+  }
+
+  try {
+    const similarFaces = await findSimilarFaces(
+      descriptor,
+      50, // Higher limit for general search
+      0.6,
+      wedding_name
+    );
+
+    res.json({
+      matches: similarFaces.map(f => f.photo),
+      total: similarFaces.length,
+      message: similarFaces.length > 0 ? 'Success' : 'No matching photos found'
+    });
+  } catch (error) {
+    console.error('Error in legacy recognize endpoint:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -168,7 +211,7 @@ router.get('/statistics', async (req, res) => {
  * POST /api/faces/verify/:faceId
  * Manually verify a face identification
  */
-router.post('/verify/:faceId', async (req, res) => {
+router.post('/verify/:faceId', authenticateToken, async (req, res) => {
   try {
     const { faceId } = req.params;
     const { personId, isVerified } = req.body;
@@ -258,7 +301,7 @@ router.get('/people/:id', async (req, res) => {
  * POST /api/people
  * Create a new person with optional face descriptors
  */
-router.post('/people', async (req, res) => {
+router.post('/people', authenticateToken, async (req, res) => {
   try {
     const { name, role, sister, avatarUrl, faceDescriptors, photoIds } = req.body;
 
@@ -309,7 +352,7 @@ router.post('/people', async (req, res) => {
  * PATCH /api/people/:id
  * Update a person's information
  */
-router.patch('/people/:id', async (req, res) => {
+router.patch('/people/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, role, sister, avatarUrl } = req.body;
@@ -339,7 +382,7 @@ router.patch('/people/:id', async (req, res) => {
  * DELETE /api/people/:id
  * Delete a person (cascades to their face descriptors)
  */
-router.delete('/people/:id', async (req, res) => {
+router.delete('/people/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -362,7 +405,7 @@ router.delete('/people/:id', async (req, res) => {
  * POST /api/people/:id/descriptors
  * Add face descriptors for an existing person
  */
-router.post('/people/:id/descriptors', async (req, res) => {
+router.post('/people/:id/descriptors', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { descriptors, photoIds } = req.body;

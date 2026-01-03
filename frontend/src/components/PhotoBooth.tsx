@@ -665,18 +665,21 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
 
 
       // STEP 2: Send face descriptor to backend for matching
-      const formData = new FormData();
-      formData.append('wedding_name', selectedWedding);
-      formData.append('face_descriptor', JSON.stringify(faceDescriptor));
-
       console.log('🔍 Calling Find My Photos API with face descriptor...');
       console.log('Wedding:', selectedWedding);
       console.log('Descriptor length:', faceDescriptor.length);
 
       // Use API_BASE_URL from config (works in both local and deployed)
-      const response = await fetch(`${API_BASE_URL}/api/recognize`, {
+      // Call the correct endpoint at /api/faces/recognize
+      const response = await fetch(`${API_BASE_URL}/api/faces/recognize`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          wedding_name: selectedWedding,
+          face_descriptor: faceDescriptor
+        }),
       });
 
       console.log('📡 Response status:', response.status, response.statusText);

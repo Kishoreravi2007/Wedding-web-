@@ -140,9 +140,9 @@ app.use('/api/auth', authRouter);
 const photosRouter = require('./photos-new');
 app.use('/api/photos', authenticateToken, photosRouter);
 
-// Face recognition routes (Supabase)
+// Face recognition routes (Cloud SQL)
 const facesRouter = require('./faces');
-app.use('/api/faces', authenticateToken, facesRouter);
+app.use('/api/faces', facesRouter); // Auth handled per-route inside facesRouter
 
 // Profile routes (Cloud SQL)
 const profilesRouter = require('./routes/profiles');
