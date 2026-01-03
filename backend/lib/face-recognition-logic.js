@@ -199,7 +199,11 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
       console.warn(`⚠️  No compatible descriptors found!`);
       console.warn(`   Query descriptor: ${queryDimension} dimensions`);
       console.warn(`   Available descriptors: ${JSON.stringify(dimensionCounts)}`);
-      console.warn(`   Tip: Make sure you're using the same face detection system (DeepFace=512dim or face-api.js=128dim)`);
+      console.warn(`   💡 Dimension mismatch detected:`);
+      console.warn(`      - VGG-Face (DeepFace): 4096 dimensions`);
+      console.warn(`      - Facenet (DeepFace): 512 dimensions`);
+      console.warn(`      - face-api.js (legacy): 128 dimensions`);
+      console.warn(`   📋 Action required: Reprocess existing photos using the Face Processor tool to migrate to ${queryDimension}-dim embeddings`);
       return {
         matches: [],
         bestMatch: null
