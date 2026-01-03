@@ -25,12 +25,10 @@ import {
   Users,
   Database
 } from 'lucide-react';
-import * as faceapi from 'face-api.js';
-// Firebase service (commented out - using Supabase backend API instead)
-// import { PhotoService } from '../services/firebaseService';
 import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 interface UploadProgress {
   filename: string;
@@ -59,45 +57,25 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
-  // Load face-api.js models
+  // DeepFace models are handled on the server
   React.useEffect(() => {
-    const loadModels = async () => {
-      try {
-        console.log('🔄 Loading face-api.js models for photo processing...');
-
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-          faceapi.nets.faceExpressionNet.loadFromUri('/models')
-        ]);
-
-        console.log('✅ Photo processing models loaded successfully');
-        setIsModelLoaded(true);
-      } catch (error) {
-        console.error('❌ Error loading models:', error);
-        setError('Failed to load face detection models.');
-      }
-    };
-
-    loadModels();
+    setIsModelLoaded(true);
   }, []);
 
-  // Extract face embeddings from image
-  const extractFaceEmbeddings = useCallback(async (imageElement: HTMLImageElement): Promise<Float32Array[]> => {
+  // Extract face embeddings from image using DeepFace API
+  const extractFaceEmbeddings = useCallback(async (file: File): Promise<any[]> => {
     try {
-      console.log('🔍 Extracting face embeddings...');
+      console.log('🔍 Extracting face embeddings via DeepFace API...');
 
-      // Detect all faces and extract descriptors
-      const detections = await faceapi
-        .detectAllFaces(imageElement, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptors();
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('detector_backend', 'yolov8');
 
-      const embeddings = detections.map(detection => detection.descriptor);
-      console.log(`✅ Extracted ${embeddings.length} face embeddings`);
+      const response = await axios.post(`${DEEPFACE_API_URL}/api/faces/detect`, formData);
+      const { faces } = response.data;
 
-      return embeddings;
+      console.log(`✅ Extracted ${faces?.length || 0} face embeddings`);
+      return faces || [];
     } catch (error) {
       console.error('❌ Error extracting face embeddings:', error);
       throw error;
@@ -119,18 +97,8 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         i === index ? { ...item, status: 'processing', progress: 25 } : item
       ));
 
-      // Create image element for face detection
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = URL.createObjectURL(file);
-      });
-
-      // Extract face embeddings
-      const faceEmbeddings = await extractFaceEmbeddings(img);
+      // Extract face embeddings via DeepFace API
+      const detectedFaces = await extractFaceEmbeddings(file);
 
       // Update progress
       setUploadProgress(prev => prev.map((item, i) =>
@@ -146,12 +114,18 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       formData.append('tags', JSON.stringify([]));
 
       // Add face descriptors if any
-      if (faceEmbeddings.length > 0) {
-        const faceDescriptors = faceEmbeddings.map(embedding => ({
-          descriptor: Array.from(embedding),
-          confidence: 1.0
+      if (detectedFaces.length > 0) {
+        const faceDescriptors = detectedFaces.map((face: any) => ({
+          descriptor: face.embedding,
+          boundingBox: {
+            x: face.bbox[0],
+            y: face.bbox[1],
+            width: face.bbox[2],
+            height: face.bbox[3]
+          },
+          confidence: face.det_score
         }));
-        formData.append('face_descriptors', JSON.stringify(faceDescriptors));
+        formData.append('faces', JSON.stringify(faceDescriptors));
       }
 
       // Get authentication token

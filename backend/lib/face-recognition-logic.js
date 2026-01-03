@@ -299,53 +299,30 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
       };
     }
 
-    // STRICT VALIDATION: Best match must be significantly better than others
-    // This prevents matching similar-looking people
+    // BALANCED VALIDATION: Best match should ideally be better than others
     const bestMatch = goodMatches[0];
     if (goodMatches.length > 1) {
       const secondBest = goodMatches[1];
       const distanceDiff = secondBest.distance - bestMatch.distance;
       const improvementRatio = distanceDiff / secondBest.distance;
 
-      // Require at least 25% improvement over second best match (stricter)
-      // This ensures we're matching to the correct person, not just a similar face
-      if (improvementRatio < 0.25) {
-        console.log(`⚠️  Best match too close to second best (${bestMatch.distance.toFixed(4)} vs ${secondBest.distance.toFixed(4)}, improvement: ${(improvementRatio * 100).toFixed(1)}%)`);
-        console.log(`   Rejecting match to prevent false positive`);
-        return {
-          matches: [],
-          bestMatch: null
-        };
+      // Log but don't necessarily reject if improvement is small
+      if (improvementRatio < 0.10) {
+        console.warn(`⚠️  Best match very close to second best (${bestMatch.distance.toFixed(4)} vs ${secondBest.distance.toFixed(4)}, improvement: ${(improvementRatio * 100).toFixed(1)}%)`);
       }
     }
 
-    // BALANCED VALIDATION: Require good confidence but not too strict
-    // Distance < 0.5 = excellent match (50%+ confidence) - always accept
-    // Distance 0.5-0.6 = good match (40-50% confidence) - accept with validation
-    // Reject matches that are too close to threshold (within 90% of threshold)
-    if (bestMatch.distance > threshold * 0.90) {
-      // Match is too close to threshold - might be false positive
-      console.log(`⚠️  Best match distance (${bestMatch.distance.toFixed(4)}) too close to threshold (${threshold})`);
-      console.log(`   Rejecting to prevent false positive`);
-      return {
-        matches: [],
-        bestMatch: null
-      };
+    // Accept matches within threshold
+    if (bestMatch.distance > threshold * 0.95) {
+      console.log(`ℹ️  Best match distance (${bestMatch.distance.toFixed(4)}) is close to threshold (${threshold})`);
     }
 
-    // ADDITIONAL CHECK: If best match is borderline (>0.4), require it to be clearly better than second best
-    if (goodMatches.length > 1 && bestMatch.distance > 0.4) {
+    // ADDITIONAL CHECK: If best match is borderline (>0.45)
+    if (goodMatches.length > 1 && bestMatch.distance > 0.45) {
       const secondBest = goodMatches[1];
       const improvementRatio = (secondBest.distance - bestMatch.distance) / secondBest.distance;
-      // For borderline matches (>0.4), require at least 20% improvement
-      if (improvementRatio < 0.20) {
-        console.log(`⚠️  Borderline match (${bestMatch.distance.toFixed(4)}) not clearly better than second best`);
-        console.log(`   Improvement: ${(improvementRatio * 100).toFixed(1)}% (need 25%+)`);
-        console.log(`   Rejecting to prevent false positive`);
-        return {
-          matches: [],
-          bestMatch: null
-        };
+      if (improvementRatio < 0.05) {
+        console.warn(`⚠️  Borderline match (${bestMatch.distance.toFixed(4)}) very similar to second best`);
       }
     }
 

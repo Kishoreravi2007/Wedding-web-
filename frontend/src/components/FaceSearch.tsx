@@ -17,13 +17,13 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { 
-  Search, 
-  Upload, 
-  Camera, 
-  Users, 
-  Image as ImageIcon, 
-  AlertCircle, 
+import {
+  Search,
+  Upload,
+  Camera,
+  Users,
+  Image as ImageIcon,
+  AlertCircle,
   CheckCircle,
   Loader2,
   Download,
@@ -50,14 +50,14 @@ interface FaceSearchProps {
   eventId?: string;
 }
 
-const FaceSearch: React.FC<FaceSearchProps> = ({ 
-  className = '', 
-  eventId = 'wedding-event' 
+const FaceSearch: React.FC<FaceSearchProps> = ({
+  className = '',
+  eventId = 'wedding-event'
 }) => {
   // Refs for file input and canvas
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   // State management
   const [isModelLoaded, setIsModelLoaded] = useState(true); // DeepFace runs on backend, always available
   const [isSearching, setIsSearching] = useState(false);
@@ -78,7 +78,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
   const extractFaceDescriptor = useCallback(async (file: File): Promise<number[] | null> => {
     try {
       console.log('🔍 Extracting face descriptor using DeepFace + YOLOv8-face...');
-      
+
       // Create FormData to send file to DeepFace API
       const formData = new FormData();
       formData.append('file', file);
@@ -128,9 +128,10 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       // Call backend API for face matching (descriptor is already an array)
       const response = await axios.post(`${BACKEND_URL}/api/faces/find-similar`, {
-        descriptor: queryDescriptor, // 512-dim DeepFace embedding
+        descriptor: queryDescriptor, // 512-dim DeepFace embedding or 128-dim face-api.js
         limit: 50,
-        threshold: 0.6
+        threshold: 0.5,
+        sister: eventId
       });
 
       const { faces } = response.data;
@@ -145,7 +146,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       // Get photos for the matched faces
       const photoIds = [...new Set(faces.map((face: any) => face.photo_id))];
-      
+
       // Fetch photo details
       const photoPromises = photoIds.map(async (photoId: string) => {
         try {
@@ -163,7 +164,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       const matches: FaceMatch[] = photos.map((photo: any) => {
         // Find the face match for this photo
         const face = faces.find((f: any) => f.photo_id === photo.id);
-        
+
         return {
           id: photo.id,
           photoUrl: photo.public_url,
@@ -181,7 +182,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       console.log(`✅ Displaying ${matches.length} matching photos`);
       setSearchResults(matches);
-      
+
       if (matches.length > 0) {
         setSuccess(`Found ${matches.length} matching photos!`);
       } else {
@@ -224,7 +225,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       // Extract face descriptor using DeepFace API
       const descriptor = await extractFaceDescriptor(file);
-      
+
       if (descriptor) {
         // Create image element for display
         const img = new Image();
@@ -232,7 +233,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
         setDetectedFace({ descriptor, image: img });
         setSuccess('Face detected! Click "Search Photos" to find matches.');
       }
-      
+
       setIsUploading(false);
 
       img.onerror = () => {
@@ -266,7 +267,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
     setDetectedFace(null);
     setError('');
     setSuccess('');
-    
+
     // Clear file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -278,12 +279,12 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
     try {
       const response = await fetch(photoUrl);
       const blob = await response.blob();
-      
+
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = filename;
       link.click();
-      
+
       URL.revokeObjectURL(link.href);
     } catch (error) {
       console.error('❌ Error downloading photo:', error);
@@ -303,7 +304,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
             Upload a selfie to find photos of yourself from the wedding event
           </p>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           {/* Model Status */}
           <div className="flex items-center gap-2">
@@ -423,7 +424,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
                         {(match.confidence * 100).toFixed(1)}% Match
                       </div>
                     </div>
-                    
+
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -432,7 +433,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
                             {match.metadata.filename}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <ImageIcon className="w-4 h-4 text-gray-500" />
                           <span className="text-sm text-gray-600">
@@ -450,7 +451,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
                             <Download className="w-4 h-4 mr-1" />
                             Download
                           </Button>
-                          
+
                           <Button
                             onClick={() => window.open(match.photoUrl, '_blank')}
                             variant="outline"

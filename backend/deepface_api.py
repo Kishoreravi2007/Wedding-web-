@@ -693,9 +693,9 @@ async def detect_faces(
             content={
                 "faces": response_faces,
                 "count": len(response_faces),
-                "embedding_dimension": 128,
-                "model": "Facenet",
-                "backend": "RetinaFace"
+                "embedding_dimension": 4096 if detector_backend == "yolov8" else 128,
+                "model": "VGG-Face" if detector_backend == "yolov8" else "Facenet",
+                "backend": "YOLOv8-face" if detector_backend == "yolov8" else "RetinaFace"
             }
         )
 

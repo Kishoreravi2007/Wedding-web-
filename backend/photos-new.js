@@ -154,7 +154,8 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     return res.status(400).json({ message: 'No photo file uploaded' });
   }
 
-  const { sister, title, description, eventType, tags, faces } = req.body;
+  const { sister, title, description, eventType, tags } = req.body;
+  const faces = req.body.faces || req.body.faceDescriptors || req.body.face_descriptors;
 
   // Validate required fields
   if (!sister || !['sister-a', 'sister-b'].includes(sister)) {

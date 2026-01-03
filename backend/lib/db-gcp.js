@@ -5,24 +5,30 @@
  * Uses standard 'pg' library.
  */
 
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Pool } = require('pg');
 
 // Get database credentials from environment variables
-const dbConfig = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST, // Could be socket path for Cloud Run
-    port: process.env.DB_PORT || 5432,
-    // Cloud SQL specific config
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-};
+const dbConfig = process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 5432,
+    };
+
+// Add pool settings
+dbConfig.max = 20;
+dbConfig.idleTimeoutMillis = 30000;
+dbConfig.connectionTimeoutMillis = 2000;
 
 // Validate configuration
 const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_NAME', 'DB_HOST'];
-const missingVars = requiredEnvVars.filter(key => !process.env[key]);
+const missingVars = process.env.DATABASE_URL
+    ? []
+    : requiredEnvVars.filter(key => !process.env[key]);
 
 if (missingVars.length > 0) {
     console.warn(`⚠️  Missing Cloud SQL environment variables: ${missingVars.join(', ')}`);

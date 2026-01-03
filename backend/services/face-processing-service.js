@@ -5,8 +5,8 @@
  * for wedding photo galleries with robust error handling and quality checks.
  */
 
-const { PhotoDB, PeopleDB, FaceDescriptorDB, PhotoFaceDB } = require('../lib/supabase-db');
-const { matchFace, validateDescriptor } = require('../lib/face-recognition');
+const { PhotoDB, PeopleDB, FaceDescriptorDB, PhotoFaceDB } = require('../lib/sql-db');
+const { matchFace, validateDescriptor } = require('../lib/face-recognition-logic');
 const EventEmitter = require('events');
 
 // Processing queue and events
@@ -76,7 +76,7 @@ class FaceProcessingService extends EventEmitter {
       // Process each detected face
       for (let i = 0; i < faceDescriptors.length; i++) {
         const faceData = faceDescriptors[i];
-        
+
         try {
           // Validate face data structure
           if (!faceData.descriptor || !faceData.boundingBox) {
@@ -103,7 +103,7 @@ class FaceProcessingService extends EventEmitter {
 
           // Match face against known people
           const matchResult = await matchFace(faceData.descriptor, confidenceThreshold);
-          
+
           let personId = null;
           let confidence = 0;
           let isVerified = autoVerify;
@@ -112,7 +112,7 @@ class FaceProcessingService extends EventEmitter {
             personId = matchResult.bestMatch.personId;
             confidence = matchResult.bestMatch.confidence;
             result.identifiedFaces++;
-            
+
             // Auto-verify if confidence is very high
             if (confidence >= 0.85) {
               isVerified = true;
@@ -205,20 +205,20 @@ class FaceProcessingService extends EventEmitter {
     // Process in chunks for concurrency control
     for (let i = 0; i < photoBatch.length; i += concurrency) {
       const chunk = photoBatch.slice(i, i + concurrency);
-      
-      const chunkPromises = chunk.map(({ photoId, faceDescriptors }) => 
+
+      const chunkPromises = chunk.map(({ photoId, faceDescriptors }) =>
         this.processSinglePhoto(photoId, faceDescriptors, options)
       );
 
       const chunkResults = await Promise.allSettled(chunkPromises);
-      
+
       for (const settledResult of chunkResults) {
         batchResult.processed++;
-        
+
         if (settledResult.status === 'fulfilled') {
           const result = settledResult.value;
           batchResult.results.push(result);
-          
+
           if (result.success) {
             batchResult.successful++;
             batchResult.totalFacesDetected += result.detectedFaces;
@@ -287,7 +287,7 @@ class FaceProcessingService extends EventEmitter {
     while (this.queue.length > 0) {
       const item = this.queue.shift();
       item.status = 'processing';
-      
+
       try {
         const result = await this.processBatch(item.photos, item.options);
         item.result = result;
@@ -309,18 +309,18 @@ class FaceProcessingService extends EventEmitter {
    */
   updateStats(result) {
     this.stats.totalProcessed++;
-    
+
     if (result.success) {
       this.stats.successCount++;
     } else {
       this.stats.errorCount++;
     }
-    
+
     this.stats.unidentifiedFaces += result.unidentifiedFaces;
-    
+
     // Update average processing time
     const totalTime = this.stats.averageProcessingTime * (this.stats.totalProcessed - 1);
-    this.stats.averageProcessingTime = 
+    this.stats.averageProcessingTime =
       (totalTime + result.processingTime) / this.stats.totalProcessed;
   }
 
@@ -340,38 +340,33 @@ class FaceProcessingService extends EventEmitter {
    */
   async getUnidentifiedFaces(options = {}) {
     const { limit = 50, offset = 0, photoId = null } = options;
-    
-    const { supabase } = require('../server');
-    
-    let query = supabase
-      .from('photo_faces')
-      .select(`
-        id,
-        bounding_box,
-        confidence,
-        photo:photos (
-          id,
-          filename,
-          public_url,
-          title
-        )
-      `)
-      .is('person_id', null)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-    
+
+    const { query } = require('../lib/db-gcp');
+
+    let sql = `
+      SELECT pf.*, p.filename, p.public_url, p.title
+      FROM photo_faces pf
+      JOIN photos p ON pf.photo_id = p.id
+      WHERE pf.person_id IS NULL
+    `;
+    const params = [];
+
     if (photoId) {
-      query = query.eq('photo_id', photoId);
+      sql += ` AND pf.photo_id = $${params.length + 1}`;
+      params.push(photoId);
     }
-    
-    const { data, error, count } = await query;
-    
-    if (error) throw error;
-    
+
+    sql += ` ORDER BY pf.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    const { rows } = await query(sql, params);
+    const { rows: countRows } = await query('SELECT COUNT(*) FROM photo_faces WHERE person_id IS NULL');
+    const total = parseInt(countRows[0].count);
+
     return {
-      faces: data,
-      total: count,
-      hasMore: count > offset + limit
+      faces: rows,
+      total,
+      hasMore: total > offset + limit
     };
   }
 
@@ -380,37 +375,28 @@ class FaceProcessingService extends EventEmitter {
    */
   async reprocessFaces(faceIds, newThreshold = 0.5) {
     const results = [];
-    
+
     for (const faceId of faceIds) {
       try {
         // Get face data
-        const { supabase } = require('../server');
-        const { data: face } = await supabase
-          .from('photo_faces')
-          .select('*, photo:photos(*)')
-          .eq('id', faceId)
-          .single();
-        
+        const face = await PhotoFaceDB.findById(faceId);
+
         if (!face) {
           results.push({ faceId, success: false, error: 'Face not found' });
           continue;
         }
-        
+
         // Get descriptor from face_descriptors table
-        const { data: descriptors } = await supabase
-          .from('face_descriptors')
-          .select('descriptor')
-          .eq('photo_id', face.photo_id)
-          .limit(1);
-        
+        const descriptors = await FaceDescriptorDB.findAll({ photo_id: face.photo_id });
+
         if (!descriptors || descriptors.length === 0) {
           results.push({ faceId, success: false, error: 'No descriptor found' });
           continue;
         }
-        
+
         // Re-match with new threshold
         const matchResult = await matchFace(descriptors[0].descriptor, newThreshold);
-        
+
         if (matchResult.bestMatch) {
           // Update face with new match
           await PhotoFaceDB.update(faceId, {
@@ -418,7 +404,7 @@ class FaceProcessingService extends EventEmitter {
             confidence: matchResult.bestMatch.confidence,
             is_verified: false // Require manual verification
           });
-          
+
           results.push({
             faceId,
             success: true,
@@ -429,12 +415,12 @@ class FaceProcessingService extends EventEmitter {
         } else {
           results.push({ faceId, success: false, error: 'No match found' });
         }
-        
+
       } catch (error) {
         results.push({ faceId, success: false, error: error.message });
       }
     }
-    
+
     return results;
   }
 
@@ -442,21 +428,17 @@ class FaceProcessingService extends EventEmitter {
    * Get face detection quality report for a photo
    */
   async getFaceQualityReport(photoId) {
-    const { supabase } = require('../server');
-    
-    const { data: faces } = await supabase
-      .from('photo_faces')
-      .select(`
-        id,
-        confidence,
-        bounding_box,
-        is_verified,
-        person:people (name, role)
-      `)
-      .eq('photo_id', photoId);
-    
-    if (!faces) return null;
-    
+    const { query } = require('../lib/db-gcp');
+
+    const { rows: faces } = await query(`
+      SELECT pf.*, p.name as person_name, p.role as person_role
+      FROM photo_faces pf
+      LEFT JOIN people p ON pf.person_id = p.id
+      WHERE pf.photo_id = $1
+    `, [photoId]);
+
+    if (!faces || faces.length === 0) return null;
+
     const report = {
       totalFaces: faces.length,
       identifiedFaces: faces.filter(f => f.person).length,
@@ -475,7 +457,7 @@ class FaceProcessingService extends EventEmitter {
         size: f.bounding_box.width * f.bounding_box.height
       }))
     };
-    
+
     return report;
   }
 }

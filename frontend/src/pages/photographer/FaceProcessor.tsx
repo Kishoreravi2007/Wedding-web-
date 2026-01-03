@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
+import axios from 'axios';
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
-import * as faceapi from 'face-api.js';
+
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 const FaceProcessor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -31,30 +33,13 @@ const FaceProcessor = () => {
   });
   const [stats, setStats] = useState<any>(null);
 
-  // Load face-api models
+  // DeepFace API is external, no models to load here
   useEffect(() => {
-    loadFaceModels();
+    setModelsLoaded(true);
   }, []);
 
   const loadFaceModels = async () => {
-    try {
-      setLoadingModels(true);
-      console.log('Loading face-api models...');
-
-      await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        faceapi.nets.faceRecognitionNet.loadFromUri('/models')
-      ]);
-
-      setModelsLoaded(true);
-      console.log('✅ Face-api models loaded');
-    } catch (error) {
-      console.error('Failed to load models:', error);
-      alert('Failed to load face detection models. Please refresh the page.');
-    } finally {
-      setLoadingModels(false);
-    }
+    setModelsLoaded(true);
   };
 
   // Fetch photos
@@ -115,36 +100,31 @@ const FaceProcessor = () => {
       setProgress(((i + 1) / photos.length) * 100);
 
       try {
-        // Load image
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.src = photo.public_url;
+        // Fetch image as blob for DeepFace API
+        const imgRes = await fetch(photo.public_url);
+        const imgBlob = await imgRes.blob();
 
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = () => reject(new Error('Failed to load image'));
-          setTimeout(() => reject(new Error('Image load timeout')), 10000);
-        });
+        const formData = new FormData();
+        formData.append('file', imgBlob, photo.filename);
+        formData.append('detector_backend', 'yolov8');
 
-        // Detect faces and extract descriptors
-        const detections = await faceapi
-          .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
-          .withFaceLandmarks()
-          .withFaceDescriptors();
+        // Detect faces and extract 4096-dim descriptors via DeepFace API
+        const detectRes = await axios.post(`${DEEPFACE_API_URL}/api/faces/detect`, formData);
+        const { faces: detectedFaces } = detectRes.data;
 
-        console.log(`${photo.filename}: Found ${detections.length} face(s)`);
+        console.log(`${photo.filename}: Found ${detectedFaces?.length || 0} face(s) via DeepFace`);
 
-        if (detections.length > 0) {
-          // Prepare face data
-          const faces = detections.map(detection => ({
-            descriptor: Array.from(detection.descriptor),
+        if (detectedFaces && detectedFaces.length > 0) {
+          // Prepare face data (DeepFace returns bbox as [x, y, w, h])
+          const faces = detectedFaces.map((face: any) => ({
+            descriptor: face.embedding,
             boundingBox: {
-              x: detection.detection.box.x,
-              y: detection.detection.box.y,
-              width: detection.detection.box.width,
-              height: detection.detection.box.height
+              x: face.bbox[0],
+              y: face.bbox[1],
+              width: face.bbox[2],
+              height: face.bbox[3]
             },
-            confidence: detection.detection.score
+            confidence: face.det_score
           }));
 
           // Send to backend
