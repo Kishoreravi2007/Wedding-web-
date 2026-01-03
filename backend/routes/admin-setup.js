@@ -27,10 +27,10 @@ router.post('/setup-users', async (req, res) => {
         const photographerPassword = await bcrypt.hash('photo123', 10);
 
         const photographerResult = await query(`
-      INSERT INTO users (username, password_hash, role, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      INSERT INTO users (username, password, role, is_active, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
       ON CONFLICT (username) DO UPDATE 
-      SET password_hash = EXCLUDED.password_hash, updated_at = NOW()
+      SET password = EXCLUDED.password
       RETURNING id, username, role
     `, ['photographer', photographerPassword, 'photographer', true]);
 
@@ -44,10 +44,10 @@ router.post('/setup-users', async (req, res) => {
         const couplePassword = await bcrypt.hash('123@qwerty', 10);
 
         const coupleResult = await query(`
-      INSERT INTO users (username, password_hash, role, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      INSERT INTO users (username, password, role, is_active, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
       ON CONFLICT (username) DO UPDATE 
-      SET password_hash = EXCLUDED.password_hash, updated_at = NOW()
+      SET password = EXCLUDED.password
       RETURNING id, username, role
     `, ['phsv', couplePassword, 'couple', true]);
 
