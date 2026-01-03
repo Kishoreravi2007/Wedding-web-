@@ -25,6 +25,7 @@ steps:
       - '-c'
       - |
         gsutil -m cp -r frontend/dist/* gs://$PROJECT_ID-wedding-frontend/
+        gsutil cp gs://$PROJECT_ID-wedding-frontend/index.html gs://$PROJECT_ID-wedding-frontend/404.html
         gsutil -m setmeta -h "Cache-Control:private, max-age=0, no-transform" gs://$PROJECT_ID-wedding-frontend/**/*.html
         gsutil web set -m index.html -e 404.html gs://$PROJECT_ID-wedding-frontend/
         gsutil cors set gcs-cors.json gs://$PROJECT_ID-wedding-frontend/
