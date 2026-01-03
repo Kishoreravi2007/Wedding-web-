@@ -15,11 +15,11 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
-import { 
-  Upload, 
-  Camera, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  Upload,
+  Camera,
+  CheckCircle,
+  AlertCircle,
   Loader2,
   Image as ImageIcon,
   Users,
@@ -46,7 +46,7 @@ interface PhotoUploaderProps {
   className?: string;
 }
 
-const PhotoUploader: React.FC<PhotoUploaderProps> = ({ 
+const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   eventId = 'wedding-event',
   className = ''
 }) => {
@@ -64,14 +64,14 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
     const loadModels = async () => {
       try {
         console.log('🔄 Loading face-api.js models for photo processing...');
-        
+
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
           faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
           faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
           faceapi.nets.faceExpressionNet.loadFromUri('/models')
         ]);
-        
+
         console.log('✅ Photo processing models loaded successfully');
         setIsModelLoaded(true);
       } catch (error) {
@@ -87,7 +87,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   const extractFaceEmbeddings = useCallback(async (imageElement: HTMLImageElement): Promise<Float32Array[]> => {
     try {
       console.log('🔍 Extracting face embeddings...');
-      
+
       // Detect all faces and extract descriptors
       const detections = await faceapi
         .detectAllFaces(imageElement, new faceapi.TinyFaceDetectorOptions())
@@ -96,7 +96,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
       const embeddings = detections.map(detection => detection.descriptor);
       console.log(`✅ Extracted ${embeddings.length} face embeddings`);
-      
+
       return embeddings;
     } catch (error) {
       console.error('❌ Error extracting face embeddings:', error);
@@ -107,22 +107,22 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   // Process a single photo
   const processPhoto = useCallback(async (file: File, index: number): Promise<void> => {
     const filename = file.name;
-    
+
     try {
       // Update progress to uploading
-      setUploadProgress(prev => prev.map((item, i) => 
+      setUploadProgress(prev => prev.map((item, i) =>
         i === index ? { ...item, status: 'uploading', progress: 0 } : item
       ));
 
       // Update progress to processing
-      setUploadProgress(prev => prev.map((item, i) => 
+      setUploadProgress(prev => prev.map((item, i) =>
         i === index ? { ...item, status: 'processing', progress: 25 } : item
       ));
 
       // Create image element for face detection
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      
+
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
@@ -131,9 +131,9 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
       // Extract face embeddings
       const faceEmbeddings = await extractFaceEmbeddings(img);
-      
+
       // Update progress
-      setUploadProgress(prev => prev.map((item, i) => 
+      setUploadProgress(prev => prev.map((item, i) =>
         i === index ? { ...item, progress: 50 } : item
       ));
 
@@ -144,7 +144,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       formData.append('title', filename);
       formData.append('eventType', 'wedding');
       formData.append('tags', JSON.stringify([]));
-      
+
       // Add face descriptors if any
       if (faceEmbeddings.length > 0) {
         const faceDescriptors = faceEmbeddings.map(embedding => ({
@@ -156,7 +156,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
       // Get authentication token
       const token = localStorage.getItem('accessToken');
-      
+
       const response = await axios.post(`${BACKEND_URL}/api/photos`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -164,13 +164,13 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         }
       });
 
-      const photoData = response.data.photo;
+      const photoData = response.data;
 
       // Update progress to completed
-      setUploadProgress(prev => prev.map((item, i) => 
-        i === index ? { 
-          ...item, 
-          status: 'completed', 
+      setUploadProgress(prev => prev.map((item, i) =>
+        i === index ? {
+          ...item,
+          status: 'completed',
           progress: 100,
           faceCount: faceEmbeddings.length,
           photoId: photoData.id
@@ -181,11 +181,11 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
     } catch (error) {
       console.error(`❌ Error processing ${filename}:`, error);
-      
-      setUploadProgress(prev => prev.map((item, i) => 
-        i === index ? { 
-          ...item, 
-          status: 'error', 
+
+      setUploadProgress(prev => prev.map((item, i) =>
+        i === index ? {
+          ...item,
+          status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error'
         } : item
       ));
@@ -206,12 +206,12 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         errors.push(`${file.name}: Not an image file`);
         return;
       }
-      
+
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
         errors.push(`${file.name}: File too large (max 10MB)`);
         return;
       }
-      
+
       validFiles.push(file);
     });
 
@@ -246,11 +246,11 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       if (!files) return;
 
       const fileArray = Array.from(files);
-      
+
       // Process files sequentially to avoid overwhelming the system
       for (let i = 0; i < fileArray.length; i++) {
         await processPhoto(fileArray[i], i);
-        
+
         // Update total progress
         const completed = uploadProgress.filter(p => p.status === 'completed').length + 1;
         setTotalProgress((completed / fileArray.length) * 100);
@@ -258,11 +258,11 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
       const completedCount = uploadProgress.filter(p => p.status === 'completed').length;
       const errorCount = uploadProgress.filter(p => p.status === 'error').length;
-      
+
       if (completedCount > 0) {
         setSuccess(`Successfully processed ${completedCount} photos! ${errorCount > 0 ? `${errorCount} failed.` : ''}`);
       }
-      
+
       if (errorCount > 0 && completedCount === 0) {
         setError('All photos failed to process. Please check the errors and try again.');
       }
@@ -281,7 +281,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
     setTotalProgress(0);
     setError('');
     setSuccess('');
-    
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -299,7 +299,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             Upload wedding photos to enable face search for guests
           </p>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           {/* Model Status */}
           <div className="flex items-center gap-2">
@@ -350,7 +350,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                     </div>
                   )}
                 </Button>
-                
+
                 <Button
                   onClick={clearUploads}
                   variant="outline"
@@ -384,17 +384,17 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                       {item.status === 'uploading' && <Upload className="w-5 h-5 text-blue-500" />}
                       {item.status === 'pending' && <ImageIcon className="w-5 h-5 text-gray-400" />}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium truncate">{item.filename}</span>
                         <span className="text-sm text-gray-600">{Math.round(item.progress)}%</span>
                       </div>
-                      
+
                       <div className="mt-1">
                         <Progress value={item.progress} className="w-full h-2" />
                       </div>
-                      
+
                       {item.faceCount !== undefined && (
                         <div className="flex items-center gap-1 mt-1">
                           <Users className="w-3 h-3 text-green-500" />
@@ -403,7 +403,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                           </span>
                         </div>
                       )}
-                      
+
                       {item.error && (
                         <p className="text-xs text-red-600 mt-1">{item.error}</p>
                       )}

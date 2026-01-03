@@ -54,7 +54,7 @@ const PhotographerDashboard = () => {
     const loadAllPhotos = async () => {
       try {
         console.log('Loading all photos from API...');
-        
+
         const [sisterAResponse, sisterBResponse] = await Promise.all([
           fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
           fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
@@ -65,10 +65,13 @@ const PhotographerDashboard = () => {
           return;
         }
 
-        const [sisterAPhotosRaw, sisterBPhotosRaw] = await Promise.all([
+        const [sisterAData, sisterBData] = await Promise.all([
           sisterAResponse.json(),
           sisterBResponse.json()
         ]);
+
+        const sisterAPhotosRaw = Array.isArray(sisterAData) ? sisterAData : (sisterAData.photos || []);
+        const sisterBPhotosRaw = Array.isArray(sisterBData) ? sisterBData : (sisterBData.photos || []);
 
         const allPhotosRaw = [...sisterAPhotosRaw, ...sisterBPhotosRaw];
 
@@ -181,7 +184,7 @@ const PhotographerDashboard = () => {
         console.error('Error fetching uploaded photo:', error);
       });
   };
-  
+
   // Helper function to format file size
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -212,7 +215,7 @@ const PhotographerDashboard = () => {
 
       // Remove from uploadedPhotos state
       setUploadedPhotos(prev => prev.filter(p => p.id !== photoId));
-      
+
       // Remove from recentUploads state
       setRecentUploads(prev => prev.filter(u => u.id !== photoId));
 
@@ -360,38 +363,38 @@ const PhotographerDashboard = () => {
                 Upload your wedding photos with proper metadata and tags.
                 Guests will be able to find their photos easily using our face detection system.
               </p>
-                <div className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="wedding-select">Select Wedding</Label>
-                    <Select value={selectedWeddingId} onValueChange={setSelectedWeddingId}>
-                      <SelectTrigger id="wedding-select">
-                        <SelectValue placeholder="Select a wedding" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {photographerWeddingOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {selectedWeddingId ? (
-                    <PhotoUploadSimple weddingId={selectedWeddingId} onUploadSuccess={handlePhotoUploadSuccess} />
-                  ) : (
-                    <p className="text-gray-500 text-center mt-4">Please select a wedding to upload photos.</p>
-                  )}
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="wedding-select">Select Wedding</Label>
+                  <Select value={selectedWeddingId} onValueChange={setSelectedWeddingId}>
+                    <SelectTrigger id="wedding-select">
+                      <SelectValue placeholder="Select a wedding" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {photographerWeddingOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+                {selectedWeddingId ? (
+                  <PhotoUploadSimple weddingId={selectedWeddingId} onUploadSuccess={handlePhotoUploadSuccess} />
+                ) : (
+                  <p className="text-gray-500 text-center mt-4">Please select a wedding to upload photos.</p>
+                )}
               </div>
-            </TabsContent>
+            </div>
+          </TabsContent>
 
-            <TabsContent value="recent" className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Recent Uploads</h2>
-                <p className="text-gray-600 mb-6">
-                  View and manage your recently uploaded photos.
-                </p>
-              
+          <TabsContent value="recent" className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold mb-4">Recent Uploads</h2>
+              <p className="text-gray-600 mb-6">
+                View and manage your recently uploaded photos.
+              </p>
+
               <div className="space-y-4">
                 {recentUploads.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
@@ -401,15 +404,15 @@ const PhotographerDashboard = () => {
                   recentUploads.map((upload) => {
                     // Find the full photo object for this upload
                     const fullPhoto = uploadedPhotos.find(p => p.id === upload.id);
-                    
+
                     return (
                       <Card key={upload.id} className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             {fullPhoto && fullPhoto.thumbnail ? (
                               <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
-                                <img 
-                                  src={fullPhoto.thumbnail} 
+                                <img
+                                  src={fullPhoto.thumbnail}
                                   alt={upload.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -430,8 +433,8 @@ const PhotographerDashboard = () => {
                           <div className="flex items-center gap-3">
                             <Badge variant="outline">{upload.event}</Badge>
                             <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="outline"
                                 onClick={() => {
                                   if (fullPhoto?.url) {
@@ -442,8 +445,8 @@ const PhotographerDashboard = () => {
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="outline"
                                 onClick={() => {
                                   if (fullPhoto?.url) {
@@ -459,8 +462,8 @@ const PhotographerDashboard = () => {
                               >
                                 <Download className="w-4 h-4" />
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 variant="destructive"
                                 onClick={() => handleDeletePhoto(upload.id)}
                                 title="Delete photo"

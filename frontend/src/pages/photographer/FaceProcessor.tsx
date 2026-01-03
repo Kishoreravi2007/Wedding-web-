@@ -40,13 +40,13 @@ const FaceProcessor = () => {
     try {
       setLoadingModels(true);
       console.log('Loading face-api models...');
-      
+
       await Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/models')
       ]);
-      
+
       setModelsLoaded(true);
       console.log('✅ Face-api models loaded');
     } catch (error) {
@@ -64,11 +64,15 @@ const FaceProcessor = () => {
         fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
         fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
       ]);
-      
-      const sisterAPhotos = await sisterARes.json();
-      const sisterBPhotos = await sisterBRes.json();
+
+      const sisterAData = await sisterARes.json();
+      const sisterBData = await sisterBRes.json();
+
+      const sisterAPhotos = Array.isArray(sisterAData) ? sisterAData : (sisterAData.photos || []);
+      const sisterBPhotos = Array.isArray(sisterBData) ? sisterBData : (sisterBData.photos || []);
+
       const allPhotos = [...sisterAPhotos, ...sisterBPhotos];
-      
+
       setPhotos(allPhotos);
       console.log(`Loaded ${allPhotos.length} photos for processing`);
     } catch (error) {
@@ -202,10 +206,10 @@ const FaceProcessor = () => {
       // Check if auto-processing is needed
       const response = await fetch(`${API_BASE_URL}/api/auto-face-detection/status`);
       const data = await response.json();
-      
+
       if (data.needsProcessing && data.unprocessedCount > 0) {
         console.log(`🤖 Auto-processing ${data.unprocessedCount} unprocessed photos...`);
-        
+
         // Wait for models to load before auto-processing
         const checkModels = setInterval(() => {
           if (modelsLoaded && !isProcessing) {

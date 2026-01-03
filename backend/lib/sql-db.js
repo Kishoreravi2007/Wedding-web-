@@ -435,9 +435,67 @@ const PhotoFaceDB = {
   }
 };
 
+/**
+ * Wishes operations
+ */
+const WishesDB = {
+  async create(wishData) {
+    const keys = Object.keys(wishData);
+    const columns = keys.join(', ');
+    const values = keys.map((_, i) => `$${i + 1}`).join(', ');
+
+    const text = `
+      INSERT INTO wishes (${columns})
+      VALUES (${values})
+      RETURNING *
+    `;
+
+    const { rows } = await query(text, Object.values(wishData));
+    return rows[0];
+  },
+
+  async findAll(filters = {}) {
+    let text = 'SELECT * FROM wishes';
+    const params = [];
+    const conditions = [];
+
+    if (filters.recipient && filters.recipient !== 'both') {
+      conditions.push(`(recipient = $${params.length + 1} OR recipient = 'both')`);
+      params.push(filters.recipient);
+    } else if (filters.recipient === 'both') {
+      conditions.push(`recipient = 'both'`);
+    }
+
+    if (conditions.length > 0) {
+      text += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    text += ' ORDER BY timestamp DESC';
+
+    if (filters.limit) {
+      text += ` LIMIT $${params.length + 1}`;
+      params.push(filters.limit);
+    }
+
+    const { rows } = await query(text, params);
+    return rows;
+  },
+
+  async findById(id) {
+    const { rows } = await query('SELECT * FROM wishes WHERE id = $1', [id]);
+    return rows[0];
+  },
+
+  async delete(id) {
+    await query('DELETE FROM wishes WHERE id = $1', [id]);
+    return true;
+  }
+};
+
 module.exports = {
   PhotoDB,
   PeopleDB,
   FaceDescriptorDB,
-  PhotoFaceDB
+  PhotoFaceDB,
+  WishesDB
 };

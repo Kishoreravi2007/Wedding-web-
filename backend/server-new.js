@@ -2,8 +2,8 @@
  * Wedding Web Application Server
  * 
  * Backend server with:
- * - Supabase for photo storage and face recognition
- * - Firebase for wishes management
+ * - Cloud SQL (PostgreSQL) for photos, faces, profiles, and wishes
+ * - Google Cloud Storage for photo files
  */
 
 require('dotenv').config({ path: __dirname + '/.env' });
@@ -91,8 +91,7 @@ app.get('/', (req, res) => {
     status: 'running',
     version: '2.0.0',
     services: {
-      firebase: admin.apps.length > 0 ? '✓' : '✗',
-      gcp_sql: '✓ (photos, faces)',
+      gcp_sql: '✓ (photos, faces, wishes)',
     },
     timestamp: new Date().toISOString()
   });
@@ -106,20 +105,21 @@ app.get('/health', async (req, res) => {
     services: {}
   };
 
-  // Check Firebase
-  try {
-    await admin.firestore().collection('wishes').limit(1).get();
-    health.services.firebase = { status: 'connected', purpose: 'wishes' };
-  } catch (error) {
-    health.services.firebase = { status: 'error', error: error.message };
-    health.status = 'degraded';
+  // Check Firebase (Optional now)
+  if (admin.apps.length > 0) {
+    try {
+      await admin.firestore().collection('wishes').limit(1).get();
+      health.services.firebase = { status: 'connected' };
+    } catch (error) {
+      health.services.firebase = { status: 'error', error: error.message };
+    }
   }
 
   // Check Database (Cloud SQL)
   try {
     const { query } = require('./lib/db-gcp');
     await query('SELECT 1');
-    health.services.database = { status: 'connected', purpose: 'photos, faces, profiles, auth' };
+    health.services.database = { status: 'connected', purpose: 'photos, faces, profiles, auth, wishes' };
   } catch (error) {
     health.services.database = { status: 'error', error: error.message };
     health.status = 'degraded';

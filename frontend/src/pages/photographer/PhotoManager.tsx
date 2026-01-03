@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Image as ImageIcon, 
-  Eye, 
-  Download, 
-  Trash2, 
+import {
+  Image as ImageIcon,
+  Eye,
+  Download,
+  Trash2,
   Search,
   RefreshCw,
   ZoomIn,
@@ -44,20 +44,21 @@ const PhotoManager: React.FC = () => {
   const loadPhotos = async () => {
     try {
       setLoading(true);
-      
+
       const [sisterAResponse, sisterBResponse] = await Promise.all([
         fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
         fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
       ]);
 
       if (sisterAResponse.ok) {
-        const photosA = await sisterAResponse.json();
+        const dataA = await sisterAResponse.json();
+        const photosA = Array.isArray(dataA) ? dataA : (dataA.photos || []);
         setSisterAPhotos(photosA.map((p: any) => ({
           id: p.id,
           filename: p.title || p.filename || 'Photo',
           url: p.public_url || p.publicUrl || p.url,
           thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
-          size: p.size,
+          size: parseInt(p.size) || 0,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
           sister: 'sister-a',
           tags: p.tags || []
@@ -65,13 +66,14 @@ const PhotoManager: React.FC = () => {
       }
 
       if (sisterBResponse.ok) {
-        const photosB = await sisterBResponse.json();
+        const dataB = await sisterBResponse.json();
+        const photosB = Array.isArray(dataB) ? dataB : (dataB.photos || []);
         setSisterBPhotos(photosB.map((p: any) => ({
           id: p.id,
           filename: p.title || p.filename || 'Photo',
           url: p.public_url || p.publicUrl || p.url,
           thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
-          size: p.size,
+          size: parseInt(p.size) || 0,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
           sister: 'sister-b',
           tags: p.tags || []
@@ -247,7 +249,7 @@ const PhotoManager: React.FC = () => {
             <p className="text-xs text-gray-500">{formatFileSize(photo.size)}</p>
             <p className="text-xs text-gray-400">{formatDate(photo.uploadedAt)}</p>
           </div>
-          
+
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -268,7 +270,7 @@ const PhotoManager: React.FC = () => {
               Download
             </Button>
           </div>
-          
+
           <Button
             size="sm"
             variant="destructive"
