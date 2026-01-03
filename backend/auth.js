@@ -38,8 +38,13 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({
       message: 'User registered successfully',
-      user: newUser,
-      token
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        role: newUser.role
+      },
+      token,
+      accessToken: token
     });
 
   } catch (error) {
@@ -72,8 +77,14 @@ router.post('/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
-      user,
-      token
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        is_active: user.is_active
+      },
+      token,
+      accessToken: token
     });
 
   } catch (error) {

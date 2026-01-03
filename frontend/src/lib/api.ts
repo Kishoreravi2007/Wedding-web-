@@ -6,7 +6,7 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL !== undefined) {
     return import.meta.env.VITE_API_BASE_URL;
   }
-  
+
   // For browser environment, use the current hostname
   if (typeof window !== 'undefined') {
     const protocol = window.location.protocol;
@@ -14,7 +14,7 @@ const getApiBaseUrl = () => {
     // Backend runs on port 5001
     return `${protocol}//${hostname}:5001`;
   }
-  
+
   // Fallback for SSR
   return 'http://localhost:5001';
 };
@@ -23,7 +23,10 @@ export const API_BASE_URL = getApiBaseUrl();
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+  const token = localStorage.getItem('token') ||
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('auth_token') ||
+    localStorage.getItem('admin_token');
   return {
     'Authorization': token ? `Bearer ${token}` : '',
   };

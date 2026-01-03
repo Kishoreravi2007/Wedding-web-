@@ -28,8 +28,10 @@ const PhotographerLogin = () => {
         password: credentials.password,
       });
 
-      if (response.data.accessToken) {
-        localStorage.setItem('token', response.data.accessToken);
+      const token = response.data.accessToken || response.data.token;
+
+      if (token) {
+        localStorage.setItem('token', token);
         localStorage.setItem('role', response.data.user?.role || 'photographer');
         showSuccess('Login successful! Welcome to the Photographer Portal.');
         navigate('/photographer');
@@ -72,7 +74,7 @@ const PhotographerLogin = () => {
             <CardTitle className="text-3xl font-bold text-gray-900">Photographer Portal</CardTitle>
             <p className="text-gray-600 mt-2">Sign in to upload and manage your stunning wedding photos.</p>
           </CardHeader>
-          
+
           <CardContent className="pt-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">

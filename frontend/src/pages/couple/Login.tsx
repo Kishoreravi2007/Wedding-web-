@@ -21,16 +21,28 @@ const CoupleLogin = () => {
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const { API_BASE_URL } = await import('@/lib/api');
+      const axios = (await import('axios')).default;
 
-      if (credentials.username === 'phsv' && credentials.password === '123qwerty') {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+        username: credentials.username,
+        password: credentials.password,
+      });
+
+      const token = response.data.accessToken || response.data.token;
+
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', response.data.user?.role || 'couple');
         showSuccess('Welcome to your special portal! 💕');
         navigate('/couple');
       } else {
-        throw new Error('Invalid credentials. Please try again.');
+        throw new Error('Authentication failed. No token received.');
       }
     } catch (error: any) {
-      showError(error.message || 'An unexpected error occurred. Please try again.');
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred. Please try again.';
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +75,7 @@ const CoupleLogin = () => {
             <CardTitle className="text-3xl font-bold text-rose-900">Couple's Portal</CardTitle>
             <p className="text-rose-700 mt-2">Your personal space for wishes, memories, and more.</p>
           </CardHeader>
-          
+
           <CardContent className="pt-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">

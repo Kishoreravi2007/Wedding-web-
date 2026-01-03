@@ -426,3 +426,11 @@ INFO:deepface_api:Processing image: detection.jpg, size: (1280, 1706, 3), scale:
 INFO:deepface_api:Using detector backend: yolov8, conf=0.5, imgsz=1280
 WARNING:deepface_api:YOLOv8-face model not available, falling back to retinaface (most accurate)
 INFO:     127.0.0.1:56501 - "POST /api/faces/detect HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'deepface_api.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [58918]
+INFO:     Started server process [85005]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
