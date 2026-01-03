@@ -55,6 +55,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   // State management
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [isWaitingForFirstFace, setIsWaitingForFirstFace] = useState(false); // Loading state for first face detection
   const [isWebcamActive, setIsWebcamActive] = useState(false);
   const [detectionResults, setDetectionResults] = useState<any[]>([]);
   const [detectionAttempts, setDetectionAttempts] = useState(0);
@@ -324,6 +325,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       video.srcObject = stream;
       await video.play();
       setIsWebcamActive(true);
+      setIsWaitingForFirstFace(true); // Show loading state until first face is detected
       setUserGuidance('Camera started! Position your face in the center of the frame.');
 
       // Use a ref to track if detection should continue
@@ -409,6 +411,9 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           if (displayDetections.length > 0) {
             const faceLabel = displayDetections.length === 1 ? 'face' : 'faces';
             const lockableDetections = displayDetections.filter(det => getDetectionScore(det) >= MIN_LOCK_CONFIDENCE);
+
+            // Clear loading state on first face detection
+            setIsWaitingForFirstFace(false);
 
             setDetectionResults(displayDetections);
             setDetectionStatus('success');
@@ -512,6 +517,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
     }
 
     setIsWebcamActive(false);
+    setIsWaitingForFirstFace(false); // Reset loading state
     setDetectionResults([]);
     setDetectionStatus('idle');
     setUserGuidance('Camera stopped. Click "Start Camera" to begin again.');
@@ -936,6 +942,28 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 <div className="text-center">
                   <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>Click "Start Camera" to begin</p>
+                </div>
+              </div>
+            )}
+
+            {/* Loading Overlay - Shows while waiting for first face detection */}
+            {isWaitingForFirstFace && (
+              <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10 backdrop-blur-sm">
+                <div className="text-center space-y-4 p-8">
+                  <div className="w-24 h-24 mx-auto bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
+                    <div className="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      Looking for your face...
+                    </h3>
+                    <p className="text-lg text-gray-200 mb-4">
+                      Position your face in the center of the frame
+                    </p>
+                    <p className="text-sm text-gray-300">
+                      💡 <strong>Tip:</strong> Make sure you have good lighting and face the camera directly
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

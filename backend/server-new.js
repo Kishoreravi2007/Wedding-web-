@@ -33,32 +33,10 @@ if (serviceAccountPath) {
 }
 
 // =============================================================================
-// SUPABASE INITIALIZATION (REMOVED - Migrated to Cloud SQL & GCS)
+// CLOUD SQL & GCS (Migrated from Supabase)
 // =============================================================================
-// const supabaseUrl = process.env.SUPABASE_URL;
-// const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-// const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-// if (!supabaseUrl || !supabaseAnonKey) {
-//   console.error('❌ Error: SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env file');
-//   console.error('   Photos and face recognition will not work without Supabase configuration');
-//   process.exit(1);
-// }
-
-// // Create Supabase client with anon key for general operations
-// const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// // Create admin client with service role key for admin operations
-// const supabaseAdmin = supabaseServiceKey 
-//   ? createClient(supabaseUrl, supabaseServiceKey)
-//   : null;
-
-// console.log('✅ Supabase initialized successfully');
-// console.log(`   URL: ${supabaseUrl}`);
-
-// // Export supabase clients for use in other modules
-// module.exports.supabase = null; // supabase;
-// module.exports.supabaseAdmin = null; // supabaseAdmin;
+// Database connection is handled in lib/db-gcp.js
+// Photos are stored in Google Cloud Storage via lib/gcs-storage.js
 
 // =============================================================================
 // EXPRESS APP SETUP
