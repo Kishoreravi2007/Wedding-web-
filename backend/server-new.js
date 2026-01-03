@@ -148,6 +148,10 @@ app.use('/api/faces', facesRouter); // Auth handled per-route inside facesRouter
 const profilesRouter = require('./routes/profiles');
 app.use('/api/profiles', profilesRouter);
 
+// Admin setup routes (one-time user creation)
+const adminSetupRouter = require('./routes/admin-setup');
+app.use('/api/admin', adminSetupRouter);
+
 // =============================================================================
 // ERROR HANDLING
 // =============================================================================
