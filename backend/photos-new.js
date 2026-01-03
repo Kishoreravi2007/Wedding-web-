@@ -14,6 +14,7 @@ const multer = require('multer');
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
 const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Use GCS implementation
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
+const { authenticateToken } = require('./auth');
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -147,7 +148,7 @@ router.get('/:id', async (req, res) => {
  * POST /api/photos
  * Upload a new photo with optional face data
  */
-router.post('/', upload.single('photo'), async (req, res) => {
+router.post('/', authenticateToken, upload.single('photo'), async (req, res) => {
   // Validate file upload
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded' });
@@ -322,7 +323,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
  * DELETE /api/photos/:id
  * Delete a photo from storage and database
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -366,7 +367,7 @@ router.delete('/:id', async (req, res) => {
  * PATCH /api/photos/:id
  * Update photo metadata
  */
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { title, description, eventType, tags } = req.body;
 

@@ -138,7 +138,7 @@ app.use('/api/auth', authRouter);
 
 // Photos routes (Supabase) - Use new version
 const photosRouter = require('./photos-new');
-app.use('/api/photos', authenticateToken, photosRouter);
+app.use('/api/photos', photosRouter);
 
 // Face recognition routes (Cloud SQL)
 const facesRouter = require('./faces');
