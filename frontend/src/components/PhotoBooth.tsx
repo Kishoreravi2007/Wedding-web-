@@ -718,12 +718,14 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
       if (normalizedMatches.length > 0) {
         console.log('📸 Found photos:', normalizedMatches);
         setSearchResults(normalizedMatches);
+        setSearchError(null); // CRITICAL: Clear any previous errors when we have results
         setShowFaceSearch(true);
         setUserGuidance(`Found ${normalizedMatches.length} matching photos!`);
       } else {
         console.log('❌ No photos found in response');
         setSearchResults([]);
-        setSearchError(data.message || 'No matching photos found for this face in the selected wedding.');
+        // Only set error if we truly have no results
+        setSearchError('No matching photos found for this face in the selected wedding.');
         setShowFaceSearch(true); // Show modal even with no results
         setUserGuidance('No matching photos found.');
       }
