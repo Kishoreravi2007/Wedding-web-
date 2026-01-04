@@ -513,22 +513,62 @@ async function getStatistics() {
 /**
  * Find similar faces across all photos
  * Useful for finding all photos containing the same person
+ * Now supports anonymous face searches (selfies) by returning photos directly from matched descriptors
  */
 async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6, sister = null) {
   try {
-    const matchResult = await matchFace(descriptor, threshold);
+    console.log(`🔍 findSimilarFaces: limit=${limit}, threshold=${threshold}, sister=${sister}`);
 
-    if (!matchResult.bestMatch) {
+    // Match face with optional wedding filter
+    const matchResult = await matchFace(descriptor, threshold, sister);
+
+    if (!matchResult.matches || matchResult.matches.length === 0) {
+      console.log('❌ No matches found in findSimilarFaces');
       return [];
     }
 
-    // Get all photo faces for the matched person
-    const { PhotoFaceDB } = require('./sql-db');
-    const photoFaces = await PhotoFaceDB.findByPersonId(matchResult.bestMatch.personId, sister);
+    console.log(`✅ Found ${matchResult.matches.length} face matches`);
 
-    return photoFaces.slice(0, limit);
+    // Get unique photos from matched faces
+    const { PhotoDB } = require('./sql-db');
+    const photoMap = new Map();
+
+    // Collect all unique photo IDs from matches
+    for (const match of matchResult.matches) {
+      if (match.photoId && !photoMap.has(match.photoId)) {
+        try {
+          const photo = await PhotoDB.findById(match.photoId);
+          if (photo) {
+            // Add match metadata to photo object
+            photoMap.set(match.photoId, {
+              ...photo,
+              similarity: match.confidence,
+              distance: match.distance,
+              photo_id: match.photoId
+            });
+            console.log(`   ✓ Added photo ${match.photoId.substring(0, 8)}... (confidence: ${(match.confidence * 100).toFixed(1)}%)`);
+          } else {
+            console.warn(`   ⚠️  Photo ${match.photoId} not found in database`);
+          }
+        } catch (err) {
+          console.error(`   ❌ Error fetching photo ${match.photoId}:`, err.message);
+        }
+      }
+    }
+
+    // Convert to array and sort by similarity (highest first)
+    const photos = Array.from(photoMap.values())
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, limit);
+
+    console.log(`✅ Returning ${photos.length} matched photos (sorted by similarity)`);
+    if (photos.length > 0) {
+      console.log(`   Top match: ${photos[0].filename} (${(photos[0].similarity * 100).toFixed(1)}% confidence)`);
+    }
+
+    return photos;
   } catch (error) {
-    console.error('Error finding similar faces:', error);
+    console.error('❌ Error in findSimilarFaces:', error);
     throw error;
   }
 }
