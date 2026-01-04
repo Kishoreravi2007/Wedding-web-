@@ -134,6 +134,9 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
         sister: eventId
       });
 
+      console.log('Backend response:', response.data);
+
+      // The backend now returns photos directly, not face descriptors
       const { faces } = response.data;
 
       if (!faces || faces.length === 0) {
@@ -144,34 +147,16 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       console.log(`✅ Found ${faces.length} matching photos from backend`);
 
-      // Get photos for the matched faces
-      const photoIds = [...new Set(faces.map((face: any) => face.photo_id))];
-
-      // Fetch photo details
-      const photoPromises = photoIds.map(async (photoId: string) => {
-        try {
-          const photoResponse = await axios.get(`${BACKEND_URL}/api/photos/${photoId}`);
-          return photoResponse.data;
-        } catch (error) {
-          console.error(`Error fetching photo ${photoId}:`, error);
-          return null;
-        }
-      });
-
-      const photos = (await Promise.all(photoPromises)).filter(p => p !== null);
-
+      // Backend now returns full photo objects with similarity scores
       // Map to FaceMatch format
-      const matches: FaceMatch[] = photos.map((photo: any) => {
-        // Find the face match for this photo
-        const face = faces.find((f: any) => f.photo_id === photo.id);
-
+      const matches: FaceMatch[] = faces.map((photo: any) => {
         return {
           id: photo.id,
           photoUrl: photo.public_url,
-          confidence: face?.similarity || 0.7,
+          confidence: photo.similarity || 0.7,
           metadata: {
             filename: photo.filename,
-            uploadedAt: photo.created_at || photo.uploaded_at,
+            uploadedAt: photo.uploaded_at || photo.created_at,
             eventId: photo.sister
           }
         };
