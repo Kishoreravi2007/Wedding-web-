@@ -15,8 +15,8 @@ const getApiBaseUrl = () => {
     }
   }
 
-  // 3. Fallback to production backend URL for weddingweb.co.in
-  return 'https://wedding-backend-979970479540.asia-south1.run.app';
+  // 3. Fallback to localhost for development
+  return 'http://localhost:5001';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
@@ -53,3 +53,4 @@ export const apiCall = async (endpoint: string, options: RequestInit = {}) => {
 
   return response.json();
 };
+

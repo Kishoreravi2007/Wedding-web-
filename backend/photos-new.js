@@ -12,7 +12,7 @@ const router = express.Router();
 const multer = require('multer');
 // const { supabase } = require('./server'); // Removed Supabase usage
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
-const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Use GCS implementation
+const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Switched back to GCS
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
 const { authenticateToken } = require('./auth');
 
@@ -149,6 +149,7 @@ router.get('/:id', async (req, res) => {
  * Upload a new photo with optional face data
  */
 router.post('/', authenticateToken, upload.single('photo'), async (req, res) => {
+  console.log('📸 POST /api/photos: Received upload request');
   // Validate file upload
   if (!req.file) {
     return res.status(400).json({ message: 'No photo file uploaded' });
@@ -229,7 +230,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
       description: description || '',
       event_type: eventType || '',
       tags: parsedTags,
-      storage_provider: 'gcs', // Changed from supabase
+      storage_provider: 'gcs', // Switched back to gcs
       photographer_id: req.user?.id || null // From authentication middleware
     };
 

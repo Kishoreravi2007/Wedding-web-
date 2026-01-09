@@ -179,8 +179,14 @@ router.post('/recognize', async (req, res) => {
       wedding_name
     );
 
+    // Debug: Log first photo object structure to help troubleshoot URL extraction
+    if (similarFaces.length > 0) {
+      console.log('📸 First photo object structure:', JSON.stringify(similarFaces[0], null, 2));
+      console.log('📸 Available photo fields:', Object.keys(similarFaces[0]));
+    }
+
     res.json({
-      matches: similarFaces.map(f => f.photo),
+      matches: similarFaces,  // Return full photo objects with public_url
       total: similarFaces.length,
       message: similarFaces.length > 0 ? 'Success' : 'No matching photos found'
     });
