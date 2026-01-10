@@ -874,14 +874,14 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
         <CardContent className="space-y-6">
 
 
-
           {/* Face Detection Status - Prominent Visual Indicator */}
-          {isWebcamActive && (
-            <div className={`p-6 rounded-lg border-3 transition-all duration-300 ${detectionResults.length > 0
+          {/* Hide this when isWaitingForFirstFace is true since the overlay already shows loading */}
+          {isWebcamActive && !isWaitingForFirstFace && (
+            <div className={`p-3 sm:p-6 rounded-lg border-2 sm:border-3 transition-all duration-300 ${detectionResults.length > 0
               ? 'bg-green-50 border-green-500 shadow-lg shadow-green-200'
               : 'bg-amber-50 border-amber-400'
               }`}>
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-2 sm:gap-4">
                 {detectionResults.length > 0 ? (
                   <>
                     <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
@@ -951,19 +951,19 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
             {/* Loading Overlay - Shows while waiting for first face detection */}
             {isWaitingForFirstFace && (
               <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-10 backdrop-blur-sm">
-                <div className="text-center space-y-4 p-8">
-                  <div className="w-24 h-24 mx-auto bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
-                    <div className="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="text-center space-y-2 sm:space-y-4 p-4 sm:p-8">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
+                    <div className="w-12 h-12 sm:w-20 sm:h-20 border-3 sm:border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">
+                    <h3 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       Looking for your face...
                     </h3>
-                    <p className="text-lg text-gray-200 mb-4">
-                      Position your face in the center of the frame
+                    <p className="text-sm sm:text-lg text-gray-200 mb-2 sm:mb-4">
+                      Position your face in the center
                     </p>
-                    <p className="text-sm text-gray-300">
-                      💡 <strong>Tip:</strong> Make sure you have good lighting and face the camera directly
+                    <p className="text-xs sm:text-sm text-gray-300">
+                      💡 Good lighting helps detection
                     </p>
                   </div>
                 </div>
