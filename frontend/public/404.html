@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <script>
+        // SPA redirect - store original path and redirect to root without showing index.html
+        var path = window.location.pathname;
+        if (path && path !== '/' && path !== '/index.html') {
+            sessionStorage.setItem('redirect', path + window.location.search + window.location.hash);
+        }
+        // Redirect to root - browser will load index.html without showing it in URL
+        window.location.replace(window.location.origin);
+    </script>
+</head>
+
+<body>
+    <p>Loading...</p>
+</body>
+
+</html>
