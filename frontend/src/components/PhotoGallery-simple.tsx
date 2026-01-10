@@ -292,45 +292,43 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
       // Add to downloading set
       setDownloadingPhotos(prev => new Set(prev).add(photo.id));
 
-      // Create a temporary anchor element for download
-      const link = document.createElement('a');
-      link.href = photo.url;
-      link.download = `${photo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.jpg`;
+      const filename = `${photo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.jpg`;
 
-      // For uploaded photos, we need to handle the URL differently
-      if (photo.isUploaded) {
-        // If it's an uploaded photo, try to fetch it first
-        try {
-          const response = await fetch(photo.url);
-          if (response.ok) {
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
+      // Always use blob fetch for reliable cross-origin downloads
+      try {
+        // Fetch the image as a blob (works for cross-origin resources with proper CORS)
+        const response = await fetch(photo.url, {
+          mode: 'cors',
+          credentials: 'omit'
+        });
 
-            link.href = blobUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Clean up the blob URL
-            URL.revokeObjectURL(blobUrl);
-          } else {
-            // If fetch fails, try direct download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }
-        } catch (error) {
-          console.warn('Failed to fetch uploaded photo, trying direct download:', error);
-          // Fallback to direct download
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
         }
-      } else {
-        // For mock photos or external URLs, use direct download
+
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Clean up the blob URL
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+        console.log(`✅ Downloaded: ${photo.title}`);
+      } catch (fetchError) {
+        console.warn('Blob fetch failed, trying window.open fallback:', fetchError);
+
+        // Fallback: Open in new tab for manual save
+        // This works even when CORS blocks the fetch
+        window.open(photo.url, '_blank');
+
+        console.log(`📥 Opened in new tab for manual download: ${photo.title}`);
       }
 
       // Update download count (in a real app, this would be sent to backend)
@@ -349,9 +347,6 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         newSet.delete(photo.id);
         return newSet;
       });
-
-      // Show success feedback
-      console.log(`Downloaded: ${photo.title}`);
 
       // Remove the downloaded indicator after 3 seconds
       setTimeout(() => {
@@ -372,8 +367,8 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         return newSet;
       });
 
-      // In a real app, you might want to show a toast notification here
-      alert('Failed to download photo. Please try again.');
+      // Show error message
+      alert('Failed to download photo. Please try right-clicking and "Save image as..."');
     }
   };
 
