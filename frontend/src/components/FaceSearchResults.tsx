@@ -8,10 +8,10 @@
 import React, { useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { 
-  X, 
-  Download, 
-  Eye, 
+import {
+  X,
+  Download,
+  Eye,
   Image as ImageIcon,
   AlertCircle,
   CheckCircle
@@ -26,9 +26,9 @@ interface FaceSearchResultsProps {
   searchError: string | null;
 }
 
-const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({ 
-  capturedFaceImage, 
-  searchResults, 
+const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
+  capturedFaceImage,
+  searchResults,
   onClose,
   weddingName,
   searchError
@@ -70,7 +70,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
           <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between z-10">
               <div>
-                <h3 className="text-lg font-semibold">Your Photos from {weddingTitle}</h3>
+                <h3 className="text-base sm:text-lg font-semibold">Your Photos from {weddingTitle}</h3>
                 <p className="text-sm text-gray-600">
                   {searchResults.length > 0 ? `Found ${searchResults.length} matching photo(s)` : ''}
                 </p>
@@ -80,15 +80,15 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
               </Button>
             </div>
 
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               {/* Captured Face Image */}
               {capturedFaceImage && (
                 <div className="mb-6 text-center">
                   <h4 className="text-md font-semibold mb-2">Your Captured Face:</h4>
-                  <img 
-                    src={capturedFaceImage} 
-                    alt="Captured Face" 
-                    className="mx-auto w-32 h-32 object-cover rounded-full border-2 border-blue-500" 
+                  <img
+                    src={capturedFaceImage}
+                    alt="Captured Face"
+                    className="mx-auto w-32 h-32 object-cover rounded-full border-2 border-blue-500"
                   />
                 </div>
               )}
@@ -137,7 +137,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                     {searchResults.map((photoUrl, index) => (
                       <motion.div
                         key={photoUrl}
@@ -150,7 +150,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                             <img
                               src={photoUrl}
                               alt={`Match ${index + 1}`}
-                              className="w-full h-48 object-cover"
+                              className="w-full h-32 sm:h-48 object-cover"
                               onLoad={() => {
                                 console.log('✅ Image loaded successfully:', photoUrl);
                               }}
@@ -162,7 +162,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                               }}
                             />
                           </div>
-                          
+
                           <CardContent className="p-4">
                             <div className="flex gap-2 pt-2">
                               <Button
@@ -174,7 +174,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                                 <Download className="w-4 h-4 mr-1" />
                                 Download
                               </Button>
-                              
+
                               <Button
                                 onClick={() => window.open(photoUrl, '_blank')}
                                 variant="outline"

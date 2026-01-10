@@ -831,7 +831,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
   }, []);
 
   return (
-    <div className={`w-full max-w-4xl mx-auto p-6 ${className}`}>
+    <div className={`w-full max-w-4xl mx-auto p-3 sm:p-6 ${className}`}>
       {/* Model Loading Screen */}
       {!isModelLoaded && (
         <Card className="mb-6">
@@ -972,7 +972,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
           </div>
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {!isWebcamActive ? (
               <Button
                 onClick={startWebcam}
@@ -987,7 +987,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 <Button
                   onClick={captureFaceForSearch}
                   disabled={!isModelLoaded}
-                  className={`${buttonClass} text-lg py-6 px-8`}
+                  className={`${buttonClass} text-base sm:text-lg py-3 px-4 sm:py-6 sm:px-8`}
                 >
                   <Search className="w-5 h-5 mr-2" />
                   Find My Photos
@@ -996,7 +996,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 <Button
                   onClick={resetDetection}
                   variant="outline"
-                  className="py-6"
+                  className="py-3 sm:py-6 text-sm sm:text-base"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retry Detection
@@ -1005,7 +1005,7 @@ const PhotoBooth: React.FC<PhotoBoothProps> = ({
                 <Button
                   onClick={stopWebcam}
                   variant="destructive"
-                  className="py-6"
+                  className="py-3 sm:py-6 text-sm sm:text-base"
                 >
                   Stop Camera
                 </Button>
