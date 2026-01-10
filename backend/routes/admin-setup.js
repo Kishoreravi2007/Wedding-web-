@@ -76,4 +76,28 @@ router.post('/setup-users', async (req, res) => {
     }
 });
 
+const fs = require('fs');
+const path = require('path');
+
+router.post('/migrate-schema', async (req, res) => {
+    try {
+        const { secret } = req.body;
+        if (secret !== SETUP_SECRET) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        const schemaPath = path.join(__dirname, '../gcp_schema.sql');
+        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+
+        console.log('Running schema migration...');
+        await query(schemaSql);
+        console.log('Schema migration completed.');
+
+        res.json({ success: true, message: 'Schema migration executed successfully' });
+    } catch (error) {
+        console.error('Migration error:', error);
+        res.status(500).json({ error: 'Migration failed', details: error.message });
+    }
+});
+
 module.exports = router;
