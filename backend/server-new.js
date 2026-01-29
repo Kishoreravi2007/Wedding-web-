@@ -140,6 +140,9 @@ app.use('/api/profiles', profilesRouter);
 const adminSetupRouter = require('./routes/admin-setup');
 app.use('/api/admin', adminSetupRouter);
 
+// AI Generation Routes
+app.use('/api/ai', require('./routes/ai'));
+
 // Wedding Routes
 console.log('💍 Registering /api/weddings route...');
 const weddingsRouter = require('./routes/weddings');

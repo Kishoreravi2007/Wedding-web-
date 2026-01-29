@@ -5,9 +5,24 @@ import { StatsCards } from "@/components/company/dashboard/StatsCards";
 import { LeadsTable } from "@/components/company/dashboard/LeadsTable";
 import { PortfolioGrid } from "@/components/company/dashboard/PortfolioGrid";
 import { ServicesCards } from "@/components/company/dashboard/ServicesCards";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const CompanyDashboard = () => {
+    const { hash } = useLocation();
+
+    useEffect(() => {
+        if (hash) {
+            const element = document.querySelector(hash);
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        }
+    }, [hash]);
+
     return (
         <div className="min-h-screen bg-slate-50/50 font-sans">
             <CompanyNavbar />
@@ -49,9 +64,9 @@ const CompanyDashboard = () => {
                 <div className="container px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
                     <p>© 2025 WeddingWeb Inc. All rights reserved.</p>
                     <div className="flex gap-6">
-                        <a href="#" className="hover:text-slate-900">Privacy Policy</a>
-                        <a href="#" className="hover:text-slate-900">Terms of Service</a>
-                        <a href="#" className="hover:text-slate-900">Support</a>
+                        <Link to="/privacy" className="hover:text-slate-900">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-slate-900">Terms of Service</Link>
+                        <Link to="/company/contact" className="hover:text-slate-900">Support</Link>
                     </div>
                 </div>
             </footer>

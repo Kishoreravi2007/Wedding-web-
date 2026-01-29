@@ -26,28 +26,30 @@ router.get('/', async (req, res) => {
  * POST /api/profiles
  * Create or update a user profile
  */
-router.post('/', async (req, res) => {
+const { authenticateToken } = require('../auth');
+router.post('/', authenticateToken, async (req, res) => {
     try {
-        const { user_id, full_name, location, bio, avatar_url, email } = req.body;
+        const { full_name, location, bio, avatar_url, email } = req.body;
+        const user_id = req.user.id; // Use authenticated ID from token
 
         if (!user_id || !email) {
             return res.status(400).json({ message: 'User ID and email are required' });
         }
 
-        // Check if profile exists
-        const checkQuery = 'SELECT id FROM profiles WHERE user_id = $1';
-        const { rows: existing } = await query(checkQuery, [user_id]);
+        // Check if profile exists by user_id
+        const checkQuery = 'SELECT id FROM profiles WHERE user_id = $1 OR email = $2';
+        const { rows: existing } = await query(checkQuery, [user_id, email]);
 
         let result;
         if (existing.length > 0) {
-            // Update
+            // Update the existing profile (use the authenticated user_id)
             const updateQuery = `
         UPDATE profiles 
-        SET full_name = $2, location = $3, bio = $4, avatar_url = $5, email = $6, updated_at = NOW()
-        WHERE user_id = $1
+        SET full_name = $2, location = $3, bio = $4, avatar_url = $5, email = $6, updated_at = NOW(), user_id = $1
+        WHERE id = $7
         RETURNING *
       `;
-            const { rows } = await query(updateQuery, [user_id, full_name, location, bio, avatar_url, email]);
+            const { rows } = await query(updateQuery, [user_id, full_name, location, bio, avatar_url, email, existing[0].id]);
             result = rows[0];
         } else {
             // Insert

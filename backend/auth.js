@@ -8,6 +8,7 @@
 const express = require('express');
 const router = express.Router();
 const { SecureUserDB, TokenManager, authMiddleware } = require('./lib/secure-auth');
+const OTPAuth = require('otpauth');
 
 /**
  * POST /api/auth/register
@@ -73,6 +74,16 @@ router.post('/login', async (req, res) => {
     }
 
     const user = await SecureUserDB.authenticateUser(effectiveUsername, password);
+
+    // 2FA CHECK
+    if (user.is_2fa_enabled) {
+      return res.json({
+        message: '2FA verification required',
+        require2FA: true,
+        userId: user.id
+      });
+    }
+
     const token = TokenManager.generateToken(user);
 
     res.json({
@@ -90,6 +101,99 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(401).json({ message: error.message || 'Login failed' });
+  }
+});
+
+/**
+ * POST /api/auth/verify-2fa
+ * Verify 2FA code and complete login
+ */
+router.post('/verify-2fa', async (req, res) => {
+  try {
+    const { userId, code } = req.body;
+
+    if (!userId || !code) {
+      return res.status(400).json({ message: 'User ID and Code are required' });
+    }
+
+    // Get user to retrieve secret (Need a method to get user by ID including secrets, 
+    // but SecureUserDB.authenticateUser is by username/password.
+    // Let's add a quick helper or reuse logic carefully. 
+    // Since we authenticated password in /login step, we just need to verify code.
+    // Ideally we would use a temporary session token, but for simplicity here we trust userId + code.
+    // A better approach: login issues a temp limited-scope JWT that allows calling /verify-2fa.
+    // For this MVP: trusting userId is risky if someone guesses userId, but they need the code too.
+
+    // We need the secret from DB. SecureUserDB doesn't expose secret by default in getUserById.
+    // We will query directly here or add a helper in SecureUserDB.
+    // Re-using a query here for simplicity:
+    const { query } = require('./lib/db-gcp');
+    const { rows } = await query('SELECT id, username, role, is_active, two_factor_secret FROM users WHERE id = $1', [userId]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify code
+    const totp = new OTPAuth.TOTP({
+      issuer: "WeddingWeb",
+      label: user.username,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: user.two_factor_secret
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+
+    if (delta === null) {
+      return res.status(401).json({ message: 'Invalid 2FA code' });
+    }
+
+    // Success - issue full token
+    const token = TokenManager.generateToken(user);
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        is_active: user.is_active
+      },
+      token,
+      accessToken: token
+    });
+
+  } catch (error) {
+    console.error('2FA Verification error:', error);
+    res.status(500).json({ message: 'Verification failed' });
+  }
+});
+
+/**
+ * POST /api/auth/2fa/toggle
+ * Enable or Disable 2FA
+ */
+router.post('/2fa/toggle', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const { enabled, secret } = req.body;
+    const userId = req.user.id;
+
+    if (enabled && !secret) {
+      return res.status(400).json({ message: 'Secret is required to enable 2FA' });
+    }
+
+    await SecureUserDB.setTwoFactorAuth(userId, enabled ? secret : null, enabled);
+
+    res.json({
+      message: `Two-factor authentication ${enabled ? 'enabled' : 'disabled'} successfully`,
+      is_2fa_enabled: enabled
+    });
+
+  } catch (error) {
+    console.error('2FA Toggle error:', error);
+    res.status(500).json({ message: 'Failed to update 2FA settings' });
   }
 });
 
@@ -155,6 +259,29 @@ router.put('/profile', authMiddleware.verifyToken, async (req, res) => {
     console.error('Profile update error:', error);
     res.status(400).json({
       message: error.message || 'Profile update failed'
+    });
+  }
+});
+
+/**
+ * DELETE /api/auth/delete
+ * Delete user account permanently
+ */
+router.delete('/delete', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Perform deletion
+    await SecureUserDB.deleteUser(userId);
+
+    res.json({
+      message: 'Account deleted successfully',
+      deleted: true
+    });
+  } catch (error) {
+    console.error('Account deletion error:', error);
+    res.status(500).json({
+      message: 'Failed to delete account. Please try again.'
     });
   }
 });

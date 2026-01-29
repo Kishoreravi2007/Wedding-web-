@@ -410,9 +410,9 @@ const CompanyAccount = () => {
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100 px-4 py-8 text-slate-900">
       <div className="mx-auto w-full max-w-5xl transform overflow-hidden rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_40px_70px_rgba(15,23,42,0.15)] transition-all duration-500 sm:p-10">
         <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-          <Link to="/company">
+          <Link to="/">
             <Button variant="ghost" size="sm" className="border border-slate-200 text-slate-700 hover:border-slate-400">
-              Back to company
+              Back to Home
             </Button>
           </Link>
           <p className="text-xs uppercase tracking-[0.6em] text-slate-500">Personal dashboard</p>
@@ -427,9 +427,9 @@ const CompanyAccount = () => {
             <Button variant="secondary" onClick={handleLogout}>
               Logout
             </Button>
-            <Link to="/company">
+            <Link to="/">
               <Button variant="ghost" className="border border-white/30 text-white">
-                Back to company
+                Back to Home
               </Button>
             </Link>
           </div>

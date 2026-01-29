@@ -41,6 +41,7 @@ import Feedback from "./pages/Feedback";
 import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
+import CompanyLanding from "./pages/company/Landing";
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import CompanyLogin from "./pages/company/Login";
 import CompanySignup from "./pages/company/Signup";
@@ -51,7 +52,12 @@ import CompanyServices from "./pages/company/Services";
 import CompanyPricing from "./pages/company/Pricing";
 import CompanyPortfolio from "./pages/company/Portfolio";
 import CompanyContact from "./pages/company/Contact";
+import CompanyLegal from "./pages/company/Legal";
+import CompanyBookings from "./pages/company/Bookings";
+import CompanyPayments from "./pages/company/Payments";
+import CompanySettings from "./pages/company/Settings";
 import CompanyScrollDemo from "./pages/company/ScrollDemo";
+import { AuthGuard } from "./components/company/dashboard/AuthGuard";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
@@ -101,7 +107,7 @@ const App = () => {
 
   // Check if Book button should be shown (only on homepage and schedule pages)
   const showBookButton = useMemo(() => {
-    return location.pathname === '/' ||
+    return location.pathname === '/weddings' ||
       location.pathname === '/parvathy' ||
       location.pathname === '/parvathy/schedule' ||
       location.pathname === '/sreedevi' ||
@@ -110,7 +116,7 @@ const App = () => {
 
   // Check if on company pages (hide music player on company pages)
   const isCompanyPage = useMemo(() => {
-    return location.pathname.startsWith('/company');
+    return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname === '/privacy' || location.pathname === '/terms';
   }, [location.pathname]);
 
   // Note: Music pause/resume is now handled globally in MusicPlayerContext
@@ -142,7 +148,7 @@ const App = () => {
           {/* <LanguageSwitcher /> */}
           {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
           {showBookButton && (
-            <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
+            <Link to="/" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
               <Button
                 size="lg"
                 className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -185,13 +191,20 @@ const App = () => {
               <Route path="/company/login" element={<CompanyLogin />} />
               <Route path="/company/signup" element={<CompanySignup />} />
               <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
-              <Route path="/company/account" element={<CompanyAccount />} />
-              <Route path="/company" element={<CompanyDashboard />} />
+              <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
+              <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
+              <Route path="/about-platform" element={<CompanyLanding />} />
+              <Route path="/privacy" element={<CompanyLegal />} />
+              <Route path="/terms" element={<CompanyLegal />} />
+              <Route path="/weddings" element={<Index />} />
               <Route path="/company/about" element={<CompanyAbout />} />
               <Route path="/company/services" element={<CompanyServices />} />
               <Route path="/company/pricing" element={<CompanyPricing />} />
               <Route path="/company/portfolio" element={<CompanyPortfolio />} />
               <Route path="/company/contact" element={<CompanyContact />} />
+              <Route path="/company/bookings" element={<AuthGuard><CompanyBookings /></AuthGuard>} />
+              <Route path="/company/payments" element={<AuthGuard><CompanyPayments /></AuthGuard>} />
+              <Route path="/company/settings" element={<AuthGuard><CompanySettings /></AuthGuard>} />
               <Route path="/company/scroll" element={<CompanyScrollDemo />} />
 
               {/* Company Route Redirects - Short URLs */}
@@ -224,7 +237,7 @@ const App = () => {
                   </div>
                 </div>
               } />
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
               <Route path="/wishes" element={<Wishes />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/premium" element={<PremiumCheckout />} />

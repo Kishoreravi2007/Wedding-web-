@@ -44,7 +44,7 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
 
   // Check if we're on a company page - reactive to route changes
   const isCompanyPage = useMemo(() => {
-    return location.pathname.startsWith('/company');
+    return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname === '/privacy' || location.pathname === '/terms';
   }, [location.pathname]);
 
   const musicSources = [

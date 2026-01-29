@@ -6,6 +6,12 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Heart, ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -19,7 +25,12 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { login } = useAuth();
+  // 2FA State
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [userId2FA, setUserId2FA] = useState<string | null>(null);
+  const [otpValue, setOtpValue] = useState("");
+
+  const { login, verify2FA } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,8 +49,14 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
 
     try {
       setIsSubmitting(true);
-      await login(email.trim(), password);
-      navigate(redirectTo || "/", { replace: true });
+      const result = await login(email.trim(), password);
+
+      if (result.require2FA) {
+        setRequires2FA(true);
+        setUserId2FA(result.userId || null);
+      } else {
+        navigate(redirectTo || "/", { replace: true });
+      }
     } catch (error: any) {
       setErrorMessage(error?.message || "Unable to sign you in right now.");
     } finally {
@@ -47,12 +64,85 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
     }
   };
 
+  const handleVerify2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      if (!userId2FA) throw new Error("Session invalid. Please login again.");
+      await verify2FA(userId2FA, otpValue);
+      navigate(redirectTo || "/", { replace: true });
+    } catch (error: any) {
+      setErrorMessage(error?.message || "Invalid code. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (requires2FA) {
+    return (
+      <Card className="bg-white border border-slate-200 shadow-xl">
+        <CardHeader className="space-y-3 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20">
+            <ShieldCheck className="h-10 w-10 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-semibold text-slate-900">Two-Factor Authentication</CardTitle>
+          <p className="text-sm text-slate-500 max-w-[280px] mx-auto">
+            Enter the 6-digit code from your authenticator app to verify your identity.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6 pt-2">
+          {errorMessage && (
+            <Alert variant="destructive" className="text-sm bg-red-50 text-red-700 border-red-200">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          <form onSubmit={handleVerify2FA} className="space-y-6">
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                onChange={(v) => setOtpValue(v)}
+                value={otpValue}
+              >
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                  <InputOTPSlot index={1} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                  <InputOTPSlot index={2} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                  <InputOTPSlot index={3} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                  <InputOTPSlot index={4} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                  <InputOTPSlot index={5} className="rounded-lg border-slate-300 w-10 h-12 text-lg font-bold" />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-11 rounded-xl shadow-lg"
+              disabled={isSubmitting || otpValue.length !== 6}
+            >
+              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Identity"}
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => setRequires2FA(false)}
+              className="w-full text-sm text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2 py-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Login
+            </button>
+          </form>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-white border border-slate-200 shadow-xl">
       <CardHeader className="space-y-3 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 shadow-lg">
-          <img src="/logo.png" alt="Wedding Web" className="h-10 w-auto object-contain" />
-        </div>
+        <img src="/logo.png" alt="WeddingWeb Logo" className="mx-auto h-20 w-20 object-contain mb-2 rounded-2xl" />
         <CardTitle className="text-3xl font-semibold text-slate-900">Sign in to Wedding Web</CardTitle>
         <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
           Premium builder dashboard
@@ -126,4 +216,3 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
 };
 
 export default LoginForm;
-

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Menu } from "lucide-react";
+import { Menu, Heart } from "lucide-react";
 
 const CompanyNav = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,7 +12,8 @@ const CompanyNav = () => {
   const { currentUser } = useAuth();
 
   const navLinks = [
-    { to: "/company", label: "Home" },
+    { to: "/", label: "Home" },
+    { to: "/weddings", label: "Weddings" },
     { to: "/company/about", label: "About" },
     { to: "/company/services", label: "Services" },
     { to: "/company/pricing", label: "Pricing" },
@@ -25,12 +26,8 @@ const CompanyNav = () => {
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-slate-200">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/company" className="flex items-center gap-4">
-          <img
-            src="/logo.png"
-            alt="WeddingWeb logo"
-            className="w-12 h-12 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
-          />
+        <Link to="/" className="flex items-center gap-4">
+          <img src="/logo.png" alt="WeddingWeb" className="w-12 h-12 rounded-xl object-contain" />
           <span className="text-3xl font-bold text-slate-900">WeddingWeb</span>
         </Link>
 
@@ -41,8 +38,8 @@ const CompanyNav = () => {
               key={link.to}
               to={link.to}
               className={`transition-colors ${isActive(link.to)
-                  ? "text-rose-500 font-semibold"
-                  : "hover:text-rose-500"
+                ? "text-rose-500 font-semibold"
+                : "hover:text-rose-500"
                 }`}
             >
               {link.label}
@@ -85,12 +82,8 @@ const CompanyNav = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-3">
-                <img
-                  src="/logo.png"
-                  alt="WeddingWeb logo"
-                  className="w-10 h-10 object-contain drop-shadow-lg bg-white rounded-xl p-1 border border-slate-200"
-                />
+              <SheetTitle className="flex items-center gap-3 text-left">
+                <img src="/logo.png" alt="WeddingWeb" className="w-10 h-10 rounded-xl object-contain" />
                 <span className="text-slate-900 text-xl font-semibold">WeddingWeb</span>
               </SheetTitle>
             </SheetHeader>
@@ -101,8 +94,8 @@ const CompanyNav = () => {
                   to={link.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`text-lg font-medium transition-colors py-2 ${isActive(link.to)
-                      ? "text-rose-500 font-bold"
-                      : "hover:text-rose-500"
+                    ? "text-rose-500 font-bold"
+                    : "hover:text-rose-500"
                     }`}
                 >
                   {link.label}

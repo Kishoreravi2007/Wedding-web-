@@ -9,13 +9,11 @@ import React, {
 
 import { API_BASE_URL } from "@/lib/api";
 
-// Backend URL from environment or default
-// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
-
 interface ProfilePayload {
   full_name?: string | null;
   location?: string | null;
   bio?: string | null;
+  email?: string | null;
   avatar_url?: string | null;
 }
 
@@ -25,12 +23,15 @@ interface User {
   username: string;
   role: string;
   profile?: ProfilePayload | null;
+  is_2fa_enabled?: boolean;
 }
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
+  verify2FA: (userId: string, code: string) => Promise<void>;
+  enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
@@ -80,11 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (token && storedUser) {
       try {
-        // Verify token with backend (optional but recommended for security on load)
-        // For now, optimistic loading from local storage to be fast
         const parsedUser = JSON.parse(storedUser);
-
-        // Fetch latest profile
         const profile = await fetchUserProfile(parsedUser.id, token);
 
         setCurrentUser({
@@ -93,7 +90,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       } catch (e) {
         console.error('Error hydrating user', e);
-        // If error, maybe clear storage
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
       }
@@ -107,11 +103,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      // NOTE: Backend expects 'username' but UI uses 'email'. 
-      // Adjust backend or frontend to match. 
-      // Assuming for this migration we treat email as username or update backend.
-      // Let's send email as username for now as that's what backend likely expects if migrated 1:1
-
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -122,6 +113,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
+      }
+
+      // Handle 2FA Requirement
+      if (data.require2FA) {
+        return { require2FA: true, userId: data.userId };
       }
 
       const { token, user } = data;
@@ -135,12 +131,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setCurrentUser({
         ...user,
-        email: email, // explicit email if not in user object from backend
+        email: email,
         profile
       });
 
+      return { require2FA: false };
+
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const verify2FA = async (userId: string, code: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify-2fa`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, code })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Verification failed');
+      }
+
+      const { token, user } = data;
+
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      const profile = await fetchUserProfile(user.id, token);
+
+      setCurrentUser({ ...user, profile });
+
+    } catch (error) {
+      console.error('2FA Verification error:', error);
+      throw error;
+    }
+  };
+
+  const enable2FA = async (enabled: boolean, secret?: string) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('Not authenticated');
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/2fa/toggle`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ enabled, secret })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update 2FA settings');
+      }
+
+      // Update local user state
+      if (currentUser) {
+        const updatedUser = { ...currentUser, is_2fa_enabled: enabled };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('auth_user', JSON.stringify(updatedUser)); // Persist locally too
+      }
+
+    } catch (error) {
+      console.error('Enable 2FA error:', error);
       throw error;
     }
   };
@@ -153,7 +210,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({
           username: email,
           password,
-          role: 'company' // Default role for signup
+          role: 'company'
         })
       });
 
@@ -163,11 +220,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(data.message || 'Signup failed');
       }
 
-      // Auto login often handled here, or return data
-      // Supabase returns session data usually.
-      // We'll mimic the shape expected by Signup page roughly or return what we have.
       return { data: { user: data.user }, error: null };
-
     } catch (error) {
       console.error('Signup error:', error);
       return { data: null, error };
@@ -189,8 +242,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const resetPassword = async (email: string) => {
-    // Implement forgot password flow logic here
-    // Likely call backend endpoint
     console.log('Reset password request for:', email);
     alert('Password reset functionality not yet implemented in migration.');
   };
@@ -199,6 +250,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     currentUser,
     loading,
     login,
+    verify2FA,
+    enable2FA,
     signup,
     logout,
     refreshProfile,

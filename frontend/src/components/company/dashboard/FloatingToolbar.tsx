@@ -4,8 +4,13 @@ import {
     Briefcase,
     ImagePlus,
     Phone,
-    Share2
+    Share2,
+    Plus
 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { UploadPhotoModal } from "./UploadPhotoModal";
+import { toast } from "sonner";
 import {
     Tooltip,
     TooltipContent,
@@ -17,14 +22,55 @@ import {
 // Using MessageCircle as a proxy for WhatsApp if needed, or stick to generic icons.
 
 const actions = [
-    { label: "Edit Profile", icon: Pencil, color: "text-slate-600", hoverBg: "hover:bg-slate-100" },
-    { label: "Add Service", icon: Briefcase, color: "text-blue-600", hoverBg: "hover:bg-blue-50" },
-    { label: "Add Photos", icon: ImagePlus, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
-    { label: "WhatsApp", icon: Phone, color: "text-green-600", hoverBg: "hover:bg-green-50" },
-    { label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" },
+    { id: 'edit', label: "Edit Profile", icon: Pencil, color: "text-slate-600", hoverBg: "hover:bg-slate-100" },
+    { id: 'service', label: "Add Service", icon: Briefcase, color: "text-blue-600", hoverBg: "hover:bg-blue-50" },
+    { id: 'photo', label: "Add Photos", icon: ImagePlus, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
+    { id: 'whatsapp', label: "WhatsApp", icon: Phone, color: "text-green-600", hoverBg: "hover:bg-green-50" },
+    { id: 'share', label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" },
 ];
 
 export function FloatingToolbar() {
+    const navigate = useNavigate();
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+    const handleAction = async (id: string) => {
+        switch (id) {
+            case 'edit':
+                toast.info("Opening account settings...");
+                navigate('/company/account');
+                break;
+            case 'service':
+                const el = document.getElementById('services');
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    toast.info("Navigate to services section");
+                }
+                break;
+            case 'photo':
+                setIsUploadOpen(true);
+                break;
+            case 'whatsapp':
+                window.open('https://wa.me/917907177841', '_blank');
+                break;
+            case 'share':
+                try {
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: 'WeddingWeb | Wedding Photography & Planning',
+                            text: 'Capture your perfect moments with WeddingWeb. Check out the portfolio!',
+                            url: window.location.href,
+                        });
+                    } else {
+                        await navigator.clipboard.writeText(window.location.href);
+                        toast.success("Link copied to clipboard!");
+                    }
+                } catch (err) {
+                    console.error("Share failed", err);
+                }
+                break;
+        }
+    };
     return (
         <TooltipProvider>
             {/* Desktop: Right Fixed Vertical Toolbar */}
@@ -35,6 +81,7 @@ export function FloatingToolbar() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                onClick={() => handleAction(action.id)}
                                 className={`h-12 w-12 rounded-xl transition-all ${action.color} ${action.hoverBg}`}
                             >
                                 <action.icon className="h-6 w-6" />
@@ -56,6 +103,7 @@ export function FloatingToolbar() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                onClick={() => handleAction(action.id)}
                                 className={`h-10 w-10 rounded-full ${action.color} ${action.hoverBg} bg-slate-50`}
                             >
                                 <action.icon className="h-5 w-5" />
@@ -65,6 +113,7 @@ export function FloatingToolbar() {
                     ))}
                 </div>
             </div>
+            <UploadPhotoModal open={isUploadOpen} onOpenChange={setIsUploadOpen} />
         </TooltipProvider>
     );
 }

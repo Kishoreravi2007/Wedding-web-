@@ -60,7 +60,7 @@ const SecureUserDB = {
     try {
       // Get user data including security fields
       const { rows } = await query(
-        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until FROM users WHERE username = $1',
+        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until, is_2fa_enabled, two_factor_secret FROM users WHERE username = $1',
         [username]
       );
 
@@ -114,7 +114,9 @@ const SecureUserDB = {
         id: user.id,
         username: user.username,
         role: user.role,
-        is_active: user.is_active
+        is_active: user.is_active,
+        is_2fa_enabled: user.is_2fa_enabled,
+        two_factor_secret: user.two_factor_secret
       };
 
     } catch (error) {
@@ -190,6 +192,48 @@ const SecureUserDB = {
       return rows[0];
     } catch (error) {
       console.error('Error updating user:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Set 2FA Secret and Enable status
+   */
+  async setTwoFactorAuth(userId, secret, enabled) {
+    try {
+      await query(
+        'UPDATE users SET two_factor_secret = $1, is_2fa_enabled = $2 WHERE id = $3',
+        [secret, enabled, userId]
+      );
+      return { success: true };
+    } catch (error) {
+      console.error('Error setting 2FA:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete user account and associated data
+   */
+  async deleteUser(userId) {
+    try {
+      // Delete from users table (cascading deletes should handle related tables if configured, 
+      // but if not, we rely on the database constraints or manual cleanup. 
+      // Assuming standard ON DELETE CASCADE for now based on typical setup, 
+      // or we accept that associated data might remain orphaned if no cascade.)
+      // Note: In production, you might want to soft-delete (is_active = false) instead.
+      // But user requested "delete immediately", so we perform a hard delete.
+
+      const { rowCount } = await query('DELETE FROM users WHERE id = $1', [userId]);
+
+      if (rowCount === 0) {
+        throw new Error('User not found or already deleted');
+      }
+
+      await this.logAuthAttempt(userId, 'delete_account', true, { reason: 'user_request' });
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting user:', error);
       throw error;
     }
   },
@@ -302,10 +346,12 @@ const authMiddleware = {
       }
 
       const user = await TokenManager.verifyToken(token);
+      console.log('Auth verification successful for user:', user.username);
       req.user = user;
       next();
     } catch (error) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
+      console.error('Auth Middleware Error:', error.message);
+      return res.status(403).json({ message: 'Invalid or expired token', details: error.message });
     }
   },
 

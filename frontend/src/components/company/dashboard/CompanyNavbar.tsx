@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Bell, Menu, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Search, Bell, Menu, User, Settings, LogOut, ChevronDown, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,11 +16,12 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
-    { label: "Overview", href: "#overview" },
-    { label: "Leads", href: "#leads" },
-    { label: "Portfolio", href: "#portfolio" },
-    { label: "Services", href: "#services" },
-    { label: "Bookings", href: "/company/bookings" }, // Keep as route if page exists or anchor if section
+    { label: "Overview", href: "/" },
+    { label: "Weddings", href: "/weddings" },
+    { label: "Leads", href: "/#leads" },
+    { label: "Portfolio", href: "/#portfolio" },
+    { label: "Services", href: "/#services" },
+    { label: "Bookings", href: "/company/bookings" },
     { label: "Payments", href: "/company/payments" },
     { label: "Settings", href: "/company/settings" },
 ];
@@ -41,11 +42,29 @@ export function CompanyNavbar() {
 
     // Helper to handle hash scrolling
     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
-        if (href.startsWith('#')) {
-            e.preventDefault();
-            const element = document.querySelector(href);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
+        if (href.includes('#')) {
+            const [path, hash] = href.split('#');
+            const targetHash = `#${hash}`;
+
+            // Check if we are already on the dashboard/root page
+            const isDashboard = location.pathname === '/' || location.pathname === '';
+
+            if (isDashboard && (path === '/' || path === '')) {
+                e.preventDefault();
+                const element = document.querySelector(targetHash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    // Update URL with hash without reload
+                    window.history.pushState(null, '', targetHash);
+                }
+            }
+        } else if (href === '/') {
+            // Handle scrolling to top when clicking "/" while on "/"
+            const isDashboard = location.pathname === '/' || location.pathname === '';
+            if (isDashboard) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.history.pushState(null, '', '/');
             }
         }
     };
@@ -56,11 +75,9 @@ export function CompanyNavbar() {
 
                 {/* Left: Logo */}
                 <div className="flex items-center gap-2">
-                    <Link to="/company" className="flex items-center gap-2 font-bold text-xl">
-                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white">
-                            W
-                        </div>
-                        <span className="hidden md:inline-block bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                    <Link to="/" className="flex items-center gap-3 font-bold">
+                        <img src="/logo.png" alt="WeddingWeb Logo" className="h-10 w-10 rounded-xl object-contain" />
+                        <span className="hidden md:inline-block text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
                             WeddingWeb
                         </span>
                     </Link>
@@ -69,17 +86,19 @@ export function CompanyNavbar() {
                 {/* Center: Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-6 mx-6">
                     {navItems.map((item) => (
-                        <a
+                        <Link
                             key={item.href}
-                            href={item.href}
+                            to={item.href}
                             onClick={(e) => handleScroll(e, item.href)}
-                            className={`text-sm font-medium transition-colors hover:text-primary ${location.hash === item.href
-                                ? "text-primary font-semibold"
+                            className={`text-sm font-medium transition-colors hover:text-primary ${(item.href === '/' && location.pathname === '/' && !location.hash) ||
+                                (location.pathname + location.hash === item.href) ||
+                                (location.pathname === item.href)
+                                ? "text-rose-600 font-semibold"
                                 : "text-slate-600"
                                 }`}
                         >
                             {item.label}
-                        </a>
+                        </Link>
                     ))}
                 </nav>
 
@@ -120,18 +139,22 @@ export function CompanyNavbar() {
                                         <div className="flex flex-col space-y-1">
                                             <p className="text-sm font-medium leading-none">{currentUser?.profile?.full_name || "Company Admin"}</p>
                                             <p className="text-xs leading-none text-muted-foreground">
-                                                {currentUser?.email || "contact@company.com"}
+                                                {currentUser?.email || currentUser?.username || "contact@company.com"}
                                             </p>
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
-                                        <User className="mr-2 h-4 w-4" />
-                                        <span>Profile</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link to="/company/settings?tab=general">
+                                            <User className="mr-2 h-4 w-4" />
+                                            <span>Profile</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Settings className="mr-2 h-4 w-4" />
-                                        <span>Settings</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link to="/company/settings">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <span>Settings</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-red-500 cursor-pointer" onClick={handleLogout}>
@@ -157,24 +180,22 @@ export function CompanyNavbar() {
                         </SheetTrigger>
                         <SheetContent side="left" className="pr-0">
                             <div className="px-7">
-                                <Link to="/company" className="flex items-center gap-2 font-bold text-xl mb-8">
-                                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white">
-                                        W
-                                    </div>
-                                    <span className="bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                                <Link to="/" className="flex items-center gap-3 font-bold text-2xl mb-8">
+                                    <img src="/logo.png" alt="WeddingWeb Logo" className="h-10 w-10 rounded-xl object-contain" />
+                                    <span className="bg-gradient-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
                                         WeddingWeb
                                     </span>
                                 </Link>
                                 <nav className="flex flex-col gap-4">
                                     {navItems.map((item) => (
-                                        <a
+                                        <Link
                                             key={item.href}
-                                            href={item.href}
+                                            to={item.href}
                                             onClick={(e) => handleScroll(e, item.href)}
-                                            className="text-lg font-medium transition-colors hover:text-primary text-slate-600"
+                                            className="text-lg font-medium transition-colors hover:text-rose-600 text-slate-600"
                                         >
                                             {item.label}
-                                        </a>
+                                        </Link>
                                     ))}
                                 </nav>
                             </div>

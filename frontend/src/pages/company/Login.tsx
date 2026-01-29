@@ -8,10 +8,10 @@ const CompanyLogin = () => {
       <div className="flex min-h-screen flex-col">
         <header className="flex items-center justify-between px-6 py-6 sm:px-10">
           <Link
-            to="/company"
+            to="/"
             className="text-lg font-semibold tracking-wide text-slate-700 transition hover:text-rose-500"
           >
-            Back to Company
+            Back to Home
           </Link>
         </header>
 

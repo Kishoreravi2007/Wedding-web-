@@ -1,30 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, CheckCircle2, ArrowRight, Plus, Eye, Award } from "lucide-react";
+import { Star, MapPin, CheckCircle2, ArrowRight, Plus, Eye, Award, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { UploadPhotoModal } from "./UploadPhotoModal";
 
 export function HeroSection() {
     const { currentUser } = useAuth();
+    const [isReturning, setIsReturning] = useState(false);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+    useEffect(() => {
+        const visited = localStorage.getItem("weddingweb_dashboard_visited");
+        if (visited) {
+            setIsReturning(true);
+        } else {
+            localStorage.setItem("weddingweb_dashboard_visited", "true");
+        }
+    }, []);
 
     // Fallback data if user is not fully set up
     const companyName = currentUser?.profile?.full_name || "WeddingWeb Events";
-    const location = currentUser?.profile?.location || "Kochi, Kerala";
+    const firstName = companyName.split(" ")[0];
+    const locationName = currentUser?.profile?.location || "Palakkad, Kerala";
     const avatarUrl = currentUser?.profile?.avatar_url || "/placeholder-user.jpg";
 
-    // Split name for styling (optional logic)
-    const nameParts = companyName.split(" ");
-    const firstName = nameParts[0];
-    const restName = nameParts.slice(1).join(" ");
-
     const handleUploadSuccess = () => {
-        // Optionally trigger a refresh of the portfolio grid if we can access it, 
-        // or just rely on the user scrolling down to see it (if we updated state globally)
-        // For now, simple success toast is handled in the modal.
-        // We could dispatch a custom event or use context to refresh the grid.
         window.dispatchEvent(new Event('portfolio-updated'));
     };
 
@@ -44,8 +46,17 @@ export function HeroSection() {
                             <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-rose-100 text-rose-600 hover:bg-rose-100/80">
                                 Premium Partner
                             </div>
-                            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl xl:text-6xl text-slate-900">
-                                {firstName} <span className="text-rose-600">{restName}</span>
+                            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl xl:text-6xl text-slate-900 leading-tight">
+                                {currentUser ? (
+                                    <>
+                                        {isReturning ? "Welcome back," : "Welcome,"} <br className="md:hidden" />
+                                        <span className="text-rose-600"> {firstName}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        WeddingWeb <span className="text-rose-600">Events</span>
+                                    </>
+                                )}
                             </h1>
                             <p className="text-xl font-medium text-slate-500">
                                 Turning your moments into timeless memories.
@@ -124,14 +135,18 @@ export function HeroSection() {
                             className="absolute -bottom-6 -left-6 md:bottom-8 md:-left-8 bg-white p-4 rounded-xl shadow-xl border border-slate-100 max-w-[280px] w-full"
                         >
                             <div className="flex items-start gap-3">
-                                <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0">
-                                    <img src={avatarUrl} alt="Logo" className="h-full w-full object-cover" />
+                                <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0 bg-rose-50 flex items-center justify-center">
+                                    {currentUser?.profile?.avatar_url ? (
+                                        <img src={avatarUrl} alt="Logo" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <Heart className="h-6 w-6 text-rose-500 fill-rose-500" />
+                                    )}
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-slate-900 leading-tight">{companyName}</h3>
                                     <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
                                         <MapPin className="h-3 w-3" />
-                                        <span>{location}</span>
+                                        <span>{locationName}</span>
                                     </div>
                                     <div className="flex items-center gap-1 mt-2">
                                         {[1, 2, 3, 4, 5].map((i) => (

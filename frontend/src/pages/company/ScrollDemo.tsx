@@ -13,7 +13,7 @@ const ScrollDemo = () => {
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="scroll-container"
       style={{
@@ -24,7 +24,7 @@ const ScrollDemo = () => {
       }}
     >
       {/* Fixed Header */}
-      <header 
+      <header
         style={{
           position: 'fixed',
           top: 0,
@@ -36,7 +36,7 @@ const ScrollDemo = () => {
           textAlign: 'center',
         }}
       >
-        <h1 
+        <h1
           style={{
             color: 'white',
             fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -50,7 +50,7 @@ const ScrollDemo = () => {
       </header>
 
       {/* Background Pattern */}
-      <div 
+      <div
         style={{
           position: 'fixed',
           top: 0,
@@ -66,7 +66,7 @@ const ScrollDemo = () => {
       />
 
       {/* Section 1: Hero */}
-      <section 
+      <section
         style={{
           height: '100vh',
           display: 'flex',
@@ -86,7 +86,7 @@ const ScrollDemo = () => {
           viewport={{ once: true }}
           style={{ textAlign: 'center', maxWidth: '900px' }}
         >
-          <h2 
+          <h2
             style={{
               fontSize: 'clamp(3rem, 10vw, 6rem)',
               fontWeight: 900,
@@ -97,7 +97,7 @@ const ScrollDemo = () => {
           >
             WeddingWeb
           </h2>
-          <p 
+          <p
             style={{
               fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
               color: '#666',
@@ -109,7 +109,7 @@ const ScrollDemo = () => {
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
-              to="/company"
+              to="/"
               style={{
                 padding: '1rem 2.5rem',
                 background: '#111',
@@ -145,7 +145,7 @@ const ScrollDemo = () => {
       </section>
 
       {/* Section 2: What We Do */}
-      <section 
+      <section
         style={{
           height: '100vh',
           display: 'flex',
@@ -164,7 +164,7 @@ const ScrollDemo = () => {
           viewport={{ once: true }}
           style={{ textAlign: 'center', maxWidth: '900px' }}
         >
-          <h2 
+          <h2
             style={{
               fontSize: 'clamp(2.5rem, 8vw, 5rem)',
               fontWeight: 900,
@@ -175,7 +175,7 @@ const ScrollDemo = () => {
           >
             We design. build. launch.
           </h2>
-          <div 
+          <div
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -214,7 +214,7 @@ const ScrollDemo = () => {
       </section>
 
       {/* Section 3: Why WeddingWeb */}
-      <section 
+      <section
         style={{
           height: '100vh',
           display: 'flex',
@@ -233,7 +233,7 @@ const ScrollDemo = () => {
           viewport={{ once: true }}
           style={{ textAlign: 'center', maxWidth: '800px' }}
         >
-          <h2 
+          <h2
             style={{
               fontSize: 'clamp(2.5rem, 8vw, 5rem)',
               fontWeight: 900,
@@ -244,7 +244,7 @@ const ScrollDemo = () => {
           >
             Fast. Elegant. Mobile-first.
           </h2>
-          <p 
+          <p
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.3rem)',
               color: '#666',
@@ -252,16 +252,16 @@ const ScrollDemo = () => {
               fontWeight: 400,
             }}
           >
-            We craft premium wedding websites with attention to every detail. 
-            Your guests will experience a seamless, beautiful interface that 
-            works flawlessly on any device. Trust us to make your special day 
+            We craft premium wedding websites with attention to every detail.
+            Your guests will experience a seamless, beautiful interface that
+            works flawlessly on any device. Trust us to make your special day
             even more memorable.
           </p>
         </motion.div>
       </section>
 
       {/* Section 4: Repeat Style Text - Gradient Words */}
-      <section 
+      <section
         style={{
           height: '100vh',
           display: 'flex',
@@ -280,7 +280,7 @@ const ScrollDemo = () => {
           viewport={{ once: true }}
           style={{ width: '100%' }}
         >
-          <p 
+          <p
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.2rem)',
               fontWeight: 500,
@@ -291,7 +291,7 @@ const ScrollDemo = () => {
           >
             solve.
           </p>
-          <p 
+          <p
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.2rem)',
               fontWeight: 600,
@@ -304,7 +304,7 @@ const ScrollDemo = () => {
           >
             ship.
           </p>
-          <h2 
+          <h2
             style={{
               fontSize: 'clamp(2rem, 6vw, 4rem)',
               fontWeight: 900,
@@ -318,7 +318,7 @@ const ScrollDemo = () => {
       </section>
 
       {/* Section 5: Final Page with Code Card */}
-      <section 
+      <section
         style={{
           minHeight: '100vh',
           display: 'flex',
@@ -338,7 +338,7 @@ const ScrollDemo = () => {
           viewport={{ once: true }}
           style={{ width: '100%' }}
         >
-          <h2 
+          <h2
             style={{
               fontSize: 'clamp(3rem, 10vw, 7rem)',
               fontWeight: 900,
@@ -367,7 +367,7 @@ const ScrollDemo = () => {
           }}
         >
           {/* PRO Pack Badge */}
-          <div 
+          <div
             style={{
               textAlign: 'center',
               padding: '1rem',
@@ -380,7 +380,7 @@ const ScrollDemo = () => {
           </div>
 
           {/* Code Window */}
-          <div 
+          <div
             style={{
               background: '#1e1e2e',
               borderRadius: '12px',
@@ -389,7 +389,7 @@ const ScrollDemo = () => {
             }}
           >
             {/* Window Header */}
-            <div 
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -407,7 +407,7 @@ const ScrollDemo = () => {
             </div>
 
             {/* Code Content */}
-            <pre 
+            <pre
               style={{
                 padding: '1.5rem',
                 margin: 0,
