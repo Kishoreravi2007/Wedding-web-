@@ -41,7 +41,7 @@ import Feedback from "./pages/Feedback";
 import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
-import CompanyLanding from "./pages/company/LandingMinimal";
+import CompanyDashboard from "./pages/company/CompanyDashboard";
 import CompanyLogin from "./pages/company/Login";
 import CompanySignup from "./pages/company/Signup";
 import CompanyAccount from "./pages/company/Account";
@@ -51,6 +51,7 @@ import CompanyServices from "./pages/company/Services";
 import CompanyPricing from "./pages/company/Pricing";
 import CompanyPortfolio from "./pages/company/Portfolio";
 import CompanyContact from "./pages/company/Contact";
+import CompanyScrollDemo from "./pages/company/ScrollDemo";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
@@ -100,11 +101,11 @@ const App = () => {
 
   // Check if Book button should be shown (only on homepage and schedule pages)
   const showBookButton = useMemo(() => {
-    return location.pathname === '/' || 
-           location.pathname === '/parvathy' || 
-           location.pathname === '/parvathy/schedule' ||
-           location.pathname === '/sreedevi' ||
-           location.pathname === '/sreedevi/schedule';
+    return location.pathname === '/' ||
+      location.pathname === '/parvathy' ||
+      location.pathname === '/parvathy/schedule' ||
+      location.pathname === '/sreedevi' ||
+      location.pathname === '/sreedevi/schedule';
   }, [location.pathname]);
 
   // Check if on company pages (hide music player on company pages)
@@ -142,7 +143,7 @@ const App = () => {
           {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
           {showBookButton && (
             <Link to="/company" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
-              <Button 
+              <Button
                 size="lg"
                 className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
@@ -163,14 +164,13 @@ const App = () => {
           )}
           {/* Music Player - Hidden on company pages */}
           {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
-          
+
           {/* Feedback Button - Available on all pages except feedback page itself */}
           {location.pathname !== '/feedback' && (
             <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isCompanyPage ? 'bottom-20' : 'bottom-20'}`}>
-              <Button 
-                className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${
-                  feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
-                }`}
+              <Button
+                className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
+                  }`}
                 title="Give Feedback"
                 onMouseEnter={() => setFeedbackCompact(false)}
               >
@@ -179,20 +179,21 @@ const App = () => {
               </Button>
             </Link>
           )}
-            <AnimatePresence mode="wait">
-              <Routes>
-            {/* Company Routes */}
-            <Route path="/company/login" element={<CompanyLogin />} />
-            <Route path="/company/signup" element={<CompanySignup />} />
-            <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
-            <Route path="/company/account" element={<CompanyAccount />} />
-            <Route path="/company" element={<CompanyLanding />} />
+          <AnimatePresence mode="wait">
+            <Routes>
+              {/* Company Routes */}
+              <Route path="/company/login" element={<CompanyLogin />} />
+              <Route path="/company/signup" element={<CompanySignup />} />
+              <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
+              <Route path="/company/account" element={<CompanyAccount />} />
+              <Route path="/company" element={<CompanyDashboard />} />
               <Route path="/company/about" element={<CompanyAbout />} />
               <Route path="/company/services" element={<CompanyServices />} />
               <Route path="/company/pricing" element={<CompanyPricing />} />
               <Route path="/company/portfolio" element={<CompanyPortfolio />} />
               <Route path="/company/contact" element={<CompanyContact />} />
-              
+              <Route path="/company/scroll" element={<CompanyScrollDemo />} />
+
               {/* Company Route Redirects - Short URLs */}
               <Route path="/about" element={<Navigate to="/company/about" replace />} />
               <Route path="/services" element={<Navigate to="/company/services" replace />} />

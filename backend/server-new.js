@@ -115,6 +115,10 @@ app.get('/health', async (req, res) => {
 const wishesRouter = require('./wishes');
 app.use('/api/wishes', wishesRouter);
 
+// Contact/Leads routes (Supabase)
+const contactMessagesRouter = require('./routes/contact-messages');
+app.use('/api/contact-messages', contactMessagesRouter);
+
 // Authentication routes
 const { router: authRouter, authenticateToken } = require('./auth');
 app.use('/api/auth', authRouter);
@@ -135,6 +139,12 @@ app.use('/api/profiles', profilesRouter);
 // Admin setup routes (one-time user creation)
 const adminSetupRouter = require('./routes/admin-setup');
 app.use('/api/admin', adminSetupRouter);
+
+// Wedding Routes
+console.log('💍 Registering /api/weddings route...');
+const weddingsRouter = require('./routes/weddings');
+app.use('/api/weddings', weddingsRouter);
+console.log('✅ Registered /api/weddings route.');
 
 // =============================================================================
 // ERROR HANDLING

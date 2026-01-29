@@ -1,70 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../lib/supabase');
+const db = require('../lib/db-gcp');
 const { writeContactMessageToSheet, deleteContactMessageFromSheet } = require('../lib/google-sheets');
-
-// Helper to ensure Supabase is available
-const ensureSupabase = () => {
-  if (!supabase) {
-    throw new Error('Supabase client not initialized. Check SUPABASE_URL and service keys.');
-  }
-  return supabase;
-};
 
 // Get all contact messages (for admin)
 router.get('/', async (req, res) => {
   try {
-    const client = ensureSupabase();
-    const { data, error } = await client
-      .from('contact_messages')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('❌ Supabase query error detected!');
-      console.error('Error object:', error);
-      console.error('Error type:', typeof error);
-      console.error('Error keys:', Object.keys(error || {}));
-      console.error('Error code:', error?.code);
-      console.error('Error message:', error?.message);
-      console.error('Error details:', error?.details);
-      console.error('Error hint:', error?.hint);
-      console.error('Full error JSON:', JSON.stringify(error, null, 2));
-      
-      // Check for common Supabase errors
-      if (error?.code === '42P01') {
-        console.error('🔴 TABLE DOES NOT EXIST: contact_messages');
-      } else if (error?.code === 'PGRST116') {
-        console.error('🔴 TABLE NOT FOUND: contact_messages');
-      }
-      
-      throw error;
-    }
-
-    res.json({ success: true, messages: data || [] });
+    const { rows } = await db.query(
+      'SELECT * FROM contact_messages ORDER BY created_at DESC'
+    );
+    res.json({ success: true, messages: rows });
   } catch (error) {
     console.error('Error fetching contact messages:', error);
-    console.error('Error type:', typeof error);
-    console.error('Error constructor:', error?.constructor?.name);
-    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-    
-    // Check if it's a table missing error
-    if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Table "contact_messages" does not exist. Please create it in Supabase.',
-        code: error.code,
-        hint: error.hint
-      });
+    if (error.code === '42P01') { // undefined_table
+      return res.json({ success: true, messages: [] }); // Return empty if table doesn't exist yet
     }
-    
-    res.status(500).json({ 
-      success: false, 
-      error: error?.message || error?.toString() || 'Internal server error.',
-      code: error?.code || null,
-      hint: error?.hint || null,
-      details: error?.details || null
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -81,25 +32,47 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Insert message into Supabase
-    const client = ensureSupabase();
-    const { data, error } = await client
-      .from('contact_messages')
-      .insert([{
-        name,
-        email,
-        phone: phone || null,
-        event_date: eventDate || null,
-        guest_count: guestCount || null,
-        message,
-        status: 'new',
-        created_at: new Date().toISOString()
-      }])
-      .select();
+    // Insert message into DB
+    const insertQuery = `
+      INSERT INTO contact_messages (name, email, phone, event_date, guest_count, message, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, 'new', NOW())
+      RETURNING *
+    `;
 
-    if (error) throw error;
+    // Check if table exists first, or just let it fail/create it?
+    // For robustness, let's catch the error and try to create table if missing (optional but nice)
+    // But for now, we assume migration ran or we catch error.
 
-    // Write to Google Sheets (non-blocking - don't fail if this fails)
+    let result;
+    try {
+      result = await db.query(insertQuery, [name, email, phone, eventDate, guestCount, message]);
+    } catch (err) {
+      if (err.code === '42P01') {
+        console.log('Creating contact_messages table...');
+        await db.query(`
+                CREATE TABLE IF NOT EXISTS contact_messages (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT,
+                    event_date TEXT,
+                    guest_count INTEGER,
+                    message TEXT NOT NULL,
+                    status TEXT DEFAULT 'new',
+                    response TEXT,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                )
+            `);
+        // Retry insert
+        result = await db.query(insertQuery, [name, email, phone, eventDate, guestCount, message]);
+      } else {
+        throw err;
+      }
+    }
+
+    const newMessage = result.rows[0];
+
+    // Write to Google Sheets (non-blocking)
     try {
       await writeContactMessageToSheet({
         name,
@@ -110,37 +83,32 @@ router.post('/', async (req, res) => {
         message,
       });
     } catch (sheetsError) {
-      // Log error but don't fail the request
       console.error('Error writing to Google Sheets (non-critical):', sheetsError);
     }
 
-    res.json({ success: true, message: 'Message sent successfully!', data: data[0] });
+    res.json({ success: true, message: 'Message sent successfully!', data: newMessage });
   } catch (error) {
     console.error('Error saving contact message:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Update message status (mark as read, replied, etc.)
+// Update message status
 router.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { status, response } = req.body;
 
-    const updateData = {};
-    if (status) updateData.status = status;
-    if (response) updateData.response = response;
+    const { rows } = await db.query(
+      `UPDATE contact_messages 
+       SET status = COALESCE($1, status), 
+           response = COALESCE($2, response)
+       WHERE id = $3 
+       RETURNING *`,
+      [status, response, id]
+    );
 
-    const client = ensureSupabase();
-    const { data, error } = await client
-      .from('contact_messages')
-      .update(updateData)
-      .eq('id', id)
-      .select();
-
-    if (error) throw error;
-
-    res.json({ success: true, message: 'Message updated successfully!', data: data[0] });
+    res.json({ success: true, message: 'Message updated successfully!', data: rows[0] });
   } catch (error) {
     console.error('Error updating contact message:', error);
     res.status(500).json({ success: false, error: error.message });
@@ -152,40 +120,22 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Get the message data before deleting (to find it in Google Sheets)
-    const client = ensureSupabase();
-    const { data: messageData, error: fetchError } = await client
-      .from('contact_messages')
-      .select('*')
-      .eq('id', id)
-      .single();
+    // Get message to delete from sheets later
+    const { rows: existing } = await db.query('SELECT * FROM contact_messages WHERE id = $1', [id]);
+    const messageData = existing[0];
 
-    if (fetchError) throw fetchError;
-
-    // Delete from Supabase
-    const { error } = await client
-      .from('contact_messages')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    await db.query('DELETE FROM contact_messages WHERE id = $1', [id]);
 
     // Delete from Google Sheets (non-blocking)
     if (messageData) {
       try {
-        console.log('🗑️ Attempting to delete contact message from Google Sheets...');
-        const deleteResult = await deleteContactMessageFromSheet({
+        await deleteContactMessageFromSheet({
           email: messageData.email,
           message: messageData.message,
           name: messageData.name,
         });
-        if (!deleteResult.success) {
-          console.warn('⚠️ Google Sheets deletion failed:', deleteResult.error);
-        }
       } catch (sheetsError) {
-        // Log error but don't fail the request
-        console.error('❌ Error deleting from Google Sheets (non-critical):', sheetsError);
-        console.error('   Stack:', sheetsError.stack);
+        console.error('Error deleting from Google Sheets:', sheetsError);
       }
     }
 
@@ -197,4 +147,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
-

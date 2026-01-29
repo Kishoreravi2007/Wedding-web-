@@ -77,7 +77,7 @@ const createGoogleCalendarLink = (dayDate: string, event: any) => {
   // Check if event has startDateTime (Date object or ISO string)
   if (event.startDateTime) {
     startTime = event.startDateTime instanceof Date ? event.startDateTime : new Date(event.startDateTime);
-    endTime = event.endDateTime ? 
+    endTime = event.endDateTime ?
       (event.endDateTime instanceof Date ? event.endDateTime : new Date(event.endDateTime)) :
       new Date(startTime.getTime() + 60 * 60 * 1000); // Default to 1 hour duration
   }
@@ -124,22 +124,22 @@ const SisterBSchedule = () => {
   // Initialize EventService and load events
   useEffect(() => {
     const eventService = EventService.getInstance();
-    
+
     // Convert and load sreedevi schedule events
     const events = ScheduleConverter.convertSreedeviSchedule();
     events.forEach(event => eventService.addEvent(event));
-    
+
     // Get categorized events for sreedevi schedule only
     const categorized = eventService.getCategorizedEventsBySchedule('sreedevi');
     setCategorizedEvents(categorized);
     setIsLoading(false);
-    
+
     // Set up auto-update
     const updateInterval = setInterval(() => {
       const updatedCategorized = eventService.getCategorizedEventsBySchedule('sreedevi');
       setCategorizedEvents(updatedCategorized);
     }, 60000); // Update every minute
-    
+
     return () => clearInterval(updateInterval);
   }, []);
 
@@ -159,7 +159,7 @@ const SisterBSchedule = () => {
     const monthName = date.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
     const day = date.getDate();
     const year = date.getFullYear();
-    
+
     return `${t(dayName)}, ${t(monthName)} ${day}${getOrdinalSuffix(day)}, ${year}`;
   };
 
@@ -179,7 +179,7 @@ const SisterBSchedule = () => {
   const getDescriptionKey = (eventId: string): string => {
     // Try specific event description first (e.g., "ayaniyoonu-b" -> "ayaniyoonu-bDescription")
     const specificKey = `${eventId}Description`;
-    
+
     // Fallback mapping for common descriptions
     const fallbackMap: { [key: string]: string } = {
       "engagement-a": "engagementDescription",
@@ -197,7 +197,7 @@ const SisterBSchedule = () => {
       "1000 thiritirikkal-b": "1000 thiritirikkal-bDescription",
       "ganapathykidal-a": "ganapathykidal-aDescription",
     };
-    
+
     return fallbackMap[eventId] || specificKey;
   };
 
@@ -208,7 +208,7 @@ const SisterBSchedule = () => {
   const renderEventCard = (event: Event) => {
     const descriptionKey = getDescriptionKey(event.id);
     const translatedDescription = t(descriptionKey);
-    
+
     return (
       <Card key={event.id} className="w-full sm:w-80 bg-[#FFFDD0]/50 border border-[#800000] rounded-lg overflow-hidden shadow-lg transform transition-all duration-500 hover:scale-105">
         <img src={event.image} alt={t(event.title)} className="w-full h-48 object-cover" />
@@ -217,7 +217,7 @@ const SisterBSchedule = () => {
             {t(event.title)}
           </CardTitle>
           <CardDescription className="text-[#800000] text-sm mb-4">
-            <div dangerouslySetInnerHTML={{ __html: translatedDescription }} />
+            <span dangerouslySetInnerHTML={{ __html: translatedDescription }} />
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 pt-0 space-y-3">
@@ -228,16 +228,16 @@ const SisterBSchedule = () => {
           <p className="text-[#800000] text-sm flex items-center justify-between">
             <span className="flex items-center">
               <Clock className="w-4 h-4 mr-2 text-[#800000]" />
-              {event.startDateTime.toLocaleTimeString('en-US', { 
-                hour: 'numeric', 
+              {event.startDateTime.toLocaleTimeString('en-US', {
+                hour: 'numeric',
                 minute: '2-digit',
-                hour12: true 
+                hour12: true
               })}
               {event.endDateTime && (
-                <span> - {event.endDateTime.toLocaleTimeString('en-US', { 
-                  hour: 'numeric', 
+                <span> - {event.endDateTime.toLocaleTimeString('en-US', {
+                  hour: 'numeric',
                   minute: '2-digit',
-                  hour12: true 
+                  hour12: true
                 })}</span>
               )}
             </span>
@@ -308,34 +308,34 @@ const SisterBSchedule = () => {
 
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto z-10">
-        <h1 className="font-heading text-6xl text-center mb-12 text-[#800000] font-bold">
-          {t('Schedule of Events')}
-        </h1>
+          <h1 className="font-heading text-6xl text-center mb-12 text-[#800000] font-bold">
+            {t('Schedule of Events')}
+          </h1>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#800000]"></div>
-            <span className="ml-3 text-[#800000]">Loading events...</span>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap justify-center gap-8 pb-16">
-              {upcomingEvents.map(event => renderEventCard(event))}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#800000]"></div>
+              <span className="ml-3 text-[#800000]">Loading events...</span>
             </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-center gap-8 pb-16">
+                {upcomingEvents.map(event => renderEventCard(event))}
+              </div>
 
-            {pastEvents.length > 0 && (
-              <>
-                <h2 className="font-heading text-3xl text-center mb-8 sm:mb-12 text-[#800000] font-bold mt-16">
-                  {t('Out of date Events')}
-                </h2>
-                <div className="flex flex-wrap justify-center gap-8 pb-16">
-                  {pastEvents.map(event => renderEventCard(event))}
-                </div>
-              </>
-            )}
-          </>
-        )}
-        <WishBox recipient="sreedevi" /> {/* Add the WishBox component here */}
+              {pastEvents.length > 0 && (
+                <>
+                  <h2 className="font-heading text-3xl text-center mb-8 sm:mb-12 text-[#800000] font-bold mt-16">
+                    {t('Out of date Events')}
+                  </h2>
+                  <div className="flex flex-wrap justify-center gap-8 pb-16">
+                    {pastEvents.map(event => renderEventCard(event))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+          <WishBox recipient="sreedevi" /> {/* Add the WishBox component here */}
         </div>
       </div>
     </div>

@@ -41,14 +41,14 @@ async function createAdminUser() {
 
     if (existingUser) {
       console.log('⚠️  User already exists! Updating password instead...\n');
-      
+
       // Hash new password
       const hashedPassword = await bcrypt.hash(password, 12);
-      
+
       // Update existing user
       const { error: updateError } = await supabase
         .from('users')
-        .update({ 
+        .update({
           password: hashedPassword,
           role: role,
           is_active: true

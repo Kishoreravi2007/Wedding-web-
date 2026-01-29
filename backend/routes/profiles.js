@@ -9,6 +9,20 @@ const router = express.Router();
 const { query } = require('../lib/db-gcp');
 
 /**
+ * GET /api/profiles
+ * List all profiles
+ */
+router.get('/', async (req, res) => {
+    try {
+        const { rows } = await query('SELECT * FROM profiles ORDER BY full_name');
+        res.json({ profiles: rows });
+    } catch (error) {
+        console.error('Error listing profiles:', error);
+        res.status(500).json({ message: 'Error listing profiles', error: error.message });
+    }
+});
+
+/**
  * POST /api/profiles
  * Create or update a user profile
  */

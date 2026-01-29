@@ -3,42 +3,26 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../lib/supabase');
 
-const ensureSupabase = () => {
-  if (!supabase) {
-    throw new Error('Supabase client not initialized. Check SUPABASE_URL and service keys.');
-  }
-  return supabase;
-};
-
 // =====================================================
 // GET ALL WEDDINGS
 // =====================================================
 router.get('/', async (req, res) => {
   try {
     const { status } = req.query;
-    
-    const client = ensureSupabase();
-    let query = client
+
+    let query = supabase
       .from('weddings')
       .select('*')
       .order('wedding_date', { ascending: false });
-    
-    // Filter by status if provided
+
     if (status) {
       query = query.eq('status', status);
     }
-    
+
     const { data, error } = await query;
-    
-    if (error) {
-      console.error('Supabase error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      console.error('Error details:', error.details);
-      console.error('Error hint:', error.hint);
-      throw error;
-    }
-    
+
+    if (error) throw error;
+
     res.json({
       success: true,
       weddings: data,
@@ -46,26 +30,9 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching weddings:', error);
-    console.error('Error type:', typeof error);
-    console.error('Error constructor:', error?.constructor?.name);
-    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-    
-    // Check if it's a table missing error
-    if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
-      return res.status(500).json({
-        success: false,
-        error: 'Table "weddings" does not exist. Please create it in Supabase.',
-        code: error.code,
-        hint: error.hint
-      });
-    }
-    
     res.status(500).json({
       success: false,
-      error: error?.message || error?.toString() || 'Internal server error.',
-      code: error?.code || null,
-      hint: error?.hint || null,
-      details: error?.details || null
+      error: error.message || 'Internal server error'
     });
   }
 });
@@ -76,23 +43,22 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
-    const client = ensureSupabase();
-    const { data, error } = await client
+
+    const { data, error } = await supabase
       .from('weddings')
       .select('*')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
-    
+
     if (!data) {
       return res.status(404).json({
         success: false,
         error: 'Wedding not found'
       });
     }
-    
+
     res.json({
       success: true,
       wedding: data
@@ -112,23 +78,22 @@ router.get('/:id', async (req, res) => {
 router.get('/code/:weddingCode', async (req, res) => {
   try {
     const { weddingCode } = req.params;
-    
-    const client = ensureSupabase();
-    const { data, error } = await client
+
+    const { data, error } = await supabase
       .from('weddings')
       .select('*')
       .eq('wedding_code', weddingCode)
       .single();
-    
+
     if (error) throw error;
-    
+
     if (!data) {
       return res.status(404).json({
         success: false,
         error: 'Wedding not found'
       });
     }
-    
+
     res.json({
       success: true,
       wedding: data
@@ -148,14 +113,13 @@ router.get('/code/:weddingCode', async (req, res) => {
 router.get('/:id/stats', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Use the database function to get stats
-    const client = ensureSupabase();
-    const { data, error } = await client
+    const { data, error } = await supabase
       .rpc('get_wedding_stats', { p_wedding_id: id });
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       stats: data[0] || {
@@ -197,7 +161,7 @@ router.post('/', async (req, res) => {
       enable_wishes,
       enable_live_stream
     } = req.body;
-    
+
     // Validate required fields
     if (!wedding_code || (!bride_name && !groom_name)) {
       return res.status(400).json({
@@ -205,10 +169,9 @@ router.post('/', async (req, res) => {
         error: 'wedding_code and at least one of bride_name or groom_name are required'
       });
     }
-    
+
     // Insert new wedding
-    const client = ensureSupabase();
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from('weddings')
       .insert([{
         wedding_code,
@@ -230,7 +193,7 @@ router.post('/', async (req, res) => {
       }])
       .select()
       .single();
-    
+
     if (error) {
       if (error.code === '23505') { // Unique violation
         return res.status(409).json({
@@ -240,7 +203,7 @@ router.post('/', async (req, res) => {
       }
       throw error;
     }
-    
+
     res.status(201).json({
       success: true,
       message: 'Wedding created successfully',
@@ -262,29 +225,28 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
+
     // Remove fields that shouldn't be updated directly
     delete updateData.id;
     delete updateData.created_at;
     delete updateData.created_by;
-    
-    const client = ensureSupabase();
-    const { data, error } = await client
+
+    const { data, error } = await supabase
       .from('weddings')
       .update(updateData)
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     if (!data) {
       return res.status(404).json({
         success: false,
         error: 'Wedding not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Wedding updated successfully',
@@ -305,29 +267,28 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // First, check if wedding has any photos
-    const client = ensureSupabase();
-    const { data: photos } = await client
+    const { data: photos } = await supabase
       .from('photos')
       .select('id')
       .eq('wedding_id', id)
       .limit(1);
-    
+
     if (photos && photos.length > 0) {
       return res.status(400).json({
         success: false,
         error: 'Cannot delete wedding with existing photos. Please delete photos first or archive the wedding.'
       });
     }
-    
-    const { error } = await client
+
+    const { error } = await supabase
       .from('weddings')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       message: 'Wedding deleted successfully'
@@ -347,17 +308,16 @@ router.delete('/:id', async (req, res) => {
 router.post('/:id/archive', async (req, res) => {
   try {
     const { id } = req.params;
-    
-    const client = ensureSupabase();
-    const { data, error } = await client
+
+    const { data, error } = await supabase
       .from('weddings')
       .update({ status: 'archived' })
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       message: 'Wedding archived successfully',
@@ -377,15 +337,14 @@ router.post('/:id/archive', async (req, res) => {
 // =====================================================
 router.get('/public/upcoming', async (req, res) => {
   try {
-    const client = ensureSupabase();
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from('weddings')
       .select('wedding_code, bride_name, groom_name, wedding_date, wedding_month, theme_color')
       .in('status', ['active', 'upcoming'])
       .order('wedding_date', { ascending: true });
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       weddings: data
@@ -399,5 +358,5 @@ router.get('/public/upcoming', async (req, res) => {
   }
 });
 
-module.exports = router;
 
+module.exports = router;

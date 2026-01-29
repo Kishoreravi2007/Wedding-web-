@@ -91,9 +91,21 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error getting photos:', error);
-    res.status(500).json({
-      message: 'Error retrieving photos',
-      error: error.message
+
+    // Provide more helpful error messages for common database issues
+    let status = 500;
+    let message = 'Error retrieving photos';
+    let detail = error.message;
+
+    if (error.message && error.message.includes('Tenant or user not found')) {
+      message = 'Database connection failed (Supabase project may be paused or ID incorrect)';
+    } else if (error.code === 'ECONNREFUSED' || error.message.includes('Connection terminated')) {
+      message = 'Could not connect to the database server';
+    }
+
+    res.status(status).json({
+      message,
+      error: detail
     });
   }
 });
@@ -159,9 +171,9 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
   const faces = req.body.faces || req.body.faceDescriptors || req.body.face_descriptors;
 
   // Validate required fields
-  if (!sister || !['sister-a', 'sister-b'].includes(sister)) {
+  if (!sister) {
     return res.status(400).json({
-      message: 'Invalid or missing sister identifier. Must be "sister-a" or "sister-b"'
+      message: 'Invalid or missing sister identifier/photographer.'
     });
   }
 

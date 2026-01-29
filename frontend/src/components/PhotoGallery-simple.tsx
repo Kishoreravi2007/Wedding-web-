@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Eye, Download, Check, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { Search, Eye, Download, Check, X, ChevronLeft, ChevronRight, ZoomIn, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence, Easing } from 'framer-motion';
 import { Photo, Face } from '@/types/photo'; // Import Photo and Face interfaces from types
 import { cn } from '@/lib/utils';
@@ -180,6 +180,8 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   const [downloadingPhotos, setDownloadingPhotos] = useState<Set<string>>(new Set());
   const [downloadedPhotos, setDownloadedPhotos] = useState<Set<string>>(new Set());
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch photos from backend API
   useEffect(() => {
@@ -192,14 +194,22 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
 
         const photosEndpoint = `${API_BASE_URL}/api/photos?sister=${sister}`;
 
+        setIsLoading(true);
         const response = await fetch(photosEndpoint);
 
         if (!response.ok) {
-          console.error('Failed to fetch photos:', response.status);
+          try {
+            const errorData = await response.json();
+            setError(errorData.message || `Error ${response.status}: Failed to fetch photos`);
+          } catch (e) {
+            setError(`Error ${response.status}: Failed to fetch photos`);
+          }
+          setIsLoading(false);
           return;
         }
 
         const photosData = await response.json();
+        setError(null);
 
         // Handle object response from new API version
         const photosArray = Array.isArray(photosData) ? photosData : (photosData.photos || []);
@@ -207,8 +217,11 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
         const mappedPhotos = photosArray.map(mapApiPhotoToPhotoType);
 
         setPhotos(mappedPhotos);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching photos:', error);
+        setError(error.message || 'An unexpected error occurred while fetching photos');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -431,6 +444,43 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Error Alert */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold">Unable to load gallery</p>
+                <p className="text-sm opacity-90">{error}</p>
+                {error.includes('Supabase') && (
+                  <p className="text-xs mt-2 underline cursor-help" onClick={() => alert('This error usually means your Supabase project is paused or the Project ID in your .env file is incorrect. Please check your Supabase dashboard.')}>
+                    Why am I seeing this?
+                  </p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Loading State */}
+      {isLoading && photos.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 gap-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"
+          />
+          <p className="text-gray-500 animate-pulse">Loading gallery...</p>
+        </div>
+      )}
 
       {/* Photo Grid */}
       <motion.div
