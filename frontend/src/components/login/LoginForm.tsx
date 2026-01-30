@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Heart, ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
+import { Heart, ShieldCheck, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -29,6 +29,7 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
   const [requires2FA, setRequires2FA] = useState(false);
   const [userId2FA, setUserId2FA] = useState<string | null>(null);
   const [otpValue, setOtpValue] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login, verify2FA } = useAuth();
   const navigate = useNavigate();
@@ -177,15 +178,25 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
             <Label htmlFor="password" className="text-sm text-slate-700">
               Password
             </Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              className="bg-white text-slate-900 placeholder:text-slate-400"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                className="bg-white text-slate-900 placeholder:text-slate-400 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-sm text-slate-600">

@@ -7,7 +7,8 @@ import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { X, Search, MapPin, Loader2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { detectFaces, loadFaceDetectionModels } from "@/utils/faceDetection";
 // import { supabase } from "@/lib/supabase";
 
@@ -135,6 +136,50 @@ const CompanyAccount = () => {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef<{ x: number; y: number; cropX: number; cropY: number } | null>(null);
+
+  // Location Search State
+  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Location Search Logic
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (formState.location.length < 3) {
+        setLocationSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setIsSearchingLocation(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formState.location)}&addressdetails=1&limit=5&featuretype=city`
+        );
+        const data = await response.json();
+
+        const formatted = data.map((item: any) => ({
+          id: item.place_id,
+          display: `${item.address.city || item.address.town || item.address.district || item.display_name.split(',')[0]}, ${item.address.state || ''}`,
+          fullName: item.display_name
+        }));
+
+        setLocationSuggestions(formatted);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error("Location search failed:", error);
+      } finally {
+        setIsSearchingLocation(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [formState.location]);
+
+  const handleSelectLocation = (loc: any) => {
+    handleInput("location", loc.display);
+    setShowSuggestions(false);
+  };
 
   const handleInput = useCallback(
     (field: "fullName" | "email" | "bio" | "location", value: string) => {
@@ -509,12 +554,52 @@ const CompanyAccount = () => {
 
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={formState.location}
-                onChange={(event) => handleInput("location", event.target.value)}
-                placeholder="Kerala, India"
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                <Input
+                  id="location"
+                  value={formState.location}
+                  onChange={(event) => {
+                    handleInput("location", event.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => formState.location.length >= 3 && setShowSuggestions(true)}
+                  placeholder="Search location (e.g. Palakkad, Kerala)"
+                  className="pl-10"
+                />
+                {isSearchingLocation && (
+                  <div className="absolute right-3 top-3">
+                    <Loader2 className="w-4 h-4 text-rose-500 animate-spin" />
+                  </div>
+                )}
+
+                {/* Suggestions Dropdown */}
+                <AnimatePresence>
+                  {showSuggestions && locationSuggestions.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute z-50 left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-[250px] overflow-y-auto"
+                    >
+                      {locationSuggestions.map((loc) => (
+                        <button
+                          key={loc.id}
+                          type="button"
+                          onClick={() => handleSelectLocation(loc)}
+                          className="w-full px-4 py-3 text-left hover:bg-slate-50 flex items-start gap-3 transition-colors border-b border-slate-50 last:border-0"
+                        >
+                          <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-slate-700">{loc.display}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{loc.fullName}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
             <div className="space-y-2">

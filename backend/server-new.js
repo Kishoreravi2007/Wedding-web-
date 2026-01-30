@@ -11,6 +11,8 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 const path = require('path');
+const emailService = require('./services/email-service');
+
 
 // =============================================================================
 // FIREBASE INITIALIZATION (for wishes only)
@@ -142,6 +144,14 @@ app.use('/api/admin', adminSetupRouter);
 
 // AI Generation Routes
 app.use('/api/ai', require('./routes/ai'));
+
+// Email Test Route (Development only)
+app.post('/api/email/test', async (req, res) => {
+  const { to } = req.body;
+  const result = await emailService.sendTestEmail(to || process.env.EMAIL_USER);
+  res.status(result.success ? 200 : 500).json(result);
+});
+
 
 // Wedding Routes
 console.log('💍 Registering /api/weddings route...');

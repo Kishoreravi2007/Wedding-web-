@@ -5,8 +5,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
+import { Eye, EyeOff, Search, MapPin, Loader2, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 // import { supabase } from "@/lib/supabase";
 
 const CompanySignup = () => {
@@ -20,6 +29,100 @@ const CompanySignup = () => {
   const [photo, setPhoto] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Location Search State
+  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Location Search Logic
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (location.length < 3) {
+        setLocationSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setIsSearchingLocation(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&addressdetails=1&limit=5&featuretype=city`
+        );
+        const data = await response.json();
+
+        const formatted = data.map((item: any) => ({
+          id: item.place_id,
+          display: `${item.address.city || item.address.town || item.address.district || item.display_name.split(',')[0]}, ${item.address.state || ''}`,
+          fullName: item.display_name
+        }));
+
+        setLocationSuggestions(formatted);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error("Location search failed:", error);
+      } finally {
+        setIsSearchingLocation(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [location]);
+
+  const handleSelectLocation = (loc: any) => {
+    setLocation(loc.display);
+    setShowSuggestions(false);
+  };
+
+  // AI Bio State
+  const [showAiDialog, setShowAiDialog] = useState(false);
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+  const [roughBio, setRoughBio] = useState("");
+  const [generatedPreview, setGeneratedPreview] = useState("");
+
+  const handleGenerateBio = async () => {
+    if (!roughBio.trim()) return;
+    setIsGeneratingBio(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/ai/generate-bio`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          draft: roughBio,
+          name: fullName,
+          type: "Wedding Professional"
+        })
+      });
+
+      if (!response.ok) throw new Error("Failed to generate");
+
+      const data = await response.json();
+      setGeneratedPreview(data.bio);
+      toast({
+        title: "Magic happens!",
+        description: data.isMock ? "Generated a sample bio for you." : "Your professional bio is ready.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Generation failed",
+        description: "Could not reach the AI magic. Please try again.",
+      });
+      console.error(error);
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
+
+  const applyGeneratedBio = () => {
+    setBio(generatedPreview);
+    setShowAiDialog(false);
+    setGeneratedPreview("");
+    setRoughBio("");
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,8 +177,8 @@ const CompanySignup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900 px-4 py-12">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-center gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900 px-4 py-12 flex flex-col items-center">
+      <div className="w-full max-w-5xl space-y-8">
         <Card className="w-full border border-slate-200 shadow-xl">
           <CardHeader className="space-y-3 text-center">
             <CardTitle className="text-3xl font-semibold text-slate-900">Create an account</CardTitle>
@@ -116,30 +219,81 @@ const CompanySignup = () => {
                   required
                 />
               </div>
-              <div>
+              <div className="relative">
                 <Label htmlFor="signup-location" className="text-slate-700">
                   Location
                 </Label>
-                <Input
-                  id="signup-location"
-                  type="text"
-                  value={location}
-                  onChange={(event) => setLocation(event.target.value)}
-                  placeholder="Kerala, India"
-                  className="bg-white text-slate-900 placeholder:text-slate-400"
-                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                  <Input
+                    id="signup-location"
+                    type="text"
+                    value={location}
+                    onChange={(event) => {
+                      setLocation(event.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => location.length >= 3 && setShowSuggestions(true)}
+                    placeholder="Search location (e.g. Palakkad, Kerala)"
+                    className="pl-10 bg-white text-slate-900 placeholder:text-slate-400"
+                  />
+                  {isSearchingLocation && (
+                    <div className="absolute right-3 top-3">
+                      <Loader2 className="w-4 h-4 text-rose-500 animate-spin" />
+                    </div>
+                  )}
+
+                  {/* Suggestions Dropdown */}
+                  <AnimatePresence>
+                    {showSuggestions && locationSuggestions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute z-50 left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-[250px] overflow-y-auto"
+                      >
+                        {locationSuggestions.map((loc) => (
+                          <button
+                            key={loc.id}
+                            type="button"
+                            onClick={() => handleSelectLocation(loc)}
+                            className="w-full px-4 py-3 text-left hover:bg-slate-50 flex items-start gap-3 transition-colors border-b border-slate-50 last:border-0"
+                          >
+                            <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-medium text-slate-700">{loc.display}</p>
+                              <p className="text-[10px] text-slate-400 truncate">{loc.fullName}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
               <div>
-                <Label htmlFor="signup-bio" className="text-slate-700">
-                  Bio
-                </Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label htmlFor="signup-bio" className="text-slate-700">
+                    Professional Bio
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-7 px-2 gap-1.5"
+                    onClick={() => setShowAiDialog(true)}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span className="text-xs font-semibold">Generate with AI</span>
+                  </Button>
+                </div>
                 <Textarea
                   id="signup-bio"
                   value={bio}
                   onChange={(event) => setBio(event.target.value)}
-                  placeholder="Tell us a little about you."
+                  placeholder="Tell us about your services..."
                   rows={3}
-                  className="bg-white text-slate-900 placeholder:text-slate-400"
+                  className="bg-white text-slate-900 placeholder:text-slate-400 min-h-[100px]"
                 />
               </div>
               <div>
@@ -174,14 +328,24 @@ const CompanySignup = () => {
                 <Label htmlFor="signup-password" className="text-slate-700">
                   Password<span className="ml-1 text-rose-500">*</span>
                 </Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Strong password"
-                  className="bg-white text-slate-900 placeholder:text-slate-400"
-                />
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Strong password"
+                    className="bg-white text-slate-900 placeholder:text-slate-400 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
               <Button
                 type="submit"
@@ -200,9 +364,83 @@ const CompanySignup = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Bio Generator Dialog */}
+      <Dialog open={showAiDialog} onOpenChange={setShowAiDialog}>
+        <DialogContent className="sm:max-w-lg rounded-2xl overflow-hidden p-0 gap-0 border-none shadow-2xl">
+          <DialogHeader className="p-6 pb-2 bg-gradient-to-r from-rose-500 to-indigo-600 text-white">
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Sparkles className="w-5 h-5" />
+              AI Bio Generator
+            </DialogTitle>
+            <DialogDescription className="text-rose-100">
+              Transform your rough thoughts into a premium professional bio.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6 space-y-6 bg-white">
+            {!generatedPreview ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">What should we mention?</Label>
+                  <textarea
+                    value={roughBio}
+                    onChange={(e) => setRoughBio(e.target.value)}
+                    placeholder="e.g. 5 years experience in photography, specialize in candid shots, based in Kerala..."
+                    className="w-full min-h-[120px] p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none text-sm bg-slate-50 shadow-inner transition-all"
+                  />
+                  <p className="text-[11px] text-slate-400">Our AI will polish this into a professional summary.</p>
+                </div>
+                <Button
+                  onClick={handleGenerateBio}
+                  disabled={!roughBio.trim() || isGeneratingBio}
+                  className="w-full bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-700 hover:to-indigo-700 text-white h-11 rounded-xl shadow-lg transition-all"
+                >
+                  {isGeneratingBio ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Crafting your story...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Professional Bio
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">Your Polished Bio</Label>
+                  <div className="p-4 bg-rose-50/50 rounded-xl border border-rose-100 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scrollbar">
+                    {generatedPreview}
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setGeneratedPreview("");
+                      setRoughBio("");
+                    }}
+                    className="flex-1 rounded-xl border-slate-200"
+                  >
+                    Start Over
+                  </Button>
+                  <Button
+                    onClick={applyGeneratedBio}
+                    className="flex-1 bg-slate-900 hover:bg-slate-800 text-white rounded-xl"
+                  >
+                    Apply this bio
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default CompanySignup;
-
