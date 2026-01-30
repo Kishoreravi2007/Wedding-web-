@@ -143,16 +143,15 @@ const CompanyLanding = () => {
                     Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-slate-200 text-slate-700 hover:border-rose-200 hover:bg-rose-50 text-lg px-8 py-6 h-auto transition-all hover:-translate-y-1"
-                  asChild
-                >
-                  <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                <Link to="/company/guide">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-slate-200 text-slate-700 hover:border-rose-200 hover:bg-rose-50 text-lg px-8 py-6 h-auto transition-all hover:-translate-y-1"
+                  >
                     View Customer Guide <FileText className="ml-2 w-5 h-5" />
-                  </a>
-                </Button>
+                  </Button>
+                </Link>
               </div>
 
               <div className="mt-12 flex items-center gap-6 text-sm text-slate-500">

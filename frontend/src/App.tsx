@@ -53,6 +53,7 @@ import CompanyPricing from "./pages/company/Pricing";
 import CompanyPortfolio from "./pages/company/Portfolio";
 import CompanyContact from "./pages/company/Contact";
 import CompanyLegal from "./pages/company/Legal";
+import CompanyGuide from "./pages/company/Guide";
 import CompanyBookings from "./pages/company/Bookings";
 import CompanyPayments from "./pages/company/Payments";
 import CompanySettings from "./pages/company/Settings";
@@ -206,6 +207,7 @@ const App = () => {
               <Route path="/company/bookings" element={<AuthGuard><CompanyBookings /></AuthGuard>} />
               <Route path="/company/payments" element={<AuthGuard><CompanyPayments /></AuthGuard>} />
               <Route path="/company/settings" element={<AuthGuard><CompanySettings /></AuthGuard>} />
+              <Route path="/company/guide" element={<CompanyGuide />} />
               <Route path="/company/scroll" element={<CompanyScrollDemo />} />
 
               {/* Company Route Redirects - Short URLs */}
@@ -214,6 +216,7 @@ const App = () => {
               <Route path="/pricing" element={<Navigate to="/company/pricing" replace />} />
               <Route path="/portfolio" element={<Navigate to="/company/portfolio" replace />} />
               <Route path="/contact" element={<Navigate to="/company/contact" replace />} />
+              <Route path="/guide" element={<Navigate to="/company/guide" replace />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

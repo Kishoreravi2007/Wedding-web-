@@ -449,14 +449,12 @@ const Services = () => {
               <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
               <ul className="space-y-3 text-slate-400">
                 <li>
-                  <a
-                    href={documentationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/company/guide"
                     className="hover:text-white transition-colors flex items-center gap-2"
                   >
-                    <FileText className="w-4 h-4" /> Documentation
-                  </a>
+                    <FileText className="w-4 h-4" /> Platform Guide
+                  </Link>
                 </li>
                 <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
