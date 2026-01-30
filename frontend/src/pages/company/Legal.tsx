@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Heart } from "lucide-react";
 
 const Legal = () => {
     const { pathname } = useLocation();
@@ -109,6 +110,63 @@ const Legal = () => {
                     </Link>
                 </div>
             </main>
+
+            {/* Footer */}
+            <footer className="bg-slate-900 text-white py-16 px-4">
+                <div className="container mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                        <div>
+                            <div className="flex items-center gap-3 mb-6">
+                                <img src="/logo.png" alt="WeddingWeb Logo" className="w-10 h-10 rounded-xl object-contain bg-white" />
+                                <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">WeddingWeb</span>
+                            </div>
+                            <p className="text-slate-400 leading-relaxed">
+                                Making weddings memorable with cutting-edge technology.
+                                Built with love in Kerala.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg mb-6 text-white">Product</h3>
+                            <ul className="space-y-3 text-slate-400">
+                                <li><Link to="/company/services" className="hover:text-white transition-colors">Features</Link></li>
+                                <li><Link to="/company/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                                <li><Link to="/company/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg mb-6 text-white">Company</h3>
+                            <ul className="space-y-3 text-slate-400">
+                                <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
+                                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
+                            <ul className="space-y-3 text-slate-400">
+                                <li>
+                                    <a
+                                        href="https://github.com/Kishoreravi2007/Wedding-web-"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-white transition-colors flex items-center gap-2"
+                                    >
+                                        Documentation
+                                    </a>
+                                </li>
+                                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
+                        <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+                        <p className="text-sm flex items-center justify-center gap-2">
+                            Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };

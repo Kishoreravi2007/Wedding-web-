@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { LandingToolbar } from "@/components/LandingToolbar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Check,
   Sparkles,
   Camera,
@@ -90,7 +91,7 @@ const pricingFeatures: PricingFeature[] = [
     icon: <Music className="w-5 h-5" />,
     category: 'core'
   },
-  
+
   // Advanced Features
   {
     id: 'face-detection',
@@ -149,7 +150,7 @@ const pricingFeatures: PricingFeature[] = [
     icon: <Bell className="w-5 h-5" />,
     category: 'features'
   },
-  
+
   // Premium Features
   {
     id: 'custom-branding',
@@ -183,7 +184,7 @@ const pricingFeatures: PricingFeature[] = [
     icon: <FileText className="w-5 h-5" />,
     category: 'premium'
   },
-  
+
   // Add-ons
   {
     id: 'priority-support',
@@ -278,11 +279,10 @@ const BillingDurationSelector = ({
             key={option.key}
             aria-pressed={isActive}
             onClick={() => onChange(option.key)}
-            className={`flex flex-col items-center justify-center gap-1 rounded-xl border px-3 py-2 text-center text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-500 ${
-              isActive
+            className={`flex flex-col items-center justify-center gap-1 rounded-xl border px-3 py-2 text-center text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-500 ${isActive
                 ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-inner'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-rose-300'
-            }`}
+              }`}
           >
             <span className="text-[13px] leading-tight">{option.label}</span>
             <span className="text-[10px] text-slate-400">{option.multiplier}x</span>
@@ -438,24 +438,53 @@ const Pricing = () => {
       {/* Navigation */}
       <CompanyNavSimple />
 
+      {/* Sidebar Toolbar */}
+      <LandingToolbar />
+
       {/* Hero Section */}
-      <section className="pt-32 pb-12 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-block mb-4 px-4 py-2 bg-green-100 rounded-full">
-              <span className="text-green-600 font-semibold">Customizable Pricing</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Build Your Perfect Package
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-              Choose only the features you need. Pay for what you use - transparent pricing with no hidden costs!
-            </p>
-          </motion.div>
+      <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            {/* Left Side: Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-left"
+            >
+              <div className="inline-block mb-6 px-4 py-2 bg-green-100 rounded-full">
+                <span className="text-green-600 font-semibold flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Customizable Pricing
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+                Build Your Perfect<br />Wedding Package
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-2xl leading-relaxed">
+                Choose only the features you need. Pay for what you use - transparent pricing with no hidden costs!
+              </p>
+            </motion.div>
+
+            {/* Right Side: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative lg:ml-auto w-full max-w-[600px] mx-auto"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
+                <img
+                  src="https://images.unsplash.com/photo-1554232456-8727aae0cfa4?w=800&q=80"
+                  alt="Wedding Planning"
+                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute -z-10 top-10 -left-10 w-full h-full bg-green-200/50 rounded-full blur-3xl"></div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -484,11 +513,10 @@ const Pricing = () => {
                     return (
                       <div
                         key={feature.id}
-                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                          selectedFeatures.has(feature.id)
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
                             ? 'border-rose-500 bg-rose-50 shadow-md'
                             : 'border-slate-200 hover:border-rose-300 hover:bg-rose-50/50'
-                        }`}
+                          }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
                         <Checkbox
@@ -522,11 +550,10 @@ const Pricing = () => {
                                     adjustStorageExtra(-STORAGE_STEP);
                                   }}
                                   disabled={storageExtraGB === 0}
-                                  className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
-                                    storageExtraGB === 0
+                                  className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${storageExtraGB === 0
                                       ? 'cursor-not-allowed border-slate-200 text-slate-400'
                                       : 'border-rose-300 text-rose-600 hover:border-rose-400'
-                                  }`}
+                                    }`}
                                 >
                                   -{STORAGE_STEP} GB
                                 </button>
@@ -590,11 +617,10 @@ const Pricing = () => {
                     return (
                       <div
                         key={feature.id}
-                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                          selectedFeatures.has(feature.id)
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
                             ? 'border-purple-500 bg-purple-50 shadow-md'
                             : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
-                        }`}
+                          }`}
                         onClick={() => {
                           if (feature.id === 'live-streaming') {
                             openStreamingModal();
@@ -671,11 +697,10 @@ const Pricing = () => {
                     return (
                       <div
                         key={feature.id}
-                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                          selectedFeatures.has(feature.id)
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
                             ? 'border-indigo-500 bg-indigo-50 shadow-md'
                             : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
-                        }`}
+                          }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
                         <Checkbox
@@ -726,11 +751,10 @@ const Pricing = () => {
                     return (
                       <div
                         key={feature.id}
-                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                          selectedFeatures.has(feature.id)
+                        className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
                             ? 'border-slate-500 bg-slate-50 shadow-md'
                             : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
-                        }`}
+                          }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
                         <Checkbox
@@ -845,47 +869,46 @@ const Pricing = () => {
                             </div>
                           )}
                         </div>
-                      <div className="border-slate-200 rounded-2xl border bg-slate-50/60 p-4 text-sm text-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-slate-500">
-                          <span>Coupon code</span>
-                          <span className="text-emerald-500">Coming soon perks</span>
+                        <div className="border-slate-200 rounded-2xl border bg-slate-50/60 p-4 text-sm text-slate-700 shadow-sm">
+                          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-slate-500">
+                            <span>Coupon code</span>
+                            <span className="text-emerald-500">Coming soon perks</span>
+                          </div>
+                          <div className="mt-3 flex gap-2 flex-col sm:flex-row">
+                            <label className="sr-only" htmlFor="pricing-coupon">
+                              Enter coupon code
+                            </label>
+                            <input
+                              id="pricing-coupon"
+                              type="text"
+                              value={couponCode}
+                              onChange={(event) => {
+                                setCouponCode(event.target.value);
+                                setCouponStatus('idle');
+                                setCouponDiscount(0);
+                              }}
+                              placeholder="EG: WEDSAVE100"
+                              className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-100"
+                            />
+                            <Button
+                              size="sm"
+                              className="px-4 py-2 text-[11px] uppercase tracking-wide"
+                              onClick={handleApplyCoupon}
+                            >
+                              Apply
+                            </Button>
+                          </div>
+                          {couponStatus !== 'idle' && (
+                            <p
+                              className={`mt-2 text-[11px] ${couponStatus === 'applied' ? 'text-emerald-600' : 'text-rose-500'
+                                }`}
+                            >
+                              {couponStatus === 'applied'
+                                ? `Coupon "${couponCode}" applied. Enjoy 25% off!`
+                                : 'Coupon code invalid. Try DRIDHI (case-insensitive).'}
+                            </p>
+                          )}
                         </div>
-                        <div className="mt-3 flex gap-2 flex-col sm:flex-row">
-                          <label className="sr-only" htmlFor="pricing-coupon">
-                            Enter coupon code
-                          </label>
-                          <input
-                            id="pricing-coupon"
-                            type="text"
-                            value={couponCode}
-                            onChange={(event) => {
-                              setCouponCode(event.target.value);
-                              setCouponStatus('idle');
-                              setCouponDiscount(0);
-                            }}
-                            placeholder="EG: WEDSAVE100"
-                            className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-100"
-                          />
-                          <Button
-                            size="sm"
-                            className="px-4 py-2 text-[11px] uppercase tracking-wide"
-                            onClick={handleApplyCoupon}
-                          >
-                            Apply
-                          </Button>
-                        </div>
-                        {couponStatus !== 'idle' && (
-                          <p
-                            className={`mt-2 text-[11px] ${
-                              couponStatus === 'applied' ? 'text-emerald-600' : 'text-rose-500'
-                            }`}
-                          >
-                            {couponStatus === 'applied'
-                              ? `Coupon "${couponCode}" applied. Enjoy 25% off!`
-                              : 'Coupon code invalid. Try DRIDHI (case-insensitive).'}
-                          </p>
-                        )}
-                      </div>
                         <div className="border-t-2 border-rose-200 pt-3">
                           <div className="flex items-center justify-between gap-3">
                             <span className="text-lg font-bold text-slate-900">Total Amount</span>
@@ -950,8 +973,8 @@ const Pricing = () => {
               Our team is here to help you build the perfect package for your special day
             </p>
             <Link to="/company/contact">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-purple-600 hover:bg-slate-100 text-lg px-8 py-6"
               >
                 Contact Us
@@ -960,12 +983,69 @@ const Pricing = () => {
           </motion.div>
         </div>
       </section>
-    <StreamingQualityModal
-      isOpen={isStreamingModalOpen}
-      onClose={closeStreamingModal}
-      selectedQuality={selectedStreamingQuality}
-      onSelect={handleStreamingQualitySelect}
-    />
+      <StreamingQualityModal
+        isOpen={isStreamingModalOpen}
+        onClose={closeStreamingModal}
+        selectedQuality={selectedStreamingQuality}
+        onSelect={handleStreamingQualitySelect}
+      />
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-16 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <img src="/logo.png" alt="WeddingWeb Logo" className="w-10 h-10 rounded-xl object-contain bg-white" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">WeddingWeb</span>
+              </div>
+              <p className="text-slate-400 leading-relaxed">
+                Making weddings memorable with cutting-edge technology.
+                Built with love in Kerala.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Product</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/services" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/company/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link to="/company/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Company</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li>
+                  <a
+                    href="https://github.com/Kishoreravi2007/Wedding-web-"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" /> Documentation
+                  </a>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
+            <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p className="text-sm flex items-center justify-center gap-2">
+              Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
-import { 
+import {
   Mail,
   Phone,
   MapPin,
@@ -21,8 +21,11 @@ import {
   MessageSquare,
   Calendar,
   Users,
-  Sparkles
+  Sparkles,
+  FileText,
+  Heart
 } from "lucide-react";
+import { LandingToolbar } from "@/components/LandingToolbar";
 import { useState } from "react";
 
 // Common country codes
@@ -118,17 +121,17 @@ const Contact = () => {
 
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-      
+
       // Combine country code with phone number
-      const phoneWithCode = formData.phone 
+      const phoneWithCode = formData.phone
         ? `${formData.countryCode} ${formData.phone}`.trim()
         : '';
-      
+
       const payload = {
         ...formData,
         phone: phoneWithCode,
       };
-      
+
       const response = await fetch(`${API_BASE_URL}/api/contact-messages`, {
         method: 'POST',
         headers: {
@@ -183,27 +186,54 @@ const Contact = () => {
       {/* Navigation */}
       <CompanyNavSimple />
 
+      {/* Sidebar Toolbar */}
+      <LandingToolbar />
+
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-block mb-4 px-4 py-2 bg-blue-100 rounded-full">
-              <span className="text-blue-600 font-semibold">Get in Touch</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Let's Make Your Wedding
-              <br />
-              Unforgettable Together
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Have questions? Want to see a demo? We're here to help you create 
-              the perfect wedding experience for you and your guests.
-            </p>
-          </motion.div>
+      <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            {/* Left Side: Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-left"
+            >
+              <div className="inline-block mb-6 px-4 py-2 bg-blue-100 rounded-full">
+                <span className="text-blue-600 font-semibold flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Get in Touch
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+                Let's Make Your<br />Wedding Unforgettable
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-2xl leading-relaxed">
+                Have questions? Want to see a demo? We're here to help you create
+                the perfect wedding experience for you and your guests.
+              </p>
+            </motion.div>
+
+            {/* Right Side: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative lg:ml-auto w-full max-w-[600px] mx-auto"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
+                <img
+                  src="https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=800&q=80"
+                  alt="Contact Support"
+                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute -z-10 top-10 -left-10 w-full h-full bg-blue-200/50 rounded-full blur-3xl"></div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -292,7 +322,7 @@ const Contact = () => {
                         <div className="flex gap-2">
                           <Select
                             value={formData.countryCode}
-                            onValueChange={(value) => 
+                            onValueChange={(value) =>
                               setFormData({ ...formData, countryCode: value })
                             }
                           >
@@ -376,8 +406,8 @@ const Contact = () => {
                       />
                     </div>
 
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       size="lg"
                       disabled={isSubmitting}
                       className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700"
@@ -429,8 +459,8 @@ const Contact = () => {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
                   <div className="space-y-3">
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       className="w-full justify-start text-left"
                       asChild
                     >
@@ -439,8 +469,8 @@ const Contact = () => {
                         View Pricing Plans
                       </Link>
                     </Button>
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       className="w-full justify-start text-left"
                       asChild
                     >
@@ -449,8 +479,8 @@ const Contact = () => {
                         See Success Stories
                       </Link>
                     </Button>
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       className="w-full justify-start text-left"
                     >
                       <Calendar className="w-4 h-4 mr-2" />
@@ -498,31 +528,62 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold mb-6">Still Have Questions?</h2>
-            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-              Our team is always happy to help. Reach out and we'll get back to you within 24 hours!
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-16 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <img src="/logo.png" alt="WeddingWeb Logo" className="w-10 h-10 rounded-xl object-contain bg-white" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">WeddingWeb</span>
+              </div>
+              <p className="text-slate-400 leading-relaxed">
+                Making weddings memorable with cutting-edge technology.
+                Built with love in Kerala.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Product</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/services" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/company/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link to="/company/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Company</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li>
+                  <a
+                    href="https://github.com/Kishoreravi2007/Wedding-web-"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" /> Documentation
+                  </a>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
+            <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p className="text-sm flex items-center justify-center gap-2">
+              Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
             </p>
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg px-8 py-6"
-              asChild
-            >
-              <a href="mailto:help.weddingweb@gmail.com">
-                <Mail className="mr-2 w-5 h-5" />
-                Email Us Directly
-              </a>
-            </Button>
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
-import { 
+import {
   Star,
   Users,
   Camera,
@@ -11,8 +11,10 @@ import {
   MapPin,
   Calendar,
   Quote,
-  Heart
+  Heart,
+  FileText
 } from "lucide-react";
+import { LandingToolbar } from "@/components/LandingToolbar";
 
 const Portfolio = () => {
   const caseStudies = [
@@ -93,25 +95,54 @@ const Portfolio = () => {
       {/* Navigation */}
       <CompanyNavSimple />
 
+      {/* Sidebar Toolbar */}
+      <LandingToolbar />
+
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full">
-              <span className="text-amber-600 font-semibold">🎉 Our First 2 Success Stories</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Our First Success Stories
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Meet our pioneering couples who trusted WeddingWeb to make their special day magical. 
-              Join them in shaping the future of wedding technology!
-            </p>
-          </motion.div>
+      <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            {/* Left Side: Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-left"
+            >
+              <div className="inline-block mb-6 px-4 py-2 bg-amber-100 rounded-full">
+                <span className="text-amber-600 font-semibold flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  Success Stories
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+                Our First Success<br />Stories
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-2xl leading-relaxed">
+                Meet our pioneering couples who trusted WeddingWeb to make their special day magical.
+                Join them in shaping the future of wedding technology!
+              </p>
+            </motion.div>
+
+            {/* Right Side: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative lg:ml-auto w-full max-w-[600px] mx-auto"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
+                <img
+                  src="https://images.unsplash.com/photo-1511285560982-1351cdeb9821?w=800&q=80"
+                  alt="Wedding Success"
+                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute -z-10 top-10 -left-10 w-full h-full bg-amber-200/50 rounded-full blur-3xl"></div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -168,8 +199,8 @@ const Portfolio = () => {
                   <CardContent className="p-0">
                     <div className="grid md:grid-cols-2 gap-0">
                       <div className="relative aspect-[4/3] md:aspect-auto">
-                        <img 
-                          src={study.image} 
+                        <img
+                          src={study.image}
                           alt={`${study.couple} wedding`}
                           className="w-full h-full object-cover"
                         />
@@ -341,42 +372,62 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600">
-        <div className="container mx-auto text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Be Our Next Success Story!
-            </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join our pioneering customers and get exclusive early-bird pricing plus personalized support
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/company/pricing">
-                <Button 
-                  size="lg" 
-                  className="bg-white text-purple-600 hover:bg-slate-100 text-lg px-8 py-6"
-                >
-                  View Pricing Plans
-                </Button>
-              </Link>
-              <Link to="/company/contact">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
-                >
-                  Get in Touch
-                </Button>
-              </Link>
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-16 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <img src="/logo.png" alt="WeddingWeb Logo" className="w-10 h-10 rounded-xl object-contain bg-white" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">WeddingWeb</span>
+              </div>
+              <p className="text-slate-400 leading-relaxed">
+                Making weddings memorable with cutting-edge technology.
+                Built with love in Kerala.
+              </p>
             </div>
-          </motion.div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Product</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/services" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/company/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link to="/company/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Company</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li>
+                  <a
+                    href="https://github.com/Kishoreravi2007/Wedding-web-"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" /> Documentation
+                  </a>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
+            <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p className="text-sm flex items-center justify-center gap-2">
+              Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
+            </p>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };

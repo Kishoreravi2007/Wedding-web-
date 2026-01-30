@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { LandingToolbar } from "@/components/LandingToolbar";
 import {
   Camera,
   Users,
@@ -99,84 +100,134 @@ const CompanyLanding = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-slate-50/50">
       {/* Navigation */}
       <CompanyNavSimple />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-block mb-4 px-4 py-2 bg-rose-100 rounded-full">
-              <span className="text-rose-600 font-semibold flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                AI-Powered Wedding Technology
-              </span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
-              Transform Your Wedding
-              <br />
-              Into a Digital Experience
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto">
-              Build your own personalized wedding website with AI face detection, smart galleries, 
-              live streaming, and more. Join us in revolutionizing wedding experiences!
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/company/contact">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg px-8 py-6"
-                >
-                  Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-rose-200 text-rose-600 hover:bg-rose-50 text-lg px-8 py-6"
-                asChild
-              >
-                <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
-                  View Customer Guide <FileText className="ml-2 w-5 h-5" />
-                </a>
-              </Button>
-            </div>
-          </motion.div>
+      {/* Sidebar Toolbar */}
+      <LandingToolbar />
 
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 max-w-4xl mx-auto"
-          >
-            <div>
-              <div className="text-4xl font-bold text-rose-600">2</div>
-              <div className="text-slate-600 mt-1">Happy Couples</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-600">100%</div>
-              <div className="text-slate-600 mt-1">Satisfaction</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-indigo-600">AI</div>
-              <div className="text-slate-600 mt-1">Powered</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-cyan-600">2025</div>
-              <div className="text-slate-600 mt-1">Just Started</div>
-            </div>
-          </motion.div>
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+
+            {/* Left Side: Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-left"
+            >
+              <div className="inline-block mb-6 px-4 py-2 bg-rose-100 rounded-full">
+                <span className="text-rose-600 font-semibold flex items-center gap-2">
+                  <Zap className="w-4 h-4" />
+                  AI-Powered Wedding Technology
+                </span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+                Transform Your Wedding
+                <br />
+                Into a Digital Experience
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-2xl leading-relaxed">
+                Build your own personalized wedding website with AI face detection, smart galleries,
+                live streaming, and more. Join us in revolutionizing wedding experiences!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/company/signup">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg px-8 py-6 h-auto shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all hover:-translate-y-1"
+                  >
+                    Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-slate-200 text-slate-700 hover:border-rose-200 hover:bg-rose-50 text-lg px-8 py-6 h-auto transition-all hover:-translate-y-1"
+                  asChild
+                >
+                  <a href={documentationUrl} target="_blank" rel="noopener noreferrer">
+                    View Customer Guide <FileText className="ml-2 w-5 h-5" />
+                  </a>
+                </Button>
+              </div>
+
+              <div className="mt-12 flex items-center gap-6 text-sm text-slate-500">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  <span>No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  <span>4.9/5 Average Rating</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right Side: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative lg:ml-auto w-full max-w-[600px] mx-auto"
+            >
+              {/* Main Banner Image */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
+                <img
+                  src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop"
+                  alt="Wedding Couple"
+                  className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
+
+              {/* Decorative Elements */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute -right-8 -top-8 hidden lg:flex h-32 w-32 rounded-full border-2 border-dashed border-rose-200 items-center justify-center opacity-60 pointer-events-none"
+              >
+                <div className="h-24 w-24 rounded-full bg-rose-50/50 flex items-center justify-center">
+                  <Sparkles className="h-8 w-8 text-rose-400" />
+                </div>
+              </motion.div>
+
+              {/* Profile Overlay Card */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="absolute -bottom-6 -left-6 md:bottom-8 md:-left-12 bg-white p-5 rounded-2xl shadow-xl border border-slate-100 max-w-[280px] w-full"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0 bg-rose-50 flex items-center justify-center">
+                    <Heart className="h-7 w-7 text-rose-500 fill-rose-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 leading-tight text-lg">WeddingWeb</h3>
+                    <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                      <Globe className="h-3 w-3" />
+                      <span>Global Platform</span>
+                    </div>
+                    <div className="flex items-center gap-1 mt-2">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      ))}
+                      <span className="text-xs font-medium ml-1 text-slate-700">5.0</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-slate-100">
+      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-slate-100/50">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -201,13 +252,13 @@ const CompanyLanding = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-rose-200">
-                  <CardContent className="p-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4`}>
+                <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-rose-100 group">
+                  <CardContent className="p-8">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
                       {feature.icon}
                     </div>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-slate-600">{feature.description}</p>
+                    <h3 className="text-xl font-bold mb-3 text-slate-900">{feature.title}</h3>
+                    <p className="text-slate-600 leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -217,9 +268,9 @@ const CompanyLanding = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 overflow-hidden">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -231,11 +282,11 @@ const CompanyLanding = () => {
                   Fresh Startup, Big Vision
                 </span>
               </div>
-              <h2 className="text-4xl font-bold mb-6">
+              <h2 className="text-4xl font-bold mb-6 text-slate-900">
                 Why Choose WeddingWeb?
               </h2>
-              <p className="text-lg text-slate-600 mb-8">
-                We're a new startup combining cutting-edge technology with intuitive design. 
+              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                We're a new startup combining cutting-edge technology with intuitive design.
                 Be one of our early customers and help shape the future of wedding technology!
               </p>
               <div className="space-y-4">
@@ -246,10 +297,12 @@ const CompanyLanding = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-start gap-3"
+                    className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors"
                   >
-                    <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                    <span className="text-slate-700">{benefit}</span>
+                    <div className="bg-green-100 rounded-full p-1 mt-1">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    </div>
+                    <span className="text-slate-700 font-medium">{benefit}</span>
                   </motion.div>
                 ))}
               </div>
@@ -261,27 +314,30 @@ const CompanyLanding = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
+              <div className="aspect-square rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
+                <img
+                  src="https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=2070&auto=format&fit=crop"
                   alt="Happy wedding couple celebration"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-purple-500/10 to-indigo-500/10" />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-xl border-2 border-slate-100">
-                <div className="flex items-center gap-2 text-green-600 font-semibold">
-                  <CheckCircle2 className="w-5 h-5" />
+              <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+                <div className="flex items-center gap-3 text-green-600 font-bold text-lg">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
                   <span>100% Secure</span>
                 </div>
               </div>
+              {/* Abstract decoration */}
+              <div className="absolute -z-10 top-10 -left-10 w-full h-full bg-rose-200/50 rounded-full blur-3xl"></div>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-slate-100">
+      <section className="py-20 px-4 bg-slate-50">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -306,17 +362,22 @@ const CompanyLanding = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex gap-1 mb-4">
+                <Card className="h-full hover:shadow-xl transition-all duration-300 border-none shadow-md">
+                  <CardContent className="p-8">
+                    <div className="flex gap-1 mb-6">
                       {[...Array(testimonial.rating)].map((_, i) => (
                         <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
-                    <p className="text-slate-700 mb-4 italic">"{testimonial.text}"</p>
-                    <div className="border-t pt-4">
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-slate-500">{testimonial.event}</div>
+                    <p className="text-slate-700 mb-6 italic text-lg leading-relaxed">"{testimonial.text}"</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                        {testimonial.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-900">{testimonial.name}</div>
+                        <div className="text-sm text-slate-500">{testimonial.event}</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -333,83 +394,90 @@ const CompanyLanding = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 rounded-3xl p-12 md:p-16 text-center text-white"
+            className="relative overflow-hidden bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 rounded-[2.5rem] p-12 md:p-24 text-center text-white shadow-2xl"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Create Magic?
-            </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Be an early adopter! Get special pricing and help us build the future of wedding technology together
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-white text-purple-600 hover:bg-slate-100 text-lg px-8 py-6"
-              >
-                Start Your Free Trial
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6"
-              >
-                Schedule a Demo
-              </Button>
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+                Ready to Create Magic?
+              </h2>
+              <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl mx-auto leading-relaxed">
+                Be an early adopter! Get special pricing and help us build the future of wedding technology together
+              </p>
+              <div className="flex justify-center">
+                <Link to="/company/signup">
+                  <Button
+                    size="lg"
+                    className="bg-white text-purple-600 hover:bg-slate-100 text-lg px-12 py-6 h-auto shadow-xl font-bold transition-transform hover:scale-105"
+                  >
+                    Get Started <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12 px-4">
+      <footer className="bg-slate-900 text-white py-16 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-6 h-6 text-rose-500" />
-                <span className="text-xl font-bold">WeddingWeb</span>
+              <div className="flex items-center gap-3 mb-6">
+                <img src="/logo.png" alt="WeddingWeb Logo" className="w-10 h-10 rounded-xl object-contain bg-white" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">WeddingWeb</span>
               </div>
-              <p className="text-slate-400">
-                Making weddings memorable with cutting-edge technology
+              <p className="text-slate-400 leading-relaxed">
+                Making weddings memorable with cutting-edge technology.
+                Built with love in Kerala.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link to="/company/services" className="hover:text-white">Features</Link></li>
-                <li><Link to="/company/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link to="/company/portfolio" className="hover:text-white">Portfolio</Link></li>
+              <h3 className="font-semibold text-lg mb-6 text-white">Product</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/services" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/company/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link to="/company/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link to="/company/about" className="hover:text-white">About Us</Link></li>
-                <li><Link to="/company/contact" className="hover:text-white">Contact</Link></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
+              <h3 className="font-semibold text-lg mb-6 text-white">Company</h3>
+              <ul className="space-y-3 text-slate-400">
+                <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-slate-400">
+              <h3 className="font-semibold text-lg mb-6 text-white">Support</h3>
+              <ul className="space-y-3 text-slate-400">
                 <li>
                   <a
                     href={documentationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-white"
+                    className="hover:text-white transition-colors flex items-center gap-2"
                   >
-                    Documentation
+                    <FileText className="w-4 h-4" /> Documentation
                   </a>
                 </li>
-                <li><a href="#" className="hover:text-white">FAQ</a></li>
-                <li><Link to="/company/contact" className="hover:text-white">Contact Us</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
             <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
-            <p className="text-sm">Made with love from Kerala ❤️</p>
+            <p className="text-sm flex items-center justify-center gap-2">
+              Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
+            </p>
           </div>
         </div>
       </footer>
