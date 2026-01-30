@@ -12,8 +12,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/lib/api";
+import { formatDistanceToNow } from 'date-fns';
 
 const navItems = [
     { label: "Overview", href: "/" },
@@ -30,6 +33,59 @@ export function CompanyNavbar() {
     const location = useLocation();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { currentUser, logout } = useAuth();
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
+
+    const fetchNotifications = async () => {
+        if (!currentUser) return;
+        setIsLoadingNotifs(true);
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setNotifications(data.notifications);
+            }
+        } catch (error) {
+            console.error("Error fetching notifications", error);
+        } finally {
+            setIsLoadingNotifs(false);
+        }
+    };
+
+    const markAsRead = async (id: string) => {
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(`${API_BASE_URL}/api/notifications/${id}/read`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+            }
+        } catch (error) {
+            console.error("Error marking notification as read", error);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(`${API_BASE_URL}/api/notifications/read-all`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            }
+        } catch (error) {
+            console.error("Error marking all as read", error);
+        }
+    };
+
+    const unreadCount = notifications.filter(n => !n.is_read).length;
 
     const handleLogout = async () => {
         try {
@@ -116,11 +172,97 @@ export function CompanyNavbar() {
 
                     {currentUser ? (
                         <>
-                            {/* Notification Icon */}
-                            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
-                                <Bell className="h-5 w-5" />
-                                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
-                            </Button>
+                            {/* Notification Icon & Popover */}
+                            <Popover onOpenChange={(open) => open && fetchNotifications()}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+                                        <Bell className="h-5 w-5" />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-2 right-2 flex h-2.5 w-2.5">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 border border-white"></span>
+                                            </span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 md:w-96 p-0 mr-4 md:mr-0 z-50 rounded-2xl shadow-2xl border-slate-100" align="end" sideOffset={10}>
+                                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
+                                        <div>
+                                            <h3 className="font-bold text-slate-900 leading-tight">Notifications</h3>
+                                            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">
+                                                {unreadCount} UNREAD ALERTS
+                                            </p>
+                                        </div>
+                                        {unreadCount > 0 && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-7 px-2.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-full text-[11px] font-bold"
+                                                onClick={markAllAsRead}
+                                            >
+                                                Mark all read
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
+                                        {notifications.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                                                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                                    <Bell className="w-6 h-6 text-slate-300" />
+                                                </div>
+                                                <h4 className="text-sm font-semibold text-slate-900">All caught up!</h4>
+                                                <p className="text-xs text-slate-500 mt-1 max-w-[180px]">No new notifications or activity to show right now.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="divide-y divide-slate-100">
+                                                {notifications.map((notification) => (
+                                                    <div
+                                                        key={notification.id}
+                                                        className={`p-4 transition-all hover:bg-slate-50/80 flex gap-3 relative group ${!notification.is_read ? 'bg-rose-50/20' : ''}`}
+                                                    >
+                                                        <div className={`mt-1 h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 border ${notification.category === 'marketing'
+                                                            ? 'bg-purple-50 text-purple-600 border-purple-100'
+                                                            : 'bg-rose-50 text-rose-600 border-rose-100'
+                                                            }`}>
+                                                            {notification.category === 'marketing' ? <Sparkles className="w-5 h-5" /> : <Mail className="w-5 h-5" />}
+                                                        </div>
+                                                        <div className="flex-1 space-y-1">
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <h4 className="text-sm font-bold text-slate-900 leading-tight">{notification.title}</h4>
+                                                                <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                                                                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-slate-600 leading-relaxed pr-6">{notification.message}</p>
+                                                            {notification.link && (
+                                                                <Link
+                                                                    to={notification.link}
+                                                                    className="text-[10px] font-bold text-rose-500 hover:text-rose-600 inline-flex items-center gap-1 mt-1 uppercase tracking-wider"
+                                                                    onClick={() => markAsRead(notification.id)}
+                                                                >
+                                                                    View Details →
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                        {!notification.is_read && (
+                                                            <button
+                                                                onClick={() => markAsRead(notification.id)}
+                                                                className="absolute right-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                title="Mark as read"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center rounded-b-2xl">
+                                        <p className="text-[9px] text-slate-400 font-medium uppercase tracking-widest">
+                                            WeddingWeb Notification Center
+                                        </p>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
 
                             {/* Profile Dropdown */}
                             <DropdownMenu>

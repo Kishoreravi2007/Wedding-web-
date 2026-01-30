@@ -38,14 +38,24 @@ const SecureUserDB = {
 
       // Create user
       const insertQuery = `
-        INSERT INTO users (username, password, role, is_active, created_at)
-        VALUES ($1, $2, $3, true, NOW())
+        INSERT INTO users (username, password, role, is_active, email_offers_opt_in, created_at)
+        VALUES ($1, $2, $3, true, $4, NOW())
         RETURNING id
       `;
 
-      const { rows } = await query(insertQuery, [username, hashedPassword, role]);
+      const { rows } = await query(insertQuery, [
+        username,
+        hashedPassword,
+        role,
+        userData.email_offers_opt_in || false
+      ]);
 
-      return { id: rows[0].id, username, role };
+      return {
+        id: rows[0].id,
+        username,
+        role,
+        email_offers_opt_in: userData.email_offers_opt_in || false
+      };
 
     } catch (error) {
       console.error('Error creating user:', error);
@@ -60,7 +70,7 @@ const SecureUserDB = {
     try {
       // Get user data including security fields
       const { rows } = await query(
-        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until, is_2fa_enabled, two_factor_secret FROM users WHERE username = $1',
+        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until, is_2fa_enabled, two_factor_secret, email_offers_opt_in FROM users WHERE username = $1',
         [username]
       );
 
@@ -116,7 +126,8 @@ const SecureUserDB = {
         role: user.role,
         is_active: user.is_active,
         is_2fa_enabled: user.is_2fa_enabled,
-        two_factor_secret: user.two_factor_secret
+        two_factor_secret: user.two_factor_secret,
+        email_offers_opt_in: user.email_offers_opt_in
       };
 
     } catch (error) {
@@ -148,7 +159,7 @@ const SecureUserDB = {
   async getUserById(id) {
     try {
       const { rows } = await query(
-        'SELECT id, username, role, is_active FROM users WHERE id = $1',
+        'SELECT id, username, role, is_active, email_offers_opt_in FROM users WHERE id = $1',
         [id]
       );
       return rows[0];
@@ -213,24 +224,41 @@ const SecureUserDB = {
   },
 
   /**
+   * Update email opt-in preference
+   */
+  async setEmailOptIn(userId, enabled) {
+    try {
+      await query(
+        'UPDATE users SET email_offers_opt_in = $1 WHERE id = $2',
+        [enabled, userId]
+      );
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating email opt-in:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Delete user account and associated data
    */
   async deleteUser(userId) {
     try {
-      // Delete from users table (cascading deletes should handle related tables if configured, 
-      // but if not, we rely on the database constraints or manual cleanup. 
-      // Assuming standard ON DELETE CASCADE for now based on typical setup, 
-      // or we accept that associated data might remain orphaned if no cascade.)
-      // Note: In production, you might want to soft-delete (is_active = false) instead.
-      // But user requested "delete immediately", so we perform a hard delete.
+      // 1. Log attempt FIRST while user still exists (foreign key check)
+      await this.logAuthAttempt(userId, 'delete_account', true, { reason: 'user_request' });
 
+      // 2. Delete Profile (Optional but good for cleanup)
+      // Note: profiles.user_id might be a string-id, while users.id is UUID.
+      // We check both if possible or just try to delete if exists.
+      await query('DELETE FROM profiles WHERE user_id = $1::text', [userId]);
+
+      // 3. Delete from users table
       const { rowCount } = await query('DELETE FROM users WHERE id = $1', [userId]);
 
       if (rowCount === 0) {
         throw new Error('User not found or already deleted');
       }
 
-      await this.logAuthAttempt(userId, 'delete_account', true, { reason: 'user_request' });
       return { success: true };
     } catch (error) {
       console.error('Error deleting user:', error);

@@ -24,9 +24,9 @@ console.log('🌐 API Base URL:', API_BASE_URL);
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') ||
+  const token = localStorage.getItem('auth_token') ||
+    localStorage.getItem('token') ||
     localStorage.getItem('accessToken') ||
-    localStorage.getItem('auth_token') ||
     localStorage.getItem('admin_token');
   return {
     'Authorization': token ? `Bearer ${token}` : '',

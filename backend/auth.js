@@ -31,7 +31,8 @@ router.post('/register', async (req, res) => {
     const newUser = await SecureUserDB.createUser({
       username: effectiveUsername,
       password,
-      role
+      role,
+      email_offers_opt_in: req.body.email_offers_opt_in || false
     });
 
     // Generate token
@@ -42,7 +43,8 @@ router.post('/register', async (req, res) => {
       user: {
         id: newUser.id,
         username: newUser.username,
-        role: newUser.role
+        role: newUser.role,
+        email_offers_opt_in: newUser.email_offers_opt_in
       },
       token,
       accessToken: token
@@ -92,7 +94,8 @@ router.post('/login', async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
-        is_active: user.is_active
+        is_active: user.is_active,
+        email_offers_opt_in: user.email_offers_opt_in
       },
       token,
       accessToken: token
@@ -128,11 +131,11 @@ router.post('/verify-2fa', async (req, res) => {
     // We will query directly here or add a helper in SecureUserDB.
     // Re-using a query here for simplicity:
     const { query } = require('./lib/db-gcp');
-    const { rows } = await query('SELECT id, username, role, is_active, two_factor_secret FROM users WHERE id = $1', [userId]);
+    const { rows } = await query('SELECT id, username, role, is_active, two_factor_secret, email_offers_opt_in FROM users WHERE id = $1', [userId]);
     const user = rows[0];
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User found' });
     }
 
     // Verify code
@@ -159,7 +162,8 @@ router.post('/verify-2fa', async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
-        is_active: user.is_active
+        is_active: user.is_active,
+        email_offers_opt_in: user.email_offers_opt_in
       },
       token,
       accessToken: token
@@ -283,6 +287,32 @@ router.delete('/delete', authMiddleware.verifyToken, async (req, res) => {
     res.status(500).json({
       message: 'Failed to delete account. Please try again.'
     });
+  }
+});
+
+/**
+ * POST /api/auth/preferences/email
+ * Update email opt-in preference
+ */
+router.post('/preferences/email', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    const userId = req.user.id;
+
+    if (enabled === undefined) {
+      return res.status(400).json({ message: 'Enabled status is required' });
+    }
+
+    await SecureUserDB.setEmailOptIn(userId, enabled);
+
+    res.json({
+      message: `Email offers ${enabled ? 'enabled' : 'disabled'} successfully`,
+      email_offers_opt_in: enabled
+    });
+
+  } catch (error) {
+    console.error('Email Preference error:', error);
+    res.status(500).json({ message: 'Failed to update email preferences' });
   }
 });
 

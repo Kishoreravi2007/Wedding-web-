@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../lib/db-gcp');
 const { writeContactMessageToSheet, deleteContactMessageFromSheet } = require('../lib/google-sheets');
+const NotificationService = require('../services/notification-service');
+const { SecureUserDB } = require('../lib/secure-auth');
 
 // Get all contact messages (for admin)
 router.get('/', async (req, res) => {
@@ -71,6 +73,24 @@ router.post('/', async (req, res) => {
     }
 
     const newMessage = result.rows[0];
+
+    // Create Notification for Admin/Users
+    try {
+      // For now, let's notify all admin users. 
+      // Ideally this goes to the specific vendor, but contact_messages are currently global.
+      const { rows: adminUsers } = await db.query("SELECT id FROM users WHERE role = 'admin'");
+      for (const adminUser of adminUsers) {
+        await NotificationService.createNotification(adminUser.id, {
+          title: 'New Lead Received!',
+          message: `${name} is interested in your services. View leads to respond.`,
+          type: 'success',
+          category: 'personal',
+          link: '/#leads'
+        });
+      }
+    } catch (notifError) {
+      console.error('Error creating notification for lead:', notifError);
+    }
 
     // Write to Google Sheets (non-blocking)
     try {

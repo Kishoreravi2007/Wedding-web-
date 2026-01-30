@@ -43,10 +43,12 @@ import {
     MapPin
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/components/theme-provider";
 import { toast } from "sonner";
 
 const Settings = () => {
-    const { currentUser, enable2FA, refreshProfile, logout } = useAuth();
+    const { currentUser, enable2FA, refreshProfile, logout, updateEmailPreference } = useAuth();
+    const { theme, setTheme } = useTheme();
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "general");
     const [is2FAEnabled, setIs2FAEnabled] = useState(currentUser?.is_2fa_enabled || false);
@@ -68,6 +70,25 @@ const Settings = () => {
     const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
     const [isSearchingLocation, setIsSearchingLocation] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const [emailOptIn, setEmailOptIn] = useState(currentUser?.email_offers_opt_in || false);
+
+    // Sync state with currentUser when it changes
+    useEffect(() => {
+        if (currentUser?.email_offers_opt_in !== undefined) {
+            setEmailOptIn(currentUser.email_offers_opt_in);
+        }
+    }, [currentUser]);
+
+    const handleEmailOptInChange = async (enabled: boolean) => {
+        try {
+            await updateEmailPreference(enabled);
+            setEmailOptIn(enabled);
+            toast.success(`Email notifications ${enabled ? 'enabled' : 'disabled'}`);
+        } catch (error) {
+            toast.error("Failed to update email preferences");
+        }
+    };
 
     // Sync tab with URL
     useEffect(() => {
@@ -710,16 +731,25 @@ const Settings = () => {
                                                 <div className="space-y-4">
                                                     <Label className="text-base font-semibold">Theme Mode</Label>
                                                     <div className="grid grid-cols-3 gap-4">
-                                                        <button className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-rose-500 bg-white shadow-sm ring-2 ring-rose-50">
-                                                            <Sun className="w-6 h-6 text-rose-500" />
+                                                        <button
+                                                            onClick={() => setTheme("light")}
+                                                            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${theme === 'light' ? 'border-rose-500 bg-white shadow-sm ring-2 ring-rose-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}
+                                                        >
+                                                            <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-rose-500' : 'text-slate-400'}`} />
                                                             <span className="text-sm font-medium">Light</span>
                                                         </button>
-                                                        <button className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors opacity-50 cursor-not-allowed">
-                                                            <Moon className="w-6 h-6 text-slate-400" />
+                                                        <button
+                                                            onClick={() => setTheme("dark")}
+                                                            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${theme === 'dark' ? 'border-rose-500 bg-white shadow-sm ring-2 ring-rose-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}
+                                                        >
+                                                            <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-rose-500' : 'text-slate-400'}`} />
                                                             <span className="text-sm font-medium">Dark</span>
                                                         </button>
-                                                        <button className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors opacity-50 cursor-not-allowed">
-                                                            <Smartphone className="w-6 h-6 text-slate-400" />
+                                                        <button
+                                                            onClick={() => setTheme("system")}
+                                                            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${theme === 'system' ? 'border-rose-500 bg-white shadow-sm ring-2 ring-rose-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}
+                                                        >
+                                                            <Smartphone className={`w-6 h-6 ${theme === 'system' ? 'text-rose-500' : 'text-slate-400'}`} />
                                                             <span className="text-sm font-medium">System</span>
                                                         </button>
                                                     </div>
@@ -738,6 +768,28 @@ const Settings = () => {
                                                             </div>
                                                         </div>
                                                         <Switch defaultChecked />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4 pt-4 border-t border-slate-100">
+                                                    <Label className="text-base font-semibold">Email Notifications</Label>
+                                                    <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 bg-rose-50 rounded-full flex items-center justify-center">
+                                                                <Bell className="w-5 h-5 text-rose-500" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-semibold text-slate-900">Marketing & Offers</p>
+                                                                <p className="text-xs text-slate-500 leading-relaxed max-w-[280px]">
+                                                                    Receive exclusive deals, tips, and feature updates.
+                                                                    <span className="block mt-0.5 text-rose-500/80 font-medium">Sent from help.weddingweb@gmail.com</span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <Switch
+                                                            checked={emailOptIn}
+                                                            onCheckedChange={handleEmailOptInChange}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <Button onClick={handleSave} className="bg-rose-500 hover:bg-rose-600 text-white px-8 rounded-xl">

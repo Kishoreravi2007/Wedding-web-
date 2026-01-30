@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Search, MapPin, Loader2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Search, MapPin, Loader2, Sparkles, Mail, Bell } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Dialog,
@@ -15,11 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
-// import { supabase } from "@/lib/supabase";
 
 const CompanySignup = () => {
-  const { signup } = useAuth();
+  const { signup, updateEmailPreference } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,6 +30,10 @@ const CompanySignup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Email Opt-in State
+  const [showOptInDialog, setShowOptInDialog] = useState(false);
+  const [tempUserId, setTempUserId] = useState<string | null>(null);
 
   // Location Search State
   const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
@@ -134,7 +138,7 @@ const CompanySignup = () => {
 
     try {
       setIsSubmitting(true);
-      // Signup (still uses Supabase Auth for now, will migrate AuthContext next)
+      // Signup
       const { data, error: signupError } = await signup(email.trim(), password);
       if (signupError) {
         throw signupError;
@@ -160,13 +164,84 @@ const CompanySignup = () => {
         if (!response.ok) {
           const errorData = await response.json();
           console.warn("Failed to save profile info after signup", errorData);
-          // Not throwing here to allow the signup flow to "complete" even if profile details fail, 
-          // but normally you might want to handle this better.
         }
+
+        // Show Opt-in Dialog after successful profile creation
+        setTempUserId(data.user.id);
+        setShowOptInDialog(true);
       }
+    } catch (submitError: any) {
+      setError(submitError?.message || "Unable to sign you up right now.");
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOptInChoice = async (optedIn: boolean) => {
+    try {
+      // In a real scenario, we might need a temporary token or handle this via the register API directly.
+      // But since we are showing a popup *after* signup, and usually the user is not automatically logged in 
+      // with a token yet in this flow (depends on AuthContext implementation of signup).
+      // Our signup returns { data: { user: data.user }, error: null } but doesn't set token in state.
+      // Let's check AuthContext signup. It doesn't set token.
+
+      // If the user opted in, we can send a separate request if we have a way to authenticate, 
+      // or we just include it in the signup call.
+      // Actually, I updated AuthContext's signup to accept emailOptIn. 
+      // But I only added it to the API call. I didn't update the Signup.tsx call yet.
+
+      // Let's refine the flow: 
+      // 1. User fills form.
+      // 2. User clicks "Create Account".
+      // 3. Popup appears: "Wait! Can we send you emails?"
+      // 4. User clicks Yes/No.
+      // 5. Signup API is called with the preference.
+
+      // Let's change the flow to that.
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // REFINED SUBMIT FLOW
+  const [isOptingIn, setIsOptingIn] = useState(false);
+
+  const startSignupFlow = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
+      setError("Full name, email, and password are required.");
+      return;
+    }
+    setShowOptInDialog(true);
+  };
+
+  const completeSignup = async (emailOptIn: boolean) => {
+    setShowOptInDialog(false);
+    try {
+      setIsSubmitting(true);
+      const { data, error: signupError } = await signup(email.trim(), password, emailOptIn);
+      if (signupError) {
+        throw signupError;
+      }
+
+      if (data?.user?.id) {
+        await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: data.user.id,
+            email: email.trim(),
+            full_name: fullName.trim() || null,
+            location: location.trim() || null,
+            bio: bio.trim() || null,
+            avatar_url: photo,
+          }),
+        });
+      }
+
       toast({
-        title: "Check your inbox",
-        description: "We saved your profile info and sent a confirmation email.",
+        title: "Account Created!",
+        description: emailOptIn ? "Registration successful! You'll receive our awesome offers." : "Registration successful!",
       });
       navigate("/company/login");
     } catch (submitError: any) {
@@ -190,7 +265,7 @@ const CompanySignup = () => {
                 {error}
               </div>
             )}
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit={startSignupFlow}>
               <div>
                 <Label htmlFor="signup-email" className="text-slate-700">
                   Email address<span className="ml-1 text-rose-500">*</span>
@@ -436,6 +511,48 @@ const CompanySignup = () => {
                 </div>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Opt-in Dialog */}
+      <Dialog open={showOptInDialog} onOpenChange={setShowOptInDialog}>
+        <DialogContent className="sm:max-w-md rounded-2xl overflow-hidden p-0 gap-0 border-none shadow-2xl">
+          <div className="p-8 text-center space-y-6 bg-white">
+            <div className="mx-auto w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center">
+              <Bell className="w-8 h-8 text-rose-500 animate-bounce" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-900">Wait! One last thing...</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Can we send you occasional emails about **exclusive offers**, new features, and other information to help your business grow?
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 py-2">
+              <Button
+                onClick={() => completeSignup(true)}
+                className="w-full bg-rose-500 hover:bg-rose-600 text-white h-12 rounded-xl font-semibold shadow-lg shadow-rose-200 transition-all text-base"
+                disabled={isSubmitting}
+              >
+                Yes, send me offers!
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => completeSignup(false)}
+                className="w-full text-slate-500 hover:text-slate-700 hover:bg-slate-50 h-12 rounded-xl font-medium"
+                disabled={isSubmitting}
+              >
+                No, maybe later
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-50">
+              <Mail className="w-3.5 h-3.5 text-slate-300" />
+              <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                Sent from help.weddingweb@gmail.com
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

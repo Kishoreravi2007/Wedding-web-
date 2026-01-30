@@ -24,6 +24,7 @@ interface User {
   role: string;
   profile?: ProfilePayload | null;
   is_2fa_enabled?: boolean;
+  email_offers_opt_in?: boolean;
 }
 
 interface AuthContextType {
@@ -32,7 +33,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
   verify2FA: (userId: string, code: string) => Promise<void>;
   enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<any>;
+  signup: (email: string, password: string, emailOptIn?: boolean) => Promise<any>;
+  updateEmailPreference: (enabled: boolean) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -202,7 +204,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (email: string, password: string) => {
+  const updateEmailPreference = async (enabled: boolean) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('Not authenticated');
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/preferences/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ enabled })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update email preferences');
+      }
+
+      // Update local user state
+      if (currentUser) {
+        const updatedUser = { ...currentUser, email_offers_opt_in: enabled };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      }
+
+    } catch (error) {
+      console.error('Update email preference error:', error);
+      throw error;
+    }
+  };
+
+  const signup = async (email: string, password: string, emailOptIn: boolean = false) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -210,7 +243,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({
           username: email,
           password,
-          role: 'company'
+          role: 'company',
+          email_offers_opt_in: emailOptIn
         })
       });
 
@@ -253,6 +287,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     verify2FA,
     enable2FA,
     signup,
+    updateEmailPreference,
     logout,
     refreshProfile,
     resetPassword,

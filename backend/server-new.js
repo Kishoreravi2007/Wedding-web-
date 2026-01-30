@@ -145,6 +145,9 @@ app.use('/api/admin', adminSetupRouter);
 // AI Generation Routes
 app.use('/api/ai', require('./routes/ai'));
 
+// Notifications routes
+app.use('/api/notifications', require('./routes/notifications'));
+
 // Email Test Route (Development only)
 app.post('/api/email/test', async (req, res) => {
   const { to } = req.body;

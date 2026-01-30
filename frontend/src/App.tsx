@@ -8,6 +8,7 @@ import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
 import { WebsiteProvider } from "./contexts/WebsiteContext";
+import { ThemeProvider } from "./components/theme-provider";
 import { useMusicPlayer } from "./contexts/MusicPlayerContext";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "./components/ui/button";
@@ -142,143 +143,145 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WebsiteProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          {/* LanguageSwitcher disabled - Malayalam removed */}
-          {/* <LanguageSwitcher /> */}
-          {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
-          {showBookButton && (
-            <Link to="/" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
+      <ThemeProvider defaultTheme="light" storageKey="wedding-web-theme">
+        <WebsiteProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            {/* LanguageSwitcher disabled - Malayalam removed */}
+            {/* <LanguageSwitcher /> */}
+            {/* Company Book Button - Bottom Right Corner - Only on homepage and schedule pages */}
+            {showBookButton && (
+              <Link to="/" className={`fixed right-4 z-[45] transition-all ${hasBottomNav ? 'bottom-20' : 'bottom-4'}`}>
+                <Button
+                  size="lg"
+                  className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  Book
+                </Button>
+              </Link>
+            )}
+            {/* Music Player Toggle - Hidden on company pages and feedback page */}
+            {!isCompanyPage && location.pathname !== '/feedback' && (
               <Button
-                size="lg"
-                className="bg-black hover:bg-gray-900 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                variant="outline"
+                size="icon"
+                className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-[4.5rem]' : 'bottom-4'}`}
+                onClick={() => setShowMusicPlayer(!showMusicPlayer)}
               >
-                Book
+                {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
               </Button>
-            </Link>
-          )}
-          {/* Music Player Toggle - Hidden on company pages and feedback page */}
-          {!isCompanyPage && location.pathname !== '/feedback' && (
-            <Button
-              variant="outline"
-              size="icon"
-              className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-[4.5rem]' : 'bottom-4'}`}
-              onClick={() => setShowMusicPlayer(!showMusicPlayer)}
-            >
-              {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
-            </Button>
-          )}
-          {/* Music Player - Hidden on company pages */}
-          {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
+            )}
+            {/* Music Player - Hidden on company pages */}
+            {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
 
-          {/* Feedback Button - Available on all pages except feedback page itself */}
-          {location.pathname !== '/feedback' && (
-            <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isCompanyPage ? 'bottom-20' : 'bottom-20'}`}>
-              <Button
-                className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
-                  }`}
-                title="Give Feedback"
-                onMouseEnter={() => setFeedbackCompact(false)}
-              >
-                <MessageSquare className={`w-5 h-5 transition-all duration-500 ${feedbackCompact ? '' : 'mr-2'}`} />
-                {!feedbackCompact && <span className="transition-opacity duration-500">Feedback</span>}
-              </Button>
-            </Link>
-          )}
-          <AnimatePresence mode="wait">
-            <Routes>
-              {/* Company Routes */}
-              <Route path="/company/login" element={<CompanyLogin />} />
-              <Route path="/company/signup" element={<CompanySignup />} />
-              <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
-              <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
-              <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
-              <Route path="/about-platform" element={<CompanyLanding />} />
-              <Route path="/privacy" element={<CompanyLegal />} />
-              <Route path="/terms" element={<CompanyLegal />} />
-              <Route path="/weddings" element={<Index />} />
-              <Route path="/company/about" element={<CompanyAbout />} />
-              <Route path="/company/services" element={<CompanyServices />} />
-              <Route path="/company/pricing" element={<CompanyPricing />} />
-              <Route path="/company/portfolio" element={<CompanyPortfolio />} />
-              <Route path="/company/contact" element={<CompanyContact />} />
-              <Route path="/company/bookings" element={<AuthGuard><CompanyBookings /></AuthGuard>} />
-              <Route path="/company/payments" element={<AuthGuard><CompanyPayments /></AuthGuard>} />
-              <Route path="/company/settings" element={<AuthGuard><CompanySettings /></AuthGuard>} />
-              <Route path="/company/guide" element={<CompanyGuide />} />
-              <Route path="/company/scroll" element={<CompanyScrollDemo />} />
+            {/* Feedback Button - Available on all pages except feedback page itself */}
+            {location.pathname !== '/feedback' && (
+              <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isCompanyPage ? 'bottom-20' : 'bottom-20'}`}>
+                <Button
+                  className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
+                    }`}
+                  title="Give Feedback"
+                  onMouseEnter={() => setFeedbackCompact(false)}
+                >
+                  <MessageSquare className={`w-5 h-5 transition-all duration-500 ${feedbackCompact ? '' : 'mr-2'}`} />
+                  {!feedbackCompact && <span className="transition-opacity duration-500">Feedback</span>}
+                </Button>
+              </Link>
+            )}
+            <AnimatePresence mode="wait">
+              <Routes>
+                {/* Company Routes */}
+                <Route path="/company/login" element={<CompanyLogin />} />
+                <Route path="/company/signup" element={<CompanySignup />} />
+                <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
+                <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
+                <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
+                <Route path="/about-platform" element={<CompanyLanding />} />
+                <Route path="/privacy" element={<CompanyLegal />} />
+                <Route path="/terms" element={<CompanyLegal />} />
+                <Route path="/weddings" element={<Index />} />
+                <Route path="/company/about" element={<CompanyAbout />} />
+                <Route path="/company/services" element={<CompanyServices />} />
+                <Route path="/company/pricing" element={<CompanyPricing />} />
+                <Route path="/company/portfolio" element={<CompanyPortfolio />} />
+                <Route path="/company/contact" element={<CompanyContact />} />
+                <Route path="/company/bookings" element={<AuthGuard><CompanyBookings /></AuthGuard>} />
+                <Route path="/company/payments" element={<AuthGuard><CompanyPayments /></AuthGuard>} />
+                <Route path="/company/settings" element={<AuthGuard><CompanySettings /></AuthGuard>} />
+                <Route path="/company/guide" element={<CompanyGuide />} />
+                <Route path="/company/scroll" element={<CompanyScrollDemo />} />
 
-              {/* Company Route Redirects - Short URLs */}
-              <Route path="/about" element={<Navigate to="/company/about" replace />} />
-              <Route path="/services" element={<Navigate to="/company/services" replace />} />
-              <Route path="/pricing" element={<Navigate to="/company/pricing" replace />} />
-              <Route path="/portfolio" element={<Navigate to="/company/portfolio" replace />} />
-              <Route path="/contact" element={<Navigate to="/company/contact" replace />} />
-              <Route path="/guide" element={<Navigate to="/company/guide" replace />} />
+                {/* Company Route Redirects - Short URLs */}
+                <Route path="/about" element={<Navigate to="/company/about" replace />} />
+                <Route path="/services" element={<Navigate to="/company/services" replace />} />
+                <Route path="/pricing" element={<Navigate to="/company/pricing" replace />} />
+                <Route path="/portfolio" element={<Navigate to="/company/portfolio" replace />} />
+                <Route path="/contact" element={<Navigate to="/company/contact" replace />} />
+                <Route path="/guide" element={<Navigate to="/company/guide" replace />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
-              <Route path="/admin/feedback" element={<AdminFeedback />} />
-              <Route path="/admin/call-schedules" element={<AdminCallSchedules />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
+                {/* Admin Routes */}
+                <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
+                <Route path="/admin/feedback" element={<AdminFeedback />} />
+                <Route path="/admin/call-schedules" element={<AdminCallSchedules />} />
+                <Route path="/admin/settings" element={<AdminSettings />} />
 
-              {/* Public Routes */}
-              <Route path="/countdown" element={
-                <div className="text-center p-8">
-                  <h1 className="text-4xl font-bold mb-4">{t('weddingCountdown')}</h1>
-                  <div className="mb-8">
-                    <h2 className="text-2xl">{t('sister1Muhurtham')}</h2>
-                    <CountdownTimer targetDate={'2024-08-04T10:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500" />
+                {/* Public Routes */}
+                <Route path="/countdown" element={
+                  <div className="text-center p-8">
+                    <h1 className="text-4xl font-bold mb-4">{t('weddingCountdown')}</h1>
+                    <div className="mb-8">
+                      <h2 className="text-2xl">{t('sister1Muhurtham')}</h2>
+                      <CountdownTimer targetDate={'2024-08-04T10:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl">{t('sister2Muhurtham')}</h2>
+                      <CountdownTimer targetDate={'2024-08-05T11:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500" />
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-2xl">{t('sister2Muhurtham')}</h2>
-                    <CountdownTimer targetDate={'2024-08-05T11:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500" />
-                  </div>
-                </div>
-              } />
-              <Route path="/" element={<HomeRoute />} />
-              <Route path="/wishes" element={<Wishes />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/premium" element={<PremiumCheckout />} />
+                } />
+                <Route path="/" element={<HomeRoute />} />
+                <Route path="/wishes" element={<Wishes />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/premium" element={<PremiumCheckout />} />
 
-              {/* Wedding Site Routes */}
-              <Route path="/parvathy" element={<ParvathyLayout />}>
-                <Route index element={<ParvathySchedule />} />
-                <Route path="schedule" element={<ParvathySchedule />} />
-                <Route path="schedule/:eventId" element={<EventInvitation sister="a" />} />
-                <Route path="photobooth" element={<ParvathyPhotoBooth />} />
-                <Route path="gallery" element={<PhotoGallery sister="a" />} />
-                <Route path="live" element={<ParvathyLiveStream />} />
-              </Route>
-              <Route path="/sreedevi" element={<SreedeviLayout />}>
-                <Route index element={<SreedeviSchedule />} />
-                <Route path="schedule" element={<SreedeviSchedule />} />
-                <Route path="schedule/:eventId" element={<EventInvitation sister="b" />} />
-                <Route path="photobooth" element={<SreedeviPhotoBooth />} />
-                <Route path="gallery" element={<PhotoGallery sister="b" />} />
-                <Route path="engagement-video" element={<SreedeviEngagementVideo />} />
-                <Route path="live" element={<SreedeviLiveStream />} />
-              </Route>
+                {/* Wedding Site Routes */}
+                <Route path="/parvathy" element={<ParvathyLayout />}>
+                  <Route index element={<ParvathySchedule />} />
+                  <Route path="schedule" element={<ParvathySchedule />} />
+                  <Route path="schedule/:eventId" element={<EventInvitation sister="a" />} />
+                  <Route path="photobooth" element={<ParvathyPhotoBooth />} />
+                  <Route path="gallery" element={<PhotoGallery sister="a" />} />
+                  <Route path="live" element={<ParvathyLiveStream />} />
+                </Route>
+                <Route path="/sreedevi" element={<SreedeviLayout />}>
+                  <Route index element={<SreedeviSchedule />} />
+                  <Route path="schedule" element={<SreedeviSchedule />} />
+                  <Route path="schedule/:eventId" element={<EventInvitation sister="b" />} />
+                  <Route path="photobooth" element={<SreedeviPhotoBooth />} />
+                  <Route path="gallery" element={<PhotoGallery sister="b" />} />
+                  <Route path="engagement-video" element={<SreedeviEngagementVideo />} />
+                  <Route path="live" element={<SreedeviLiveStream />} />
+                </Route>
 
-              {/* Portal Routes */}
-              <Route path="/photographer-login" element={<PhotographerLogin />} />
-              <Route path="/photographer" element={<PhotographerDashboard />} />
-              <Route path="/couple-login" element={<CoupleLogin />} />
-              <Route path="/couple" element={<CoupleDashboard />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/view-feedback" element={<ViewFeedback />} />
+                {/* Portal Routes */}
+                <Route path="/photographer-login" element={<PhotographerLogin />} />
+                <Route path="/photographer" element={<PhotographerDashboard />} />
+                <Route path="/couple-login" element={<CoupleLogin />} />
+                <Route path="/couple" element={<CoupleDashboard />} />
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="/view-feedback" element={<ViewFeedback />} />
 
-              {/* Not Found Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-        </TooltipProvider>
-      </WebsiteProvider>
+                {/* Not Found Route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </TooltipProvider>
+        </WebsiteProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
