@@ -133,7 +133,7 @@ const Portfolio = () => {
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1511285560982-1351cdeb9821?w=800&q=80"
+                  src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=2070&auto=format&fit=crop"
                   alt="Wedding Success"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />

@@ -28,7 +28,7 @@ export function LandingToolbar() {
     const handleAction = async (id: string) => {
         switch (id) {
             case 'login':
-                navigate('/login');
+                navigate('/company/login');
                 break;
             case 'signup':
                 navigate('/company/signup');

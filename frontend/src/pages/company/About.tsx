@@ -99,7 +99,7 @@ const About = () => {
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
                   alt="Team Collaboration"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />
@@ -149,7 +149,7 @@ const About = () => {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
+                  src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop"
                   alt="Wedding celebration"
                   className="w-full h-full object-cover"
                 />

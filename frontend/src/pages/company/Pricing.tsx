@@ -280,8 +280,8 @@ const BillingDurationSelector = ({
             aria-pressed={isActive}
             onClick={() => onChange(option.key)}
             className={`flex flex-col items-center justify-center gap-1 rounded-xl border px-3 py-2 text-center text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-500 ${isActive
-                ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-inner'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-rose-300'
+              ? 'border-rose-500 bg-rose-50 text-rose-600 shadow-inner'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-rose-300'
               }`}
           >
             <span className="text-[13px] leading-tight">{option.label}</span>
@@ -475,7 +475,7 @@ const Pricing = () => {
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1554232456-8727aae0cfa4?w=800&q=80"
+                  src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=2068&auto=format&fit=crop"
                   alt="Wedding Planning"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />
@@ -514,8 +514,8 @@ const Pricing = () => {
                       <div
                         key={feature.id}
                         className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
-                            ? 'border-rose-500 bg-rose-50 shadow-md'
-                            : 'border-slate-200 hover:border-rose-300 hover:bg-rose-50/50'
+                          ? 'border-rose-500 bg-rose-50 shadow-md'
+                          : 'border-slate-200 hover:border-rose-300 hover:bg-rose-50/50'
                           }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
@@ -551,8 +551,8 @@ const Pricing = () => {
                                   }}
                                   disabled={storageExtraGB === 0}
                                   className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${storageExtraGB === 0
-                                      ? 'cursor-not-allowed border-slate-200 text-slate-400'
-                                      : 'border-rose-300 text-rose-600 hover:border-rose-400'
+                                    ? 'cursor-not-allowed border-slate-200 text-slate-400'
+                                    : 'border-rose-300 text-rose-600 hover:border-rose-400'
                                     }`}
                                 >
                                   -{STORAGE_STEP} GB
@@ -618,8 +618,8 @@ const Pricing = () => {
                       <div
                         key={feature.id}
                         className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
-                            ? 'border-purple-500 bg-purple-50 shadow-md'
-                            : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
+                          ? 'border-purple-500 bg-purple-50 shadow-md'
+                          : 'border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
                           }`}
                         onClick={() => {
                           if (feature.id === 'live-streaming') {
@@ -698,8 +698,8 @@ const Pricing = () => {
                       <div
                         key={feature.id}
                         className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
-                            ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                            : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
+                          ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                          : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
                           }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
@@ -752,8 +752,8 @@ const Pricing = () => {
                       <div
                         key={feature.id}
                         className={`flex items-start gap-4 p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFeatures.has(feature.id)
-                            ? 'border-slate-500 bg-slate-50 shadow-md'
-                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                          ? 'border-slate-500 bg-slate-50 shadow-md'
+                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
                           }`}
                         onClick={() => toggleFeature(feature.id)}
                       >
