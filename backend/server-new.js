@@ -155,6 +155,11 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
   res.status(result.success ? 200 : 500).json(result);
 });
 
+// AI Email Webhook (for Google Apps Script fallback)
+console.log('✉️ Registering /api/email/auto-reply-webhook route...');
+app.use('/api/email', require('./routes/email-webhook'));
+console.log('✅ Registered /api/email/auto-reply-webhook route.');
+
 
 // Wedding Routes
 console.log('💍 Registering /api/weddings route...');
@@ -182,7 +187,8 @@ app.use((req, res) => {
       'DELETE /api/photos/:id',
       'POST /api/faces/match',
       'GET /api/faces/people',
-      'POST /api/faces/people'
+      'POST /api/faces/people',
+      'POST /api/email/auto-reply-webhook'
     ]
   });
 });
@@ -216,7 +222,7 @@ const server = app.listen(PORT, () => {
   console.log(`   Photos:         http://localhost:${PORT}/api/photos`);
   console.log(`   Face Recognition: http://localhost:${PORT}/api/faces`);
   console.log(`   Authentication: http://localhost:${PORT}/api/auth`);
-  console.log('\n' + '='.repeat(80) + '\n');
+  console.log('='.repeat(80) + '\n');
 });
 
 // Graceful shutdown

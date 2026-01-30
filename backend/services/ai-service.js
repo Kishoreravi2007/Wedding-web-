@@ -55,7 +55,7 @@ const AIService = {
             };
         }
 
-        const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro-vision"];
+        const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-2.0-flash-exp"];
         let lastError = null;
 
         for (const modelName of modelsToTry) {
@@ -83,7 +83,12 @@ const AIService = {
             }
         }
 
-        throw lastError || new Error("All AI models failed to respond.");
+        console.warn(`[AI Service] ⚠️ All models failed. Falling back to MOCK content.`);
+        return {
+            text: mockContent,
+            isMock: true,
+            modelUsed: "fallback-mock"
+        };
     },
 
     /**
@@ -155,6 +160,60 @@ const AIService = {
 
         return {
             bio: this.cleanResponse(result.text),
+            isMock: result.isMock,
+            modelUsed: result.modelUsed
+        };
+    },
+
+    /**
+     * Generate a professional support response to a user's email enquiry
+     * @param {Object} context - { from, subject, body }
+     * @returns {Promise<Object>} - { text, isMock }
+     */
+    async generateSupportResponse(context) {
+        const { from, subject, body } = context;
+
+        const prompt = `You are "WeddingWeb AI Support", a highly organized and friendly support agent.
+        Your goal is to reply to a support enquiry from ${from || 'a user'}.
+
+        CRITICAL SECURITY & CONTEXT RULES:
+        1. YOU ONLY REPRESENT WEDDINGWEB (weddingweb.co.in).
+        2. IF THE EMAIL IS NOT RELATED TO WEDDINGWEB OR WEDDING INDUSTRY SERVICES, YOU MUST REPLY WITH: 
+           "I'm sorry, I can only assist with queries related to WeddingWeb and our wedding service platform. I apologize for any inconvenience." 
+           (Do not attempt to answer unrelated questions).
+        3. Platform Features for reference: 
+           - Digital Wedding Invites & Portfolios
+           - Vendor Listings (Photographers, Planners, etc.)
+           - Face Recognition Photo Galleries
+           - AI Bio Generator for Professionals
+           - Real-time Notifications for Leads
+           - Two-Factor Authentication (2FA) security
+        4. Tone: Helpful, empathetic, and professional.
+        5. Structure: Greet them, address their specific question if it's WeddingWeb-related, and offer further help if needed.
+
+        Inbound Email:
+        From: ${from}
+        Subject: ${subject}
+        Content: ${body}
+
+        WeddingWeb AI Support Response (Start immediately):`;
+
+        let mockResponse = `Hi there! Thank you for reaching out to WeddingWeb Support regarding "${subject}". One of our team members (or our AI) will look into this shortly. We are here to help you make your wedding digital and organized!`;
+
+        // Smart Mock: If it looks totally unrelated, provide the refusal in mock mode too
+        const lowBody = body.toLowerCase();
+        const lowSub = subject.toLowerCase();
+        const keywords = ['wedding', 'invite', 'photo', 'portfolio', 'vendor', 'support', 'help', 'account', 'login', '2fa', 'bio'];
+        const isRelated = keywords.some(k => lowBody.includes(k) || lowSub.includes(k));
+
+        if (!isRelated) {
+            mockResponse = "I'm sorry, I can only assist with queries related to WeddingWeb and our wedding service platform. I apologize for any inconvenience.";
+        }
+
+        const result = await this.generateContent(prompt, mockResponse);
+
+        return {
+            text: this.cleanResponse(result.text),
             isMock: result.isMock,
             modelUsed: result.modelUsed
         };
