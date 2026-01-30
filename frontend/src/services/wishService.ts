@@ -1,6 +1,6 @@
 import { Wish } from "@/types/wish";
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
 const API_URL = `${BASE_URL}/api/wishes`;
 
 export const saveWish = async (name: string, wish: string, recipient: string): Promise<void> => {

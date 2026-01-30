@@ -5,7 +5,7 @@
  * Fast and accurate face detection with confidence threshold 0.25-0.3 and image size 1280+
  */
 
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
 
 let modelsLoaded = true; // DeepFace runs on backend, always available
 
@@ -34,14 +34,14 @@ async function elementToBlob(element: HTMLImageElement | HTMLVideoElement): Prom
   const canvas = document.createElement('canvas');
   canvas.width = element instanceof HTMLVideoElement ? element.videoWidth : element.width;
   canvas.height = element instanceof HTMLVideoElement ? element.videoHeight : element.height;
-  
+
   const ctx = canvas.getContext('2d');
   if (!ctx) {
     throw new Error('Could not get canvas context');
   }
-  
+
   ctx.drawImage(element, 0, 0);
-  
+
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob) {

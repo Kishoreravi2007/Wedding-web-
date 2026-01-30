@@ -13,7 +13,7 @@ import { CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
 
 const FaceProcessor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
