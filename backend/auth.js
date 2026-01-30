@@ -8,6 +8,7 @@
 const express = require('express');
 const router = express.Router();
 const { SecureUserDB, TokenManager, authMiddleware } = require('./lib/secure-auth');
+const emailService = require('./services/email-service');
 const OTPAuth = require('otpauth');
 
 /**
@@ -49,6 +50,13 @@ router.post('/register', async (req, res) => {
       token,
       accessToken: token
     });
+
+    // Send AI Welcome Email (Non-blocking)
+    try {
+      emailService.sendWelcomeEmailAI(effectiveUsername, effectiveUsername.split('@')[0]);
+    } catch (emailError) {
+      console.error('Failed to send AI welcome email:', emailError);
+    }
 
   } catch (error) {
     console.error('Registration error:', error);
