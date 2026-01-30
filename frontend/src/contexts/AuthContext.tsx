@@ -33,7 +33,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
   verify2FA: (userId: string, code: string) => Promise<void>;
   enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
-  signup: (email: string, password: string, emailOptIn?: boolean) => Promise<any>;
+  signup: (email: string, password: string, emailOptIn?: boolean, fullName?: string) => Promise<any>;
   updateEmailPreference: (enabled: boolean) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
@@ -235,7 +235,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (email: string, password: string, emailOptIn: boolean = false) => {
+  const signup = async (email: string, password: string, emailOptIn: boolean = false, fullName?: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -244,7 +244,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           username: email,
           password,
           role: 'company',
-          email_offers_opt_in: emailOptIn
+          email_offers_opt_in: emailOptIn,
+          fullName
         })
       });
 

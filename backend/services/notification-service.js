@@ -81,7 +81,7 @@ const NotificationService = {
     async clearOldNotifications(days = 30) {
         try {
             await query(
-                'DELETE FROM notifications WHERE created_at < NOW() - INTERVAL \'$1 days\'',
+                'DELETE FROM notifications WHERE created_at < NOW() - ($1 || \' days\')::INTERVAL',
                 [days]
             );
         } catch (error) {

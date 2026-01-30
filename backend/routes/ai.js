@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const AIService = require('../services/ai-service');
+const { authMiddleware } = require('../lib/secure-auth');
 
 /**
  * POST /api/ai/generate-bio
  * Generate a professional bio using Gemini
  */
-router.post('/generate-bio', async (req, res) => {
+router.post('/generate-bio', authMiddleware.verifyToken, async (req, res) => {
     try {
         console.log('🤖 AI Bio Request Received');
 

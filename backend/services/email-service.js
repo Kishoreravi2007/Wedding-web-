@@ -23,11 +23,18 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async ({ to, subject, text, html }) => {
   try {
     const info = await transporter.sendMail({
-      from: `"WeddingWeb Support" <${process.env.EMAIL_USER || 'help.weddingweb@gmail.com'}>`,
+      from: process.env.SMTP_FROM || `"WeddingWeb Support" <${process.env.EMAIL_USER || 'help.weddingweb@gmail.com'}>`,
       to,
       subject,
       text,
-      html
+      html,
+      attachments: [
+        {
+          filename: 'logo.png',
+          path: require('path').join(__dirname, '../../frontend/public/logo.png'),
+          cid: 'logo' // same cid value as in the html img src
+        }
+      ]
     });
     console.log('📧 Email sent: %s', info.messageId);
     return { success: true, messageId: info.messageId };
@@ -46,7 +53,7 @@ const sendWelcomeEmail = async (to, name) => {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; rounded: 10px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://wedding-web-three.vercel.app/logo.png" alt="WeddingWeb Logo" style="width: 50px; height: 50px;">
+        <img src="cid:logo" alt="WeddingWeb Logo" style="width: 60px; height: 60px; object-fit: contain;">
         <h1 style="color: #e11d48; margin-top: 10px;">Welcome to WeddingWeb!</h1>
       </div>
       <p style="font-size: 16px; color: #334155;">Hi ${name},</p>
@@ -54,7 +61,7 @@ const sendWelcomeEmail = async (to, name) => {
         We're thrilled to have you join us! WeddingWeb is here to help you create, manage, and share your perfect wedding digital experience.
       </p>
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://wedding-web-three.vercel.app/company/login" 
+        <a href="${process.env.FRONTEND_URL || 'https://weddingweb.co.in'}/company/login" 
            style="background-color: #e11d48; color: white; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block;">
            Go to Your Dashboard
         </a>
@@ -90,12 +97,12 @@ const sendWelcomeEmailAI = async (to, name) => {
     const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://wedding-web-three.vercel.app/logo.png" alt="WeddingWeb Logo" style="width: 50px; height: 50px;">
+        <img src="cid:logo" alt="WeddingWeb Logo" style="width: 60px; height: 60px; object-fit: contain;">
         <h1 style="color: #e11d48; margin-top: 10px;">Welcome to WeddingWeb!</h1>
       </div>
       <p style="font-size: 16px; color: #334155; line-height: 1.6; white-space: pre-wrap;">${body}</p>
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://wedding-web-three.vercel.app/company/login" 
+        <a href="${process.env.FRONTEND_URL || 'https://weddingweb.co.in'}/company/login" 
            style="background-color: #e11d48; color: white; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block;">
            Go to Your Dashboard
         </a>

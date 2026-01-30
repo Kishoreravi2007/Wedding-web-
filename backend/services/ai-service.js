@@ -55,7 +55,7 @@ const AIService = {
             };
         }
 
-        const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro"];
+        const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro-vision"];
         let lastError = null;
 
         for (const modelName of modelsToTry) {
@@ -65,6 +65,10 @@ const AIService = {
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
                 const text = response.text().trim();
+
+                if (!text) {
+                    throw new Error(`Empty response from model ${modelName}`);
+                }
 
                 console.log(`[AI Service] ✅ SUCCESS with ${modelName}`);
                 return {

@@ -49,7 +49,7 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -148,10 +148,10 @@ app.use('/api/ai', require('./routes/ai'));
 // Notifications routes
 app.use('/api/notifications', require('./routes/notifications'));
 
-// Email Test Route (Development only)
-app.post('/api/email/test', async (req, res) => {
+// Email Test Route (Development only, protected)
+app.post('/api/email/test', authenticateToken, async (req, res) => {
   const { to } = req.body;
-  const result = await emailService.sendTestEmail(to || process.env.EMAIL_USER);
+  const result = await emailService.sendTestEmail(to || req.user.email || process.env.EMAIL_USER);
   res.status(result.success ? 200 : 500).json(result);
 });
 

@@ -17,7 +17,7 @@ const OTPAuth = require('otpauth');
  */
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, role = 'user' } = req.body;
+    const { username, email, password, role = 'user', fullName } = req.body;
 
     // Support both username and email fields (map email to username if needed)
     const effectiveUsername = username || email;
@@ -53,7 +53,8 @@ router.post('/register', async (req, res) => {
 
     // Send AI Welcome Email (Non-blocking)
     try {
-      emailService.sendWelcomeEmailAI(effectiveUsername, effectiveUsername.split('@')[0]);
+      const displayName = fullName || effectiveUsername.split('@')[0];
+      emailService.sendWelcomeEmailAI(effectiveUsername, displayName);
     } catch (emailError) {
       console.error('Failed to send AI welcome email:', emailError);
     }

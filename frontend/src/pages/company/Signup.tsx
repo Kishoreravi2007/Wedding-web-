@@ -219,7 +219,7 @@ const CompanySignup = () => {
     setShowOptInDialog(false);
     try {
       setIsSubmitting(true);
-      const { data, error: signupError } = await signup(email.trim(), password, emailOptIn);
+      const { data, error: signupError } = await signup(email.trim(), password, emailOptIn, fullName.trim());
       if (signupError) {
         throw signupError;
       }
