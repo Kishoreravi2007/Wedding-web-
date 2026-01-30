@@ -58,6 +58,7 @@ import CompanyPayments from "./pages/company/Payments";
 import CompanySettings from "./pages/company/Settings";
 import CompanyScrollDemo from "./pages/company/ScrollDemo";
 import { AuthGuard } from "./components/company/dashboard/AuthGuard";
+import { HomeRoute } from "./components/HomeRoute";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
@@ -237,7 +238,7 @@ const App = () => {
                   </div>
                 </div>
               } />
-              <Route path="/" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
+              <Route path="/" element={<HomeRoute />} />
               <Route path="/wishes" element={<Wishes />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/premium" element={<PremiumCheckout />} />
