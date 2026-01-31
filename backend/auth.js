@@ -325,4 +325,72 @@ router.post('/preferences/email', authMiddleware.verifyToken, async (req, res) =
   }
 });
 
+/**
+ * POST /api/auth/forgot-password
+ * Request a password reset email
+ */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    console.log('🔐 Password reset requested for:', email);
+
+    // Check if user exists (using email as username)
+    const { rows } = await require('./db/postgres').query(
+      'SELECT id, username, email FROM users WHERE username = $1 OR email = $1',
+      [email.toLowerCase()]
+    );
+
+    // Always return success to prevent email enumeration attacks
+    if (rows.length === 0) {
+      console.log('⚠️ Password reset requested for non-existent email:', email);
+      return res.json({
+        message: 'If an account exists with this email, a reset link has been sent.',
+        success: true
+      });
+    }
+
+    const user = rows[0];
+
+    // Generate reset token (simple UUID-like token)
+    const resetToken = require('crypto').randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+    // Store the token in the database
+    await require('./db/postgres').query(
+      `UPDATE users SET 
+        password_reset_token = $1, 
+        password_reset_expires = $2 
+      WHERE id = $3`,
+      [resetToken, expiresAt, user.id]
+    );
+
+    // Send the reset email
+    const emailResult = await emailService.sendPasswordResetEmail(
+      user.username,
+      resetToken,
+      user.email || user.username.split('@')[0]
+    );
+
+    if (emailResult.success) {
+      console.log('✅ Password reset email sent to:', email);
+    } else {
+      console.error('❌ Failed to send password reset email:', emailResult.error);
+    }
+
+    res.json({
+      message: 'If an account exists with this email, a reset link has been sent.',
+      success: true
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Failed to process password reset request' });
+  }
+});
+
 module.exports = { router, authenticateToken: authMiddleware.verifyToken };

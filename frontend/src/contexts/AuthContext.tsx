@@ -278,7 +278,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resetPassword = async (email: string) => {
     console.log('Reset password request for:', email);
-    alert('Password reset functionality not yet implemented in migration.');
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send reset email');
+    }
+
+    return data;
   };
 
   const value: AuthContextType = {

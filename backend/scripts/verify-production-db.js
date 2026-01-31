@@ -44,7 +44,9 @@ async function verifyAndFixProductionDB() {
             'is_active',
             'login_attempts',
             'last_login_attempt',
-            'locked_until'
+            'locked_until',
+            'password_reset_token',
+            'password_reset_expires'
         ];
 
         const existingColumns = colsResult.rows.map(r => r.column_name);
@@ -66,7 +68,9 @@ async function verifyAndFixProductionDB() {
                 'is_active': 'ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT TRUE;',
                 'login_attempts': 'ALTER TABLE users ADD COLUMN login_attempts INTEGER DEFAULT 0;',
                 'last_login_attempt': 'ALTER TABLE users ADD COLUMN last_login_attempt TIMESTAMP WITH TIME ZONE;',
-                'locked_until': 'ALTER TABLE users ADD COLUMN locked_until TIMESTAMP WITH TIME ZONE;'
+                'locked_until': 'ALTER TABLE users ADD COLUMN locked_until TIMESTAMP WITH TIME ZONE;',
+                'password_reset_token': 'ALTER TABLE users ADD COLUMN password_reset_token TEXT;',
+                'password_reset_expires': 'ALTER TABLE users ADD COLUMN password_reset_expires TIMESTAMP WITH TIME ZONE;'
             };
 
             for (const col of missingColumns) {

@@ -62,6 +62,9 @@ import CompanyScrollDemo from "./pages/company/ScrollDemo";
 import { AuthGuard } from "./components/company/dashboard/AuthGuard";
 import { HomeRoute } from "./components/HomeRoute";
 
+// Client Dashboard (Premium Builder)
+import ClientDashboard from "./pages/client/ClientDashboard";
+
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -197,6 +200,11 @@ const App = () => {
                 <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
                 <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
                 <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
+
+                {/* Client Dashboard (Premium Builder) */}
+                <Route path="/client" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+                <Route path="/client/*" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+
                 <Route path="/about-platform" element={<CompanyLanding />} />
                 <Route path="/privacy" element={<CompanyLegal />} />
                 <Route path="/terms" element={<CompanyLegal />} />
