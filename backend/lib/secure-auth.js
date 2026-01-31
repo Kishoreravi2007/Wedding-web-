@@ -68,9 +68,9 @@ const SecureUserDB = {
    */
   async authenticateUser(username, password) {
     try {
-      // Get user data including security fields
+      // Get user data - using SELECT * to be defensive against schema changes
       const { rows } = await query(
-        'SELECT id, username, password, role, is_active, login_attempts, last_login_attempt, locked_until, is_2fa_enabled, two_factor_secret, email_offers_opt_in FROM users WHERE username = $1',
+        'SELECT * FROM users WHERE username = $1',
         [username]
       );
 
