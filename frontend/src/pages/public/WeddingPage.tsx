@@ -2,6 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink } from 'lucide-react';
 import CountdownTimer from '@/components/premium/CountdownTimer';
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 interface WeddingData {
     groomName: string;
@@ -26,10 +34,11 @@ interface TimelineItem {
 
 const WeddingPage = () => {
     const { slug } = useParams();
-    const [weddingData, setWeddingData] = useState<WeddingData | null>(null);
-    const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+    const [weddingData, setWeddingData] = useState<any>(null);
+    const [timeline, setTimeline] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
     useEffect(() => {
         const fetchWeddingData = async () => {
@@ -130,6 +139,7 @@ const WeddingPage = () => {
                                 <CountdownTimer
                                     targetDate={weddingData.weddingDate}
                                     targetTime={weddingData.weddingTime}
+                                    theme={weddingData.theme}
                                 />
                             </div>
                         </div>
@@ -163,47 +173,49 @@ const WeddingPage = () => {
                                     </div>
 
                                     {/* Content Card */}
-                                    <div className={`flex-1 w-full sm:w-[calc(50%-3rem)] p-8 rounded-3xl bg-white shadow-xl shadow-rose-900/5 border border-rose-100 hover:scale-[1.02] transition-transform duration-300 ${idx % 2 === 0 ? 'text-left sm:text-right text-slate-900' : 'text-left text-slate-900'}`}>
+                                    <div
+                                        onClick={() => setSelectedEvent(event)}
+                                        className={`w-full sm:w-[calc(50%-3rem)] p-8 rounded-3xl bg-white shadow-xl shadow-rose-900/5 border border-rose-100 hover:scale-[1.02] transition-transform duration-300 cursor-pointer ${idx % 2 === 0 ? 'text-left sm:text-right text-slate-900' : 'text-left text-slate-900'}`}
+                                    >
                                         <div className={`flex flex-wrap items-center gap-3 mb-4 ${idx % 2 === 0 ? 'sm:justify-end' : ''}`}>
-                                            {event.event_date && (
+                                            {event.event_date ? (
                                                 <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-medium text-[10px] uppercase tracking-wider">
-                                                    {new Date(event.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                    {new Date(event.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </span>
+                                            ) : (
+                                                <span className="px-3 py-1 rounded-full bg-slate-50 text-slate-400 font-medium text-[10px] uppercase tracking-wider">
+                                                    Date TBD
                                                 </span>
                                             )}
                                             <span className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 font-bold text-sm tracking-wider flex items-center gap-2">
                                                 <Clock className="w-4 h-4" /> {event.event_time}
                                             </span>
                                         </div>
-                                        <h3 className="text-2xl font-serif font-bold mb-3 text-slate-800">{event.title}</h3>
-                                        <p className="text-slate-600 leading-relaxed mb-6">{event.description}</p>
+                                        <h3 className="text-2xl font-serif font-bold mb-3 text-slate-800 break-words">{event.title}</h3>
+                                        <p className="text-slate-600 leading-relaxed mb-6 break-words">{event.description}</p>
 
                                         {event.location && (
                                             <div className={`flex items-center gap-2 text-sm font-medium ${idx % 2 === 0 ? 'sm:justify-end' : ''}`}>
-                                                <div className={`flex items-center gap-1.5 text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100`}>
-                                                    <MapPin className="w-4 h-4 text-rose-500" />
+                                                <a
+                                                    href={event.location_map_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={`flex items-center gap-1.5 text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all group`}
+                                                    title={event.location_map_url ? "View on Google Maps" : "Search on Google Maps"}
+                                                >
+                                                    <MapPin className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
                                                     <span>{event.location}</span>
-                                                </div>
-                                                {event.location_map_url && (
-                                                    <a
-                                                        href={event.location_map_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1 group"
-                                                        title="Open in Google Maps"
-                                                    >
-                                                        <ExternalLink className="w-4 h-4" />
-                                                        <span className="max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300">Map</span>
-                                                    </a>
-                                                )}
-                                            </div>
+                                                    <ExternalLink className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+                                                </a >
+                                            </div >
                                         )}
-                                    </div>
+                                    </div >
                                     <div className="hidden sm:block flex-1"></div>
-                                </div>
+                                </div >
                             ))}
-                        </div>
-                    </div>
-                </section>
+                        </div >
+                    </div >
+                </section >
             )}
 
             {/* Content Section Placeholder */}
@@ -220,7 +232,68 @@ const WeddingPage = () => {
             <footer className="py-8 text-center text-sm opacity-60">
                 <p>Created with <Heart className="w-3 h-3 inline-block mx-1 text-rose-500 fill-current" /> WeddingWeb</p>
             </footer>
-        </div>
+
+            {/* Event Details Modal */}
+            <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    {selectedEvent && (
+                        <>
+                            <DialogHeader>
+                                <div className="flex items-center gap-2 mb-2 text-rose-500 font-bold uppercase tracking-wider text-sm">
+                                    {selectedEvent.event_date && (
+                                        <span>{new Date(selectedEvent.event_date).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}</span>
+                                    )}
+                                    <span>•</span>
+                                    <span>{selectedEvent.event_time}</span>
+                                </div>
+                                <DialogTitle className="text-3xl font-serif text-slate-900">{selectedEvent.title}</DialogTitle>
+                            </DialogHeader>
+
+                            <div className="space-y-6 mt-4">
+                                {selectedEvent.photo_url && (
+                                    <div className="rounded-xl overflow-hidden aspect-video relative">
+                                        <img
+                                            src={selectedEvent.photo_url}
+                                            alt={selectedEvent.title}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
+                                    </div>
+                                )}
+
+                                <DialogDescription className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                    {selectedEvent.description || "Join us for this special moment."}
+                                </DialogDescription>
+
+                                {selectedEvent.location && (
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                                                <MapPin className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Location</p>
+                                                <p className="font-medium text-slate-900">{selectedEvent.location}</p>
+                                            </div>
+                                        </div>
+                                        <a
+                                            href={selectedEvent.location_map_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedEvent.location)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm"
+                                        >
+                                            View Map
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </div >
     );
 };
 

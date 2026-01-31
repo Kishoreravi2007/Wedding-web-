@@ -365,15 +365,41 @@ const ClientDashboard = () => {
         }
     };
 
-    const [eventForm, setEventForm] = useState({
+    const [eventForm, setEventForm] = useState<{
+        id: string;
+        date: string;
+        time: string;
+        title: string;
+        location: string;
+        locationMapUrl: string;
+        photoFile: File | null;
+        photoUrl: string; // For display only
+        description: string;
+        sortOrder: number;
+    }>({
+        id: '', // Add ID for editing
         date: weddingData.weddingDate || new Date().toISOString().split('T')[0],
         time: '10:00',
         title: '',
         location: '',
         locationMapUrl: '',
+        photoFile: null,
+        photoUrl: '',
         description: '',
         sortOrder: 0
     });
+    const [isEditingEvent, setIsEditingEvent] = useState(false);
+    const [showEventDialog, setShowEventDialog] = useState(false);
+
+    // Auto-sync event date with wedding date when it's loaded
+    useEffect(() => {
+        if (weddingData.weddingDate) {
+            setEventForm(prev => ({
+                ...prev,
+                date: weddingData.weddingDate
+            }));
+        }
+    }, [weddingData.weddingDate]);
 
     const fetchPhase2Data = async () => {
         if (!currentUser) return;
@@ -447,13 +473,28 @@ const ClientDashboard = () => {
         try {
             const token = getAccessToken();
             const apiUrl = API_BASE_URL;
+
+            const formData = new FormData();
+            formData.append('event_date', newEvent.event_date);
+            formData.append('event_time', newEvent.event_time);
+            formData.append('title', newEvent.title);
+            formData.append('description', newEvent.description);
+            formData.append('location', newEvent.location);
+            formData.append('location_map_url', newEvent.location_map_url);
+            formData.append('sort_order', newEvent.sort_order.toString());
+            // Send photo_url as well, so if no file is uploaded but URL exists (or is cleared), it's handled
+            formData.append('photo_url', newEvent.photoUrl || '');
+
+            if (newEvent.photoFile) {
+                formData.append('photo', newEvent.photoFile);
+            }
+
             const res = await fetch(`${apiUrl}/api/timeline`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(newEvent)
+                body: formData
             });
             const data = await res.json();
             if (data.success) {
@@ -468,6 +509,50 @@ const ClientDashboard = () => {
             }
         } catch (error) {
             showError('Failed to add event');
+        }
+        return false;
+    };
+
+    const handleUpdateEvent = async (id: string, updatedEvent: any) => {
+        try {
+            const token = getAccessToken();
+            const apiUrl = API_BASE_URL;
+
+            const formData = new FormData();
+            formData.append('event_date', updatedEvent.event_date);
+            formData.append('event_time', updatedEvent.event_time);
+            formData.append('title', updatedEvent.title);
+            formData.append('description', updatedEvent.description);
+            formData.append('location', updatedEvent.location);
+            formData.append('location_map_url', updatedEvent.location_map_url);
+            formData.append('sort_order', updatedEvent.sort_order.toString());
+            // Send photo_url as well, so if no file is uploaded but URL exists (or is cleared), it's handled
+            formData.append('photo_url', updatedEvent.photoUrl || '');
+
+            if (updatedEvent.photoFile) {
+                formData.append('photo', updatedEvent.photoFile);
+            }
+
+            const res = await fetch(`${apiUrl}/api/timeline/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                setTimeline(prev => prev.map(e => e.id === id ? data.event : e).sort((a, b) => {
+                    const dateA = a.event_date || '';
+                    const dateB = b.event_date || '';
+                    if (dateA !== dateB) return dateA.localeCompare(dateB);
+                    return a.event_time.localeCompare(b.event_time);
+                }));
+                showSuccess('Event updated successfully');
+                return true;
+            }
+        } catch (error) {
+            showError('Failed to update event');
         }
         return false;
     };
@@ -666,7 +751,7 @@ const ClientDashboard = () => {
                             {weddingData.showCountdown && (
                                 <div className="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20">
                                     <p className="text-[10px] text-pink-100 uppercase tracking-widest font-bold mb-2 text-center md:text-left">The Big Day In</p>
-                                    <CountdownTimer targetDate={weddingData.weddingDate} targetTime={weddingData.weddingTime} />
+                                    <CountdownTimer targetDate={weddingData.weddingDate} targetTime={weddingData.weddingTime} theme={weddingData.theme} />
                                 </div>
                             )}
 
@@ -1208,16 +1293,33 @@ const ClientDashboard = () => {
                                     </CardTitle>
                                     <CardDescription>Plan your wedding day schedule</CardDescription>
                                 </div>
-                                <Dialog>
+                                <Dialog open={showEventDialog} onOpenChange={(open) => {
+                                    setShowEventDialog(open);
+                                    if (!open) {
+                                        setIsEditingEvent(false);
+                                        setEventForm({
+                                            id: '',
+                                            date: weddingData.weddingDate,
+                                            time: '10:00',
+                                            title: '',
+                                            location: '',
+                                            locationMapUrl: '',
+                                            photoFile: null,
+                                            photoUrl: '',
+                                            description: '',
+                                            sortOrder: 0
+                                        });
+                                    }
+                                }}>
                                     <DialogTrigger asChild>
-                                        <Button>
+                                        <Button onClick={() => setIsEditingEvent(false)}>
                                             <Plus className="w-4 h-4 mr-2" />
                                             Add Event
                                         </Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
-                                            <DialogTitle>Add Timeline Event</DialogTitle>
+                                            <DialogTitle>{isEditingEvent ? 'Edit Timeline Event' : 'Add Timeline Event'}</DialogTitle>
                                         </DialogHeader>
                                         <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1265,6 +1367,41 @@ const ClientDashboard = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
+                                                <Label className="flex items-center gap-2">
+                                                    <Image className="w-4 h-4 text-purple-500" />
+                                                    Event Photo
+                                                </Label>
+                                                <div className="flex flex-col gap-2">
+                                                    {eventForm.photoUrl && !eventForm.photoFile && (
+                                                        <div className="relative w-fit">
+                                                            <img src={eventForm.photoUrl} alt="Preview" className="h-20 w-auto rounded border" />
+                                                            <Button
+                                                                type="button"
+                                                                variant="destructive"
+                                                                size="icon"
+                                                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
+                                                                onClick={() => setEventForm(prev => ({ ...prev, photoUrl: '' }))}
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            if (e.target.files && e.target.files[0]) {
+                                                                setEventForm(prev => ({
+                                                                    ...prev,
+                                                                    photoFile: e.target.files![0]
+                                                                }));
+                                                            }
+                                                        }}
+                                                    />
+                                                    <p className="text-[10px] text-gray-500">Supported formats: JPEG, PNG, WEBP (Max 5MB)</p>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
                                                 <Label>Description</Label>
                                                 <textarea
                                                     className="w-full p-2 border rounded-md text-sm"
@@ -1276,27 +1413,36 @@ const ClientDashboard = () => {
                                             </div>
                                         </div>
                                         <DialogFooter>
-                                            <DialogClose asChild>
-                                                <Button onClick={async () => {
-                                                    const { date: event_date, time: event_time, title, description, location, locationMapUrl: location_map_url, sortOrder: sort_order } = eventForm;
-                                                    if (event_time && title) {
-                                                        const success = await handleAddEvent({ event_date, event_time, title, description, location, location_map_url, sort_order });
-                                                        if (success) {
-                                                            setEventForm({
-                                                                date: weddingData.weddingDate,
-                                                                time: '10:00',
-                                                                title: '',
-                                                                location: '',
-                                                                locationMapUrl: '',
-                                                                description: '',
-                                                                sortOrder: 0
-                                                            });
-                                                        }
+                                            <Button onClick={async () => {
+                                                const { id, date: event_date, time: event_time, title, description, location, locationMapUrl: location_map_url, photoFile, sortOrder: sort_order } = eventForm;
+                                                if (event_time && title) {
+                                                    let success = false;
+                                                    if (isEditingEvent && id) {
+                                                        success = await handleUpdateEvent(id, { event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
                                                     } else {
-                                                        showError('Time and title are required');
+                                                        success = await handleAddEvent({ event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
                                                     }
-                                                }}>Add Event</Button>
-                                            </DialogClose>
+
+                                                    if (success) {
+                                                        setShowEventDialog(false);
+                                                        setEventForm({
+                                                            id: '',
+                                                            date: weddingData.weddingDate,
+                                                            time: '10:00',
+                                                            title: '',
+                                                            location: '',
+                                                            locationMapUrl: '',
+                                                            photoFile: null,
+                                                            photoUrl: '',
+                                                            description: '',
+                                                            sortOrder: 0
+                                                        });
+                                                        setIsEditingEvent(false);
+                                                    }
+                                                } else {
+                                                    showError('Time and title are required');
+                                                }
+                                            }}>{isEditingEvent ? 'Update Event' : 'Add Event'}</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
@@ -1320,24 +1466,50 @@ const ClientDashboard = () => {
                                                     <p className="font-medium">{item.title}</p>
                                                     <p className="text-sm text-gray-500">{item.description}</p>
                                                     {item.location && <div className="flex flex-wrap items-center gap-2 mt-1">
-                                                        <p className="text-[10px] text-gray-400 flex items-center gap-1">
-                                                            <MapPin className="w-3 h-3" /> {item.location}
-                                                        </p>
-                                                        {item.location_map_url && (
+                                                        {item.location_map_url ? (
                                                             <a
                                                                 href={item.location_map_url}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5"
+                                                                className="text-[10px] text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium bg-blue-50 px-2 py-0.5 rounded"
                                                             >
-                                                                <ExternalLink className="w-2.5 h-2.5" /> View on Map
+                                                                <MapPin className="w-3 h-3" /> {item.location}
                                                             </a>
+                                                        ) : (
+                                                            <p className="text-[10px] text-gray-400 flex items-center gap-1">
+                                                                <MapPin className="w-3 h-3" /> {item.location}
+                                                            </p>
                                                         )}
                                                     </div>}
                                                 </div>
-                                                <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteEvent(item.id)}>
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                <div className="flex gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="text-amber-500"
+                                                        onClick={() => {
+                                                            setEventForm({
+                                                                id: item.id,
+                                                                date: item.event_date ? new Date(item.event_date).toISOString().split('T')[0] : weddingData.weddingDate,
+                                                                time: item.event_time,
+                                                                title: item.title,
+                                                                location: item.location || '',
+                                                                locationMapUrl: item.location_map_url || '',
+                                                                photoFile: null,
+                                                                photoUrl: item.photo_url || '', // Set existing URL for display
+                                                                description: item.description || '',
+                                                                sortOrder: item.sort_order || 0
+                                                            });
+                                                            setIsEditingEvent(true);
+                                                            setShowEventDialog(true);
+                                                        }}
+                                                    >
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteEvent(item.id)}>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         ))
                                     )}

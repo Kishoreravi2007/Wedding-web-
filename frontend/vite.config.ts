@@ -15,7 +15,7 @@ export default defineConfig(async ({ mode }) => {
     publicDir: 'public',
     server: {
       host: "::",
-      port: 3000, // Use standard port 3000
+      port: 3001, // Use port 3001 to match dashboard links
       strictPort: false, // Allow fallback to another port if needed
     },
     plugins: [

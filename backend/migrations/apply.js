@@ -5,7 +5,8 @@ const { query } = require('../lib/db-gcp');
 
 async function applyMigration() {
     try {
-        const migrationPath = path.join(__dirname, 'migration_clock_maps.sql');
+        const migrationFile = process.argv[2] || 'migration_clock_maps.sql';
+        const migrationPath = path.isAbsolute(migrationFile) ? migrationFile : path.join(__dirname, migrationFile);
         const sql = fs.readFileSync(migrationPath, 'utf8');
 
         console.log('🚀 Applying migration...');

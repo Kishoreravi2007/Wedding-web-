@@ -2,6 +2,40 @@ const express = require('express');
 const router = express.Router();
 const db = require('../lib/db-gcp');
 const { authMiddleware } = require('../lib/secure-auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure Multer for local storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, '../uploads/timeline');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'event-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|webp/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Only images are allowed (jpeg, jpg, png, webp)'));
+    }
+});
+
+const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5005';
 
 // Get all timeline events for the authenticated user
 router.get('/', authMiddleware.verifyToken, async (req, res) => {
@@ -19,20 +53,26 @@ router.get('/', authMiddleware.verifyToken, async (req, res) => {
 });
 
 // Add a new timeline event
-router.post('/', authMiddleware.verifyToken, async (req, res) => {
+// Add event
+router.post('/', authMiddleware.verifyToken, upload.single('photo'), async (req, res) => {
     try {
         const userId = req.user.id;
         const { event_date, event_time, title, description, location, location_map_url, sort_order } = req.body;
+
+        let photo_url = req.body.photo_url || null;
+        if (req.file) {
+            photo_url = `${API_BASE_URL}/uploads/timeline/${req.file.filename}`;
+        }
 
         if (!event_time || !title) {
             return res.status(400).json({ success: false, error: 'Time and title are required' });
         }
 
         const { rows } = await db.query(
-            `INSERT INTO event_timeline (user_id, event_date, event_time, title, description, location, location_map_url, sort_order)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            `INSERT INTO event_timeline (user_id, event_date, event_time, title, description, location, location_map_url, photo_url, sort_order)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              RETURNING *`,
-            [userId, event_date, event_time, title, description, location, location_map_url, sort_order || 0]
+            [userId, event_date, event_time, title, description, location, location_map_url, photo_url, sort_order || 0]
         );
 
         res.status(201).json({ success: true, event: rows[0] });
@@ -43,13 +83,23 @@ router.post('/', authMiddleware.verifyToken, async (req, res) => {
 });
 
 // Update timeline event
-router.patch('/:id', authMiddleware.verifyToken, async (req, res) => {
+router.patch('/:id', authMiddleware.verifyToken, upload.single('photo'), async (req, res) => {
     try {
         const userId = req.user.id;
         const { id } = req.params;
         const updates = req.body;
 
-        const allowedUpdates = ['event_date', 'event_time', 'title', 'description', 'location', 'location_map_url', 'sort_order'];
+        console.log('PATCH /timeline/:id - Payload:', {
+            id,
+            file: req.file ? req.file.filename : 'none',
+            body: updates
+        });
+
+        if (req.file) {
+            updates.photo_url = `${API_BASE_URL}/uploads/timeline/${req.file.filename}`;
+        }
+
+        const allowedUpdates = ['event_date', 'event_time', 'title', 'description', 'location', 'location_map_url', 'photo_url', 'sort_order'];
         const setClauses = [];
         const values = [];
         let index = 1;
@@ -61,6 +111,8 @@ router.patch('/:id', authMiddleware.verifyToken, async (req, res) => {
                 index++;
             }
         }
+
+        console.log('Update query clauses:', setClauses);
 
         if (setClauses.length === 0) {
             return res.status(400).json({ success: false, error: 'No updates provided' });
