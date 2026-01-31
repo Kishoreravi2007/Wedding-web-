@@ -1,6 +1,6 @@
 // Supabase for storage (switched back from Firebase)
 // import { supabase } from '@/lib/supabase';
-import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { API_BASE_URL, getAuthHeaders, getAccessToken } from '@/lib/api';
 
 // Firebase imports (commented out - keeping for future migration)
 // import { db, storage } from '@/lib/firebase';
@@ -95,7 +95,7 @@ export async function uploadFiles(
     const uploadedFiles: UploadedFile[] = [];
 
     // Check if user is authenticated
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     if (!token) {
       throw new Error('Authentication required. Please login to upload photos.');
     }
@@ -170,7 +170,7 @@ export async function uploadFiles(
 // New function to upload audio blobs for wishes using Backend API
 export async function uploadAudioWish(audioBlob: Blob, recipient: string): Promise<string> {
   try {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     if (!token) throw new Error('Authentication required');
 
     const formData = new FormData();
@@ -211,7 +211,7 @@ export async function uploadAudioWish(audioBlob: Blob, recipient: string): Promi
 // Get all uploaded files from Backend
 export async function getUploadedFiles(): Promise<UploadedFile[]> {
   try {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     const response = await fetch(`${API_BASE_URL}/api/photos`, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -249,7 +249,7 @@ export async function getUploadedFiles(): Promise<UploadedFile[]> {
 export async function deleteUploadedFile(fileId: string, filePath: string): Promise<boolean> {
   try {
     // Backend handles both DB and Storage deletion
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     const response = await fetch(`${API_BASE_URL}/api/photos/${fileId}`, {
       method: 'DELETE',
       headers: {

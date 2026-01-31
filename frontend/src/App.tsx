@@ -22,6 +22,7 @@ import LoginPage from "./pages/login/page";
 import NotFound from "./pages/NotFound";
 
 import ParvathyLayout from "./pages/sister-a/Layout";
+import WeddingPage from "./pages/public/WeddingPage";
 import ParvathySchedule from "./pages/sister-a/Schedule";
 import ParvathyPhotoBooth from "./pages/sister-a/PhotoBooth";
 import ParvathyLiveStream from "./pages/sister-a/LiveStream";
@@ -48,6 +49,7 @@ import CompanyLogin from "./pages/company/Login";
 import CompanySignup from "./pages/company/Signup";
 import CompanyAccount from "./pages/company/Account";
 import CompanyForgotPassword from "./pages/company/ForgotPassword";
+import CompanyResetPassword from "./pages/company/ResetPassword";
 import CompanyAbout from "./pages/company/About";
 import CompanyServices from "./pages/company/Services";
 import CompanyPricing from "./pages/company/Pricing";
@@ -122,7 +124,7 @@ const App = () => {
 
   // Check if on company pages (hide music player on company pages)
   const isCompanyPage = useMemo(() => {
-    return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname === '/privacy' || location.pathname === '/terms';
+    return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname.startsWith('/client') || location.pathname === '/privacy' || location.pathname === '/terms';
   }, [location.pathname]);
 
   // Note: Music pause/resume is now handled globally in MusicPlayerContext
@@ -194,10 +196,15 @@ const App = () => {
             )}
             <AnimatePresence mode="wait">
               <Routes>
+                {/* Public Wedding Routes (High Priority) */}
+                <Route path="/w/:slug" element={<WeddingPage />} />
+                <Route path="/w/:slug/" element={<WeddingPage />} />
+
                 {/* Company Routes */}
                 <Route path="/company/login" element={<CompanyLogin />} />
                 <Route path="/company/signup" element={<CompanySignup />} />
                 <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
+                <Route path="/company/reset-password" element={<CompanyResetPassword />} />
                 <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
                 <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
 

@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Upload, X, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { uploadFiles } from '@/services/fileUploadService'; // Import the uploadFiles service
+import { uploadFiles } from '@/services/fileUploadService';
+import { getAccessToken } from '@/lib/api';
 import { loadFaceModels, extractFaceDescriptors, areModelsLoaded } from '@/utils/faceDescriptorExtractor';
 
 interface PhotoUploadSimpleProps {
@@ -45,7 +46,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
     }
 
     // Check authentication
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     if (!token) {
       toast.error('Please login to upload photos. Redirecting to login page...');
       setTimeout(() => {
@@ -69,7 +70,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
         if (areModelsLoaded()) {
           setProcessingFaces(true);
           setUploadProgress(prev => ({ ...prev, [index]: 5 }));
-          
+
           try {
             console.log(`🔍 Extracting face descriptors from ${file.name}...`);
             faceData = await extractFaceDescriptors(file);
@@ -77,25 +78,25 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
           } catch (faceError) {
             console.warn('Face extraction failed, uploading without faces:', faceError);
           }
-          
+
           setProcessingFaces(false);
         }
 
         // STEP 2: Upload photo
         setUploadProgress(prev => ({ ...prev, [index]: 10 }));
         const result = await uploadFiles(
-          [file], 
-          weddingId === 'sister-a' ? 'sister-a' : 'sister-b', 
+          [file],
+          weddingId === 'sister-a' ? 'sister-a' : 'sister-b',
           faceData,
           {
             eventType: photoTag,
             tags: [photoTag]
           }
         );
-        
+
         // Update progress during upload
         setUploadProgress(prev => ({ ...prev, [index]: 50 }));
-        
+
         if (result.success && result.files.length > 0) {
           setUploadProgress(prev => ({ ...prev, [index]: 100 }));
           uploadResults.push({ success: true, file: file.name, id: result.files[0].id });
@@ -108,7 +109,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
       } catch (error: any) {
         console.error('Upload error for', file.name, ':', error);
         setUploadProgress(prev => ({ ...prev, [index]: 0 }));
-        
+
         // Show specific error message
         const errorMessage = error.message || 'Unknown error';
         if (errorMessage.includes('Authentication')) {
@@ -118,7 +119,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
           }, 2000);
           break; // Stop uploading if auth fails
         }
-        
+
         uploadResults.push({ success: false, file: file.name, error: errorMessage });
       }
     }
@@ -142,7 +143,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
       const failedFileNames = failedUploads.map(f => f.file);
       setSelectedFiles(prev => prev.filter(f => failedFileNames.includes(f.name)));
     }
-    
+
     setUploading(false);
     setUploadProgress({});
   };

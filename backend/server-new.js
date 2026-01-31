@@ -49,7 +49,7 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
+  origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'].filter(Boolean),
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -122,19 +122,26 @@ const contactMessagesRouter = require('./routes/contact-messages');
 app.use('/api/contact-messages', contactMessagesRouter);
 
 // Authentication routes
-const { router: authRouter, authenticateToken } = require('./auth');
+const { authMiddleware } = require('./lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
+const { router: authRouter } = require('./auth-new');
+
+console.log('🔑 Registering /api/auth routes...');
+app.get('/api/auth/test-inline', (req, res) => res.json({ message: 'w00t' }));
 app.use('/api/auth', authRouter);
 
 // Photos routes (Supabase) - Use new version
-console.log('📦 Loading photos router from ./photos-new');
+console.log('📦 Registering /api/photos routes...');
 const photosRouter = require('./photos-new');
 app.use('/api/photos', photosRouter);
 
 // Face recognition routes (Cloud SQL)
+console.log('👤 Registering /api/faces routes...');
 const facesRouter = require('./faces');
-app.use('/api/faces', facesRouter); // Auth handled per-route inside facesRouter
+app.use('/api/faces', facesRouter);
 
 // Profile routes (Cloud SQL)
+console.log('👤 Registering /api/profiles routes...');
 const profilesRouter = require('./routes/profiles');
 app.use('/api/profiles', profilesRouter);
 
@@ -142,10 +149,10 @@ app.use('/api/profiles', profilesRouter);
 const adminSetupRouter = require('./routes/admin-setup');
 app.use('/api/admin', adminSetupRouter);
 
-// AI Generation Routes
+console.log('🤖 Registering /api/ai routes...');
 app.use('/api/ai', require('./routes/ai'));
 
-// Notifications routes
+console.log('🔔 Registering /api/notifications routes...');
 app.use('/api/notifications', require('./routes/notifications'));
 
 // Email Test Route (Development only, protected)
@@ -167,6 +174,12 @@ const weddingsRouter = require('./routes/weddings');
 app.use('/api/weddings', weddingsRouter);
 console.log('✅ Registered /api/weddings route.');
 
+// Phase 2: Guests & Timeline
+console.log('👥 Registering /api/guests routes...');
+app.use('/api/guests', require('./routes/guests'));
+console.log('📅 Registering /api/timeline routes...');
+app.use('/api/timeline', require('./routes/timeline'));
+
 // =============================================================================
 // ERROR HANDLING
 // =============================================================================
@@ -182,13 +195,17 @@ app.use((req, res) => {
       'GET /api/wishes',
       'POST /api/wishes',
       'POST /api/auth/login',
+      'POST /api/auth/register',
+      'POST /api/auth/verify-token',
       'GET /api/photos',
       'POST /api/photos',
-      'DELETE /api/photos/:id',
-      'POST /api/faces/match',
-      'GET /api/faces/people',
-      'POST /api/faces/people',
-      'POST /api/email/auto-reply-webhook'
+      'GET /api/profiles/:userId',
+      'POST /api/profiles',
+      'GET /api/guests',
+      'POST /api/guests',
+      'GET /api/timeline',
+      'POST /api/timeline',
+      'POST /api/ai/generate-bio'
     ]
   });
 });

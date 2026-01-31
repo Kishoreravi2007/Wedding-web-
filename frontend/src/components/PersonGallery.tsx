@@ -17,13 +17,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
-import { 
-  Grid, 
-  List, 
-  User, 
-  Download, 
-  Share2, 
-  CheckCircle, 
+import {
+  Grid,
+  List,
+  User,
+  Download,
+  Share2,
+  CheckCircle,
   AlertCircle,
   Search,
   Filter,
@@ -32,7 +32,7 @@ import {
   Calendar,
   Loader2
 } from 'lucide-react';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, getAccessToken } from '@/lib/api';
 import { showSuccess, showError } from '@/utils/toast';
 
 interface PersonGalleryProps {
@@ -61,8 +61,8 @@ interface PhotoData {
   };
 }
 
-const PersonGallery: React.FC<PersonGalleryProps> = ({ 
-  personId, 
+const PersonGallery: React.FC<PersonGalleryProps> = ({
+  personId,
   personName = 'Person',
   personRole = 'Guest'
 }) => {
@@ -88,7 +88,7 @@ const PersonGallery: React.FC<PersonGalleryProps> = ({
         `${API_BASE_URL}/api/photos-enhanced/by-person/${personId}?minConfidence=${minConfidence}`,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${getAccessToken()}`
           }
         }
       );
@@ -124,7 +124,7 @@ const PersonGallery: React.FC<PersonGalleryProps> = ({
 
     // Search query
     if (searchQuery) {
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );

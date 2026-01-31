@@ -14,7 +14,8 @@ const multer = require('multer');
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
 const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Switched back to GCS
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
-const { authenticateToken } = require('./auth');
+const { authMiddleware } = require('./lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
 
 // Multer configuration for in-memory storage
 const upload = multer({

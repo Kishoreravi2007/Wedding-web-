@@ -11,23 +11,35 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return `http://localhost:5001`;
+      return `http://localhost:5005`;
     }
   }
 
   // 3. Fallback to localhost for development
-  return 'http://localhost:5001';
+  return 'http://localhost:5005';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
 console.log('🌐 API Base URL:', API_BASE_URL);
 
-// Helper function to get auth headers
-export const getAuthHeaders = () => {
-  const token = localStorage.getItem('auth_token') ||
+// Helper function to get access token from various storage keys
+export const getAccessToken = () => {
+  let token = localStorage.getItem('auth_token') ||
     localStorage.getItem('token') ||
     localStorage.getItem('accessToken') ||
     localStorage.getItem('admin_token');
+
+  // Robust check for invalid token strings
+  if (!token || token === 'undefined' || token === 'null' || token === '[object Object]') {
+    return null;
+  }
+  return token;
+};
+
+// Helper function to get auth headers
+export const getAuthHeaders = () => {
+  const token = getAccessToken();
+
   return {
     'Authorization': token ? `Bearer ${token}` : '',
   };

@@ -66,19 +66,25 @@ const SecureUserDB = {
   /**
    * Authenticate user with security checks
    */
-  async authenticateUser(username, password) {
+  async authenticateUser(username, password, ipAddress, userAgent) {
     try {
       // Get user data - using SELECT * to be defensive against schema changes
+      // AND join with weddings table to populate weddingData
       const { rows } = await query(
-        'SELECT * FROM users WHERE username = $1',
+        `SELECT u.*, 
+            w.groom_name, w.bride_name, w.wedding_date, w.venue, w.guest_count, w.theme
+         FROM users u
+         LEFT JOIN weddings w ON u.id = w.user_id
+         WHERE u.username = $1`,
         [username]
       );
 
       const user = rows[0];
+      const authDetails = { username, ip_address: ipAddress, user_agent: userAgent };
 
       if (!user) {
         // Log failed attempt (generic user_not_found)
-        // await this.logAuthAttempt(null, 'login_failed', false, { username, reason: 'user_not_found' });
+        await this.logAuthAttempt(null, 'login_failed', false, { ...authDetails, reason: 'user_not_found' });
         throw new Error('Invalid credentials');
       }
 
@@ -88,14 +94,14 @@ const SecureUserDB = {
       }
 
       if (!user.is_active) {
-        await this.logAuthAttempt(user.id, 'login_failed', false, { username, reason: 'account_inactive' });
+        await this.logAuthAttempt(user.id, 'login_failed', false, { ...authDetails, reason: 'account_inactive' });
         throw new Error('Account is deactivated');
       }
 
       // Verify password
-      const isValidPassword = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password);
 
-      if (!isValidPassword) {
+      if (!isMatch) {
         // Increment login attempts and lock if necessary
         const newAttempts = (user.login_attempts || 0) + 1;
         let lockQuery = 'UPDATE users SET login_attempts = $1, last_login_attempt = NOW() WHERE id = $2';
@@ -107,7 +113,7 @@ const SecureUserDB = {
         }
         await query(lockQuery, params);
 
-        await this.logAuthAttempt(user.id, 'login_failed', false, { username, reason: 'invalid_password' });
+        await this.logAuthAttempt(user.id, 'login_failed', false, { ...authDetails, reason: 'invalid_password' });
         throw new Error('Invalid credentials');
       }
 
@@ -118,7 +124,20 @@ const SecureUserDB = {
       );
 
       // Log successful login
-      await this.logAuthAttempt(user.id, 'login_success', true, { username });
+      await this.logAuthAttempt(user.id, 'login_success', true, authDetails);
+
+      // Map wedding data
+      user.profile = user.profile || {};
+      if (user.groom_name || user.bride_name) {
+        user.profile.weddingData = {
+          groomName: user.groom_name,
+          brideName: user.bride_name,
+          weddingDate: user.wedding_date,
+          venue: user.venue,
+          guestCount: user.guest_count,
+          theme: user.theme
+        };
+      }
 
       return {
         id: user.id,
@@ -127,7 +146,8 @@ const SecureUserDB = {
         is_active: user.is_active,
         is_2fa_enabled: user.is_2fa_enabled,
         two_factor_secret: user.two_factor_secret,
-        email_offers_opt_in: user.email_offers_opt_in
+        email_offers_opt_in: user.email_offers_opt_in,
+        profile: user.profile // Return profile with weddingData
       };
 
     } catch (error) {
@@ -170,6 +190,38 @@ const SecureUserDB = {
   },
 
   /**
+   * Get user with password (for validation)
+   */
+  async getUserWithPassword(id) {
+    try {
+      const { rows } = await query(
+        'SELECT id, username, password FROM users WHERE id = $1',
+        [id]
+      );
+      return rows[0];
+    } catch (error) {
+      console.error('Error getting user with password:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update user password
+   */
+  async updateUserPassword(id, hashedPassword) {
+    try {
+      await query(
+        'UPDATE users SET password = $1 WHERE id = $2',
+        [hashedPassword, id]
+      );
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating password:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Update user profile (safe fields only)
    */
   async updateUserProfile(id, updates) {
@@ -206,6 +258,7 @@ const SecureUserDB = {
       throw error;
     }
   },
+
 
   /**
    * Set 2FA Secret and Enable status
@@ -272,15 +325,14 @@ const SecureUserDB = {
   async getAuditLogs(filters = {}) {
     try {
       let text = `
-        SELECT a.*, u.username, u.role
+        SELECT a.*
         FROM auth_audit_log a
-        JOIN users u ON a.user_id = u.id
       `;
       const params = [];
       const conditions = [];
 
       if (filters.user_id) {
-        conditions.push(`a.user_id = $${params.length + 1}`);
+        conditions.push(`a.user_id = $${params.length + 1}::uuid`);
         params.push(filters.user_id);
       }
 
@@ -339,17 +391,26 @@ const TokenManager = {
    */
   async verifyToken(token) {
     try {
+      console.log('🛡️ Attempting to verify token:', token ? `${token.substring(0, 10)}...` : 'NONE');
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-do-not-use-in-prod');
+      console.log('🔓 Token decoded successfully for ID:', decoded.id);
 
       // Verify user still exists and is active
       const user = await SecureUserDB.getUserById(decoded.id);
 
-      if (!user || !user.is_active) {
-        throw new Error('User not found or inactive');
+      if (!user) {
+        console.error('❌ User not found in DB for ID:', decoded.id);
+        throw new Error('User not found');
+      }
+
+      if (!user.is_active) {
+        console.error('❌ User is inactive:', user.username);
+        throw new Error('User inactive');
       }
 
       return user;
     } catch (error) {
+      console.error('❌ TokenManager Verify Error:', error.message);
       throw new Error('Invalid token');
     }
   }
@@ -374,12 +435,15 @@ const authMiddleware = {
       }
 
       const user = await TokenManager.verifyToken(token);
-      console.log('Auth verification successful for user:', user.username);
       req.user = user;
       next();
     } catch (error) {
-      console.error('Auth Middleware Error:', error.message);
-      return res.status(403).json({ message: 'Invalid or expired token', details: error.message });
+      console.error('🛡️ Auth Middleware Error:', error.message);
+      return res.status(403).json({
+        message: 'Invalid or expired token',
+        details: error.message,
+        hint: 'Please try logging out and logging in again.'
+      });
     }
   },
 

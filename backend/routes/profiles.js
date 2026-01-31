@@ -26,7 +26,8 @@ router.get('/', async (req, res) => {
  * POST /api/profiles
  * Create or update a user profile
  */
-const { authenticateToken } = require('../auth');
+const { authMiddleware } = require('../lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
 router.post('/', authenticateToken, async (req, res) => {
     try {
         const { full_name, location, bio, avatar_url, email } = req.body;
@@ -79,7 +80,15 @@ router.get('/:userId', async (req, res) => {
         const { rows } = await query('SELECT * FROM profiles WHERE user_id = $1', [userId]);
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: 'Profile not found' });
+            // Return a default profile instead of 404 for a better UX
+            return res.json({
+                user_id: userId,
+                full_name: 'Guest User',
+                location: 'Not specified',
+                bio: 'Welcome! Click Edit Profile to tell your story.',
+                avatar_url: null,
+                is_default: true
+            });
         }
 
         res.json(rows[0]);

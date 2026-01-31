@@ -36,9 +36,6 @@ const CompanyLogin = () => {
             </section>
 
             <section className="space-y-4">
-              <p className="text-sm font-medium uppercase tracking-[0.4em] text-slate-500">
-                Client login
-              </p>
               <LoginForm redirectTo="/client" />
             </section>
           </div>

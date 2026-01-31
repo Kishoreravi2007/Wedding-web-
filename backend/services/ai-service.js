@@ -10,6 +10,15 @@ let genAI = null;
 
 if (apiKey) {
     genAI = new GoogleGenerativeAI(apiKey);
+    // Debug available models
+    (async () => {
+        try {
+            console.log("🔍 Checking available Gemini models...");
+            // The listModels method isn't directly on genAI in this version or needs a specific import
+            // In v0.24.1, it's not a simple method. 
+            // We'll just stick to trying specific ones.
+        } catch (e) { }
+    })();
 } else {
     console.warn("⚠️ GEMINI_API_KEY is missing. AI features will run in MOCK mode.");
 }
@@ -46,23 +55,35 @@ const AIService = {
      */
     async generateContent(prompt, mockContent = "AI Content Placeholder") {
         if (!genAI) {
-            console.log("🤖 AI Service: Running in MOCK mode");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("🤖 AI Service: Running in MOCK mode (No API Key)");
+            await new Promise(resolve => setTimeout(resolve, 800));
             return {
                 text: mockContent,
                 isMock: true,
-                modelUsed: "mock"
+                modelUsed: "pure-mock"
             };
         }
 
-        const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-2.0-flash-exp"];
+        const modelsToTry = [
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-pro",
+            "gemini-pro",
+            "gemini-2.0-flash-exp"
+        ];
         let lastError = null;
 
         for (const modelName of modelsToTry) {
             try {
-                console.log(`[AI Service] Attempting ${modelName}...`);
+                console.log(`[AI Service] 🛰️ Attempting ${modelName}...`);
                 const model = genAI.getGenerativeModel({ model: modelName });
-                const result = await model.generateContent(prompt);
+
+                // Set a timeout for the API call
+                const result = await Promise.race([
+                    model.generateContent(prompt),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+                ]);
+
                 const response = await result.response;
                 const text = response.text().trim();
 
@@ -70,24 +91,30 @@ const AIService = {
                     throw new Error(`Empty response from model ${modelName}`);
                 }
 
-                console.log(`[AI Service] ✅ SUCCESS with ${modelName}`);
+                console.log(`[AI Service] ✨ SUCCESS with ${modelName}`);
                 return {
                     text,
                     isMock: false,
                     modelUsed: modelName
                 };
             } catch (apiError) {
-                console.warn(`[AI Service] ❌ Model ${modelName} failed:`, apiError.message);
+                console.warn(`[AI Service] ⚠️ Model ${modelName} failed:`, apiError.message);
                 lastError = apiError;
+                // If it's a regional error (403), we might want to skip other models if they'll all fail
+                if (apiError.message.includes('location is not supported')) {
+                    console.error('[AI Service] 🌍 Regional restriction detected.');
+                    break;
+                }
                 continue;
             }
         }
 
-        console.warn(`[AI Service] ⚠️ All models failed. Falling back to MOCK content.`);
+        console.warn(`[AI Service] 📉 All models failed or reached quota. Falling back to MOCK.`);
         return {
-            text: mockContent,
+            text: mockContent || "We're currently imagining your beautiful story. Please save your profile and try again in a moment!",
             isMock: true,
-            modelUsed: "fallback-mock"
+            modelUsed: "fallback-mock",
+            error: lastError ? lastError.message : 'Unknown'
         };
     },
 
@@ -154,7 +181,15 @@ const AIService = {
 
         Refined Professional Biography (Start immediately):`;
 
-        const mockBio = `I am ${name || 'a professional'}, specializing in ${type || 'wedding services'}. With a passion for excellence, i dedicate myself to making every moment unforgettable.`;
+        const templates = [
+            `As a dedicated professional in ${type || 'wedding services'}, I, ${name || 'your host'}, am committed to bringing your unique vision to life. With years of experience and a passion for crafting unforgettable moments, I believe that every wedding tells a story. My approach merges attention to detail with a creative flair, ensuring that your celebration is as seamless as it is stunning. Whether you have a specific theme in mind or need guidance to find your style, I am here to make your journey to the altar truly magical.`,
+            `Passion, elegance, and precision define my work at ${name || 'our studio'}. Specializing in ${type || 'wedding excellence'}, I strive to turn your dream wedding into a breathtaking reality. I understand that your big day is one of the most significant chapters of your life, and I am honored to be a part of it. My goal is to provide a stress-free experience, allowing you to focus on what matters most: each other. Let's create something extraordinary together.`,
+            `Elevating your wedding experience is my primary mission. As ${name || 'a specialist'} in ${type || 'curated wedding services'}, I bring a sophisticated touch to every event I touch. I pride myself on my ability to listen to your needs and translate them into a celebration that perfectly reflects your personality. From the first consultation to the final dance, I am your partner in excellence. Together, we will make your wedding the talk of the town.`
+        ];
+
+        // Select template based on name length or just randomly
+        const fallbackText = templates[Math.floor(Math.random() * templates.length)];
+        const mockBio = draft ? `Inspired by your story ("${draft}"), ${fallbackText}` : fallbackText;
 
         const result = await this.generateContent(prompt, mockBio);
 

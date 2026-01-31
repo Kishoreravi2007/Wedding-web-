@@ -14,7 +14,8 @@ const {
   getStatistics,
   findSimilarFaces
 } = require('./lib/face-recognition-logic');
-const { authenticateToken } = require('./auth');
+const { authMiddleware } = require('./lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
 
 // People DB operations - Now using SQL implementation imported above
 // const { db } = require('./lib/firebase'); // Removed Firebase dependency for People

@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LiveGallery } from '@/components/LiveGallery';
-import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { API_BASE_URL, getAuthHeaders, getAccessToken } from '@/lib/api';
 import axios from 'axios';
 import {
   Camera,
@@ -67,7 +67,7 @@ export default function LiveSyncDashboard() {
     try {
       setIsLoadingPhotographer(true);
       // Get photographer ID from token or user context
-      const token = localStorage.getItem('token');
+      const token = getAccessToken();
       if (token) {
         // Decode JWT to get user ID (simplified - in production use proper JWT library)
         try {
@@ -199,7 +199,7 @@ export default function LiveSyncDashboard() {
             Unable to load photographer information. Please try logging out and logging back in.
             <br />
             <small className="text-xs text-gray-500 mt-2 block">
-              Debug: Token exists: {localStorage.getItem('token') ? 'Yes' : 'No'}
+              Debug: Token valid: {getAccessToken() ? 'Yes' : 'No'}
             </small>
           </AlertDescription>
         </Alert>

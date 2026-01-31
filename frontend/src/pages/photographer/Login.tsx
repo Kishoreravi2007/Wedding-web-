@@ -31,7 +31,8 @@ const PhotographerLogin = () => {
       const token = response.data.accessToken || response.data.token;
 
       if (token) {
-        localStorage.setItem('token', token);
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('token', token); // Keep legacy for a while if needed
         localStorage.setItem('role', response.data.user?.role || 'photographer');
         showSuccess('Login successful! Welcome to the Photographer Portal.');
         navigate('/photographer');
