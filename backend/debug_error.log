@@ -1,0 +1,20 @@
+2026-01-31T19:49:57.113Z - Upload Error: Error: The billing account for the owning project is disabled in state closed
+    at new ApiError (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:124:15)
+    at Util.parseHttpRespBody (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:263:38)
+    at Util.handleResp (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:203:30)
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:593:22
+    at onResponse (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\retry-request\index.js:259:7)
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\teeny-request\build\src\index.js:157:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+2026-01-31T19:52:52.797Z - Upload Error: error: new row for relation "photos" violates check constraint "photos_sister_check"
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async Object.create (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\sql-db.js:33:22)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\photos-new.js:318:19
+2026-01-31T19:55:20.367Z - Upload Error: error: new row for relation "photos" violates check constraint "photos_storage_provider_check"
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async Object.create (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\sql-db.js:33:22)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\photos-new.js:318:19

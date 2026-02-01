@@ -218,13 +218,14 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
     console.log(`✅ Comparing with ${compatibleDescriptors.length} compatible descriptor(s) (${queryDimension} dimensions)`);
 
     // Calculate distances to all known faces with matching dimensions
-    // Try both euclidean and cosine distance, use the better one
+    // For 512-dim DeepFace embeddings, cosine distance is more appropriate
+    // For 128-dim face-api.js embeddings, euclidean distance works better
     const matches = compatibleDescriptors.map(faceDesc => {
       const euclideanDist = euclideanDistance(descriptor, faceDesc.descriptor);
       const cosineDist = cosineDistance(descriptor, faceDesc.descriptor);
 
-      // Use the smaller distance (better match)
-      const distance = Math.min(euclideanDist, cosineDist);
+      // Use cosine distance for normalized embeddings (512-dim), euclidean for 128-dim
+      const distance = descriptor.length >= 512 ? cosineDist : euclideanDist;
       const confidence = Math.max(0, 1 - distance); // Convert distance to confidence
 
       return {
@@ -515,7 +516,7 @@ async function getStatistics() {
  * Useful for finding all photos containing the same person
  * Now supports anonymous face searches (selfies) by returning photos directly from matched descriptors
  */
-async function findSimilarFaces(descriptor, limit = 10, threshold = 0.6, sister = null) {
+async function findSimilarFaces(descriptor, limit = 10, threshold = 0.45, sister = null) {
   try {
     console.log(`🔍 findSimilarFaces: limit=${limit}, threshold=${threshold}, sister=${sister}`);
 

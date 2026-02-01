@@ -325,6 +325,8 @@ const ClientDashboard = () => {
 
     const [guests, setGuests] = useState<any[]>([]);
     const [timeline, setTimeline] = useState<any[]>([]);
+    const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+    const [isUploadingGallery, setIsUploadingGallery] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(false);
 
     // Fetch Guests & Timeline
@@ -421,10 +423,72 @@ const ClientDashboard = () => {
             });
             const tData = await tRes.json();
             if (tData.success) setTimeline(tData.timeline);
+
+            // Fetch Gallery Photos
+            if (weddingData.slug) {
+                const pRes = await fetch(`${apiUrl}/api/photos?sister=${weddingData.slug}&limit=50`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (pRes.ok) {
+                    const pData = await pRes.json();
+                    setGalleryPhotos(pData.photos || []);
+                }
+            }
+
         } catch (error) {
             console.error('Error fetching Phase 2 data:', error);
         } finally {
             setIsLoadingData(false);
+        }
+    };
+
+    const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || !e.target.files[0] || !weddingData.slug) return;
+
+        setIsUploadingGallery(true);
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append('photo', file);
+        formData.append('sister', weddingData.slug);
+        formData.append('title', 'Photographer Upload');
+        formData.append('description', 'Uploaded via Dashboard');
+        formData.append('eventType', 'wedding');
+        // formData.append('tags', JSON.stringify(['official'])); 
+
+        try {
+            const token = getAccessToken();
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+
+            const res = await fetch(`${apiUrl}/api/photos`, { // Authenticated upload
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                // Add new photo to start of list (assuming backend returns full photo object or we construct it)
+                // Re-fetch to be safe and get processed URLs/faces
+                const pRes = await fetch(`${apiUrl}/api/photos?sister=${weddingData.slug}&limit=50`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (pRes.ok) {
+                    const pData = await pRes.json();
+                    setGalleryPhotos(pData.photos || []);
+                }
+                showSuccess('Photo uploaded successfully');
+            } else {
+                showError('Failed to upload photo');
+            }
+        } catch (error) {
+            console.error('Gallery upload error:', error);
+            showError('Error uploading photo');
+        } finally {
+            setIsUploadingGallery(false);
+            // Reset input
+            e.target.value = '';
         }
     };
 
@@ -1146,15 +1210,51 @@ const ClientDashboard = () => {
                                 <CardDescription>Upload and manage your wedding photos</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-rose-400 transition-colors cursor-pointer">
-                                    <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-700 mb-2">Upload Photos</h3>
-                                    <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select photos</p>
-                                    <Button>
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Select Photos
-                                    </Button>
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-rose-400 transition-colors cursor-pointer relative bg-slate-50">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        onChange={handleGalleryUpload}
+                                        disabled={isUploadingGallery}
+                                    />
+                                    {isUploadingGallery ? (
+                                        <div className="flex flex-col items-center">
+                                            <Loader2 className="w-12 h-12 text-rose-500 animate-spin mb-4" />
+                                            <p className="text-sm text-gray-500">Uploading...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                            <h3 className="text-lg font-medium text-gray-700 mb-2">Upload Photos</h3>
+                                            <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select photos</p>
+                                            <Button variant="outline" className="pointer-events-none">
+                                                <Plus className="w-4 h-4 mr-2" />
+                                                Select Photos
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
+
+                                {/* Gallery Grid */}
+                                {galleryPhotos.length > 0 && (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                                        {galleryPhotos.map((photo) => (
+                                            <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden group bg-gray-100 border border-gray-200">
+                                                <img
+                                                    src={photo.publicUrl}
+                                                    alt={photo.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                    <Button size="icon" variant="ghost" className="text-white hover:bg-white/20">
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {weddingData.photosCount === 0 && (
                                     <div className="mt-6 p-4 bg-blue-50 rounded-lg">

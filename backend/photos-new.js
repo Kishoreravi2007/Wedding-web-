@@ -10,12 +10,91 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
 // const { supabase } = require('./server'); // Removed Supabase usage
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
-const { uploadFile, deleteFile } = require('./lib/gcs-storage'); // Switched back to GCS
+const { uploadFile, deleteFile } = require('./lib/local-storage'); // Switched to Local Storage due to GCS billing issue
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
 const { authMiddleware } = require('./lib/secure-auth');
 const authenticateToken = authMiddleware.verifyToken;
+
+const DEEPFACE_API_URL = process.env.DEEPFACE_API_URL || 'http://localhost:8002';
+
+/**
+ * Extract faces from image buffer using DeepFace API
+ * @param {Buffer} buffer - Image buffer
+ * @param {string} filename - Original filename for form data
+ * @returns {Promise<Array>} - Array of detected faces with embeddings
+ */
+async function extractFacesFromBuffer(buffer, filename) {
+  try {
+    const formData = new FormData();
+    formData.append('file', buffer, { filename, contentType: 'image/jpeg' });
+    formData.append('detector_backend', 'yolov8');
+    formData.append('conf_threshold', '0.5');
+    formData.append('imgsz', '1280');
+
+    const response = await axios.post(
+      `${DEEPFACE_API_URL}/api/faces/detect`,
+      formData,
+      {
+        headers: formData.getHeaders(),
+        timeout: 60000 // 60s timeout for large images
+      }
+    );
+
+    if (response.data && response.data.faces) {
+      console.log(`🔬 DeepFace: Detected ${response.data.faces.length} face(s) in ${filename}`);
+      return response.data.faces;
+    }
+    return [];
+  } catch (error) {
+    console.error(`⚠️  Face extraction failed for ${filename}:`, error.message);
+    return []; // Return empty array on failure, don't block upload
+  }
+}
+
+/**
+ * Store extracted faces in database
+ * @param {string} photoId - Photo ID to associate faces with
+ * @param {Array} faces - Array of detected faces from DeepFace API
+ */
+async function storeFacesForPhoto(photoId, faces) {
+  const storedFaces = [];
+  for (const face of faces) {
+    if (!face.embedding || face.embedding.length === 0) continue;
+
+    try {
+      const descriptor = await FaceDescriptorDB.create({
+        photo_id: photoId,
+        descriptor: face.embedding,
+        confidence: face.det_score || 0.9
+      });
+
+      await PhotoFaceDB.create({
+        photo_id: photoId,
+        face_descriptor_id: descriptor.id,
+        bounding_box: {
+          x: face.bbox[0],
+          y: face.bbox[1],
+          width: face.bbox[2],
+          height: face.bbox[3]
+        },
+        confidence: face.det_score || 0.9,
+        is_verified: false
+      });
+
+      storedFaces.push(descriptor.id);
+    } catch (err) {
+      console.error(`   ❌ Error storing face: ${err.message}`);
+    }
+  }
+  if (storedFaces.length > 0) {
+    console.log(`✅ Stored ${storedFaces.length} face embedding(s) for photo ${photoId.substring(0, 8)}...`);
+  }
+  return storedFaces;
+}
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -158,6 +237,81 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
+ * POST /api/photos/public
+ * Public upload for guests (Photobooth)
+ */
+router.post('/public', upload.single('photo'), async (req, res) => {
+  console.log('📸 POST /api/photos/public: Received public upload request');
+
+  if (!req.file) {
+    return res.status(400).json({ message: 'No photo file uploaded' });
+  }
+
+  const { sister, title, description, eventType, tags } = req.body;
+
+  // Validate required fields
+  if (!sister) {
+    return res.status(400).json({
+      message: 'Invalid or missing sister identifier/photographer.'
+    });
+  }
+
+  const file = req.file;
+  const timestamp = Date.now();
+  const cleanFileName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const fileName = `${sister}/${timestamp}_${cleanFileName}`;
+
+  try {
+    // Upload to GCS
+    const publicUrl = await uploadFile(fileName, file.buffer, file.mimetype);
+
+    // Create photo record in database
+    const photoData = {
+      filename: file.originalname,
+      file_path: fileName,
+      public_url: publicUrl,
+      size: file.size,
+      mimetype: file.mimetype,
+      sister: sister,
+      title: title || 'Guest Upload',
+      description: description || 'Uploaded via Photobooth',
+      event_type: eventType || 'photobooth',
+      tags: tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : ['guest-upload'],
+      storage_provider: 'local',
+      photographer_id: null // Public upload
+    };
+
+    const photo = await PhotoDB.create(photoData);
+
+    // Automatically extract and store face embeddings
+    const detectedFaces = await extractFacesFromBuffer(file.buffer, file.originalname);
+    if (detectedFaces.length > 0) {
+      await storeFacesForPhoto(photo.id, detectedFaces);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Photo uploaded successfully',
+      photo: {
+        id: photo.id,
+        publicUrl: photo.public_url,
+        facesDetected: detectedFaces.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error uploading public photo:', error);
+    if (fileName) {
+      try { await deleteFile(fileName); } catch (e) { /* ignore */ }
+    }
+    res.status(500).json({
+      message: 'Error uploading photo',
+      error: error.message
+    });
+  }
+});
+
+/**
  * POST /api/photos
  * Upload a new photo with optional face data
  */
@@ -243,7 +397,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
       description: description || '',
       event_type: eventType || '',
       tags: parsedTags,
-      storage_provider: 'gcs', // Switched back to gcs
+      storage_provider: 'local', // Switched to local due to billing
       photographer_id: req.user?.id || null // From authentication middleware
     };
 
@@ -296,6 +450,13 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
           // Continue processing other faces
         }
       }
+    } else {
+      // No faces provided by client — automatically extract using DeepFace API
+      const detectedFaces = await extractFacesFromBuffer(file.buffer, file.originalname);
+      if (detectedFaces.length > 0) {
+        await storeFacesForPhoto(photo.id, detectedFaces);
+        console.log(`🔬 Auto-extracted ${detectedFaces.length} face(s) for ${file.originalname}`);
+      }
     }
 
     // Return created photo with face data
@@ -317,6 +478,9 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
 
   } catch (error) {
     console.error('Error uploading photo:', error);
+    try {
+      require('fs').appendFileSync('debug_error.log', new Date().toISOString() + ' - Upload Error: ' + error.stack + '\n');
+    } catch (e) { console.error('Failed to write log'); }
 
     // Cleanup: try to delete uploaded file if database operations failed
     if (fileName) {

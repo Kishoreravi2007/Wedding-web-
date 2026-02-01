@@ -644,6 +644,70 @@ router.get('/public/wedding/:slug', async (req, res) => {
 });
 
 /**
+ * GET /api/auth/client/wedding
+ * Get wedding details for logged-in user
+ */
+router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { query } = require('./lib/db-gcp');
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Fetch wedding details for this user
+    const result = await query(
+      `SELECT * FROM weddings WHERE user_id = $1 LIMIT 1`,
+      [userId]
+    );
+
+    let weddingData = {};
+
+    if (result.rows.length > 0) {
+      const row = result.rows[0];
+      weddingData = {
+        id: row.id, // Important for updates
+        groomName: row.groom_name,
+        brideName: row.bride_name,
+        weddingDate: row.wedding_date,
+        venue: row.venue,
+        theme: row.theme,
+        weddingTime: row.wedding_time,
+        showCountdown: row.show_countdown,
+        guestCount: row.guest_count,
+        slug: row.wedding_code // Wait, calling it slug in frontend
+      };
+
+      // Also fetch the username/slug from users table if needed for correctness
+      // But wedding_code in weddings table seems to be the intended slug field based on other code
+      // Let's ensure we return what the frontend expects.
+      // Frontend expects: groomName, brideName, weddingDate, weddingTime, showCountdown, guestCount, theme, slug.
+    } else {
+      // Return defaults if no wedding set up yet
+      weddingData = {
+        groomName: 'Groom',
+        brideName: 'Bride',
+        weddingDate: '2026-03-15',
+        venue: '',
+        theme: 'Modern Elegance',
+        weddingTime: '10:00',
+        showCountdown: true,
+        guestCount: 0,
+        slug: req.user.username // Fallback to username as slug if no wedding code
+      };
+    }
+
+    // Wrap in "wedding" key as seen in frontend: if (data.wedding)
+    res.json({ wedding: weddingData });
+
+  } catch (error) {
+    console.error('Get client wedding error:', error);
+    res.status(500).json({ message: 'Failed to fetch wedding details' });
+  }
+});
+
+/**
  * PUT /api/auth/client/wedding
  * Update wedding details for logged-in user
  */

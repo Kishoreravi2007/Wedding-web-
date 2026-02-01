@@ -22,3 +22,7 @@ google-service-account.json
 .env
 .env.local
 .env.production
+
+# Local storage
+uploads/
+/uploads

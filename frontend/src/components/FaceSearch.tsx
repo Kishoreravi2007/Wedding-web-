@@ -1,20 +1,5 @@
-/**
- * Face Search Component
- * 
- * This component allows guests to upload a selfie and find matching photos
- * from the wedding event using face-api.js face recognition.
- * 
- * Features:
- * - Upload selfie for face detection
- * - Extract face embeddings using face-api.js
- * - Compare with stored event photo embeddings
- * - Display matching photos with confidence scores
- * - Responsive gallery layout
- */
-
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import {
@@ -27,12 +12,18 @@ import {
   CheckCircle,
   Loader2,
   Download,
-  Eye
+  Eye,
+  X,
+  Sparkles,
+  User,
+  Scan,
+  Maximize2
 } from 'lucide-react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 interface FaceMatch {
   id: string;
@@ -54,12 +45,8 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
   className = '',
   eventId = 'wedding-event'
 }) => {
-  // Refs for file input and canvas
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // State management
-  const [isModelLoaded, setIsModelLoaded] = useState(true); // DeepFace runs on backend, always available
   const [isSearching, setIsSearching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [searchResults, setSearchResults] = useState<FaceMatch[]>([]);
@@ -67,135 +54,87 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
   const [detectedFace, setDetectedFace] = useState<any>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [isHovering, setIsHovering] = useState(false);
 
-  // DeepFace runs on backend, no models to load
   useEffect(() => {
-    console.log('✅ Using DeepFace + YOLOv8-face backend API for face search');
-    setIsModelLoaded(true);
+    console.log('✅ AI Photobooth Ready - Port 8002');
   }, []);
 
-  // Extract face descriptor from image using DeepFace API
   const extractFaceDescriptor = useCallback(async (file: File): Promise<number[] | null> => {
     try {
-      console.log('🔍 Extracting face descriptor using DeepFace + YOLOv8-face...');
-
-      // Create FormData to send file to DeepFace API
       const formData = new FormData();
       formData.append('file', file);
       formData.append('return_landmarks', 'false');
       formData.append('return_age_gender', 'false');
       formData.append('enforce_detection', 'false');
 
-      // Call DeepFace API
       const response = await fetch(`${DEEPFACE_API_URL}/api/faces/detect`, {
         method: 'POST',
         body: formData
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ DeepFace API error:', errorText);
-        throw new Error(`DeepFace API error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`DeepFace API error: ${response.status}`);
 
       const result = await response.json();
-
       if (!result.faces || result.faces.length === 0) {
-        console.log('⚠️ No face detected in the image');
-        setError('No face detected in the uploaded image. Please ensure your face is clearly visible.');
+        setError('We couldn\'t find a face in that photo. Try a clear selfie!');
         return null;
       }
 
-      // Use the first detected face
-      const face = result.faces[0];
-      console.log('✅ Face descriptor extracted successfully using DeepFace + YOLOv8-face');
-      return face.embedding; // 512-dim embedding
-
+      return result.faces[0].embedding;
     } catch (error) {
-      console.error('❌ Error extracting face descriptor:', error);
-      setError('Failed to extract face features. Please try again.');
+      console.error(error);
+      setError('Connection issue. Please try again in a moment.');
       return null;
     }
   }, []);
 
-  // Search for matching faces in stored photos
   const searchForMatches = useCallback(async (queryDescriptor: number[]) => {
     try {
-      console.log('🔍 Searching for matching faces...');
       setIsSearching(true);
       setError('');
       setSuccess('');
 
-      // Call backend API for face matching (descriptor is already an array)
       const response = await axios.post(`${BACKEND_URL}/api/faces/find-similar`, {
-        descriptor: queryDescriptor, // 512-dim DeepFace embedding or 128-dim face-api.js
+        descriptor: queryDescriptor,
         limit: 50,
         threshold: 0.5,
         sister: eventId
       });
 
-      console.log('Backend response:', response.data);
-
-      // The backend now returns photos directly, not face descriptors
       const { faces } = response.data;
-
       if (!faces || faces.length === 0) {
-        setError('No matching photos found. Try uploading a clearer photo with your face clearly visible.');
+        setError('No matching photos found yet! We\'ll keep looking as more photos are uploaded.');
         setSearchResults([]);
         return;
       }
 
-      console.log(`✅ Found ${faces.length} matching photos from backend`);
+      const matches: FaceMatch[] = faces.map((photo: any) => ({
+        id: photo.id,
+        photoUrl: photo.public_url,
+        confidence: photo.similarity || 0.7,
+        metadata: {
+          filename: photo.filename,
+          uploadedAt: photo.uploaded_at || photo.created_at,
+          eventId: photo.sister
+        }
+      })).sort((a: any, b: any) => b.confidence - a.confidence);
 
-      // Backend now returns full photo objects with similarity scores
-      // Map to FaceMatch format
-      const matches: FaceMatch[] = faces.map((photo: any) => {
-        return {
-          id: photo.id,
-          photoUrl: photo.public_url,
-          confidence: photo.similarity || 0.7,
-          metadata: {
-            filename: photo.filename,
-            uploadedAt: photo.uploaded_at || photo.created_at,
-            eventId: photo.sister
-          }
-        };
-      });
-
-      // Sort matches by confidence (highest first)
-      matches.sort((a, b) => b.confidence - a.confidence);
-
-      console.log(`✅ Displaying ${matches.length} matching photos`);
       setSearchResults(matches);
-
-      if (matches.length > 0) {
-        setSuccess(`Found ${matches.length} matching photos!`);
-      } else {
-        setError('No matching photos found. Try uploading a clearer photo of your face.');
-      }
-
+      setSuccess(`Success! We found ${matches.length} photos of you.`);
     } catch (error) {
-      console.error('❌ Error during face search:', error);
-      setError('Face search failed. Please try again.');
+      setError('Search failed. Our server is taking a breather.');
     } finally {
       setIsSearching(false);
     }
   }, [eventId]);
 
-  // Handle file upload
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please select a valid image file.');
-      return;
-    }
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image file is too large. Please select an image smaller than 10MB.');
       return;
     }
 
@@ -203,271 +142,334 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       setIsUploading(true);
       setError('');
       setSuccess('');
+      setDetectedFace(null);
+      setSearchResults([]);
 
-      // Display uploaded image
       const imageUrl = URL.createObjectURL(file);
       setUploadedImage(imageUrl);
 
-      // Extract face descriptor using DeepFace API
       const descriptor = await extractFaceDescriptor(file);
 
-      if (descriptor) {
-        // Create image element for display
-        const img = new Image();
-        img.src = imageUrl;
-        setDetectedFace({ descriptor, image: img });
-        setSuccess('Face detected! Click "Search Photos" to find matches.');
-      }
-
-      setIsUploading(false);
-
-      img.onerror = () => {
-        setError('Failed to load the uploaded image. Please try again.');
+      const img = new Image();
+      img.onload = () => {
+        if (descriptor) {
+          setDetectedFace({ descriptor, image: img });
+        }
         setIsUploading(false);
       };
-
-      img.src = URL.createObjectURL(file);
+      img.onerror = () => {
+        setError('Failed to load image.');
+        setIsUploading(false);
+      };
+      img.src = imageUrl;
 
     } catch (error) {
-      console.error('❌ Error handling file upload:', error);
-      setError('Failed to upload image. Please try again.');
+      setError('Upload failed.');
       setIsUploading(false);
     }
   }, [extractFaceDescriptor]);
 
-  // Start face search
-  const startSearch = useCallback(async () => {
-    if (!detectedFace) {
-      setError('Please upload a photo with your face first.');
-      return;
-    }
-
-    await searchForMatches(detectedFace.descriptor);
-  }, [detectedFace, searchForMatches]);
-
-  // Clear search results
   const clearSearch = useCallback(() => {
     setSearchResults([]);
     setUploadedImage(null);
     setDetectedFace(null);
     setError('');
     setSuccess('');
-
-    // Clear file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }, []);
 
-  // Download photo
   const downloadPhoto = useCallback(async (photoUrl: string, filename: string) => {
     try {
-      const response = await fetch(photoUrl);
-      const blob = await response.blob();
-
+      const resp = await fetch(photoUrl);
+      const blob = await resp.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = filename;
       link.click();
-
-      URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.error('❌ Error downloading photo:', error);
-      setError('Failed to download photo. Please try again.');
+    } catch (e) {
+      setError('Download failed.');
     }
   }, []);
 
   return (
-    <div className={`w-full max-w-6xl mx-auto p-6 ${className}`}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="w-6 h-6" />
-            Find Your Photos
-          </CardTitle>
-          <p className="text-gray-600">
-            Upload a selfie to find photos of yourself from the wedding event
+    <div className={`w-full max-w-5xl mx-auto space-y-8 ${className}`}>
+      {/* Immersive Header */}
+      {!uploadedImage && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4 py-8"
+        >
+          <div className="inline-block p-4 rounded-full bg-rose-50 border border-rose-100 mb-2">
+            <Sparkles className="w-8 h-8 text-rose-500 animate-pulse" />
+          </div>
+          <h2 className="text-4xl font-serif font-bold text-slate-900">Step Into Our Photobooth</h2>
+          <p className="text-gray-500 max-w-lg mx-auto italic font-serif text-lg">
+            Let our AI find every beautiful moment you've shared with us today.
           </p>
-        </CardHeader>
+        </motion.div>
+      )}
 
-        <CardContent className="space-y-6">
-          {/* Model Status */}
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isModelLoaded ? 'bg-green-500' : 'bg-yellow-500'}`} />
-            <span className="text-sm">
-              {isModelLoaded ? 'Face recognition ready' : 'Loading face recognition models...'}
-            </span>
-          </div>
+      {/* Main Glass Container */}
+      <div className="relative">
+        <div className="absolute inset-x-0 -top-4 -bottom-4 bg-gradient-to-r from-rose-100/20 via-rose-200/20 to-rose-100/20 blur-3xl rounded-full" />
 
+        <motion.div
+          layout
+          className="relative bg-white/70 backdrop-blur-xl border border-white/40 rounded-[2.5rem] shadow-2xl p-8 md:p-12 overflow-hidden"
+        >
           {/* Upload Section */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="selfie-upload" className="text-base font-medium">
-                Upload Your Selfie
-              </Label>
-              <Input
-                ref={fileInputRef}
-                id="selfie-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="cursor-pointer"
-                disabled={!isModelLoaded || isUploading}
-              />
-              <p className="text-sm text-gray-500">
-                Upload a clear photo of your face. Supported formats: JPG, PNG, WebP (max 10MB)
-              </p>
-            </div>
-
-            {/* Uploaded Image Preview */}
-            {uploadedImage && (
-              <div className="relative">
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded selfie"
-                  className="w-full max-w-md mx-auto rounded-lg shadow-md"
-                />
-                {detectedFace && (
-                  <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    Face Detected
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Search Button */}
-            {detectedFace && (
-              <Button
-                onClick={startSearch}
-                disabled={isSearching}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+          <AnimatePresence mode="wait">
+            {!uploadedImage ? (
+              <motion.div
+                key="dropzone"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center"
               >
-                {isSearching ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Searching Photos...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4" />
-                    Search Photos
-                  </div>
-                )}
-              </Button>
-            )}
-          </div>
-
-          {/* Status Messages */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-500" />
-                <span className="text-red-700 font-medium">Error</span>
-              </div>
-              <p className="text-red-600 mt-1">{error}</p>
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="text-green-700 font-medium">Success</span>
-              </div>
-              <p className="text-green-600 mt-1">{success}</p>
-            </div>
-          )}
-
-          {/* Search Results */}
-          {searchResults.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  Found {searchResults.length} Matching Photos
-                </h3>
-                <Button
-                  onClick={clearSearch}
-                  variant="outline"
-                  size="sm"
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={() => setIsHovering(false)}
+                  className={`
+                    w-full max-w-xl aspect-[16/9] md:aspect-[2/1] rounded-3xl border-2 border-dashed 
+                    flex flex-col items-center justify-center cursor-pointer transition-all duration-500
+                    ${isHovering ? 'border-rose-400 bg-rose-50/50 scale-[1.01]' : 'border-rose-200 bg-white/30'}
+                  `}
                 >
-                  Clear Results
-                </Button>
-              </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept="image/*"
+                  />
 
-              {/* Results Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {searchResults.map((match, index) => (
-                  <Card key={match.id} className="overflow-hidden">
-                    <div className="relative">
-                      <img
-                        src={match.photoUrl}
-                        alt={`Match ${index + 1}`}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                        {(match.confidence * 100).toFixed(1)}% Match
-                      </div>
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-rose-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <div className="relative w-20 h-20 bg-white shadow-lg rounded-full flex items-center justify-center mb-6 border border-rose-50">
+                      <Camera className="w-8 h-8 text-rose-500" />
                     </div>
+                  </div>
 
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">
-                            {match.metadata.filename}
-                          </span>
-                        </div>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-2">Upload Your Selfie</h3>
+                  <p className="text-slate-500 text-center px-8">
+                    Tap to capture or select a clear photo of your face
+                  </p>
 
-                        <div className="flex items-center gap-2">
-                          <ImageIcon className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">
-                            {new Date(match.metadata.uploadedAt).toLocaleDateString()}
-                          </span>
-                        </div>
+                  <div className="mt-8 flex gap-4 text-xs font-medium text-rose-400/60 tracking-widest uppercase">
+                    <span>Precision AI</span>
+                    <span>•</span>
+                    <span>Instant Match</span>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="preview"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="grid md:grid-cols-2 gap-12 items-center"
+              >
+                {/* Photo Preview with Scanning Animation */}
+                <div className="relative group">
+                  <div className="aspect-[3/4] rounded-3xl overflow-hidden bg-slate-100 shadow-2xl border-4 border-white">
+                    <img src={uploadedImage} alt="Selfie" className="w-full h-full object-cover" />
 
-                        <div className="flex gap-2 pt-2">
-                          <Button
-                            onClick={() => downloadPhoto(match.photoUrl, match.metadata.filename)}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                          >
-                            <Download className="w-4 h-4 mr-1" />
-                            Download
-                          </Button>
+                    {/* Scanning Animation */}
+                    {(isUploading || isSearching) && (
+                      <motion.div
+                        initial={{ top: '0%' }}
+                        animate={{ top: '100%' }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-rose-500 to-transparent shadow-[0_0_15px_rgba(244,63,94,0.8)] z-10"
+                      />
+                    )}
 
-                          <Button
-                            onClick={() => window.open(match.photoUrl, '_blank')}
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+                    {detectedFace && !isSearching && (
+                      <div className="absolute inset-0 border-4 border-rose-500/50 animate-pulse" />
+                    )}
+                  </div>
 
-          {/* Tips */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Tips for Better Results:</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Upload a clear, well-lit photo of your face</li>
-              <li>• Look directly at the camera</li>
-              <li>• Ensure your face is centered in the image</li>
-              <li>• Avoid sunglasses or face coverings</li>
-              <li>• Use a recent photo for best matching</li>
-            </ul>
+                  <button
+                    onClick={clearSearch}
+                    className="absolute -top-4 -right-4 p-3 bg-white shadow-xl rounded-full text-rose-500 hover:bg-rose-50 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Control Panel */}
+                <div className="space-y-8">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-serif font-bold text-slate-900">
+                      {isUploading ? "Identifying You..." : detectedFace ? "Face Detected!" : "Hold On..."}
+                    </h3>
+                    <p className="text-slate-500">
+                      {isUploading
+                        ? "Our AI is analyzing your features to find the best matches."
+                        : detectedFace
+                          ? "We've mapped your face. Ready to search through the wedding album?"
+                          : "Processing your photo..."}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {detectedFace && (
+                      <Button
+                        onClick={() => searchForMatches(detectedFace.descriptor)}
+                        disabled={isSearching}
+                        className="w-full h-16 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-lg font-bold shadow-xl shadow-rose-200"
+                      >
+                        {isSearching ? (
+                          <div className="flex items-center gap-3">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Searching 100+ Photos...
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <Scan className="w-5 h-5" />
+                            Search Wedding Album
+                          </div>
+                        )}
+                      </Button>
+                    )}
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full text-slate-400 hover:text-rose-500"
+                    >
+                      Try a different photo
+                    </Button>
+                  </div>
+
+                  {/* Trust Badges */}
+                  <div className="pt-8 grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <div className="w-2 h-2 rounded-full bg-green-400" />
+                      YOLOv8 Precise Detection
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <div className="w-2 h-2 rounded-full bg-blue-400" />
+                      512-dim Embedding
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Toast-style Messages */}
+          <div className="mt-8">
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 text-red-700"
+                >
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <span className="font-medium">{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </CardContent>
-      </Card>
+        </motion.div>
+      </div>
+
+      {/* Results Title */}
+      {searchResults.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center justify-between px-2"
+        >
+          <div className="space-y-1">
+            <h3 className="text-2xl font-serif font-bold text-slate-900">Your Found Moments</h3>
+            <p className="text-sm text-slate-500">We found {searchResults.length} photos of you</p>
+          </div>
+          <Button variant="outline" onClick={clearSearch} className="rounded-full border-rose-200 text-rose-500">
+            Start New Search
+          </Button>
+        </motion.div>
+      )}
+
+      {/* Results Masonry-ish Grid */}
+      <AnimatePresence>
+        {searchResults.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12"
+          >
+            {searchResults.map((match, index) => (
+              <motion.div
+                key={match.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className="group relative bg-white rounded-[2rem] overflow-hidden border border-rose-100/50 shadow-xl shadow-rose-900/5"
+              >
+                <div className="aspect-[4/5] overflow-hidden">
+                  <img src={match.photoUrl} alt="Match" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+
+                  {/* Confidence Badge */}
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-rose-100">
+                    <span className="text-[10px] font-bold text-rose-500 uppercase tracking-tighter">
+                      {match.confidence > 0.8 ? "Perfect Match" : "Great Shot"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <div className="flex items-center gap-1">
+                      <ImageIcon className="w-3 h-3" />
+                      {new Date(match.metadata.uploadedAt).toLocaleDateString()}
+                    </div>
+                    <span>DeepFace Match Score: {(match.confidence * 100).toFixed(0)}%</span>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => downloadPhoto(match.photoUrl, match.metadata.filename)}
+                      className="flex-1 bg-slate-900 hover:bg-black text-white rounded-xl h-11"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Keep it
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.open(match.photoUrl, '_blank')}
+                      className="aspect-square p-0 rounded-xl h-11 border-slate-200 text-slate-500"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Footer Tips */}
+      {!uploadedImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-rose-50/50 border border-rose-100/50 rounded-3xl p-6 text-center"
+        >
+          <div className="flex justify-center gap-8 text-sm text-rose-400 italic">
+            <span className="flex items-center gap-2">📸 Use Good Lighting</span>
+            <span className="flex items-center gap-2">👤 Look at Camera</span>
+            <span className="flex items-center gap-2">🕶 No Sunglasses</span>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

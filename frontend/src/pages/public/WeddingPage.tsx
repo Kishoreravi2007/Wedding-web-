@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink } from 'lucide-react';
+import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink, Camera, Image as ImageIcon, Upload, X, Search as SearchIcon } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import CountdownTimer from '@/components/premium/CountdownTimer';
 import { Button } from "@/components/ui/button";
+import FaceSearch from '@/components/FaceSearch';
 import {
     Dialog,
     DialogContent,
@@ -39,6 +42,72 @@ const WeddingPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
+
+    // Gallery State
+    const [photos, setPhotos] = useState<any[]>([]);
+    const [galleryLoading, setGalleryLoading] = useState(true);
+    const [showUploadDialog, setShowUploadDialog] = useState(false);
+    const [showSearchDialog, setShowSearchDialog] = useState(false);
+    const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadFile, setUploadFile] = useState<File | null>(null);
+
+    const fetchPhotos = async () => {
+        try {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+            // Use slug as the primary identifier (sister) since this is the public page
+            if (slug) {
+                const response = await fetch(`${apiUrl}/api/photos?sister=${slug}&limit=20`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPhotos(data.photos || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching photos:', error);
+        } finally {
+            setGalleryLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (slug) {
+            fetchPhotos();
+        }
+    }, [slug]);
+
+    const handlePhotoUpload = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!uploadFile || !slug) return;
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('photo', uploadFile);
+        formData.append('sister', slug);
+        formData.append('title', 'Guest Capture');
+        formData.append('description', 'Uploaded via Wedding Page');
+        formData.append('eventType', 'photobooth');
+
+        try {
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+            const response = await fetch(`${apiUrl}/api/photos/public`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                setShowUploadDialog(false);
+                setUploadFile(null);
+                fetchPhotos(); // Refresh gallery
+            } else {
+                console.error('Upload failed');
+            }
+        } catch (error) {
+            console.error('Error uploading:', error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchWeddingData = async () => {
@@ -218,6 +287,70 @@ const WeddingPage = () => {
                 </section >
             )}
 
+            {/* Photo Gallery Section */}
+            <section className="py-24 px-4 bg-white/50 backdrop-blur-sm border-t border-white/10" id="gallery">
+                <div className="max-w-6xl mx-auto space-y-12">
+                    <div className="text-center space-y-4">
+                        <div className="inline-block p-3 rounded-full bg-rose-500/10 mb-2">
+                            <Camera className="w-6 h-6 text-rose-500 fill-rose-500/20" />
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">Captured Moments</h2>
+                        <p className="text-lg opacity-60 italic font-serif">Find yourself in our special moments</p>
+
+                        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Button
+                                onClick={() => setShowSearchDialog(true)}
+                                className="bg-rose-500 hover:bg-rose-600 text-white rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-rose-500/25 transition-all duration-300 group w-full sm:w-auto"
+                            >
+                                <SearchIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                                Search Your Photos
+                            </Button>
+
+                            <Button
+                                onClick={() => setShowUploadDialog(true)}
+                                variant="outline"
+                                className="border-rose-200 text-rose-600 hover:bg-rose-50 rounded-full px-8 py-6 text-lg transition-all duration-300 group w-full sm:w-auto"
+                            >
+                                <Camera className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                                Add Your Photo
+                            </Button>
+                        </div>
+                    </div>
+
+                    {galleryLoading ? (
+                        <div className="flex justify-center py-12">
+                            <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+                        </div>
+                    ) : photos.length === 0 ? (
+                        <div className="text-center py-12 bg-white/30 rounded-3xl border border-dashed border-rose-200">
+                            <ImageIcon className="w-12 h-12 text-rose-300 mx-auto mb-4" />
+                            <p className="text-lg text-slate-500 font-serif italic">Be the first to share a memory!</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {photos.map((photo) => (
+                                <div
+                                    key={photo.id}
+                                    className="aspect-square group relative rounded-2xl overflow-hidden cursor-pointer bg-slate-100 shadow-sm hover:shadow-md transition-all"
+                                    onClick={() => setSelectedPhoto(photo)}
+                                >
+                                    <img
+                                        src={photo.publicUrl}
+                                        alt={photo.title}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        loading="lazy"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                        <p className="text-white font-medium text-sm truncate">{photo.title}</p>
+                                        <p className="text-white/80 text-xs truncate">{new Date(photo.uploadedAt || Date.now()).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
             {/* Content Section Placeholder */}
             <main className="bg-white/50 backdrop-blur-sm py-20 px-4">
                 <div className="max-w-4xl mx-auto text-center">
@@ -290,6 +423,105 @@ const WeddingPage = () => {
                                 )}
                             </div>
                         </>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Photo Upload Dialog */}
+            <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Share a Memory</DialogTitle>
+                        <DialogDescription>
+                            Upload a photo to our wedding gallery.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handlePhotoUpload} className="space-y-4">
+                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-8 hover:bg-slate-50 transition-colors cursor-pointer relative">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setUploadFile(e.target.files[0]);
+                                    }
+                                }}
+                            />
+                            {uploadFile ? (
+                                <div className="text-center">
+                                    <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-2 text-rose-600">
+                                        <ImageIcon className="w-8 h-8" />
+                                    </div>
+                                    <p className="font-medium text-slate-900 truncate max-w-[200px]">{uploadFile.name}</p>
+                                    <p className="text-sm text-green-600">Ready to upload</p>
+                                </div>
+                            ) : (
+                                <div className="text-center text-slate-500">
+                                    <Camera className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                                    <p className="font-medium">Tap to select photo</p>
+                                    <p className="text-xs opacity-70">Supports JPG, PNG</p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button type="button" variant="ghost" onClick={() => setShowUploadDialog(false)}>Cancel</Button>
+                            <Button type="submit" disabled={!uploadFile || isUploading} className="bg-rose-500 hover:bg-rose-600">
+                                {isUploading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="w-4 h-4 mr-2" /> Upload Photo
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Face Search (Photobooth) Dialog */}
+            <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-serif">AI Photobooth</DialogTitle>
+                        <DialogDescription>
+                            Upload a selfie to find all wedding photos you're in.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="py-4">
+                        <FaceSearch eventId={slug} className="shadow-none border-none p-0" />
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Photo Lightbox Dialog */}
+            <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
+                <DialogContent className="max-w-4xl bg-black/95 p-1 border-none text-white">
+                    <div className="relative aspect-auto max-h-[90vh] flex items-center justify-center">
+                        <Button
+                            className="absolute right-2 top-2 z-50 rounded-full bg-black/50 hover:bg-black/80"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setSelectedPhoto(null)}
+                        >
+                            <X className="w-5 h-5 text-white" />
+                        </Button>
+                        {selectedPhoto && (
+                            <img
+                                src={selectedPhoto.publicUrl}
+                                alt={selectedPhoto.title}
+                                className="max-w-full max-h-[85vh] object-contain rounded-sm"
+                            />
+                        )}
+                    </div>
+                    {selectedPhoto && (
+                        <div className="p-4 text-center">
+                            <p className="font-medium text-lg">{selectedPhoto.title}</p>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

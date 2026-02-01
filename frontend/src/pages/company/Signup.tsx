@@ -521,12 +521,12 @@ const CompanySignup = () => {
       <Dialog open={showAiDialog} onOpenChange={setShowAiDialog}>
         <DialogContent className="sm:max-w-lg rounded-2xl overflow-hidden p-0 gap-0 border-none shadow-2xl">
           <DialogHeader className="p-6 pb-2 bg-gradient-to-r from-rose-500 to-indigo-600 text-white">
-            <DialogTitle className="flex items-center gap-2 text-xl">
+            <DialogTitle className="flex items-center gap-2 text-xl" id="ai-generator-title">
               <Sparkles className="w-5 h-5" />
               AI Bio Generator
             </DialogTitle>
-            <DialogDescription className="text-rose-100">
-              Transform your rough thoughts into a premium professional bio.
+            <DialogDescription className="text-rose-100" id="ai-generator-description">
+              Transform your rough thoughts into a professional profile bio instantly using our integrated AI tools.
             </DialogDescription>
           </DialogHeader>
           <div className="p-6 space-y-6 bg-white">

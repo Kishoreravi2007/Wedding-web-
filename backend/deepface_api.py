@@ -114,7 +114,8 @@ app.add_middleware(
         "https://sub-projects-483107.web.app",
         "https://sub-projects-483107.firebaseapp.com",
         "http://localhost:5173",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://localhost:3001"
     ],
     allow_credentials=True,
     allow_methods=["*"],
