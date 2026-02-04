@@ -236,7 +236,7 @@ const ClientDashboard = () => {
         galleryViews: 0,
         theme: 'Modern Elegance',
         slug: currentUser?.username?.split('@')[0] || 'your-wedding',
-        shareUrl: `weddingweb.co.in/w/${currentUser?.username?.split('@')[0] || 'your-wedding'}`,
+        shareUrl: `weddingweb.co.in/weddings/${currentUser?.username?.split('@')[0] || 'your-wedding'}`,
         musicEnabled: false,
         musicUrl: null as string | null,
         musicSource: 'upload', // 'upload' | 'spotify' | 'youtube' | 'applemusic'
@@ -848,9 +848,116 @@ const ClientDashboard = () => {
                 return true;
             }
         } catch (error) {
-            showError('Failed to add guest');
+            console.error('Add guest error:', error);
+            showError('Error adding guest');
         }
         return false;
+    };
+
+    const handleResetAllGuests = async () => {
+        if (!window.confirm('Are you sure you want to delete ALL guests? This action cannot be undone.')) return;
+
+        try {
+            const token = getAccessToken();
+            const apiUrl = API_BASE_URL;
+            const res = await fetch(`${apiUrl}/api/guests`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                setGuests([]);
+                showSuccess('All guests removed');
+                // Update stats
+                setWeddingData(prev => ({
+                    ...prev,
+                    guestCount: 0
+                }));
+            } else {
+                showError('Failed to reset guests');
+            }
+        } catch (error) {
+            console.error('Reset all guests error:', error);
+            showError('Error resetting guest list');
+        }
+    };
+
+    const handleCsvImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const text = event.target?.result as string;
+            if (!text) return;
+
+            // Simple CSV parser supporting common delimiters and quoted fields (basic)
+            const rows = text.split(/\r?\n/).filter(line => line.trim()).map(row => {
+                // Handle basic comma separation (no complex CSV support like quotes with commas for now)
+                return row.split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
+            });
+
+            if (rows.length < 2) {
+                showError('Invalid CSV format. Need at least a header and one row.');
+                return;
+            }
+
+            const headers = rows[0].map(h => h.toLowerCase());
+            const guestRows = rows.slice(1);
+
+            const guestData = guestRows.map(row => {
+                const guest: any = {};
+                headers.forEach((header, index) => {
+                    const value = row[index];
+                    if (!value) return;
+
+                    if (header.includes('name')) guest.name = value;
+                    else if (header.includes('email')) guest.email = value;
+                    else if (header.includes('phone')) guest.phone = value;
+                    else if (header.includes('group')) guest.group_name = value;
+                    else if (header.includes('diet')) guest.dietary_requirements = value;
+                });
+                return guest;
+            }).filter(g => g.name);
+
+            if (guestData.length === 0) {
+                showError('No valid guest data found in CSV (Names are required)');
+                return;
+            }
+
+            try {
+                const token = getAccessToken();
+                const apiUrl = API_BASE_URL;
+                const res = await fetch(`${apiUrl}/api/guests/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ guests: guestData })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showSuccess(data.message || `Imported ${data.count} guests`);
+                    // Refresh guests list
+                    const gRes = await fetch(`${apiUrl}/api/guests`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (gRes.ok) {
+                        const gData = await gRes.json();
+                        setGuests(gData.guests || []);
+                    }
+                } else {
+                    showError(data.error || 'Failed to import guests');
+                }
+            } catch (error) {
+                showError('Error importing guests');
+            } finally {
+                e.target.value = '';
+            }
+        };
+        reader.readAsText(file);
     };
 
     const handleDeleteGuest = async (id: string) => {
@@ -1193,8 +1300,8 @@ const ClientDashboard = () => {
             {/* Main Content Area with Sidebar */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col lg:flex-row gap-8 items-start">
-                    {/* Sidebar Navigation */}
-                    <aside className="w-full lg:w-64 flex-shrink-0 bg-white/80 backdrop-blur-md rounded-2xl border border-rose-100 p-4 sticky top-24 z-30 shadow-sm">
+                    {/* Sidebar Navigation - Hidden on Mobile, Fixed Sidebar on Desktop */}
+                    <aside className="hidden lg:block w-64 flex-shrink-0 bg-white/80 backdrop-blur-md rounded-2xl border border-rose-100 p-4 sticky top-24 z-30 shadow-sm">
                         <div className="space-y-1">
                             {[
                                 { id: 'overview', label: 'Dashboard', icon: Layout },
@@ -1252,19 +1359,15 @@ const ClientDashboard = () => {
                     {/* Content Section */}
                     <div className="flex-1 min-w-0 w-full">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                            {/* Horizontal Tabs hidden on Desktop, show on Mobile? 
-                                Actually, the user asked for a sidebar, so we replace the horizontal one. 
-                                For mobile, we can keep the horizontal one or hide it. 
-                                Let's keep a simplified scrollable version for mobile or just use the sidebar block (which stacks).
-                            */}
-                            <div className="lg:hidden mb-6">
-                                <TabsList className="flex overflow-x-auto bg-white/50 backdrop-blur-md rounded-xl p-1 no-scrollbar">
-                                    <TabsTrigger value="overview" className="flex-shrink-0">Dashboard</TabsTrigger>
-                                    <TabsTrigger value="builder" className="flex-shrink-0">Builder</TabsTrigger>
-                                    <TabsTrigger value="gallery" className="flex-shrink-0">Gallery</TabsTrigger>
-                                    <TabsTrigger value="guests" className="flex-shrink-0">Guests</TabsTrigger>
-                                    <TabsTrigger value="timeline" className="flex-shrink-0">Timeline</TabsTrigger>
-                                    <TabsTrigger value="music" className="flex-shrink-0">Music</TabsTrigger>
+                            {/* Horizontal Tabs - Only show on Mobile */}
+                            <div className="lg:hidden mb-6 sticky top-[72px] z-40 bg-gray-50/95 backdrop-blur-md py-2 -mx-4 px-4 border-b border-rose-100">
+                                <TabsList className="flex overflow-x-auto bg-white/80 rounded-xl p-1 no-scrollbar border border-rose-100 shadow-sm">
+                                    <TabsTrigger value="overview" className="flex-shrink-0 text-xs px-4">Dashboard</TabsTrigger>
+                                    <TabsTrigger value="builder" className="flex-shrink-0 text-xs px-4">Builder</TabsTrigger>
+                                    <TabsTrigger value="gallery" className="flex-shrink-0 text-xs px-4">Gallery</TabsTrigger>
+                                    <TabsTrigger value="guests" className="flex-shrink-0 text-xs px-4">Guests</TabsTrigger>
+                                    <TabsTrigger value="timeline" className="flex-shrink-0 text-xs px-4">Timeline</TabsTrigger>
+                                    <TabsTrigger value="music" className="flex-shrink-0 text-xs px-4">Music</TabsTrigger>
                                 </TabsList>
                             </div>
 
@@ -1957,6 +2060,13 @@ const ClientDashboard = () => {
                             {/* Guests Tab */}
                             <TabsContent value="guests" className="space-y-6">
                                 <Card className="bg-white/80 backdrop-blur-sm">
+                                    <input
+                                        type="file"
+                                        id="guest-csv-upload"
+                                        accept=".csv"
+                                        className="hidden"
+                                        onChange={handleCsvImport}
+                                    />
                                     <CardHeader className="flex flex-row items-center justify-between">
                                         <div>
                                             <CardTitle className="flex items-center gap-2">
@@ -1965,10 +2075,66 @@ const ClientDashboard = () => {
                                             </CardTitle>
                                             <CardDescription>Manage your guest list and track RSVPs</CardDescription>
                                         </div>
-                                        <Button>
-                                            <Plus className="w-4 h-4 mr-2" />
-                                            Add Guest
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            {guests.length > 0 && (
+                                                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-rose-500" onClick={handleResetAllGuests}>
+                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                    Reset All
+                                                </Button>
+                                            )}
+                                            <Button variant="outline" size="sm" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
+                                                <Upload className="w-4 h-4 mr-2" />
+                                                Import CSV
+                                            </Button>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button size="sm">
+                                                        <Plus className="w-4 h-4 mr-2" />
+                                                        Add Guest
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>Add New Guest</DialogTitle>
+                                                    </DialogHeader>
+                                                    <div className="space-y-4 py-4">
+                                                        <div className="space-y-2">
+                                                            <Label>Guest Name</Label>
+                                                            <Input id="guestNameHeader" placeholder="Full Name" />
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label>Email</Label>
+                                                                <Input id="guestEmailHeader" type="email" placeholder="email@example.com" />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label>Phone</Label>
+                                                                <Input id="guestPhoneHeader" placeholder="+91..." />
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label>RSVP Status</Label>
+                                                            <select id="guestRsvpHeader" className="w-full p-2 border rounded-md">
+                                                                <option value="pending">Pending</option>
+                                                                <option value="attending">Attending</option>
+                                                                <option value="declined">Declined</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <DialogClose asChild>
+                                                            <Button onClick={async () => {
+                                                                const name = (document.getElementById('guestNameHeader') as HTMLInputElement).value;
+                                                                const email = (document.getElementById('guestEmailHeader') as HTMLInputElement).value;
+                                                                const phone = (document.getElementById('guestPhoneHeader') as HTMLInputElement).value;
+                                                                const rsvp_status = (document.getElementById('guestRsvpHeader') as HTMLSelectElement).value;
+                                                                if (name) await handleAddGuest({ name, email, phone, rsvp_status });
+                                                            }}>Add Guest</Button>
+                                                        </DialogClose>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
                                     </CardHeader>
                                     <CardContent>
                                         {guests.length === 0 ? (
@@ -1977,7 +2143,7 @@ const ClientDashboard = () => {
                                                 <h3 className="text-lg font-medium text-gray-700 mb-2">No Guests Yet</h3>
                                                 <p className="text-sm text-gray-500 mb-4">Start by adding your first guest or importing a list</p>
                                                 <div className="flex gap-3 justify-center">
-                                                    <Button variant="outline">
+                                                    <Button variant="outline" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
                                                         Import CSV
                                                     </Button>
                                                     <Dialog>
