@@ -12,14 +12,18 @@ const router = express.Router();
 const multer = require('multer');
 const axios = require('axios');
 const FormData = require('form-data');
-// const { supabase } = require('./server'); // Removed Supabase usage
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
-const { uploadFile, deleteFile } = require('./lib/local-storage'); // Switched to Local Storage due to GCS billing issue
+const { uploadFile, deleteFile, getPublicUrl } = require('./lib/supabase-storage'); // Switched to Supabase Storage
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
+const JSZip = require('jszip'); // For download-all feature
 const { authMiddleware } = require('./lib/secure-auth');
 const authenticateToken = authMiddleware.verifyToken;
 
 const DEEPFACE_API_URL = process.env.DEEPFACE_API_URL || 'http://localhost:8002';
+
+// Ensure Supabase bucket exists on startup
+const { createBucketIfNotExists } = require('./lib/supabase-storage');
+createBucketIfNotExists('photos').catch(err => console.error('Failed to ensure bucket:', err));
 
 /**
  * Extract faces from image buffer using DeepFace API
@@ -104,8 +108,11 @@ const upload = multer({
     files: 1 // One file at a time
   },
   fileFilter: (req, file, cb) => {
-    // Accept images only
-    if (!file.mimetype.startsWith('image/')) {
+    // Accept images - check mimetype OR file extension for HEIC/HEIF/JPG/PNG support
+    const isImageMime = file.mimetype.startsWith('image/');
+    const isImageExt = file.originalname && file.originalname.match(/\.(heic|heif|jpg|jpeg|png|webp)$/i);
+
+    if (!isImageMime && !isImageExt) {
       cb(new Error('Only image files are allowed'));
       return;
     }
@@ -191,6 +198,92 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * GET /api/photos/download-all
+ * Download all photos for a wedding as a ZIP
+ */
+router.get('/download-all', async (req, res) => {
+  try {
+    const { sister } = req.query;
+    if (!sister) {
+      return res.status(400).json({ message: 'Wedding slug (sister) is required' });
+    }
+
+    // Get all photos for this wedding
+    const photos = await PhotoDB.findAll({ sister, limit: 1000 });
+
+    if (photos.length === 0) {
+      return res.status(404).json({ message: 'No photos found for this wedding' });
+    }
+
+    const zip = new JSZip();
+
+    // Download all photos and add to ZIP
+    const downloadPromises = photos.map(async (photo) => {
+      try {
+        let fetchUrl = photo.public_url;
+        let photoData;
+
+        // Try reading locally if it's a relative path starting with /uploads
+        if (fetchUrl && fetchUrl.startsWith('/uploads')) {
+          try {
+            const fs = require('fs').promises;
+            const path = require('path');
+            // uploads is in the same directory as this file (backend/)
+            const localPath = path.join(__dirname, fetchUrl);
+            photoData = await fs.readFile(localPath);
+            console.log(`📖 Read local photo for ZIP: ${localPath}`);
+          } catch (localErr) {
+            console.warn(`⚠️  Could not read local file ${fetchUrl}, falling back to HTTP: ${localErr.message}`);
+          }
+        }
+
+        // If not local or local read failed, use HTTP
+        if (!photoData && fetchUrl) {
+          // Ensure absolute URL
+          if (!fetchUrl.startsWith('http')) {
+            const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+            fetchUrl = `${baseUrl.replace(/\/$/, '')}/${fetchUrl.replace(/^\//, '')}`;
+          }
+
+          console.log(`📥 Downloading photo for ZIP: ${fetchUrl}`);
+          const response = await axios.get(fetchUrl, {
+            responseType: 'arraybuffer',
+            timeout: 15000
+          });
+          photoData = response.data;
+        }
+
+        if (photoData) {
+          // Use a unique name within the zip
+          const uniqueName = `${photo.id.toString().substring(0, 4)}_${photo.filename || 'photo.jpg'}`;
+          zip.file(uniqueName, photoData);
+        } else {
+          console.warn(`⚠️  No data for photo ${photo.id}`);
+        }
+      } catch (err) {
+        console.error(`❌ Failed to include photo ${photo.filename} in ZIP:`, err.message);
+      }
+    });
+
+    await Promise.all(downloadPromises);
+
+    console.log(`📦 Generating ZIP for ${photos.length} photos...`);
+    const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename=wedding_photos_${sister}.zip`);
+    res.send(zipContent);
+
+  } catch (error) {
+    console.error('❌ Error in download-all route:', error);
+    res.status(500).json({
+      message: 'Failed to create download package',
+      error: error.message
+    });
+  }
+});
+
+/**
  * GET /api/photos/:id
  * Retrieve a single photo by ID
  */
@@ -262,8 +355,8 @@ router.post('/public', upload.single('photo'), async (req, res) => {
   const fileName = `${sister}/${timestamp}_${cleanFileName}`;
 
   try {
-    // Upload to GCS
-    const publicUrl = await uploadFile(fileName, file.buffer, file.mimetype);
+    // Upload to Supabase Storage (automatic folder creation by prefixing fileName with sister/)
+    const publicUrl = await uploadFile('photos', fileName, file.buffer, file.mimetype);
 
     // Create photo record in database
     const photoData = {
@@ -277,7 +370,7 @@ router.post('/public', upload.single('photo'), async (req, res) => {
       description: description || 'Uploaded via Photobooth',
       event_type: eventType || 'photobooth',
       tags: tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : ['guest-upload'],
-      storage_provider: 'local',
+      storage_provider: 'supabase',
       photographer_id: null // Public upload
     };
 
@@ -302,7 +395,7 @@ router.post('/public', upload.single('photo'), async (req, res) => {
   } catch (error) {
     console.error('Error uploading public photo:', error);
     if (fileName) {
-      try { await deleteFile(fileName); } catch (e) { /* ignore */ }
+      try { await deleteFile('photos', fileName); } catch (e) { /* ignore */ }
     }
     res.status(500).json({
       message: 'Error uploading photo',
@@ -381,9 +474,8 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
   const fileName = `${sister}/${timestamp}_${cleanFileName}`;
 
   try {
-
-    // Upload to GCS
-    const publicUrl = await uploadFile(fileName, file.buffer, file.mimetype);
+    // Upload to Supabase Storage
+    const publicUrl = await uploadFile('photos', fileName, file.buffer, file.mimetype);
 
     // Create photo record in database
     const photoData = {
@@ -397,7 +489,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
       description: description || '',
       event_type: eventType || '',
       tags: parsedTags,
-      storage_provider: 'local', // Switched to local due to billing
+      storage_provider: 'supabase',
       photographer_id: req.user?.id || null // From authentication middleware
     };
 
@@ -485,7 +577,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     // Cleanup: try to delete uploaded file if database operations failed
     if (fileName) {
       try {
-        await deleteFile(fileName);
+        await deleteFile('photos', fileName);
       } catch (cleanupError) {
         console.error('Error cleaning up file:', cleanupError);
       }
@@ -520,7 +612,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
     // Delete from Storage
     try {
-      await deleteFile(photo.file_path);
+      await deleteFile('photos', photo.file_path);
     } catch (storageError) {
       console.error('Error deleting from storage:', storageError);
       // Continue with database deletion even if storage delete fails

@@ -109,14 +109,15 @@ app = FastAPI(
 # Explicitly list origins to support credentialed requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
+    allow_origins=[o for o in [
         "https://weddingweb.co.in",
         "https://sub-projects-483107.web.app",
         "https://sub-projects-483107.firebaseapp.com",
         "http://localhost:5173",
         "http://localhost:3000",
-        "http://localhost:3001"
-    ],
+        "http://localhost:3001",
+        os.getenv("FRONTEND_URL")
+    ] if o],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -131,7 +132,7 @@ async def root():
         "service": "DeepFace Face Detection API",
         "backend": "YOLOv8-face",
         "embedding_dimension": 512,
-        "model": "VGG-Face"
+        "model": "Facenet512"
     }
 
 
@@ -145,7 +146,7 @@ async def health_check():
             "status": "healthy",
             "backend": "YOLOv8-face",
             "embedding_dimension": 512,
-            "model": "VGG-Face"
+            "model": "Facenet512"
         }
     except Exception as e:
         return {
@@ -441,7 +442,7 @@ async def detect_faces(
                                     # Use img_path=face_crop (numpy array) directly
                                     embedding_obj = DeepFace.represent(
                                         img_path=face_crop,
-                                        model_name="VGG-Face",
+                                        model_name="Facenet512",
                                         detector_backend="skip",  # Skip detection since we already cropped it
                                         enforce_detection=False,
                                         align=False
@@ -483,7 +484,7 @@ async def detect_faces(
                     # Pass img directly (numpy array)
                     face_objs = DeepFace.represent(
                         img_path=img,
-                        model_name="Facenet",  # 128-dim embeddings to match existing database
+                        model_name="Facenet512",  # 512-dim embeddings for better accuracy
                         detector_backend=detector_backend,
                         enforce_detection=enforce_detection,
                         align=True
@@ -939,10 +940,11 @@ if __name__ == "__main__":
     import uvicorn
     
     # Run the server
+    is_prod = os.getenv("NODE_ENV") == "production"
     uvicorn.run(
         "deepface_api:app",
         host="0.0.0.0",
         port=8002,  # Different port from InsightFace API
-        reload=True,
-        log_level="info"
+        reload=not is_prod,
+        log_level="info" if is_prod else "debug"
     )

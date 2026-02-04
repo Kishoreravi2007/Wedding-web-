@@ -168,10 +168,11 @@ router.get('/public/:slug', async (req, res) => {
         console.log(`[Timeline] Fetching public timeline for slug: ${slug}`);
         const { rows } = await db.query(
             `SELECT t.*, u.username FROM event_timeline t
-             JOIN users u ON t.user_id = u.id
-             WHERE u.username ILIKE $1
-             ORDER BY t.event_date ASC, t.event_time ASC`,
-            [`${slug}%`]
+              JOIN users u ON t.user_id = u.id
+              LEFT JOIN weddings w ON u.id = w.user_id
+              WHERE w.wedding_code ILIKE $1 OR u.username ILIKE $1
+              ORDER BY t.event_date ASC, t.event_time ASC`,
+            [slug]
         );
         console.log(`[Timeline] Found ${rows.length} events for slug: ${slug}`);
         res.json({ success: true, timeline: rows });

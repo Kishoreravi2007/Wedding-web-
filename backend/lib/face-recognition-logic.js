@@ -218,8 +218,8 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
     console.log(`✅ Comparing with ${compatibleDescriptors.length} compatible descriptor(s) (${queryDimension} dimensions)`);
 
     // Calculate distances to all known faces with matching dimensions
-    // For 512-dim DeepFace embeddings, cosine distance is more appropriate
-    // For 128-dim face-api.js embeddings, euclidean distance works better
+    console.log(`📊 Comparing query (${descriptor.length}) with ${compatibleDescriptors.length} descriptors`);
+
     const matches = compatibleDescriptors.map(faceDesc => {
       const euclideanDist = euclideanDistance(descriptor, faceDesc.descriptor);
       const cosineDist = cosineDistance(descriptor, faceDesc.descriptor);
@@ -244,13 +244,12 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
     // Sort by distance (closest first)
     matches.sort((a, b) => a.distance - b.distance);
 
-    console.log('🎯 Face match distances (top 10):');
-    matches.slice(0, 10).forEach((m, i) => {
-      console.log(`   ${i + 1}. Photo ${m.photoId?.substring(0, 8)}... | Distance: ${m.distance.toFixed(4)} (${(m.confidence * 100).toFixed(1)}% confidence) | Person: ${m.personName || 'Unknown'}`);
-      if (m.euclideanDist !== undefined && m.cosineDist !== undefined) {
-        console.log(`      Euclidean: ${m.euclideanDist.toFixed(4)} | Cosine: ${m.cosineDist.toFixed(4)}`);
-      }
-    });
+    if (matches.length > 0) {
+      console.log(`🎯 Top matches:`);
+      matches.slice(0, 5).forEach((m, i) => {
+        console.log(`   ${i + 1}. Photo: ${m.photoId}, Distance: ${m.distance.toFixed(4)}, Confidence: ${m.confidence.toFixed(4)}`);
+      });
+    }
 
     // Filter by threshold - Use STRICT threshold to prevent false positives
     // For Facenet 128-dim embeddings, typical good matches are 0.3-0.45 distance
@@ -373,14 +372,8 @@ async function matchFace(descriptor, threshold = 0.55, weddingName = null) {
     // Prefer person matches if available, otherwise use photo matches
     const finalMatches = uniquePersonMatches.length > 0 ? uniquePersonMatches : uniquePhotoMatches;
 
-    // Limit to top 10 matches, but filter out borderline matches
-    // Keep matches that are clearly good (distance < 0.5) or at least 3% better than threshold
-    const limitedMatches = finalMatches
-      .filter(m => {
-        // Accept if excellent match (< 0.5) OR at least 3% better than threshold
-        return m.distance < 0.5 || m.distance < threshold * 0.97;
-      })
-      .slice(0, 10); // Limit to top 10
+    // Limit to top 50 matches - the threshold check already filtered appropriately
+    const limitedMatches = finalMatches.slice(0, 50);
 
     console.log(`✅ Found ${limitedMatches.length} valid match(es) after strict filtering`);
     console.log(`   Best match distance: ${limitedMatches[0].distance.toFixed(4)} (confidence: ${((1 - limitedMatches[0].distance) * 100).toFixed(1)}%)`);

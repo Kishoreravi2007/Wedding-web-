@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink, Camera, Image as ImageIcon, Upload, X, Search as SearchIcon } from 'lucide-react';
+import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink, Camera, Image as ImageIcon, Upload, X, Search as SearchIcon, Play, Pause, Volume2, Music } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import CountdownTimer from '@/components/premium/CountdownTimer';
@@ -21,7 +21,10 @@ interface WeddingData {
     weddingTime: string;
     showCountdown: boolean;
     venue: string;
+
     theme: string;
+    musicEnabled?: boolean;
+    musicUrl?: string;
 }
 
 interface TimelineItem {
@@ -35,8 +38,11 @@ interface TimelineItem {
     sort_order: number;
 }
 
+import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
+
 const WeddingPage = () => {
     const { slug } = useParams();
+    const { setWeddingMusic, isPlaying, togglePlay, volume, setVolume, musicSource, playlistUrl, isLoaded } = useMusicPlayer();
     const [weddingData, setWeddingData] = useState<any>(null);
     const [timeline, setTimeline] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -54,7 +60,7 @@ const WeddingPage = () => {
 
     const fetchPhotos = async () => {
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
             // Use slug as the primary identifier (sister) since this is the public page
             if (slug) {
                 const response = await fetch(`${apiUrl}/api/photos?sister=${slug}&limit=20`);
@@ -89,7 +95,7 @@ const WeddingPage = () => {
         formData.append('eventType', 'photobooth');
 
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
             const response = await fetch(`${apiUrl}/api/photos/public`, {
                 method: 'POST',
                 body: formData
@@ -114,7 +120,7 @@ const WeddingPage = () => {
             try {
                 // Use the correct API URL - make sure VITE_API_BASE_URL is set correctly in .env
                 // or use a relative path if proxying, but here we likely need absolute if pure client
-                const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+                const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
                 const response = await fetch(`${apiUrl}/api/auth/public/wedding/${slug}`);
 
                 if (!response.ok) {
@@ -122,7 +128,21 @@ const WeddingPage = () => {
                 }
 
                 const data = await response.json();
+
                 setWeddingData(data);
+
+                // Set music if enabled
+                if (data.musicEnabled) {
+                    setWeddingMusic({
+                        url: data.musicUrl,
+                        source: data.musicSource || 'upload',
+                        playlistUrl: data.playlistUrl,
+                        volume: (data.volume !== null && data.volume !== undefined) ? data.volume : 50
+                    });
+                } else {
+                    setWeddingMusic(null);
+                }
+
 
                 // Also fetch timeline
                 const tRes = await fetch(`${apiUrl}/api/timeline/public/${slug}`);
@@ -143,7 +163,11 @@ const WeddingPage = () => {
         if (slug) {
             fetchWeddingData();
         }
-    }, [slug]);
+
+        return () => {
+            setWeddingMusic(null);
+        }
+    }, [slug, setWeddingMusic]);
 
     if (loading) {
         return (
@@ -174,6 +198,42 @@ const WeddingPage = () => {
             case 'Boho Chic': return 'bg-[#fdf6e3] text-[#5c4b37]';
             case 'Beach Bliss': return 'bg-cyan-50 text-cyan-900';
             case 'Royal Luxury': return 'bg-purple-900 text-purple-50';
+
+            // Nature
+            case 'Forest Fern': return 'bg-emerald-50 text-emerald-900';
+            case 'Ocean Breeze': return 'bg-sky-50 text-sky-900';
+            case 'Sunset Glow': return 'bg-orange-50 text-orange-900';
+            case 'Mountain Mist': return 'bg-gray-100 text-slate-800';
+            case 'Desert Bloom': return 'bg-rose-100 text-stone-800';
+
+            // Classic
+            case 'Gold & Ivory': return 'bg-[#fffff0] text-[#c5a059]';
+            case 'Silver Soiree': return 'bg-slate-50 text-slate-600';
+            case 'Pearl White': return 'bg-white text-stone-500';
+            case 'Black Tie': return 'bg-black text-white';
+            case 'Champagne Toast': return 'bg-[#f7e7ce] text-[#5c5346]';
+
+            // Modern
+            case 'City Lights': return 'bg-zinc-900 text-yellow-100';
+            case 'Midnight Blue': return 'bg-[#1a237e] text-white';
+            case 'Charcoal & Rose': return 'bg-stone-800 text-rose-200';
+            case 'Monochrome': return 'bg-white text-black border-4 border-black';
+            case 'Geometric Pop': return 'bg-white text-indigo-600';
+
+            // Romantic
+            case 'Blushing Bride': return 'bg-pink-100 text-pink-900';
+            case 'Lavender Haze': return 'bg-purple-100 text-purple-900';
+            case 'Peachy Keen': return 'bg-orange-100 text-orange-800';
+            case 'Red Velvet': return 'bg-red-900 text-rose-50';
+            case 'Sweetheart Pink': return 'bg-rose-200 text-rose-900';
+
+            // Cultural
+            case 'Royal Red': return 'bg-red-700 text-yellow-200';
+            case 'Saffron Sun': return 'bg-yellow-500 text-red-900';
+            case 'Teal & Gold': return 'bg-teal-700 text-yellow-100';
+            case 'Magenta Magic': return 'bg-fuchsia-800 text-fuchsia-100';
+            case 'Emerald Elegance': return 'bg-emerald-800 text-emerald-100';
+
             default: return 'bg-white text-gray-900';
         }
     };
@@ -525,6 +585,92 @@ const WeddingPage = () => {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Floating Music Controls */}
+            {
+                weddingData.musicEnabled && (
+                    <div className="fixed bottom-4 left-4 z-50 animate-in slide-in-from-bottom-4 duration-500">
+                        {/* Upload Mode: Custom Controls */}
+                        {musicSource === 'upload' && weddingData.musicUrl && (
+                            <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-full p-2 pr-4 flex items-center gap-3 border border-rose-100 ring-1 ring-rose-500/10">
+                                <Button
+                                    onClick={togglePlay}
+                                    size="icon"
+                                    className={`rounded-full shadow-md transition-all ${isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-slate-900 hover:bg-slate-800'} text-white w-10 h-10`}
+                                >
+                                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                                </Button>
+
+                                <div className="flex flex-col min-w-[100px]">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Music className={`w-3 h-3 ${isPlaying ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`} />
+                                        <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">Our Song</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 group relative">
+                                        <Volume2 className="w-3 h-3 text-slate-400" />
+                                        <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden cursor-pointer">
+                                            <div
+                                                className="h-full bg-rose-500 rounded-full relative"
+                                                style={{ width: `${volume * 100}%` }}
+                                            />
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="100"
+                                                value={volume * 100}
+                                                onChange={(e) => setVolume(parseInt(e.target.value) / 100)}
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Playlist Mode: Embed Widgets */}
+                        {musicSource === 'playlist' && playlistUrl && (
+                            <div className="shadow-2xl rounded-xl overflow-hidden border border-white/20">
+                                {/* Spotify Embed */}
+                                {playlistUrl.includes('spotify.com') && (
+                                    <iframe
+                                        style={{ borderRadius: '12px' }}
+                                        src={playlistUrl.replace('open.spotify.com', 'open.spotify.com/embed')}
+                                        width="300"
+                                        height="80"
+                                        frameBorder="0"
+                                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                        loading="lazy"
+                                    ></iframe>
+                                )}
+                                {/* Apple Music Embed */}
+                                {playlistUrl.includes('music.apple.com') && (
+                                    <iframe
+                                        allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                                        frameBorder="0"
+                                        height="175"
+                                        style={{ width: '100%', maxWidth: '300px', overflow: 'hidden', background: 'transparent' }}
+                                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts storage-access-api-by-user-activation"
+                                        src={playlistUrl.replace('music.apple.com', 'embed.music.apple.com')}
+                                    ></iframe>
+                                )}
+                                {/* YouTube Embed */}
+                                {(playlistUrl.includes('youtube.com') || playlistUrl.includes('youtu.be')) && (
+                                    <iframe
+                                        width="300"
+                                        height="170"
+                                        src={`https://www.youtube.com/embed/?listType=playlist&list=${new URL(playlistUrl).searchParams.get('list') || 'PL'}`}
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowFullScreen
+                                    ></iframe>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )
+            }
+
         </div >
     );
 };

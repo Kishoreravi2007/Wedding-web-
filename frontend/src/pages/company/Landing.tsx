@@ -60,12 +60,6 @@ const CompanyLanding = () => {
       title: "Digital Wishes",
       description: "Collect heartfelt messages from guests in a beautiful digital guestbook",
       color: "from-pink-500 to-rose-500"
-    },
-    {
-      icon: <Clock className="w-8 h-8" />,
-      title: "Event Scheduling",
-      description: "Keep guests informed with detailed event schedules and countdown timers",
-      color: "from-indigo-500 to-purple-500"
     }
   ];
 

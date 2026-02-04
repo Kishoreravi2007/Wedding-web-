@@ -374,6 +374,11 @@ const TokenManager = {
    * Generate JWT token
    */
   generateToken(user) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret && process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET must be set in production environment');
+    }
+
     const payload = {
       id: user.id,
       username: user.username,
@@ -381,7 +386,7 @@ const TokenManager = {
       iat: Math.floor(Date.now() / 1000)
     };
 
-    return jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret-do-not-use-in-prod', {
+    return jwt.sign(payload, secret || 'dev-secret-do-not-use-in-prod', {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d'
     });
   },
@@ -391,8 +396,13 @@ const TokenManager = {
    */
   async verifyToken(token) {
     try {
+      const secret = process.env.JWT_SECRET;
+      if (!secret && process.env.NODE_ENV === 'production') {
+        throw new Error('JWT_SECRET must be set in production environment');
+      }
+
       console.log('🛡️ Attempting to verify token:', token ? `${token.substring(0, 10)}...` : 'NONE');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-do-not-use-in-prod');
+      const decoded = jwt.verify(token, secret || 'dev-secret-do-not-use-in-prod');
       console.log('🔓 Token decoded successfully for ID:', decoded.id);
 
       // Verify user still exists and is active

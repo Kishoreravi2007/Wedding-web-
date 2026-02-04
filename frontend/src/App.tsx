@@ -66,6 +66,7 @@ import { HomeRoute } from "./components/HomeRoute";
 
 // Client Dashboard (Premium Builder)
 import ClientDashboard from "./pages/client/ClientDashboard";
+import VisualEditor from "./pages/client/VisualEditor";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/Login";
@@ -101,12 +102,6 @@ const App = () => {
     document.documentElement.setAttribute('lang', i18n.language);
   }, [i18n.language]);
 
-  const initialMusicTrack = useMemo(() => {
-    if (location.pathname.startsWith('/sreedevi')) {
-      return 1; // Index for 'another-song.mp3'
-    }
-    return 0; // Default to 'wedding-music.mp3'
-  }, [location.pathname]);
 
   // Check if current route has bottom navigation
   const hasBottomNav = useMemo(() => {
@@ -166,8 +161,8 @@ const App = () => {
                 </Button>
               </Link>
             )}
-            {/* Music Player Toggle - Hidden on company pages and feedback page */}
-            {!isCompanyPage && location.pathname !== '/feedback' && (
+            {/* Music Player Toggle - Hidden on company pages, feedback page, and wedding pages (which have their own player) */}
+            {!isCompanyPage && !location.pathname.startsWith('/w/') && location.pathname !== '/feedback' && (
               <Button
                 variant="outline"
                 size="icon"
@@ -177,8 +172,8 @@ const App = () => {
                 {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
               </Button>
             )}
-            {/* Music Player - Hidden on company pages */}
-            {!isCompanyPage && showMusicPlayer && <MusicPlayer />}
+            {/* Music Player - Hidden on company pages and wedding pages */}
+            {!isCompanyPage && !location.pathname.startsWith('/w/') && showMusicPlayer && <MusicPlayer />}
 
             {/* Feedback Button - Available on all pages except feedback page itself */}
             {location.pathname !== '/feedback' && (
@@ -209,6 +204,7 @@ const App = () => {
                 <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
 
                 {/* Client Dashboard (Premium Builder) */}
+                <Route path="/client/editor" element={<AuthGuard><VisualEditor /></AuthGuard>} />
                 <Route path="/client" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
                 <Route path="/client/*" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
 

@@ -16,7 +16,10 @@ interface MusicPlayerContextType {
   setVolume: (volume: number) => void;
   goToNextTrack: () => void;
   goToPrevTrack: () => void;
-  playTrack: (src: string) => void; // Changed to accept src string
+  playTrack: (src: string) => void;
+  setWeddingMusic: (data: { url: string | null, source?: 'upload' | 'playlist', playlistUrl?: string | null, volume?: number } | string | null) => void;
+  musicSource?: 'upload' | 'playlist';
+  playlistUrl?: string | null;
   musicSources: { title: string; src: string; }[];
 }
 
@@ -47,10 +50,66 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
     return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname.startsWith('/client') || location.pathname === '/privacy' || location.pathname === '/terms';
   }, [location.pathname]);
 
-  const musicSources = [
-    { title: 'Wedding Music', src: '/wedding-music.mp3' },
-    { title: 'Another Song', src: '/another-song.mp3' },
-  ];
+  const [weddingMusicUrl, setWeddingMusicUrl] = useState<string | null>(null);
+  const [weddingMusicSource, setWeddingMusicSource] = useState<'upload' | 'playlist'>('upload');
+  const [weddingPlaylistUrl, setWeddingPlaylistUrl] = useState<string | null>(null);
+
+  const musicSources = useMemo(() => {
+    if (weddingMusicUrl) {
+      try {
+        if (weddingMusicUrl.startsWith('[')) {
+          const urls = JSON.parse(weddingMusicUrl);
+          if (Array.isArray(urls)) {
+            return urls.map((url, index) => ({ title: `Track ${index + 1}`, src: url }));
+          }
+        }
+      } catch (e) {
+        // Fallback to simple string
+      }
+      return [{ title: 'Our Song', src: weddingMusicUrl }];
+    }
+    return [];
+  }, [weddingMusicUrl]);
+
+  const setWeddingMusic = useCallback((data: { url: string | null, source?: 'upload' | 'playlist', playlistUrl?: string | null, volume?: number } | string | null) => {
+    if (typeof data === 'string') {
+      // Legacy support
+      setWeddingMusicUrl(data);
+      setCurrentTrackIndex(0);
+    } else if (data) {
+      setWeddingMusicUrl(data.url);
+      setWeddingMusicSource(data.source || 'upload');
+      setWeddingPlaylistUrl(data.playlistUrl || null);
+      if (data.volume !== undefined) {
+        setVolumeState(data.volume / 100);
+        if (audioRef.current) audioRef.current.volume = data.volume / 100;
+      }
+      if (data.url) setCurrentTrackIndex(0);
+    } else {
+      setWeddingMusicUrl(null);
+    }
+  }, []);
+
+  // Sync volume state to audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  // Reload audio when music sources change (e.g. switching to custom track)
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+      if (hasUserInteracted && !isCompanyPage) {
+        // playCurrentTrack(); // Don't auto-play immediately to avoid conflicts? 
+        // Actually we do want to play if user has interacted.
+        audioRef.current.play().catch(err => console.log("Autoplay prevented on source change", err));
+        setIsPlaying(true);
+      }
+    }
+  }, [musicSources, hasUserInteracted, isCompanyPage]);
+
 
   const playCurrentTrack = useCallback(async () => {
     // NEVER play on company pages
@@ -253,19 +312,24 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
     goToNextTrack,
     goToPrevTrack,
     playTrack,
+    setWeddingMusic,
     musicSources,
+    musicSource: weddingMusicSource,
+    playlistUrl: weddingPlaylistUrl
   };
 
   return (
     <MusicPlayerContext.Provider value={contextValue}>
       <audio
         ref={audioRef}
-        loop
         preload="auto"
         onLoadedData={handleLoadedData}
         onError={handleError}
+        onEnded={goToNextTrack}
       >
-        <source src={musicSources[currentTrackIndex].src} type="audio/mpeg" />
+        {musicSources.length > 0 && (
+          <source src={musicSources[currentTrackIndex]?.src} type="audio/mpeg" />
+        )}
         Your browser does not support the audio element.
       </audio>
       {children}

@@ -72,7 +72,7 @@ async function detectFaces(imagePath) {
             formData,
             {
                 headers: formData.getHeaders(),
-                timeout: 60000 // 60s timeout for large images
+                timeout: 300000 // 5 min timeout for large images or model loading
             }
         );
 

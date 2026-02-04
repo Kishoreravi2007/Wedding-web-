@@ -21,8 +21,9 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import heic2any from 'heic2any';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 interface FaceMatch {
@@ -97,10 +98,12 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
       const response = await axios.post(`${BACKEND_URL}/api/faces/find-similar`, {
         descriptor: queryDescriptor,
-        limit: 50,
-        threshold: 0.5,
+        limit: 100, // Show up to 100 matches
+        threshold: 0.8, // Even more lenient for searching
         sister: eventId
       });
+
+      console.log('🔍 Search results:', response.data);
 
       const { faces } = response.data;
       if (!faces || faces.length === 0) {
@@ -121,7 +124,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       })).sort((a: any, b: any) => b.confidence - a.confidence);
 
       setSearchResults(matches);
-      setSuccess(`Success! We found ${matches.length} photos of you.`);
+      setSuccess(`Success! We found ${matches.length} photos of you. Scroll down to see them!`);
     } catch (error) {
       setError('Search failed. Our server is taking a breather.');
     } finally {
@@ -131,10 +134,21 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
 
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file.');
+    console.log('📷 File selected:', { name: file.name, type: file.type, size: file.size });
+
+    // Check for image type or common extensions
+    const isImageType = file.type.startsWith('image/');
+    const isHeicFile = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+    const isImageExt = /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
+
+    if (!isImageType && !isImageExt && !isHeicFile) {
+      console.warn('File validation failed:', { type: file.type, name: file.name });
+      setError('Please select a valid image file (JPG, PNG, or HEIC).');
       return;
     }
 
@@ -145,10 +159,47 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       setDetectedFace(null);
       setSearchResults([]);
 
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImage(imageUrl);
+      // Show original preview immediately (if browser supports it)
+      const initialPreviewUrl = URL.createObjectURL(file);
+      setUploadedImage(initialPreviewUrl);
+      let previewUrl = initialPreviewUrl;
 
-      const descriptor = await extractFaceDescriptor(file);
+      // Convert HEIC to JPEG if needed
+      let fileToProcess: File | Blob = file;
+      if (isHeicFile) {
+        try {
+          // Dynamic check for heic2any
+          if (typeof heic2any !== 'function') {
+            throw new Error('HEIC converter not loaded correctly.');
+          }
+
+          const convertedBlob = await (heic2any as any)({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.8
+          });
+          fileToProcess = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+
+          // Re-set preview with converted image
+          const convertedUrl = URL.createObjectURL(fileToProcess);
+          setUploadedImage(convertedUrl);
+          previewUrl = convertedUrl; // CRITICAL: Update the preview URL variable
+        } catch (conversionError) {
+          console.error('HEIC conversion failed:', conversionError);
+          setError('Could not process this HEIC file. Please try a standard photo.');
+          setIsUploading(false);
+          return;
+        }
+      }
+
+      console.log('Processing file:', { name: file.name, type: file.type, size: file.size });
+
+      // Use the converted file for face detection
+      const finalFile = fileToProcess instanceof File
+        ? fileToProcess
+        : new File([fileToProcess], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+
+      const descriptor = await extractFaceDescriptor(finalFile);
 
       const img = new Image();
       img.onload = () => {
@@ -161,7 +212,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
         setError('Failed to load image.');
         setIsUploading(false);
       };
-      img.src = imageUrl;
+      img.src = previewUrl;
 
     } catch (error) {
       setError('Upload failed.');
@@ -243,7 +294,7 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
                     type="file"
                     onChange={handleFileUpload}
                     className="hidden"
-                    accept="image/*"
+                    accept="image/*,.heic,.heif"
                   />
 
                   <div className="relative group">
@@ -375,27 +426,40 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
                   <span className="font-medium">{error}</span>
                 </motion.div>
               )}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center gap-3 text-green-700"
+                >
+                  <CheckCircle className="w-5 h-5 shrink-0" />
+                  <span className="font-medium">{success}</span>
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
         </motion.div>
       </div>
 
       {/* Results Title */}
-      {searchResults.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center justify-between px-2"
-        >
-          <div className="space-y-1">
-            <h3 className="text-2xl font-serif font-bold text-slate-900">Your Found Moments</h3>
-            <p className="text-sm text-slate-500">We found {searchResults.length} photos of you</p>
-          </div>
-          <Button variant="outline" onClick={clearSearch} className="rounded-full border-rose-200 text-rose-500">
-            Start New Search
-          </Button>
-        </motion.div>
-      )}
+      {
+        searchResults.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-between px-2"
+          >
+            <div className="space-y-1">
+              <h3 className="text-2xl font-serif font-bold text-slate-900">Your Found Moments</h3>
+              <p className="text-sm text-slate-500">We found {searchResults.length} photos of you</p>
+            </div>
+            <Button variant="outline" onClick={clearSearch} className="rounded-full border-rose-200 text-rose-500">
+              Start New Search
+            </Button>
+          </motion.div>
+        )
+      }
 
       {/* Results Masonry-ish Grid */}
       <AnimatePresence>
@@ -457,20 +521,22 @@ const FaceSearch: React.FC<FaceSearchProps> = ({
       </AnimatePresence>
 
       {/* Footer Tips */}
-      {!uploadedImage && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="bg-rose-50/50 border border-rose-100/50 rounded-3xl p-6 text-center"
-        >
-          <div className="flex justify-center gap-8 text-sm text-rose-400 italic">
-            <span className="flex items-center gap-2">📸 Use Good Lighting</span>
-            <span className="flex items-center gap-2">👤 Look at Camera</span>
-            <span className="flex items-center gap-2">🕶 No Sunglasses</span>
-          </div>
-        </motion.div>
-      )}
-    </div>
+      {
+        !uploadedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-rose-50/50 border border-rose-100/50 rounded-3xl p-6 text-center"
+          >
+            <div className="flex justify-center gap-8 text-sm text-rose-400 italic">
+              <span className="flex items-center gap-2">📸 Use Good Lighting</span>
+              <span className="flex items-center gap-2">👤 Look at Camera</span>
+              <span className="flex items-center gap-2">🕶 No Sunglasses</span>
+            </div>
+          </motion.div>
+        )
+      }
+    </div >
   );
 };
 

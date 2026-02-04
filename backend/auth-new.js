@@ -6,7 +6,7 @@
  */
 
 const express = require('express');
-console.log("!!! LOADING AUTH.JS WITH NEW ROUTES !!!");
+// Auth router loading...
 const router = express.Router();
 const { SecureUserDB, TokenManager, authMiddleware } = require('./lib/secure-auth');
 const emailService = require('./services/email-service');
@@ -601,31 +601,48 @@ router.get('/public/wedding/:slug', async (req, res) => {
 
     // Join users and weddings table
     // We limit to 1 result
-    console.log(`[PublicWedding] Fetching details for slug: ${slug}`);
+    const normalizedSlug = slug ? slug.trim().toLowerCase().replace(/\/$/, '') : '';
+    console.log(`[PublicWedding] Fetching details for normalized slug: "${normalizedSlug}" (Original: "${slug}")`);
+
     const result = await query(
-      `SELECT u.username, w.* 
-         FROM users u
-         LEFT JOIN weddings w ON u.id = w.user_id
-         WHERE u.username ILIKE $1 
-         LIMIT 1`,
-      [slug + '%']
+      `SELECT 
+          u.username,
+          u.id as user_uuid,
+          w.user_id as wedding_id,
+          w.groom_name,
+          w.bride_name,
+          w.wedding_date,
+          w.venue,
+          w.guest_count,
+          w.theme,
+          w.wedding_time,
+          w.show_countdown,
+          w.music_enabled,
+          w.music_url,
+          w.music_source,
+          w.playlist_url,
+          w.volume,
+          w.wedding_code,
+          w.customizations
+        FROM users u
+        LEFT JOIN weddings w ON u.id = w.user_id
+        WHERE w.wedding_code ILIKE $1 OR u.username ILIKE $1
+        LIMIT 1`,
+      [normalizedSlug]
     );
+
     console.log(`[PublicWedding] Query result rows: ${result.rows.length}`);
-    if (result.rows.length > 0) {
-      console.log(`[PublicWedding] Found user: ${result.rows[0].username}, Wedding ID: ${result.rows[0].id}`);
-    }
 
     if (result.rows.length === 0) {
+      console.log(`[PublicWedding] No wedding found for slug: "${normalizedSlug}"`);
       return res.status(404).json({ message: 'Wedding not found' });
     }
 
     const row = result.rows[0];
-
-    // If no wedding data found (row.user_id might be null if left join failed to find match, 
-    // but row exists because user exists), we return defaults
-    // Actually if user exists but no wedding record, w.* columns will be null
+    console.log(`[PublicWedding] Match found - Username: ${row.username}, Slug Match: ${row.wedding_code === normalizedSlug ? 'Wedding Code' : 'Username'}`);
 
     const weddingData = {
+      id: row.wedding_id || row.user_uuid,
       groomName: row.groom_name || 'Groom',
       brideName: row.bride_name || 'Bride',
       weddingDate: row.wedding_date || '2026-03-15',
@@ -633,7 +650,15 @@ router.get('/public/wedding/:slug', async (req, res) => {
       theme: row.theme || 'Modern Elegance',
       weddingTime: row.wedding_time || '10:00',
       showCountdown: row.show_countdown !== null ? row.show_countdown : true,
-      guestCount: row.guest_count || 0
+      guestCount: row.guest_count || 0,
+      musicEnabled: row.music_enabled || false,
+      musicUrl: row.music_url || null,
+      musicSource: row.music_source || 'upload',
+      playlistUrl: row.playlist_url || null,
+      musicSource: row.music_source || 'upload',
+      playlistUrl: row.playlist_url || null,
+      volume: row.volume !== null ? row.volume : 50,
+      customizations: row.customizations || {}
     };
 
     res.json(weddingData);
@@ -667,7 +692,9 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
     if (result.rows.length > 0) {
       const row = result.rows[0];
       weddingData = {
-        id: row.id, // Important for updates
+        ...row,
+        // Also provide camelCase for other components
+        id: row.id,
         groomName: row.groom_name,
         brideName: row.bride_name,
         weddingDate: row.wedding_date,
@@ -676,7 +703,14 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
         weddingTime: row.wedding_time,
         showCountdown: row.show_countdown,
         guestCount: row.guest_count,
-        slug: row.wedding_code // Wait, calling it slug in frontend
+        slug: row.wedding_code,
+        musicEnabled: row.music_enabled || false,
+        musicUrl: row.music_url || null,
+        musicSource: row.music_source || 'upload',
+        playlistUrl: row.playlist_url || null,
+        playlistUrl: row.playlist_url || null,
+        volume: row.volume !== null ? row.volume : 50,
+        customizations: row.customizations || {}
       };
 
       // Also fetch the username/slug from users table if needed for correctness
@@ -686,19 +720,33 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
     } else {
       // Return defaults if no wedding set up yet
       weddingData = {
+        groom_name: 'Groom',
+        bride_name: 'Bride',
+        wedding_date: '2026-03-15',
+        venue: '',
+        theme: 'Modern Elegance',
+        wedding_time: '10:00',
+        show_countdown: true,
+        guest_count: 0,
+        wedding_code: req.user.username.split('@')[0],
+
         groomName: 'Groom',
         brideName: 'Bride',
         weddingDate: '2026-03-15',
-        venue: '',
         theme: 'Modern Elegance',
         weddingTime: '10:00',
         showCountdown: true,
+        musicEnabled: false,
+        musicUrl: null,
+        musicSource: 'upload',
+        playlistUrl: null,
+        volume: 50,
         guestCount: 0,
-        slug: req.user.username // Fallback to username as slug if no wedding code
+        slug: req.user.username.split('@')[0]
       };
     }
 
-    // Wrap in "wedding" key as seen in frontend: if (data.wedding)
+    console.log('📡 [GET /client/wedding] Sending response (wrapped):', JSON.stringify({ wedding: weddingData }, null, 2));
     res.json({ wedding: weddingData });
 
   } catch (error) {
@@ -722,18 +770,46 @@ router.put('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
 
     // req.user is set by authMiddleware
     // secure-auth.js -> verifyToken sets req.user = user
+    console.log('📝 [PUT /client/wedding] Received weddingData:', JSON.stringify(weddingData, null, 2));
+
     // TokenManager.verifyToken returns user object (from SecureUserDB) which has .id property
     const userId = req.user.id;
+    const requestedSlug = weddingData.slug ? weddingData.slug.toLowerCase().trim() : null;
 
     if (!userId) {
       return res.status(401).json({ message: 'User ID not found in token' });
     }
 
+    // Check for slug uniqueness if provided
+    if (requestedSlug) {
+      // Check if it's already used in weddings table by someone else
+      const weddingCheck = await query(
+        `SELECT user_id FROM weddings WHERE wedding_code ILIKE $1 AND user_id != $2`,
+        [requestedSlug, userId]
+      );
+
+      if (weddingCheck.rows.length > 0) {
+        return res.status(409).json({ message: 'This personalized link is already taken by another wedding.' });
+      }
+
+      // Check if it's a reserved username in the users table by someone else
+      const userCheck = await query(
+        `SELECT id FROM users WHERE username ILIKE $1 AND id != $2`,
+        [requestedSlug, userId]
+      );
+
+      if (userCheck.rows.length > 0) {
+        return res.status(409).json({ message: 'This link name is reserved by another user profile. Please choose another.' });
+      }
+    }
+
+    console.log('📝 [PUT /client/wedding] userId:', userId, 'Slug:', requestedSlug);
+
     // Upsert into weddings table
     // PostgreSQL UPSERT syntax
     await query(
-      `INSERT INTO weddings (user_id, groom_name, bride_name, wedding_date, venue, guest_count, theme, wedding_time, show_countdown, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      `INSERT INTO weddings (user_id, groom_name, bride_name, wedding_date, venue, guest_count, theme, wedding_time, show_countdown, music_enabled, music_url, music_source, playlist_url, volume, wedding_code, customizations, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
          ON CONFLICT (user_id) 
          DO UPDATE SET 
             groom_name = EXCLUDED.groom_name,
@@ -744,6 +820,13 @@ router.put('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
             theme = EXCLUDED.theme,
             wedding_time = EXCLUDED.wedding_time,
             show_countdown = EXCLUDED.show_countdown,
+            music_enabled = EXCLUDED.music_enabled,
+            music_url = EXCLUDED.music_url,
+            music_source = EXCLUDED.music_source,
+            playlist_url = EXCLUDED.playlist_url,
+            volume = EXCLUDED.volume,
+            wedding_code = EXCLUDED.wedding_code,
+            customizations = EXCLUDED.customizations,
             updated_at = NOW()`,
       [
         userId,
@@ -754,15 +837,27 @@ router.put('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
         weddingData.guestCount || 0,
         weddingData.theme,
         weddingData.weddingTime,
-        weddingData.showCountdown !== undefined ? weddingData.showCountdown : true
+        weddingData.showCountdown !== undefined ? weddingData.showCountdown : true,
+        weddingData.musicEnabled !== undefined ? weddingData.musicEnabled : false,
+        weddingData.musicUrl || null,
+        weddingData.musicSource || 'upload',
+        weddingData.playlistUrl || null,
+        weddingData.volume !== undefined ? weddingData.volume : 50,
+        weddingData.slug,
+        weddingData.customizations || {}
       ]
     );
 
     res.json({ message: 'Wedding details updated successfully', success: true });
+
   } catch (error) {
-    console.error('Update wedding details error:', error);
-    res.status(500).json({ message: 'Failed to update wedding details' });
+    if (error.code === '23505') {
+      return res.status(409).json({ message: 'This Website Link is already taken. Please choose another one.' });
+    }
+    console.error('Update wedding error details:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    res.status(500).json({ message: 'Failed to update wedding details: ' + error.message });
   }
 });
+
 
 module.exports = { router, authenticateToken: authMiddleware.verifyToken };

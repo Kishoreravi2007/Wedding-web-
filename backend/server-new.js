@@ -19,23 +19,12 @@ const rateLimit = require('express-rate-limit');
 // =============================================================================
 // FIREBASE INITIALIZATION (for wishes only)
 // =============================================================================
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
-if (serviceAccountPath) {
-  try {
-    const serviceAccount = require(serviceAccountPath);
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-      });
-    }
-    console.log('✅ Firebase initialized successfully (for wishes)');
-  } catch (error) {
-    console.warn('⚠️ Warning: Firebase initialization failed. Wishes feature might not work:', error.message);
-  }
-} else {
-  console.log('ℹ️ Firebase service account path not provided. Skipping Firebase initialization.');
-}
+// =============================================================================
+// FIREBASE INITIALIZATION 
+// =============================================================================
+// Initialization is handled by individual modules (lib/firebase.js, etc.) if needed.
+// This manual block is removed to prevent conflicts and credential errors.
+
 
 // =============================================================================
 // CLOUD SQL & GCS (Migrated from Supabase)
@@ -106,11 +95,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const uploadsPath = path.join(__dirname, process.env.LOCAL_STORAGE_PATH || 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+// Request logging middleware (Development only)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log('\n--- Incoming Request ---');
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    console.log('------------------------\n');
+    next();
+  });
+}
 
 // =============================================================================
 // ROUTES
@@ -220,6 +213,13 @@ console.log('💍 Registering /api/weddings route...');
 const weddingsRouter = require('./routes/weddings');
 app.use('/api/weddings', weddingsRouter);
 console.log('✅ Registered /api/weddings route.');
+
+// Music Routes
+console.log('🎵 Registering /api/music routes...');
+app.use('/api/music', require('./routes/music'));
+console.log('✅ Registered /api/music routes.');
+
+
 
 // Phase 2: Guests & Timeline
 console.log('👥 Registering /api/guests routes...');
