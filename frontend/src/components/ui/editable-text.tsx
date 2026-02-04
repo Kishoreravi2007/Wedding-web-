@@ -9,6 +9,7 @@ interface EditableTextProps {
     className?: string;
     tag?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
     placeholder?: string;
+    type?: 'text' | 'date';
 }
 
 export const EditableText = ({
@@ -17,10 +18,11 @@ export const EditableText = ({
     isEditing,
     className = '',
     tag: Tag = 'p',
-    placeholder = 'Click to edit'
+    placeholder = 'Click to edit',
+    type = 'text'
 }: EditableTextProps) => {
     const [text, setText] = useState(initialValue);
-    const elementRef = useRef<HTMLElement>(null);
+    const elementRef = useRef<any>(null);
 
     useEffect(() => {
         setText(initialValue);
@@ -40,6 +42,22 @@ export const EditableText = ({
 
     if (!isEditing) {
         return <Tag className={className}>{text}</Tag>;
+    }
+
+    if (type === 'date') {
+        return (
+            <div className="relative group inline-block">
+                <input
+                    type="date"
+                    value={text}
+                    onChange={(e) => {
+                        setText(e.target.value);
+                        onSave(e.target.value);
+                    }}
+                    className={`${className} outline-none border border-dashed border-rose-300 bg-rose-50/50 rounded px-2 cursor-pointer transition-all`}
+                />
+            </div>
+        );
     }
 
     return (
