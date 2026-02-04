@@ -162,7 +162,7 @@ const App = () => {
               </Link>
             )}
             {/* Music Player Toggle - Hidden on company pages, feedback page, and wedding pages (which have their own player) */}
-            {!isCompanyPage && !location.pathname.startsWith('/w/') && location.pathname !== '/feedback' && (
+            {!isCompanyPage && !location.pathname.startsWith('/weddings/') && location.pathname !== '/feedback' && (
               <Button
                 variant="outline"
                 size="icon"
@@ -173,7 +173,7 @@ const App = () => {
               </Button>
             )}
             {/* Music Player - Hidden on company pages and wedding pages */}
-            {!isCompanyPage && !location.pathname.startsWith('/w/') && showMusicPlayer && <MusicPlayer />}
+            {!isCompanyPage && !location.pathname.startsWith('/weddings/') && showMusicPlayer && <MusicPlayer />}
 
             {/* Feedback Button - Available on all pages except feedback page itself */}
             {location.pathname !== '/feedback' && (
@@ -192,8 +192,8 @@ const App = () => {
             <AnimatePresence mode="wait">
               <Routes>
                 {/* Public Wedding Routes (High Priority) */}
-                <Route path="/w/:slug" element={<WeddingPage />} />
-                <Route path="/w/:slug/" element={<WeddingPage />} />
+                <Route path="/weddings/:slug" element={<WeddingPage />} />
+                <Route path="/weddings/:slug/" element={<WeddingPage />} />
 
                 {/* Company Routes */}
                 <Route path="/company/login" element={<CompanyLogin />} />
@@ -211,7 +211,7 @@ const App = () => {
                 <Route path="/about-platform" element={<CompanyLanding />} />
                 <Route path="/privacy" element={<CompanyLegal />} />
                 <Route path="/terms" element={<CompanyLegal />} />
-                <Route path="/weddings" element={<Index />} />
+                <Route path="/all-weddings" element={<Index />} />
                 <Route path="/company/about" element={<CompanyAbout />} />
                 <Route path="/company/services" element={<CompanyServices />} />
                 <Route path="/company/pricing" element={<CompanyPricing />} />

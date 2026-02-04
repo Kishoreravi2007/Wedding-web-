@@ -227,6 +227,10 @@ app.use('/api/guests', require('./routes/guests'));
 console.log('📅 Registering /api/timeline routes...');
 app.use('/api/timeline', require('./routes/timeline'));
 
+// Public Guest Routes (RSVP)
+const publicGuestsRouter = require('./routes/public-guests');
+app.use('/api/public/guests', publicGuestsRouter);
+
 // =============================================================================
 // ERROR HANDLING
 // =============================================================================

@@ -78,6 +78,9 @@ const PhotoDB = {
     if (filters.eventType) {
       conditions.push(`p.event_type = $${paramIndex++}`);
       params.push(filters.eventType);
+    } else {
+      // By default, exclude special system types like 'hero' backgrounds from general gallery
+      conditions.push(`p.event_type != 'hero'`);
     }
 
     if (filters.tags && filters.tags.length > 0) {
@@ -209,6 +212,9 @@ const PhotoDB = {
     if (filters.eventType) {
       conditions.push(`event_type = $${params.length + 1}`);
       params.push(filters.eventType);
+    } else {
+      // Consistent with findAll, exclude 'hero' types from general counts
+      conditions.push(`event_type != 'hero'`);
     }
 
     if (conditions.length > 0) {

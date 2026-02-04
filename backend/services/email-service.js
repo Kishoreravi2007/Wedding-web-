@@ -180,6 +180,83 @@ const sendPasswordResetEmail = async (to, resetToken, name = 'User') => {
 };
 
 /**
+ * Send a wedding invitation email with RSVP buttons
+ * @param {Object} guest - Guest object (name, email, rsvp_token)
+ * @param {Object} wedding - Wedding object (couple_name, wedding_date, venue, slug)
+ */
+const sendInvitationEmail = async (guest, wedding) => {
+  const rsvpBaseUrl = `${process.env.BACKEND_URL || 'http://localhost:5001'}/api/public/guests/rsvp/${guest.rsvp_token}`;
+  const weddingUrl = `${process.env.FRONTEND_URL || 'https://weddingweb.co.in'}/weddings/${wedding.slug}`;
+
+  const formattedDate = wedding.wedding_date ? new Date(wedding.wedding_date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : 'TBA';
+
+  const html = `
+    <div style="font-family: 'Playfair Display', serif; max-width: 600px; margin: 0 auto; padding: 40px; border: 1px solid #fecdd3; border-radius: 20px; background-color: #fffafb;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <img src="cid:logo" alt="WeddingWeb" style="width: 50px; height: 50px; margin-bottom: 20px;">
+        <h2 style="color: #9f1239; font-size: 24px; margin: 0; letter-spacing: 1px;">You're Invited!</h2>
+        <div style="width: 50px; hieght: 1px; background-color: #fda4af; margin: 15px auto;"></div>
+      </div>
+      
+      <p style="font-size: 18px; color: #4c0519; text-align: center; font-style: italic;">
+        Dear ${guest.name},
+      </p>
+      
+      <p style="font-size: 16px; color: #334155; text-align: center; line-height: 1.8;">
+        We are delighted to invite you to celebrate the wedding of
+      </p>
+      
+      <h1 style="color: #e11d48; text-align: center; font-size: 28px; margin: 20px 0;">
+        ${wedding.couple_name}
+      </h1>
+      
+      <div style="background-color: #fff; padding: 20px; border-radius: 12px; border: 1px dashed #fda4af; margin: 25px 0; text-align: center;">
+        <p style="margin: 5px 0; font-weight: bold; color: #9f1239;">${formattedDate}</p>
+        <p style="margin: 5px 0; color: #334155;">at ${wedding.venue || 'Our Wedding Venue'}</p>
+      </div>
+
+      <p style="font-size: 15px; color: #334155; text-align: center; margin-bottom: 30px;">
+        Please let us know if you can make it:
+      </p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${rsvpBaseUrl}/attending" 
+           style="background-color: #e11d48; color: white; padding: 12px 35px; text-decoration: none; font-weight: bold; border-radius: 50px; display: inline-block; margin: 10px; box-shadow: 0 4px 14px 0 rgba(225, 29, 72, 0.39);">
+           Yes, I'm Coming!
+        </a>
+        <a href="${rsvpBaseUrl}/declined" 
+           style="background-color: #f1f5f9; color: #64748b; padding: 12px 35px; text-decoration: none; font-weight: bold; border-radius: 50px; display: inline-block; margin: 10px; border: 1px solid #e2e8f0;">
+           Respectfully Decline
+        </a>
+      </div>
+      
+      <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 40px;">
+        View our wedding website for more details, registry, and location:
+        <br/>
+        <a href="${weddingUrl}" style="color: #e11d48; text-decoration: underline;">${weddingUrl}</a>
+      </p>
+      
+      <hr style="border: 0; border-top: 1px solid #fff1f2; margin: 40px 0;">
+      <p style="font-size: 11px; color: #94a3b8; text-align: center;">
+        Sent via WeddingWeb.co.in - Modern Wedding Experiences
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: guest.email,
+    subject: `Wedding Invitation: ${wedding.couple_name} 💍`,
+    text: `Hi ${guest.name}, you are invited to the wedding of ${wedding.couple_name} on ${formattedDate}. Please RSVP at ${rsvpBaseUrl}/attending`,
+    html
+  });
+};
+
+/**
  * Send a test email
  */
 const sendTestEmail = async (to) => {
@@ -196,5 +273,6 @@ module.exports = {
   sendWelcomeEmail,
   sendWelcomeEmailAI,
   sendPasswordResetEmail,
-  sendTestEmail
+  sendTestEmail,
+  sendInvitationEmail
 };
