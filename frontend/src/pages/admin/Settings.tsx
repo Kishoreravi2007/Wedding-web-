@@ -26,6 +26,8 @@ const defaultFeatureSettings = {
   weeklyReports: false
 };
 
+import { API_BASE_URL } from '@/lib/api';
+
 const AdminSettings: React.FC = () => {
   const [generalSettings, setGeneralSettings] = useState(defaultGeneralSettings);
   const [featureSettings, setFeatureSettings] = useState(defaultFeatureSettings);
@@ -33,7 +35,6 @@ const AdminSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
   const parseBoolean = (value: unknown, fallback: boolean) => {
     if (typeof value === 'boolean') return value;
@@ -186,8 +187,8 @@ const AdminSettings: React.FC = () => {
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Reload
               </Button>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-pink-600 hover:bg-pink-700 text-white"
                 onClick={handleSave}
                 disabled={saving || loading}
@@ -237,115 +238,115 @@ const AdminSettings: React.FC = () => {
           ) : (
             <>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>General Information</CardTitle>
-              <CardDescription>These values appear across the admin portal and client-facing pages.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="companyName">Brand Name</Label>
-                  <Input
-                    id="companyName"
-                    value={generalSettings.companyName}
-                    onChange={(e) => handleGeneralChange('companyName', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="supportEmail">Support Email</Label>
-                  <Input
-                    id="supportEmail"
-                    type="email"
-                    value={generalSettings.supportEmail}
-                    onChange={(e) => handleGeneralChange('supportEmail', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="contactNumber">Contact Number</Label>
-                  <Input
-                    id="contactNumber"
-                    value={generalSettings.contactNumber}
-                    onChange={(e) => handleGeneralChange('contactNumber', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="brandTagline">Brand Tagline</Label>
-                  <Input
-                    id="brandTagline"
-                    value={generalSettings.brandTagline}
-                    onChange={(e) => handleGeneralChange('brandTagline', e.target.value)}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="aboutCompany">About Company</Label>
-                <Textarea
-                  id="aboutCompany"
-                  rows={4}
-                  value={generalSettings.aboutCompany}
-                  onChange={(e) => handleGeneralChange('aboutCompany', e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Feature Toggles</CardTitle>
-              <CardDescription>Enable or disable platform functionality per wedding.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { field: 'enablePhotoBooth', label: 'Photo Booth & Face Match' },
-                { field: 'enableFaceRecognition', label: 'Face Recognition Search' },
-                { field: 'enableWishes', label: 'Digital Wishes Wall' },
-                { field: 'enableLiveStream', label: 'Live Stream Module' },
-                { field: 'autoArchiveCompleted', label: 'Auto-archive completed weddings' },
-                { field: 'weeklyReports', label: 'Send weekly performance report' }
-              ].map(item => (
-                <div key={item.field} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{item.label}</p>
-                    <p className="text-sm text-gray-500">
-                      {item.field === 'autoArchiveCompleted'
-                        ? 'Automatically moves weddings to archive 30 days after completion.'
-                        : item.field === 'weeklyReports'
-                          ? 'Email summary of gallery views, downloads and wishes.'
-                          : 'Toggle availability for every new wedding you create.'}
-                    </p>
+              <Card>
+                <CardHeader>
+                  <CardTitle>General Information</CardTitle>
+                  <CardDescription>These values appear across the admin portal and client-facing pages.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="companyName">Brand Name</Label>
+                      <Input
+                        id="companyName"
+                        value={generalSettings.companyName}
+                        onChange={(e) => handleGeneralChange('companyName', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="supportEmail">Support Email</Label>
+                      <Input
+                        id="supportEmail"
+                        type="email"
+                        value={generalSettings.supportEmail}
+                        onChange={(e) => handleGeneralChange('supportEmail', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contactNumber">Contact Number</Label>
+                      <Input
+                        id="contactNumber"
+                        value={generalSettings.contactNumber}
+                        onChange={(e) => handleGeneralChange('contactNumber', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="brandTagline">Brand Tagline</Label>
+                      <Input
+                        id="brandTagline"
+                        value={generalSettings.brandTagline}
+                        onChange={(e) => handleGeneralChange('brandTagline', e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={featureSettings[item.field as keyof typeof featureSettings]}
-                    onCheckedChange={(checked) => handleFeatureToggle(item.field as keyof typeof featureSettings, checked)}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                  <div>
+                    <Label htmlFor="aboutCompany">About Company</Label>
+                    <Textarea
+                      id="aboutCompany"
+                      rows={4}
+                      value={generalSettings.aboutCompany}
+                      onChange={(e) => handleGeneralChange('aboutCompany', e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Data & Maintenance</CardTitle>
-              <CardDescription>Quick utilities to keep your Supabase data healthy.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg bg-white">
-                <h3 className="font-semibold mb-2">Data Backups</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Export wedding, people, and photo metadata for safekeeping.
-                </p>
-                <Button variant="outline" className="w-full">Download CSV Export</Button>
-              </div>
-              <div className="p-4 border rounded-lg bg-white">
-                <h3 className="font-semibold mb-2">Storage Cleanup</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Find orphan files in Supabase Storage and reclaim space.
-                </p>
-                <Button variant="outline" className="w-full">Run Cleanup Scan</Button>
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Feature Toggles</CardTitle>
+                  <CardDescription>Enable or disable platform functionality per wedding.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    { field: 'enablePhotoBooth', label: 'Photo Booth & Face Match' },
+                    { field: 'enableFaceRecognition', label: 'Face Recognition Search' },
+                    { field: 'enableWishes', label: 'Digital Wishes Wall' },
+                    { field: 'enableLiveStream', label: 'Live Stream Module' },
+                    { field: 'autoArchiveCompleted', label: 'Auto-archive completed weddings' },
+                    { field: 'weeklyReports', label: 'Send weekly performance report' }
+                  ].map(item => (
+                    <div key={item.field} className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{item.label}</p>
+                        <p className="text-sm text-gray-500">
+                          {item.field === 'autoArchiveCompleted'
+                            ? 'Automatically moves weddings to archive 30 days after completion.'
+                            : item.field === 'weeklyReports'
+                              ? 'Email summary of gallery views, downloads and wishes.'
+                              : 'Toggle availability for every new wedding you create.'}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={featureSettings[item.field as keyof typeof featureSettings]}
+                        onCheckedChange={(checked) => handleFeatureToggle(item.field as keyof typeof featureSettings, checked)}
+                      />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Data & Maintenance</CardTitle>
+                  <CardDescription>Quick utilities to keep your Supabase data healthy.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg bg-white">
+                    <h3 className="font-semibold mb-2">Data Backups</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Export wedding, people, and photo metadata for safekeeping.
+                    </p>
+                    <Button variant="outline" className="w-full">Download CSV Export</Button>
+                  </div>
+                  <div className="p-4 border rounded-lg bg-white">
+                    <h3 className="font-semibold mb-2">Storage Cleanup</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Find orphan files in Supabase Storage and reclaim space.
+                    </p>
+                    <Button variant="outline" className="w-full">Run Cleanup Scan</Button>
+                  </div>
+                </CardContent>
+              </Card>
             </>
           )}
         </div>

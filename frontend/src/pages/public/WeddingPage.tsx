@@ -4,6 +4,7 @@ import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart } from 'lucide-reac
 import { Button } from "@/components/ui/button";
 import { WeddingTemplate } from '@/components/WeddingTemplate';
 import FaceSearch from '@/components/FaceSearch';
+import { API_BASE_URL } from '@/lib/api';
 import {
     Dialog,
     DialogContent,
@@ -34,7 +35,7 @@ const WeddingPage = () => {
 
     const fetchPhotos = async () => {
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+            const apiUrl = API_BASE_URL;
             // Use slug as the primary identifier (sister) since this is the public page
             if (slug) {
                 const response = await fetch(`${apiUrl}/api/photos?sister=${slug}&limit=20`);
@@ -69,7 +70,7 @@ const WeddingPage = () => {
         formData.append('eventType', 'photobooth');
 
         try {
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+            const apiUrl = API_BASE_URL;
             const response = await fetch(`${apiUrl}/api/photos/public`, {
                 method: 'POST',
                 body: formData
@@ -92,9 +93,8 @@ const WeddingPage = () => {
     useEffect(() => {
         const fetchWeddingData = async () => {
             try {
-                // Use the correct API URL - make sure VITE_API_BASE_URL is set correctly in .env
-                // or use a relative path if proxying, but here we likely need absolute if pure client
-                const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+                // Use the correct API URL
+                const apiUrl = API_BASE_URL;
                 const response = await fetch(`${apiUrl}/api/auth/public/wedding/${slug}`);
 
                 if (!response.ok) {

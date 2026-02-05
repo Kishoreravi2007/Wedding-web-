@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../lib/db-gcp');
 const { authMiddleware } = require('../lib/secure-auth');
 const emailService = require('../services/email-service');
+const whatsappService = require('../services/whatsapp-service');
 const { v4: uuidv4 } = require('uuid');
 
 // Get all guests for the authenticated user
@@ -10,6 +11,29 @@ router.use((req, res, next) => {
     console.log(`📡 Guests Router: ${req.method} ${req.path}`);
     next();
 });
+
+// Helper function to recalculate and update guest count
+async function updateGuestCount(userId) {
+    try {
+        const { rows: countRows } = await db.query(
+            `SELECT COUNT(*) as count FROM guests 
+             WHERE user_id = $1 AND rsvp_status = 'attending'`,
+            [userId]
+        );
+        const attendingCount = parseInt(countRows[0].count, 10);
+
+        await db.query(
+            'UPDATE weddings SET guest_count = $1, updated_at = NOW() WHERE user_id = $2',
+            [attendingCount, userId]
+        );
+        console.log(`📊 Guest count updated to ${attendingCount} for user ${userId}`);
+        return attendingCount;
+    } catch (error) {
+        console.error('Error updating guest count:', error);
+        return null;
+    }
+}
+
 
 router.get('/', authMiddleware.verifyToken, async (req, res) => {
     try {
@@ -62,18 +86,34 @@ router.post('/', authMiddleware.verifyToken, async (req, res) => {
         const guest = rows[0];
 
         // Send invitation email if email is provided
-        if (email) {
+        if (email || phone) {
             const wedding = await getWeddingInfo(userId);
             console.log(`ℹ️ Wedding info for user ${userId}:`, wedding ? 'Found' : 'Not Found');
+
             if (wedding) {
-                console.log(`📧 Triggering invitation email for ${guest.name} (${guest.email})`);
-                // Non-blocking email send
-                emailService.sendInvitationEmail(guest, wedding)
-                    .then(() => console.log(`✅ Email service call completed for ${guest.name}`))
-                    .catch(err => console.error('❌ Failed to send invitation email:', err));
+                // Handle Email
+                if (email) {
+                    console.log(`📧 Triggering invitation email for ${guest.name} (${guest.email})`);
+                    emailService.sendInvitationEmail(guest, wedding)
+                        .then(() => console.log(`✅ Email service call completed for ${guest.name}`))
+                        .catch(err => console.error('❌ Failed to send invitation email:', err));
+                }
+
+                // Handle WhatsApp
+                if (phone) {
+                    console.log(`💬 Triggering WhatsApp invitation for ${guest.name} (${guest.phone})`);
+                    whatsappService.sendInvitation(guest, wedding)
+                        .then(() => console.log(`✅ WhatsApp service call completed for ${guest.name}`))
+                        .catch(err => console.error('❌ Failed to send WhatsApp invitation:', err));
+                }
             } else {
-                console.warn(`⚠️ No wedding found for user ${userId}. Invitation email skipped.`);
+                console.warn(`⚠️ No wedding found for user ${userId}. Invitations skipped.`);
             }
+        }
+
+        // Update guest count if the new guest is attending
+        if (rsvp_status === 'attending') {
+            await updateGuestCount(userId);
         }
 
         res.status(201).json({ success: true, guest });
@@ -121,6 +161,11 @@ router.patch('/:id', authMiddleware.verifyToken, async (req, res) => {
             return res.status(404).json({ success: false, error: 'Guest not found or unauthorized' });
         }
 
+        // Update guest count if RSVP status was changed
+        if (updates.rsvp_status !== undefined) {
+            await updateGuestCount(userId);
+        }
+
         res.json({ success: true, guest: rows[0] });
     } catch (error) {
         console.error('Error updating guest:', error);
@@ -138,6 +183,9 @@ router.delete('/', authMiddleware.verifyToken, async (req, res) => {
             'DELETE FROM guests WHERE user_id = $1',
             [userId]
         );
+
+        // Reset guest count to 0
+        await updateGuestCount(userId);
 
         res.json({
             success: true,
@@ -164,6 +212,9 @@ router.delete('/:id', authMiddleware.verifyToken, async (req, res) => {
         if (rowCount === 0) {
             return res.status(404).json({ success: false, error: 'Guest not found or unauthorized' });
         }
+
+        // Recalculate guest count after deletion
+        await updateGuestCount(userId);
 
         res.json({ success: true, message: 'Guest deleted successfully' });
     } catch (error) {
@@ -211,16 +262,28 @@ router.post('/bulk', authMiddleware.verifyToken, async (req, res) => {
             const savedGuest = rows[0];
             results.push(savedGuest);
 
-            // Send invitation email if email is provided
-            if (savedGuest.email && wedding) {
-                console.log(`📧 Triggering bulk invitation email for ${savedGuest.name} (${savedGuest.email})`);
-                emailService.sendInvitationEmail(savedGuest, wedding)
-                    .then(() => console.log(`✅ Bulk email sent for ${savedGuest.name}`))
-                    .catch(err => console.error(`❌ Failed to send bulk invitation email for ${savedGuest.name}:`, err));
-            } else if (savedGuest.email && !wedding) {
-                console.warn(`⚠️ No wedding found for user ${userId}. Bulk invitation skipped for ${savedGuest.name}.`);
+            // Send invitation if contact info is provided
+            if (wedding && (savedGuest.email || savedGuest.phone)) {
+                console.log(`📩 Triggering invitations for ${savedGuest.name}`);
+
+                if (savedGuest.email) {
+                    emailService.sendInvitationEmail(savedGuest, wedding)
+                        .then(() => console.log(`✅ Bulk email sent for ${savedGuest.name}`))
+                        .catch(err => console.error(`❌ Failed to send bulk invitation email for ${savedGuest.name}:`, err));
+                }
+
+                if (savedGuest.phone) {
+                    whatsappService.sendInvitation(savedGuest, wedding)
+                        .then(() => console.log(`✅ Bulk WhatsApp sent for ${savedGuest.name}`))
+                        .catch(err => console.error(`❌ Failed to send bulk WhatsApp for ${savedGuest.name}:`, err));
+                }
+            } else if (!wedding && (savedGuest.email || savedGuest.phone)) {
+                console.warn(`⚠️ No wedding found for user ${userId}. Bulk invitations skipped for ${savedGuest.name}.`);
             }
         }
+
+        // Recalculate guest count after bulk import
+        await updateGuestCount(userId);
 
         res.status(201).json({
             success: true,
@@ -231,6 +294,95 @@ router.post('/bulk', authMiddleware.verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Error bulk adding guests:', error);
         res.status(500).json({ success: false, error: 'Failed to import guests' });
+    }
+});
+
+// Send WhatsApp invitation manually
+router.post('/:id/send-whatsapp', authMiddleware.verifyToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        const { rows: guestRows } = await db.query(
+            'SELECT * FROM guests WHERE id = $1 AND user_id = $2',
+            [id, userId]
+        );
+
+        if (guestRows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Guest not found' });
+        }
+
+        const guest = guestRows[0];
+        if (!guest.phone) {
+            return res.status(400).json({ success: false, error: 'Guest does not have a phone number' });
+        }
+
+        const wedding = await getWeddingInfo(userId);
+        if (!wedding) {
+            return res.status(404).json({ success: false, error: 'Wedding info not found' });
+        }
+
+        const result = await whatsappService.sendInvitation(guest, wedding);
+        if (result.success) {
+            res.json({ success: true, message: 'WhatsApp invitation sent successfully' });
+        } else {
+            res.status(500).json({ success: false, error: result.error });
+        }
+    } catch (error) {
+        console.error('Error sending WhatsApp:', error);
+        res.status(500).json({ success: false, error: 'Failed to send WhatsApp invitation' });
+    }
+});
+
+// Send WhatsApp invitation to all guests
+router.post('/send-whatsapp-all', authMiddleware.verifyToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Fetch all guests with phone numbers for this user
+        const { rows: guests } = await db.query(
+            'SELECT * FROM guests WHERE user_id = $1 AND phone IS NOT NULL AND phone != \'\'',
+            [userId]
+        );
+
+        if (guests.length === 0) {
+            return res.status(404).json({ success: false, error: 'No guests with phone numbers found' });
+        }
+
+        const wedding = await getWeddingInfo(userId);
+        if (!wedding) {
+            return res.status(404).json({ success: false, error: 'Wedding info not found' });
+        }
+
+        // Send invitations (Non-blocking as it might take time for many guests)
+        // Note: WhatsApp might flag rapid-fire messages as spam, so we introduce small delays
+        const sendInvitations = async () => {
+            console.log(`📣 Starting bulk WhatsApp invitations for ${guests.length} guests...`);
+            let count = 0;
+            for (const guest of guests) {
+                try {
+                    // Small delay to be safe (500ms between messages)
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const result = await whatsappService.sendInvitation(guest, wedding);
+                    if (result.success) count++;
+                } catch (err) {
+                    console.error(`❌ Bulk WhatsApp failed for ${guest.name}:`, err.message);
+                }
+            }
+            console.log(`✅ Bulk WhatsApp completed. Sent ${count}/${guests.length} messages.`);
+        };
+
+        // Start the background process
+        sendInvitations();
+
+        res.json({
+            success: true,
+            message: `Starting to send WhatsApp invitations to ${guests.length} guests in the background.`,
+            count: guests.length
+        });
+    } catch (error) {
+        console.error('Error in bulk WhatsApp:', error);
+        res.status(500).json({ success: false, error: 'Failed to trigger bulk WhatsApp invitations' });
     }
 });
 

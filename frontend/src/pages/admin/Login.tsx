@@ -7,13 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Heart } from 'lucide-react';
 
+import { API_BASE_URL } from '@/lib/api';
+
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +66,7 @@ const AdminLogin: React.FC = () => {
           <CardTitle className="text-2xl">Admin Portal</CardTitle>
           <CardDescription>Sign in to manage wedding clients</CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             {error && (
@@ -73,7 +74,7 @@ const AdminLogin: React.FC = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -85,7 +86,7 @@ const AdminLogin: React.FC = () => {
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="password">Password</Label>
               <Input
@@ -97,9 +98,9 @@ const AdminLogin: React.FC = () => {
                 required
               />
             </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               className="w-full bg-pink-600 hover:bg-pink-700"
               disabled={loading}
             >

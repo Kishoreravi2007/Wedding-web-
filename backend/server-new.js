@@ -44,16 +44,19 @@ const PORT = process.env.PORT || 5001;
 
 // CORS Configuration
 const whitelist = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:3001',
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
+// Add local origins in development
+if (process.env.NODE_ENV !== 'production') {
+  whitelist.push('http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001');
+}
+
 const corsOptions = {
   origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl) or if in whitelist
     if (!origin || whitelist.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
       callback(null, true);
     } else {

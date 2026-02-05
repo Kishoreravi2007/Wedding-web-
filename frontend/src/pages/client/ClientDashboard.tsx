@@ -288,23 +288,24 @@ const ClientDashboard = () => {
 
     // Sync editForm with weddingData when it's loaded
     useEffect(() => {
-        setEditForm({
-            groomName: weddingData.groomName,
-            brideName: weddingData.brideName,
-            weddingDate: weddingData.weddingDate,
-            weddingTime: weddingData.weddingTime,
-            showCountdown: weddingData.showCountdown,
-            venue: weddingData.venue,
-
-            guestCount: weddingData.guestCount,
-            musicEnabled: weddingData.musicEnabled,
-            musicUrl: weddingData.musicUrl,
-            musicSource: weddingData.musicSource,
-            playlistUrl: weddingData.playlistUrl,
-            volume: weddingData.volume,
-            slug: weddingData.slug || ''
-        });
-    }, [weddingData.groomName, weddingData.brideName, weddingData.weddingDate, weddingData.weddingTime, weddingData.showCountdown, weddingData.venue, weddingData.guestCount, weddingData.musicEnabled, weddingData.musicUrl, weddingData.volume, weddingData.slug]);
+        if (!isEditing) {
+            setEditForm({
+                groomName: weddingData.groomName,
+                brideName: weddingData.brideName,
+                weddingDate: weddingData.weddingDate,
+                weddingTime: weddingData.weddingTime,
+                showCountdown: weddingData.showCountdown,
+                venue: weddingData.venue,
+                guestCount: weddingData.guestCount,
+                musicEnabled: weddingData.musicEnabled,
+                musicUrl: weddingData.musicUrl,
+                musicSource: weddingData.musicSource,
+                playlistUrl: weddingData.playlistUrl,
+                volume: weddingData.volume,
+                slug: weddingData.slug || ''
+            });
+        }
+    }, [weddingData, isEditing]); // Now checks isEditing to prevent overwriting during edits
 
     const fetchLoginActivity = useCallback(async () => {
         setIsLoadingSessions(true);
@@ -551,10 +552,7 @@ const ClientDashboard = () => {
                 const newUrlString = JSON.stringify(newUrls);
 
                 setEditForm(prev => ({ ...prev, musicUrl: newUrlString }));
-
-                if (!isEditing) {
-                    setWeddingData(prev => ({ ...prev, musicUrl: newUrlString }));
-                }
+                setIsEditing(true); // Automatically enable save button on upload
             } else {
                 showError('Failed to upload music');
             }
@@ -587,9 +585,7 @@ const ClientDashboard = () => {
         const newUrlString = newUrls.length > 0 ? JSON.stringify(newUrls) : null;
 
         setEditForm(prev => ({ ...prev, musicUrl: newUrlString }));
-        if (!isEditing) {
-            setWeddingData(prev => ({ ...prev, musicUrl: newUrlString }));
-        }
+        setIsEditing(true); // Always enable save button on removal
     };
 
     const [guests, setGuests] = useState<any[]>([]);
@@ -629,6 +625,7 @@ const ClientDashboard = () => {
                         theme: data.wedding.theme || prev.theme,
 
                         slug: data.wedding.wedding_code || prev.slug,
+                        shareUrl: `weddingweb.co.in/weddings/${data.wedding.wedding_code || prev.slug}`,
                         musicEnabled: data.wedding.musicEnabled !== undefined ? data.wedding.musicEnabled : prev.musicEnabled,
                         musicUrl: data.wedding.musicUrl || prev.musicUrl,
                         musicSource: data.wedding.musicSource || prev.musicSource,
@@ -682,7 +679,7 @@ const ClientDashboard = () => {
         if (!currentUser) return;
         setIsLoadingData(true);
         const token = getAccessToken();
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+        const apiUrl = API_BASE_URL;
 
         try {
             // Fetch Guests
@@ -732,7 +729,7 @@ const ClientDashboard = () => {
 
         try {
             const token = getAccessToken();
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+            const apiUrl = API_BASE_URL;
 
             const res = await fetch(`${apiUrl}/api/photos`, { // Authenticated upload
                 method: 'POST',
@@ -772,7 +769,7 @@ const ClientDashboard = () => {
 
         try {
             const token = getAccessToken();
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+            const apiUrl = API_BASE_URL;
             const res = await fetch(`${apiUrl}/api/photos/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -804,7 +801,7 @@ const ClientDashboard = () => {
         try {
             setIsDownloadingAll(true);
             const token = getAccessToken();
-            const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+            const apiUrl = API_BASE_URL;
             const response = await fetch(`${apiUrl}/api/photos/download-all?sister=${weddingData.slug}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -852,6 +849,48 @@ const ClientDashboard = () => {
             showError('Error adding guest');
         }
         return false;
+    };
+
+    const handleSendWhatsApp = async (guestId: string) => {
+        try {
+            const token = getAccessToken();
+            const apiUrl = API_BASE_URL;
+            const res = await fetch(`${apiUrl}/api/guests/${guestId}/send-whatsapp`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess('WhatsApp invitation sent!');
+            } else {
+                showError(data.error || 'Failed to send WhatsApp');
+            }
+        } catch (error) {
+            console.error('WhatsApp send error:', error);
+            showError('Error sending WhatsApp invitation');
+        }
+    };
+
+    const handleSendWhatsAppAll = async () => {
+        if (!window.confirm(`Are you sure you want to send WhatsApp invitations to all guests with phone numbers?`)) return;
+
+        try {
+            const token = getAccessToken();
+            const apiUrl = API_BASE_URL;
+            const res = await fetch(`${apiUrl}/api/guests/send-whatsapp-all`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                showSuccess(`Started sending ${data.count} invitations in the background!`);
+            } else {
+                showError(data.error || 'Failed to trigger bulk invitations');
+            }
+        } catch (error) {
+            console.error('Bulk WhatsApp error:', error);
+            showError('Error triggering bulk WhatsApp invitations');
+        }
     };
 
     const handleResetAllGuests = async () => {
@@ -1170,7 +1209,7 @@ const ClientDashboard = () => {
                 ...prev,
                 ...editForm,
                 slug: editForm.slug,
-                shareUrl: `weddingweb.co.in/w/${editForm.slug}`
+                shareUrl: `weddingweb.co.in/weddings/${editForm.slug}`
             }));
 
             setIsEditing(false);
@@ -1277,7 +1316,7 @@ const ClientDashboard = () => {
                                         <User className="mr-2 h-4 w-4" />
                                         <span>My Profile</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => navigate(`/w/${weddingData.slug}`)}>
+                                    <DropdownMenuItem onClick={() => navigate(`/weddings/${weddingData.slug}`)}>
                                         <Eye className="mr-2 h-4 w-4" />
                                         <span>View Website</span>
                                     </DropdownMenuItem>
@@ -1576,17 +1615,17 @@ const ClientDashboard = () => {
                                                     <p className="text-[10px] uppercase tracking-wider text-rose-500 font-bold mb-1">Local Development URL</p>
                                                     <div className="flex items-center gap-2">
                                                         <Input
-                                                            value={`http://localhost:3001/w/${weddingData.slug}`}
+                                                            value={`http://localhost:3001/weddings/${weddingData.slug}`}
                                                             readOnly
                                                             className="bg-gray-50 font-mono text-xs h-8"
                                                         />
                                                         <Button size="sm" variant="ghost" onClick={() => {
-                                                            navigator.clipboard.writeText(`http://localhost:3001/w/${weddingData.slug}`);
+                                                            navigator.clipboard.writeText(`http://localhost:3001/weddings/${weddingData.slug}`);
                                                             showSuccess('Local URL copied');
                                                         }}>
                                                             <Copy className="w-3.5 h-3.5" />
                                                         </Button>
-                                                        <Button size="sm" variant="ghost" onClick={() => window.open(`http://localhost:3001/w/${weddingData.slug}`, '_blank')}>
+                                                        <Button size="sm" variant="ghost" onClick={() => window.open(`http://localhost:3001/weddings/${weddingData.slug}`, '_blank')}>
                                                             <ExternalLink className="w-3.5 h-3.5" />
                                                         </Button>
                                                     </div>
@@ -1598,7 +1637,7 @@ const ClientDashboard = () => {
                                                     <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-1">Production URL (Live Site)</p>
                                                     <div className="flex items-center gap-2">
                                                         <Input
-                                                            value={`https://weddingweb.co.in/w/${weddingData.slug}`}
+                                                            value={`https://weddingweb.co.in/weddings/${weddingData.slug}`}
                                                             readOnly
                                                             className="bg-white/50 font-mono text-xs h-8"
                                                         />
@@ -1693,7 +1732,7 @@ const ClientDashboard = () => {
                                                 <Label>Personalized Wedding Link</Label>
                                                 <div className="flex items-center gap-2">
                                                     <div className="bg-muted px-3 py-2 rounded-l-md border border-r-0 text-muted-foreground text-sm whitespace-nowrap">
-                                                        weddingweb.co.in/w/
+                                                        weddingweb.co.in/weddings/
                                                     </div>
                                                     <Input
                                                         value={isEditing ? editForm.slug : weddingData.slug}
@@ -2134,6 +2173,16 @@ const ClientDashboard = () => {
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>
+                                            {guests.length > 0 && (
+                                                <Button
+                                                    variant="outline"
+                                                    className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                    onClick={handleSendWhatsAppAll}
+                                                >
+                                                    <MessageCircle className="w-4 h-4 mr-2" />
+                                                    Send to All
+                                                </Button>
+                                            )}
                                         </div>
                                     </CardHeader>
                                     <CardContent>
@@ -2221,9 +2270,20 @@ const ClientDashboard = () => {
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-4 py-3">
-                                                                    <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteGuest(guest.id)}>
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                    </Button>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                                            onClick={() => handleSendWhatsApp(guest.id)}
+                                                                            title="Send WhatsApp Invitation"
+                                                                        >
+                                                                            <MessageCircle className="w-4 h-4" />
+                                                                        </Button>
+                                                                        <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteGuest(guest.id)}>
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </Button>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         ))}
@@ -2609,8 +2669,11 @@ const ClientDashboard = () => {
                                                     <div className="space-y-2">
                                                         <Label>Playlist URL (Embed Link)</Label>
                                                         <Input
-                                                            value={editForm.playlistUrl || ''}
-                                                            onChange={(e) => setEditForm(prev => ({ ...prev, playlistUrl: e.target.value }))}
+                                                            value={isEditing ? editForm.playlistUrl || '' : weddingData.playlistUrl || ''}
+                                                            onChange={(e) => {
+                                                                setEditForm(prev => ({ ...prev, playlistUrl: e.target.value }));
+                                                                if (!isEditing) setIsEditing(true);
+                                                            }}
                                                             placeholder="https://open.spotify.com/embed/playlist/..."
                                                         />
                                                         <p className="text-[10px] text-gray-500">
@@ -2643,8 +2706,12 @@ const ClientDashboard = () => {
                                                     type="range"
                                                     min="0"
                                                     max="100"
-                                                    value={editForm.volume || 50}
-                                                    onChange={(e) => setEditForm(prev => ({ ...prev, volume: parseInt(e.target.value) }))}
+                                                    value={isEditing ? editForm.volume || 0 : weddingData.volume || 0}
+                                                    onChange={(e) => {
+                                                        const newVal = parseInt(e.target.value);
+                                                        setEditForm(prev => ({ ...prev, volume: newVal }));
+                                                        if (!isEditing) setIsEditing(true);
+                                                    }}
                                                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
                                                 />
                                             </div>

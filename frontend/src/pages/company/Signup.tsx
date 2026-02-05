@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, Search, MapPin, Loader2, Sparkles, Mail, Bell, Camera, User } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { API_BASE_URL } from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -90,7 +91,7 @@ const CompanySignup = () => {
     if (!roughBio.trim()) return;
     setIsGeneratingBio(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/ai/generate-bio`, {
+      const response = await fetch(`${API_BASE_URL}/api/ai/generate-bio`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,8 +147,8 @@ const CompanySignup = () => {
       }
 
       if (data?.user?.id) {
-        // Use Backend API instead of Supabase Client
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+        // Use Backend API
+        const response = await fetch(`${API_BASE_URL}/api/profiles`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -230,7 +231,7 @@ const CompanySignup = () => {
       }
 
       if (data?.user?.id) {
-        await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+        await fetch(`${API_BASE_URL}/api/profiles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -71,3 +71,9 @@ Thumbs.db
 *.temp
 /tmp/
 
+# WhatsApp session and QR data
+backend/.wwebjs_auth/
+backend/whatsapp-qr.txt
+.wwebjs_auth/
+whatsapp-qr.txt
+

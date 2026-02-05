@@ -36,6 +36,28 @@ router.get('/rsvp/:token/:status', async (req, res) => {
 
         console.log(`✅ RSVP Updated: ${guest.name} marked as ${status}`);
 
+        // Recalculate guest count for the wedding
+        const { rows: userRows } = await db.query(
+            'SELECT user_id FROM guests WHERE rsvp_token = $1',
+            [token]
+        );
+        if (userRows.length > 0) {
+            const userId = userRows[0].user_id;
+            const { rows: countRows } = await db.query(
+                `SELECT COUNT(*) as count FROM guests 
+                 WHERE user_id = $1 AND rsvp_status = 'attending'`,
+                [userId]
+            );
+            const attendingCount = parseInt(countRows[0].count, 10);
+
+            await db.query(
+                'UPDATE weddings SET guest_count = $1, updated_at = NOW() WHERE user_id = $2',
+                [attendingCount, userId]
+            );
+            console.log(`📊 Guest count updated to ${attendingCount} for user ${userId}`);
+        }
+
+
         // Render a beautiful thank you page
         const isAttending = status === 'attending';
         const html = `

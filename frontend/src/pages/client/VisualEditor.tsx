@@ -456,7 +456,7 @@ const VisualEditor = () => {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => window.open(`/w/${weddingData.slug}`, '_blank')}
+                                    onClick={() => window.open(`/weddings/${weddingData.slug}`, '_blank')}
                                     className="rounded-full w-10 h-10 hover:bg-white/10 hover:text-white text-white/70"
                                 >
                                     <ExternalLink className="w-5 h-5" />
