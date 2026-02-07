@@ -1,9 +1,12 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CompanyNavSimple from "@/components/CompanyNavSimple";
 import { LandingToolbar } from "@/components/LandingToolbar";
+import { useAuth } from "@/contexts/AuthContext";
+import { ReviewModal } from "@/components/ReviewModal";
 import {
   Camera,
   Users,
@@ -17,12 +20,46 @@ import {
   Star,
   Globe,
   Heart,
-  FileText
+  FileText,
+  MessageSquarePlus,
+  Loader2
 } from "lucide-react";
 
 const CompanyLanding = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
   const documentationUrl = `${API_BASE_URL.replace(/\/$/, "")}/backend/docs/WeddingWeb_Customer_Documentation_Final.pdf`;
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/reviews`);
+      const data = await res.json();
+      if (data.success) {
+        setReviews(data.reviews);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews", error);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const handleAddReview = () => {
+    if (!currentUser) {
+      navigate("/company/login");
+    } else {
+      setIsReviewModalOpen(true);
+    }
+  };
 
   const features = [
     {
@@ -70,27 +107,6 @@ const CompanyLanding = () => {
     "Real-time photo uploads during events",
     "Professional dashboards for couples and photographers",
     "24/7 technical support"
-  ];
-
-  const testimonials = [
-    {
-      name: "Sreedevi & Vaishag",
-      event: "Wedding • January 11, 2026 • Kerala",
-      text: "WeddingWeb made our wedding so special! Our guests loved being able to find their photos instantly using face detection. The website builder was super easy to use!",
-      rating: 5
-    },
-    {
-      name: "Parvathy & Hari",
-      event: "Wedding • January 04, 2026 • Kerala",
-      text: "As early customers, we got amazing personalized service. The team helped us every step of the way. Our families abroad could watch the live stream - it was perfect!",
-      rating: 5
-    },
-    {
-      name: "Your Wedding Here",
-      event: "Coming Soon",
-      text: "Join our growing family! We're offering special early-bird pricing and dedicated support for our next customers. Be part of our success story!",
-      rating: 5
-    }
   ];
 
   return (
@@ -341,42 +357,61 @@ const CompanyLanding = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Early Customer Reviews
             </h2>
-            <p className="text-xl text-slate-600">
+            <p className="text-xl text-slate-600 mb-8">
               Join our growing community of happy couples
             </p>
+            <Button
+              onClick={handleAddReview}
+              className="bg-white text-rose-600 border border-rose-100 hover:bg-rose-50 shadow-sm"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquarePlus className="w-4 h-4" />
+                <span>{currentUser ? "Share Your Experience" : "Login to Share Experience"}</span>
+              </div>
+            </Button>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-none shadow-md">
-                  <CardContent className="p-8">
-                    <div className="flex gap-1 mb-6">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                    <p className="text-slate-700 mb-6 italic text-lg leading-relaxed">"{testimonial.text}"</p>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-                        {testimonial.name.charAt(0)}
+          {isLoadingReviews ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 text-rose-500 animate-spin" />
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {reviews.map((review, index) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full hover:shadow-xl transition-all duration-300 border-none shadow-md">
+                    <CardContent className="p-8">
+                      <div className="flex gap-1 mb-6">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                        ))}
                       </div>
-                      <div>
-                        <div className="font-semibold text-slate-900">{testimonial.name}</div>
-                        <div className="text-sm text-slate-500">{testimonial.event}</div>
+                      <p className="text-slate-700 mb-6 italic text-lg leading-relaxed">"{review.text}"</p>
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                          {review.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-slate-900">{review.name}</div>
+                          <div className="text-sm text-slate-500">{review.event}</div>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-slate-500 italic py-12">
+              No reviews yet. Be the first to share your experience!
+            </div>
+          )}
         </div>
       </section>
 
@@ -474,6 +509,11 @@ const CompanyLanding = () => {
           </div>
         </div>
       </footer>
+      <ReviewModal
+        open={isReviewModalOpen}
+        onOpenChange={setIsReviewModalOpen}
+        onSuccess={fetchReviews}
+      />
     </div>
   );
 };

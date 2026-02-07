@@ -5,10 +5,18 @@ import {
     ImagePlus,
     Phone,
     Share2,
-    Plus
+    Plus,
+    Users,
+    MessageCircle,
+    Calendar,
+    Sparkles,
+    Zap,
+    CreditCard,
+    Mail
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { UploadPhotoModal } from "./UploadPhotoModal";
 import { toast } from "sonner";
 import {
@@ -21,20 +29,53 @@ import {
 // Custom WhatsApp Icon since Lucide might not have the brand icon in this version, or standard Phone is fine.
 // Using MessageCircle as a proxy for WhatsApp if needed, or stick to generic icons.
 
-const actions = [
-    { id: 'edit', label: "Edit Profile", icon: Pencil, color: "text-slate-600", hoverBg: "hover:bg-slate-100" },
-    { id: 'service', label: "Add Service", icon: Briefcase, color: "text-blue-600", hoverBg: "hover:bg-blue-50" },
-    { id: 'photo', label: "Add Photos", icon: ImagePlus, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
-    { id: 'whatsapp', label: "WhatsApp", icon: Phone, color: "text-green-600", hoverBg: "hover:bg-green-50" },
-    { id: 'share', label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" },
-];
+// Actions are now defined inside the component based on role
 
 export function FloatingToolbar() {
+    const { currentUser } = useAuth();
     const navigate = useNavigate();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
 
+    // Unified role logic
+    const isProfessional = ['vendor', 'photographer', 'admin'].includes(currentUser?.role || '');
+    const isClient = !isProfessional;
+
+    const actions = useMemo(() => {
+        if (isProfessional) {
+            return [
+                { id: 'edit', label: "Edit Profile", icon: Pencil, color: "text-slate-600", hoverBg: "hover:bg-slate-100" },
+                { id: 'service', label: "Add Service", icon: Briefcase, color: "text-blue-600", hoverBg: "hover:bg-blue-50" },
+                { id: 'photo', label: "Add Photos", icon: ImagePlus, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
+                { id: 'whatsapp', label: "WhatsApp", icon: Phone, color: "text-green-600", hoverBg: "hover:bg-green-50" },
+                { id: 'share', label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" },
+            ];
+        } else {
+            const baseActions = [
+                { id: 'edit', label: "Settings", icon: Pencil, color: "text-slate-600", hoverBg: "hover:bg-slate-100" },
+                { id: 'pricing', label: "Pricing", icon: CreditCard, color: "text-purple-600", hoverBg: "hover:bg-purple-50" },
+                { id: 'contact', label: "Contact", icon: Mail, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
+            ];
+
+            if (!currentUser?.has_premium_access) {
+                baseActions.push({ id: 'upgrade', label: "Upgrade", icon: Zap, color: "text-amber-600", hoverBg: "hover:bg-amber-50" });
+            } else {
+                baseActions.push({ id: 'builder', label: "Enter Premium Builder", icon: Sparkles, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" });
+            }
+
+            baseActions.push({ id: 'share', label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" });
+            return baseActions;
+        }
+    }, [isProfessional, currentUser?.has_premium_access]);
+
     const handleAction = async (id: string) => {
         switch (id) {
+            case 'upgrade':
+            case 'pricing':
+                navigate('/company/pricing');
+                break;
+            case 'contact':
+                navigate('/company/contact');
+                break;
             case 'edit':
                 toast.info("Opening account settings...");
                 navigate('/company/account');
@@ -52,6 +93,19 @@ export function FloatingToolbar() {
                 break;
             case 'whatsapp':
                 window.open('https://wa.me/917907177841', '_blank');
+                break;
+            case 'guests':
+                navigate('/company/guests');
+                break;
+            case 'wishes':
+                navigate('/company/wishes');
+                break;
+            case 'builder':
+                if (currentUser?.has_premium_access) {
+                    navigate('/client');
+                } else {
+                    navigate('/company/pricing');
+                }
                 break;
             case 'share':
                 try {

@@ -28,9 +28,16 @@ interface UploadPhotoModalProps {
     onOpenChange: (open: boolean) => void;
     onSuccess?: () => void;
     children?: React.ReactNode;
+    initialData?: {
+        id: string;
+        title: string;
+        sister: string;
+        eventType: string;
+        publicUrl: string;
+    } | null;
 }
 
-export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: UploadPhotoModalProps) {
+export function UploadPhotoModal({ open, onOpenChange, onSuccess, children, initialData }: UploadPhotoModalProps) {
     const { token } = useAuth();
     const [title, setTitle] = useState("");
     const [sister, setSister] = useState<string>("");
@@ -40,6 +47,27 @@ export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: Up
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const isEditing = !!initialData;
+
+    // Reset/Initialize form when modal opens or initialData changes
+    useEffect(() => {
+        if (open) {
+            if (initialData) {
+                setTitle(initialData.title || "");
+                setSister(initialData.sister || "");
+                setEventType(initialData.eventType || "Wedding");
+                setPreview(initialData.publicUrl || null);
+                setFile(null);
+            } else {
+                setTitle("");
+                // keep sister if we already have weddings or set default later
+                setEventType("Wedding");
+                setPreview(null);
+                setFile(null);
+            }
+        }
+    }, [open, initialData]);
 
     // Fetch weddings on mount
     useEffect(() => {
@@ -82,44 +110,66 @@ export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: Up
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!file) {
+
+        if (!isEditing && !file) {
             toast.error("Please select a photo");
             return;
         }
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append("photo", file);
-        formData.append("title", title);
-        formData.append("sister", sister); // Sending wedding_code/id as 'sister'
-        formData.append("eventType", eventType);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/photos`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
-            });
+            let response;
+
+            if (isEditing) {
+                // Metadata update only for now (matching backend PATCH)
+                response = await fetch(`${API_BASE_URL}/api/photos/${initialData.id}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        sister,
+                        eventType,
+                        tags: [] // could add tag management later
+                    })
+                });
+            } else {
+                const formData = new FormData();
+                formData.append("photo", file!);
+                formData.append("title", title);
+                formData.append("sister", sister);
+                formData.append("eventType", eventType);
+
+                response = await fetch(`${API_BASE_URL}/api/photos`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formData
+                });
+            }
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Upload failed");
+                throw new Error(errorData.message || (isEditing ? "Update failed" : "Upload failed"));
             }
 
-            toast.success("Photo uploaded successfully!");
+            toast.success(isEditing ? "Photo updated successfully!" : "Photo uploaded successfully!");
             onOpenChange(false);
             if (onSuccess) onSuccess();
 
-            // Reset form
-            setTitle("");
-            setFile(null);
-            setPreview(null);
+            if (!isEditing) {
+                setTitle("");
+                setFile(null);
+                setPreview(null);
+            }
 
         } catch (error: any) {
-            console.error("Upload error:", error);
-            toast.error(error.message || "Failed to upload photo");
+            console.error("Portfolio action error:", error);
+            toast.error(error.message || "Action failed");
         } finally {
             setUploading(false);
         }
@@ -130,9 +180,9 @@ export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: Up
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Upload to Portfolio</DialogTitle>
+                    <DialogTitle>{isEditing ? "Edit Portfolio Item" : "Upload to Portfolio"}</DialogTitle>
                     <DialogDescription>
-                        Add a new photo to your showcase gallery.
+                        {isEditing ? "Update photo details and metadata." : "Add a new photo to your showcase gallery."}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -188,7 +238,7 @@ export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: Up
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Photo</Label>
+                        <Label>{isEditing ? "Current Image" : "Photo"}</Label>
                         {!preview ? (
                             <div
                                 onClick={() => fileInputRef.current?.click()}
@@ -223,14 +273,14 @@ export function UploadPhotoModal({ open, onOpenChange, onSuccess, children }: Up
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit" className="bg-rose-600 hover:bg-rose-700 text-white" disabled={uploading || !file}>
+                        <Button type="submit" className="bg-rose-600 hover:bg-rose-700 text-white" disabled={uploading || (!isEditing && !file)}>
                             {uploading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Uploading...
+                                    {isEditing ? "Updating..." : "Uploading..."}
                                 </>
                             ) : (
-                                "Upload Photo"
+                                isEditing ? "Save Changes" : "Upload Photo"
                             )}
                         </Button>
                     </DialogFooter>

@@ -1,3 +1,4 @@
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CompanyDashboard from "@/pages/company/CompanyDashboard";
 import CompanyLanding from "@/pages/company/Landing";
@@ -14,15 +15,8 @@ export const HomeRoute = () => {
         );
     }
 
-    // If user is logged in, show the protected dashboard
-    // We wrap it in AuthGuard just to be safe and consistent, 
-    // although currentUser check here is basically doing the same.
     if (currentUser) {
-        return (
-            <AuthGuard>
-                <CompanyDashboard />
-            </AuthGuard>
-        );
+        return <Navigate to="/company" replace />;
     }
 
     // If not logged in, show the public landing page

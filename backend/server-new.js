@@ -234,6 +234,11 @@ app.use('/api/timeline', require('./routes/timeline'));
 const publicGuestsRouter = require('./routes/public-guests');
 app.use('/api/public/guests', publicGuestsRouter);
 
+// Reviews Routes
+console.log('⭐ Registering /api/reviews routes...');
+app.use('/api/reviews', require('./routes/reviews'));
+console.log('✅ Registered /api/reviews routes.');
+
 // =============================================================================
 // ERROR HANDLING
 // =============================================================================

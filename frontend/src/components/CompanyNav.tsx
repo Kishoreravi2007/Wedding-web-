@@ -13,7 +13,6 @@ const CompanyNav = () => {
 
   const navLinks = [
     { to: "/", label: "Home" },
-    { to: "/weddings", label: "Weddings" },
     { to: "/company/about", label: "About" },
     { to: "/company/services", label: "Services" },
     { to: "/company/pricing", label: "Pricing" },

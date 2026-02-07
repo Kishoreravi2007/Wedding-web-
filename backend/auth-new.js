@@ -64,7 +64,8 @@ router.post('/register', async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         role: newUser.role,
-        email_offers_opt_in: newUser.email_offers_opt_in
+        email_offers_opt_in: newUser.email_offers_opt_in,
+        has_premium_access: newUser.has_premium_access
       },
       token,
       accessToken: token
@@ -110,14 +111,8 @@ router.post('/login', async (req, res) => {
       req.headers['user-agent']
     );
 
-    // 2FA CHECK
-    if (user.is_2fa_enabled) {
-      return res.json({
-        message: '2FA verification required',
-        require2FA: true,
-        userId: user.id
-      });
-    }
+    // 2FA CHECK REMOVED FROM LOGIN
+    // We now issue the token directly. The 2FA check is moved to a 'Step-up' action.
 
     const token = TokenManager.generateToken(user);
 
@@ -128,7 +123,9 @@ router.post('/login', async (req, res) => {
         username: user.username,
         role: user.role,
         is_active: user.is_active,
-        email_offers_opt_in: user.email_offers_opt_in
+        email_offers_opt_in: user.email_offers_opt_in,
+        is_2fa_enabled: user.is_2fa_enabled,
+        has_premium_access: user.has_premium_access
       },
       token,
       accessToken: token
@@ -137,6 +134,66 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(401).json({ message: error.message || 'Login failed' });
+  }
+});
+
+/**
+ * POST /api/auth/step-up-2fa
+ * Verify 2FA code for an already authenticated user (Step-up auth)
+ */
+router.post('/step-up-2fa', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const { code } = req.body;
+    const userId = req.user.id;
+
+    if (!code) {
+      return res.status(400).json({ message: '2FA Code is required' });
+    }
+
+    // Get user from DB to get secret
+    const { query } = require('./lib/db-gcp');
+    const { rows } = await query('SELECT username, two_factor_secret, is_2fa_enabled FROM users WHERE id = $1', [userId]);
+    const user = rows[0];
+
+    if (!user || !user.is_2fa_enabled) {
+      return res.status(400).json({ message: '2FA is not enabled for this account' });
+    }
+
+    // Verify code
+    const totp = new OTPAuth.TOTP({
+      issuer: "WeddingWeb",
+      label: user.username,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: user.two_factor_secret
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+
+    if (delta === null) {
+      // Log failed step-up attempt
+      await SecureUserDB.logAuthAttempt(userId, 'step_up_2fa_fail', false, {
+        ip_address: getClientIp(req),
+        user_agent: req.headers['user-agent']
+      });
+      return res.status(401).json({ message: 'Invalid 2FA code' });
+    }
+
+    // Success
+    await SecureUserDB.logAuthAttempt(userId, 'step_up_2fa_success', true, {
+      ip_address: getClientIp(req),
+      user_agent: req.headers['user-agent']
+    });
+
+    res.json({
+      success: true,
+      message: '2FA verification successful'
+    });
+
+  } catch (error) {
+    console.error('Step-up 2FA error:', error);
+    res.status(500).json({ message: 'Verification failed' });
   }
 });
 
@@ -168,7 +225,7 @@ router.post('/verify-2fa', async (req, res) => {
     const user = rows[0];
 
     if (!user) {
-      return res.status(404).json({ message: 'User found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Verify code

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
-import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
 import {
   Mail,
   Phone,
@@ -184,7 +184,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
-      <CompanyNavSimple />
+      <CompanyNavbar />
 
       {/* Sidebar Toolbar */}
       <LandingToolbar />

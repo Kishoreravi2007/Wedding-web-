@@ -36,7 +36,7 @@ const CompanyLogin = () => {
             </section>
 
             <section className="space-y-4">
-              <LoginForm redirectTo="/client" />
+              <LoginForm redirectTo="/company" />
             </section>
           </div>
         </main>

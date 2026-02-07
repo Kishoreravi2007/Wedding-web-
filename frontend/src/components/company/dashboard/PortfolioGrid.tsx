@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, GripVertical, Loader2 } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, Loader2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { UploadPhotoModal } from "./UploadPhotoModal";
 
 export function PortfolioGrid() {
@@ -12,7 +14,9 @@ export function PortfolioGrid() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<any | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const { token } = useAuth();
 
     useEffect(() => {
         const fetchPhotos = async () => {
@@ -43,21 +47,55 @@ export function PortfolioGrid() {
 
     const handleUploadSuccess = () => {
         setRefreshTrigger(prev => prev + 1);
+        setEditingItem(null);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("Are you sure you want to delete this portfolio item?")) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/photos/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || "Failed to delete");
+            }
+
+            toast.success("Photo removed from portfolio");
+            setRefreshTrigger(prev => prev + 1);
+        } catch (err: any) {
+            console.error("Delete error:", err);
+            toast.error(err.message || "Could not delete photo");
+        }
+    };
+
+    const handleEdit = (item: any) => {
+        setEditingItem({
+            id: item.id,
+            title: item.title,
+            sister: item.sister,
+            eventType: item.eventType,
+            publicUrl: item.publicUrl
+        });
+        setIsUploadOpen(true);
     };
 
     return (
         <div className="space-y-6" id="portfolio">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900">Portfolio Highlights</h2>
-                <UploadPhotoModal
-                    open={isUploadOpen}
-                    onOpenChange={setIsUploadOpen}
-                    onSuccess={handleUploadSuccess}
+                <Button
+                    variant="outline"
+                    className="text-slate-600 hover:text-rose-600 hover:border-rose-200 transition-colors"
+                    onClick={() => { setEditingItem(null); setIsUploadOpen(true); }}
                 >
-                    <Button variant="outline" className="text-slate-600">
-                        <Plus className="mr-2 h-4 w-4" /> Add New
-                    </Button>
-                </UploadPhotoModal>
+                    <Plus className="mr-2 h-4 w-4" /> Add New
+                </Button>
             </div>
 
             {loading ? (
@@ -106,10 +144,20 @@ export function PortfolioGrid() {
                                         className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                                        <Button size="icon" variant="secondary" className="rounded-full shadow-lg hover:scale-110 transition-transform">
+                                        <Button
+                                            size="icon"
+                                            variant="secondary"
+                                            className="rounded-full shadow-lg hover:scale-110 transition-transform"
+                                            onClick={() => handleEdit(item)}
+                                        >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
-                                        <Button size="icon" variant="destructive" className="rounded-full shadow-lg hover:scale-110 transition-transform">
+                                        <Button
+                                            size="icon"
+                                            variant="destructive"
+                                            className="rounded-full shadow-lg hover:scale-110 transition-transform"
+                                            onClick={() => handleDelete(item.id)}
+                                        >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -128,6 +176,13 @@ export function PortfolioGrid() {
                     ))}
                 </div>
             )}
+
+            <UploadPhotoModal
+                open={isUploadOpen}
+                onOpenChange={setIsUploadOpen}
+                initialData={editingItem}
+                onSuccess={handleUploadSuccess}
+            />
         </div>
     );
 }

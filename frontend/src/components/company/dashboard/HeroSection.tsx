@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, CheckCircle2, ArrowRight, Plus, Eye, Award, Heart } from "lucide-react";
+import { Star, MapPin, CheckCircle2, ArrowRight, Plus, Eye, Award, Heart, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { UploadPhotoModal } from "./UploadPhotoModal";
+import { StepUp2FAModal } from "./StepUp2FAModal";
 
 export function HeroSection() {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
     const [isReturning, setIsReturning] = useState(false);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [isStepUpOpen, setIsStepUpOpen] = useState(false);
+
+    // Unified role logic
+    const isProfessional = ['vendor', 'photographer', 'admin'].includes(currentUser?.role || '');
 
     useEffect(() => {
         const visited = localStorage.getItem("weddingweb_dashboard_visited");
@@ -28,6 +35,14 @@ export function HeroSection() {
 
     const handleUploadSuccess = () => {
         window.dispatchEvent(new Event('portfolio-updated'));
+    };
+
+    const handleEnterBuilder = () => {
+        if (currentUser?.is_2fa_enabled) {
+            setIsStepUpOpen(true);
+        } else {
+            navigate("/client");
+        }
     };
 
     return (
@@ -62,30 +77,54 @@ export function HeroSection() {
                                 Turning your moments into timeless memories.
                             </p>
                             <p className="max-w-[600px] text-slate-500 md:text-lg/relaxed lg:text-base/relaxed xl:text-lg/relaxed leading-7">
-                                Welcome back! Manage your portfolio, track leads, and grow your business with WeddingWeb.
-                                Your dashboard is ready.
+                                {isProfessional ?
+                                    "Welcome back! Manage your portfolio, track leads, and grow your business with WeddingWeb." :
+                                    "Your journey starts here. Design your dream wedding website, manage your guests, and showcase your special moments."
+                                }
                             </p>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 relative">
-                            <UploadPhotoModal
-                                open={isUploadOpen}
-                                onOpenChange={setIsUploadOpen}
-                                onSuccess={handleUploadSuccess}
-                            >
-                                <Button size="lg" className="h-12 px-8 bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all hover:-translate-y-1">
-                                    <Plus className="mr-2 h-4 w-4" /> Add Portfolio
-                                </Button>
-                            </UploadPhotoModal>
+                            {isProfessional && (
+                                <>
+                                    <UploadPhotoModal
+                                        open={isUploadOpen}
+                                        onOpenChange={setIsUploadOpen}
+                                        onSuccess={handleUploadSuccess}
+                                    >
+                                        <Button size="lg" className="h-12 px-8 bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all hover:-translate-y-1">
+                                            <Plus className="mr-2 h-4 w-4" /> Add Portfolio
+                                        </Button>
+                                    </UploadPhotoModal>
 
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="h-12 px-8 border-slate-200 text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-all hover:-translate-y-1"
-                                onClick={() => document.getElementById('leads')?.scrollIntoView({ behavior: 'smooth' })}
-                            >
-                                <Eye className="mr-2 h-4 w-4" /> View Leads
-                            </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        className="h-12 px-8 border-slate-200 text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-all hover:-translate-y-1"
+                                        onClick={() => document.getElementById('leads')?.scrollIntoView({ behavior: 'smooth' })}
+                                    >
+                                        <Eye className="mr-2 h-4 w-4" /> View Leads
+                                    </Button>
+                                </>
+                            )}
+
+                            {currentUser?.has_premium_access ? (
+                                <Button
+                                    size="lg"
+                                    className="h-12 px-8 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all hover:-translate-y-1"
+                                    onClick={handleEnterBuilder}
+                                >
+                                    <Sparkles className="mr-2 h-4 w-4" /> Enter Premium Builder
+                                </Button>
+                            ) : (
+                                <Button
+                                    size="lg"
+                                    className="h-12 px-8 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-all hover:-translate-y-1"
+                                    onClick={() => navigate('/company/pricing')}
+                                >
+                                    <Sparkles className="mr-2 h-4 w-4 text-purple-600" /> Unlock Premium Builder
+                                </Button>
+                            )}
 
                             {/* Rotating Decorative Badge */}
                             <motion.div
@@ -161,6 +200,12 @@ export function HeroSection() {
 
                 </div>
             </div>
+
+            <StepUp2FAModal
+                open={isStepUpOpen}
+                onOpenChange={setIsStepUpOpen}
+                onSuccess={() => navigate("/client")}
+            />
         </section>
     );
 }

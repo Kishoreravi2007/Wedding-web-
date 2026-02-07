@@ -38,8 +38,8 @@ const SecureUserDB = {
 
       // Create user
       const insertQuery = `
-        INSERT INTO users (username, password, role, is_active, email_offers_opt_in, created_at)
-        VALUES ($1, $2, $3, true, $4, NOW())
+        INSERT INTO users (username, password, role, is_active, email_offers_opt_in, has_premium_access, created_at)
+        VALUES ($1, $2, $3, true, $4, $5, NOW())
         RETURNING id
       `;
 
@@ -47,14 +47,16 @@ const SecureUserDB = {
         username,
         hashedPassword,
         role,
-        userData.email_offers_opt_in || false
+        userData.email_offers_opt_in || false,
+        userData.has_premium_access || false
       ]);
 
       return {
         id: rows[0].id,
         username,
         role,
-        email_offers_opt_in: userData.email_offers_opt_in || false
+        email_offers_opt_in: userData.email_offers_opt_in || false,
+        has_premium_access: userData.has_premium_access || false
       };
 
     } catch (error) {

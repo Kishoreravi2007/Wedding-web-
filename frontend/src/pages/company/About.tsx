@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
 import {
   Heart,
   Target,
@@ -59,7 +59,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
-      <CompanyNavSimple />
+      <CompanyNavbar />
 
       {/* Sidebar Toolbar */}
       <LandingToolbar />

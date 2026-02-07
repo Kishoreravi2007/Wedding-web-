@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { API_BASE_URL } from "@/lib/api";
 
@@ -25,16 +26,19 @@ interface User {
   profile?: ProfilePayload | null;
   is_2fa_enabled?: boolean;
   email_offers_opt_in?: boolean;
+  has_premium_access?: boolean;
 }
 
 interface AuthContextType {
   currentUser: User | null;
+  token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
   verify2FA: (userId: string, code: string) => Promise<void>;
   enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
   signup: (email: string, password: string, emailOptIn?: boolean, fullName?: string) => Promise<any>;
   updateEmailPreference: (enabled: boolean) => Promise<void>;
+  verifyStepUp2FA: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -56,7 +60,9 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('auth_token'));
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Helper to fetch user profile
   const fetchUserProfile = useCallback(async (userId: string, token: string) => {
@@ -84,16 +90,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (token && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        setToken(token);
         const profile = await fetchUserProfile(parsedUser.id, token);
 
         setCurrentUser({
           ...parsedUser,
-          profile: profile
+          profile: profile,
+          has_premium_access: parsedUser.has_premium_access
         });
       } catch (e) {
         console.error('Error hydrating user', e);
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
+        setToken(null);
       }
     }
     setLoading(false);
@@ -117,19 +126,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Handle 2FA Requirement
-      if (data.require2FA) {
-        return { require2FA: true, userId: data.userId };
+      console.log('Login response data:', data); // Debugging
+
+      const { token: authToken, user } = data;
+
+      if (!user || !user.id) {
+        console.error('Invalid login response: missing user or user.id', data);
+        throw new Error('Invalid server response during login');
       }
 
-      const { token, user } = data;
-
       // Save to local storage
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_token', authToken);
       localStorage.setItem('auth_user', JSON.stringify(user));
+      setToken(authToken);
 
       // Fetch profile
-      const profile = await fetchUserProfile(user.id, token);
+      const profile = await fetchUserProfile(user.id, authToken);
 
       setCurrentUser({
         ...user,
@@ -141,6 +153,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const verifyStepUp2FA = async (code: string) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('Not authenticated');
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/step-up-2fa`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ code })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Verification failed');
+      }
+
+      // We could set a flag in state if we want to "remember" they verified,
+      // but for this implementation we'll just return success.
+      return;
+
+    } catch (error) {
+      console.error('Step-up 2FA error:', error);
       throw error;
     }
   };
@@ -266,8 +308,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     setCurrentUser(null);
+    setToken(null);
+    navigate('/company/login');
   };
-
   const refreshProfile = async () => {
     const token = localStorage.getItem('auth_token');
     if (currentUser && token) {
@@ -296,12 +339,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     currentUser,
+    token,
     loading,
     login,
     verify2FA,
     enable2FA,
     signup,
     updateEmailPreference,
+    verifyStepUp2FA,
     logout,
     refreshProfile,
     resetPassword,

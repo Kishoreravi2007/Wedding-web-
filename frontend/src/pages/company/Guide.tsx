@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
 import { LandingToolbar } from "@/components/LandingToolbar";
 import {
     BookOpen,
@@ -81,7 +81,7 @@ const Guide = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50">
-            <CompanyNavSimple />
+            <CompanyNavbar />
             <LandingToolbar />
 
             {/* Hero Section */}

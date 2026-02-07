@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import CompanyNavSimple from "@/components/CompanyNavSimple";
+import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Heart } from "lucide-react";
@@ -15,7 +15,7 @@ const Legal = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
-            <CompanyNavSimple />
+            <CompanyNavbar />
 
             <main className="container max-w-4xl mx-auto px-4 pt-32 pb-20">
                 <motion.div

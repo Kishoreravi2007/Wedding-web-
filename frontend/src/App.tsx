@@ -60,6 +60,9 @@ import CompanyGuide from "./pages/company/Guide";
 import CompanyBookings from "./pages/company/Bookings";
 import CompanyPayments from "./pages/company/Payments";
 import CompanySettings from "./pages/company/Settings";
+import ClientGallery from "./pages/company/ClientGallery";
+import ClientGuestList from "./pages/company/ClientGuestList";
+import ClientWishes from "./pages/company/ClientWishes";
 import CompanyScrollDemo from "./pages/company/ScrollDemo";
 import { AuthGuard } from "./components/company/dashboard/AuthGuard";
 import { HomeRoute } from "./components/HomeRoute";
@@ -197,13 +200,18 @@ const App = () => {
                 <Route path="/w/:slug" element={<WeddingPage />} />
                 <Route path="/w/:slug/" element={<WeddingPage />} />
 
-                {/* Company Routes */}
+                {/* Company & Client Hub Routes */}
                 <Route path="/company/login" element={<CompanyLogin />} />
                 <Route path="/company/signup" element={<CompanySignup />} />
                 <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
                 <Route path="/company/reset-password" element={<CompanyResetPassword />} />
                 <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
                 <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
+                <Route path="/company/wishes" element={<AuthGuard><ClientWishes /></AuthGuard>} />
+                <Route path="/company/guests" element={<AuthGuard><ClientGuestList /></AuthGuard>} />
+                <Route path="/company/gallery" element={<AuthGuard><ClientGallery /></AuthGuard>} />
+
+                <Route path="/vendor" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
 
                 {/* Client Dashboard (Premium Builder) */}
                 <Route path="/client/editor" element={<AuthGuard><VisualEditor /></AuthGuard>} />

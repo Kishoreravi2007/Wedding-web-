@@ -39,34 +39,24 @@ const WishDisplay: React.FC<WishDisplayProps> = ({ recipient }) => {
     return <div className="text-center text-red-500 mt-8">{error}</div>;
   }
 
-  const recipientDisplayMap: Record<WishDisplayProps["recipient"], string> = {
-    parvathy: "Parvathy and Hari",
-    sreedevi: "Sreedevi and Vaishak",
-  };
-
-  const recipientName = recipientDisplayMap[recipient] ?? recipient.charAt(0).toUpperCase() + recipient.slice(1);
-
   return (
-    <div className="w-full max-w-2xl mx-auto mt-8">
-      <h2 className="text-4xl font-heading text-center mb-8 text-[#800000] font-bold">
-        Wishes for {recipientName}
-      </h2>
+    <div className="w-full">
       {wishes.length === 0 ? (
-        <p className="text-center text-white">No wishes received for {recipientName} yet.</p>
+        <p className="text-center text-slate-400 py-8 italic font-medium">No wishes received yet.</p>
       ) : (
         <div className="space-y-4">
           {wishes.map((wishItem) => (
-            <Card key={wishItem.id} className="bg-[#FFFDD0]/50 border border-[#800000] text-[#800000]">
-              <CardHeader>
-                <CardTitle className="text-2xl font-display">{wishItem.name}</CardTitle>
+            <Card key={wishItem.id} className="bg-white border-slate-100 shadow-sm overflow-hidden">
+              <CardHeader className="bg-slate-50/50 pb-2">
+                <CardTitle className="text-sm font-bold text-slate-700">{wishItem.name}</CardTitle>
               </CardHeader>
-              <CardContent>
-                {wishItem.wish && <p className="text-lg">{wishItem.wish}</p>}
+              <CardContent className="pt-4">
+                {wishItem.wish && <p className="text-slate-600 leading-relaxed">{wishItem.wish}</p>}
                 {wishItem.audioUrl && (
-                  <audio controls src={wishItem.audioUrl} className="w-full mt-2"></audio>
+                  <audio controls src={wishItem.audioUrl} className="w-full mt-4 h-8"></audio>
                 )}
                 {!wishItem.wish && !wishItem.audioUrl && (
-                  <p className="text-lg text-gray-600 italic">No message content.</p>
+                  <p className="text-sm text-slate-400 italic">No message content.</p>
                 )}
               </CardContent>
             </Card>
