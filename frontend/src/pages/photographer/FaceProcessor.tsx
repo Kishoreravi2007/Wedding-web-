@@ -11,9 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
 import axios from 'axios';
-import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
-
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
+import { API_BASE_URL, getAuthHeaders, DEEPFACE_API_URL } from '@/lib/api';
 
 const FaceProcessor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -144,7 +142,7 @@ const FaceProcessor = () => {
             setResults(prev => ({
               ...prev,
               processed: prev.processed + 1,
-              faces_found: prev.faces_found + detections.length
+              faces_found: prev.faces_found + detectedFaces.length
             }));
           } else {
             throw new Error('Failed to store descriptors');

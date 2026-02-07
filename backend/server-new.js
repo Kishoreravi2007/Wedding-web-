@@ -46,6 +46,7 @@ const PORT = process.env.PORT || 5001;
 const whitelist = [
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
+  'https://api.weddingweb.co.in',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -97,6 +98,18 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Serve static files from uploads directory
 const uploadsPath = path.join(__dirname, process.env.LOCAL_STORAGE_PATH || 'uploads');
 app.use('/uploads', express.static(uploadsPath));
+
+// Serve static files from the built frontend
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = path.join(__dirname, 'build');
+  app.use(express.static(buildPath));
+
+  // All other requests should serve index.html for SPA routing
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
 
 // Request logging middleware (Development only)
 if (process.env.NODE_ENV !== 'production') {

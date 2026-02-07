@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { LandingToolbar } from "@/components/LandingToolbar";
 import { useState } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 // Common country codes
 const countryCodes = [
@@ -120,7 +121,6 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
       // Combine country code with phone number
       const phoneWithCode = formData.phone

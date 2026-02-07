@@ -5,7 +5,7 @@
  * Fast and accurate face detection with confidence threshold 0.25-0.3 and image size 1280+
  */
 
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
+import { DEEPFACE_API_URL } from '@/lib/api';
 
 let modelsLoaded = true; // DeepFace runs on backend, always available
 

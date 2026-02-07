@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Star, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/lib/api";
 
 interface ReviewModalProps {
     open: boolean;
@@ -34,7 +35,7 @@ export function ReviewModal({ open, onOpenChange, onSuccess }: ReviewModalProps)
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('auth_token');
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/reviews`, {
+            const response = await fetch(`${API_BASE_URL}/api/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -24,9 +24,9 @@ import {
   MessageSquarePlus,
   Loader2
 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 const CompanyLanding = () => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
   const documentationUrl = `${API_BASE_URL.replace(/\/$/, "")}/backend/docs/WeddingWeb_Customer_Documentation_Final.pdf`;
   const { currentUser } = useAuth();
   const navigate = useNavigate();

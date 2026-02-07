@@ -19,7 +19,15 @@ const getApiBaseUrl = () => {
   return '/api';
 };
 
+const getDeepFaceApiUrl = () => {
+  if (import.meta.env.VITE_DEEPFACE_API_URL) {
+    return import.meta.env.VITE_DEEPFACE_API_URL;
+  }
+  return 'http://localhost:8002'; // Default local port from .env
+};
+
 export const API_BASE_URL = getApiBaseUrl();
+export const DEEPFACE_API_URL = getDeepFaceApiUrl();
 console.log('🌐 API Base URL:', API_BASE_URL);
 
 // Helper function to get access token from various storage keys

@@ -11,6 +11,7 @@ import { X, Search, MapPin, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { detectFaces, loadFaceDetectionModels } from "@/utils/faceDetection";
 // import { supabase } from "@/lib/supabase";
+import { API_BASE_URL } from "@/lib/api";
 
 interface ProfileData {
   fullName: string;
@@ -369,7 +370,7 @@ const CompanyAccount = () => {
 
     try {
       // 1. Update Profile Data (Profiles table)
-      const profileResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/profiles`, {
+      const profileResponse = await fetch(`${API_BASE_URL}/api/profiles`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -392,7 +393,7 @@ const CompanyAccount = () => {
       // 2. Update Auth Data (Users table) - if email/username changed
       // Note: Changing sensitivity fields might require re-login or password check in a real app
       if (formState.email !== currentUser.email) {
-        const authResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001'}/api/auth/profile`, {
+        const authResponse = await fetch(`${API_BASE_URL}/api/auth/profile`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
