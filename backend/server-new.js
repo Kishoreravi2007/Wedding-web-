@@ -46,7 +46,7 @@ const PORT = process.env.PORT || 5001;
 const whitelist = [
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
-  'https://api.weddingweb.co.in',
+  'https://wedding-backend-rst3dulcnq-el.a.run.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
