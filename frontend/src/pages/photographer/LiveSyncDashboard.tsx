@@ -50,11 +50,13 @@ export default function LiveSyncDashboard() {
   const [newKeyName, setNewKeyName] = useState('');
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [photographerId, setPhotographerId] = useState<string | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<string>('sister-a');
-  const [selectedSister, setSelectedSister] = useState<'sister-a' | 'sister-b'>('sister-a');
+  const [selectedSister, setSelectedSister] = useState<'sister-a' | 'sister-b' | 'none'>('none');
+  const [timelineEvents, setTimelineEvents] = useState<string[]>([]);
+  const [currentWedding, setCurrentWedding] = useState<any>(null);
 
   useEffect(() => {
     loadPhotographerInfo();
+    loadWeddingEvents();
   }, []);
 
   useEffect(() => {
@@ -95,6 +97,20 @@ export default function LiveSyncDashboard() {
       console.error('Error loading photographer info:', err);
     } finally {
       setIsLoadingPhotographer(false);
+    }
+  };
+
+  const loadWeddingEvents = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/auth/photographer/wedding`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.data.success) {
+        setTimelineEvents(response.data.wedding.events || []);
+        setCurrentWedding(response.data.wedding);
+      }
+    } catch (err) {
+      console.error('Error loading wedding events:', err);
     }
   };
 
@@ -373,16 +389,28 @@ export default function LiveSyncDashboard() {
             </CardHeader>
             <CardContent>
               <div className="mb-4">
-                <Label>Select Event</Label>
+                <Label>Select Event (Gallery Filter)</Label>
                 <select
                   className="w-full mt-2 p-2 border rounded"
                   value={selectedSister}
-                  onChange={(e) => setSelectedSister(e.target.value as 'sister-a' | 'sister-b')}
+                  onChange={(e) => setSelectedSister(e.target.value as any)}
                 >
-                  <option value="sister-a">Parvathy Wedding</option>
-                  <option value="sister-b">Sreedevi Wedding</option>
+                  <option value="none">All Live Photos</option>
+                  <option value="sister-a">Stream A</option>
+                  <option value="sister-b">Stream B</option>
+                  {timelineEvents.map((event) => (
+                    <option key={event} value={event}>
+                      {event}
+                    </option>
+                  ))}
                 </select>
+                {currentWedding && (
+                  <p className="text-xs text-gray-500 mt-2 italic">
+                    Showing photos for: {currentWedding.bride_name} & {currentWedding.groom_name}'s Wedding
+                  </p>
+                )}
               </div>
+
               <LiveGallery sister={selectedSister} />
             </CardContent>
           </Card>

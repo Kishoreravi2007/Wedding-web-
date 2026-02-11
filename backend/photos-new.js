@@ -126,9 +126,10 @@ const upload = multer({
  */
 router.get('/', async (req, res) => {
   try {
-    const { sister, eventType, tags, personId, limit, offset } = req.query;
+    const { weddingId, sister, eventType, tags, personId, limit, offset } = req.query;
 
     const filters = {
+      weddingId,
       sister,
       eventType,
       tags: tags ? JSON.parse(tags) : undefined,
@@ -141,7 +142,7 @@ router.get('/', async (req, res) => {
     const photos = await PhotoDB.findAll(filters);
 
     // Get total count
-    const total = await PhotoDB.count({ sister, eventType });
+    const total = await PhotoDB.count(filters);
 
     // Format response
     const formattedPhotos = photos.map(photo => ({

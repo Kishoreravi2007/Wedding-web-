@@ -29,57 +29,42 @@ interface Photo {
   tags?: string[];
 }
 
-const PhotoManager: React.FC = () => {
-  const [sisterAPhotos, setSisterAPhotos] = useState<Photo[]>([]);
-  const [sisterBPhotos, setSisterBPhotos] = useState<Photo[]>([]);
+interface PhotoManagerProps {
+  weddingId?: string;
+}
+
+const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [activeGallery, setActiveGallery] = useState<'sister-a' | 'sister-b'>('sister-a');
 
   useEffect(() => {
     loadPhotos();
-  }, []);
+  }, [weddingId]);
 
   const loadPhotos = async () => {
+    if (!weddingId) return;
+
     try {
       setLoading(true);
 
-      const [sisterAResponse, sisterBResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
-        fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
-      ]);
+      const response = await fetch(`${API_BASE_URL}/api/photos?weddingId=${weddingId}`);
 
-      if (sisterAResponse.ok) {
-        const dataA = await sisterAResponse.json();
-        const photosA = Array.isArray(dataA) ? dataA : (dataA.photos || []);
-        setSisterAPhotos(photosA.map((p: any) => ({
+      if (response.ok) {
+        const data = await response.json();
+        const photosData = Array.isArray(data) ? data : (data.photos || []);
+        setPhotos(photosData.map((p: any) => ({
           id: p.id,
           filename: p.title || p.filename || 'Photo',
           url: p.public_url || p.publicUrl || p.url,
           thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
           size: parseInt(p.size) || 0,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
-          sister: 'sister-a',
+          sister: p.sister || 'none',
           tags: p.tags || []
         })));
       }
-
-      if (sisterBResponse.ok) {
-        const dataB = await sisterBResponse.json();
-        const photosB = Array.isArray(dataB) ? dataB : (dataB.photos || []);
-        setSisterBPhotos(photosB.map((p: any) => ({
-          id: p.id,
-          filename: p.title || p.filename || 'Photo',
-          url: p.public_url || p.publicUrl || p.url,
-          thumbnail: p.thumbnail || p.public_url || p.publicUrl || p.url,
-          size: parseInt(p.size) || 0,
-          uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
-          sister: 'sister-b',
-          tags: p.tags || []
-        })));
-      }
-
     } catch (error) {
       console.error('Error loading photos:', error);
     } finally {
@@ -102,12 +87,8 @@ const PhotoManager: React.FC = () => {
         throw new Error('Failed to delete photo');
       }
 
-      // Remove from appropriate gallery
-      if (photo.sister === 'sister-a') {
-        setSisterAPhotos(prev => prev.filter(p => p.id !== photo.id));
-      } else {
-        setSisterBPhotos(prev => prev.filter(p => p.id !== photo.id));
-      }
+      // Remove from list
+      setPhotos(prev => prev.filter(p => p.id !== photo.id));
 
       showSuccess(`${photo.filename} deleted successfully!`);
     } catch (error) {
@@ -138,8 +119,7 @@ const PhotoManager: React.FC = () => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
-  const currentPhotos = activeGallery === 'sister-a' ? sisterAPhotos : sisterBPhotos;
-  const filteredPhotos = currentPhotos.filter(photo =>
+  const filteredPhotos = photos.filter(photo =>
     photo.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -159,14 +139,7 @@ const PhotoManager: React.FC = () => {
       }
 
       // Update local state
-      const updater = (photos: Photo[]) =>
-        photos.map(p => (p.id === photo.id ? { ...p, tags } : p));
-
-      if (photo.sister === 'sister-a') {
-        setSisterAPhotos(prev => updater(prev));
-      } else {
-        setSisterBPhotos(prev => updater(prev));
-      }
+      setPhotos(prev => prev.map(p => (p.id === photo.id ? { ...p, tags } : p)));
 
       showSuccess('Tags updated!');
     } catch (error) {
@@ -324,72 +297,30 @@ const PhotoManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Gallery Tabs */}
+      {/* Gallery */}
       <div className="max-w-7xl mx-auto">
-        <Tabs value={activeGallery} onValueChange={(value) => setActiveGallery(value as 'sister-a' | 'sister-b')}>
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
-            <TabsTrigger value="sister-a" className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
-              Parvathy's Gallery
-              <Badge variant="secondary">{sisterAPhotos.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="sister-b" className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
-              Sreedevi's Gallery
-              <Badge variant="secondary">{sisterBPhotos.length}</Badge>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="sister-a" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Parvathy's Wedding Photos</span>
-                  <Badge variant="outline">{filteredPhotos.length} photos</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {filteredPhotos.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p>No photos found</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    <AnimatePresence>
-                      {filteredPhotos.map(renderPhotoCard)}
-                    </AnimatePresence>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="sister-b" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Sreedevi's Wedding Photos</span>
-                  <Badge variant="outline">{filteredPhotos.length} photos</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {filteredPhotos.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p>No photos found</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    <AnimatePresence>
-                      {filteredPhotos.map(renderPhotoCard)}
-                    </AnimatePresence>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Wedding Photos</span>
+              <Badge variant="outline">{filteredPhotos.length} photos</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {filteredPhotos.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p>No photos found</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <AnimatePresence>
+                  {filteredPhotos.map(renderPhotoCard)}
+                </AnimatePresence>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Photo Viewer Modal */}

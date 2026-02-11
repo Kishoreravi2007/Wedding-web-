@@ -6,6 +6,7 @@
 
 import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { watchFolder, stopWatching, isWatching } from './services/folderWatcher';
 import { uploadPhoto } from './services/uploader';
 import { detectCameras } from './services/cameraDetector';
@@ -22,48 +23,78 @@ import {
   setProgressCallback
 } from './services/uploadQueue';
 
+// Debug logging 
+const logFile = path.join(__dirname, 'app-debug.log');
+function log(msg: string) {
+  try {
+    const timestamp = new Date().toISOString();
+    fs.appendFileSync(logFile, `[${timestamp}] ${msg}\n`);
+    process.stdout.write(`[${timestamp}] ${msg}\n`);
+  } catch (e) {
+    // ignore
+  }
+}
+
+log('--- App Starting ---');
+log(`Working Dir: ${process.cwd()}`);
+log(`Entry Dir: ${__dirname}`);
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 900,
-    minHeight: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
-    titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 15, y: 15 },
-  });
-
-  // Load the app
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-  }
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  // Initialize queue
-  initQueue();
-
-  // Set up queue progress callback
-  setProgressCallback((item) => {
-    mainWindow?.webContents.send('queue-update', {
-      item,
-      stats: getQueueStats(),
+  try {
+    log('Creating window...');
+    mainWindow = new BrowserWindow({
+      width: 1200,
+      height: 800,
+      minWidth: 900,
+      minHeight: 600,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: false,
+        contextIsolation: true,
+      },
+      titleBarStyle: 'hiddenInset',
     });
-  });
+
+    log(`Preload path: ${path.join(__dirname, 'preload.js')}`);
+
+    // Load the app
+    const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
+    log(`Mode: ${isDev ? 'Development' : 'Production'}`);
+
+    if (isDev) {
+      log('Loading URL: http://localhost:5173');
+      mainWindow.loadURL('http://localhost:5173').catch(err => log(`Load URL Error: ${err.message}`));
+      mainWindow.webContents.openDevTools();
+    } else {
+      const filePath = path.join(__dirname, '../dist/index.html');
+      log(`Loading File: ${filePath}`);
+      mainWindow.loadFile(filePath).catch(err => log(`Load File Error: ${err.message}`));
+    }
+
+    mainWindow.on('closed', () => {
+      log('Window closed');
+      mainWindow = null;
+    });
+
+    // Initialize queue
+    initQueue();
+
+    // Set up queue progress callback
+    setProgressCallback((item) => {
+      mainWindow?.webContents.send('queue-update', {
+        item,
+        stats: getQueueStats(),
+      });
+    });
+  } catch (err: any) {
+    log(`Create Window Error: ${err.message}`);
+  }
 }
 
 app.whenReady().then(() => {
+  log('App ready');
   createWindow();
 
   app.on('activate', () => {
@@ -71,7 +102,7 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
-});
+}).catch(err => log(`App Ready Error: ${err.message}`));
 
 app.on('window-all-closed', () => {
   stopWatching();

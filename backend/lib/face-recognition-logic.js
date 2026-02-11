@@ -473,27 +473,72 @@ async function addPersonWithFaces(personData, faceDescriptors, photoIds) {
 
 /**
  * Get statistics about face recognition
+ * @param {string} weddingName - Optional: filter by wedding ('sister-a' or 'sister-b')
  */
-async function getStatistics() {
+async function getStatistics(weddingName = null) {
   try {
     const { query } = require('./db-gcp');
 
-    // Get counts via SQL
-    const { rows: personRows } = await query('SELECT COUNT(*) as count FROM people');
-    const { rows: descriptorRows } = await query('SELECT COUNT(*) as count FROM face_descriptors');
-    const { rows: faceRows } = await query('SELECT COUNT(*) as count FROM photo_faces');
-    const { rows: verifiedRows } = await query('SELECT COUNT(*) as count FROM photo_faces WHERE is_verified = true');
+    let personQuery = 'SELECT COUNT(*) as count FROM people';
+    let descriptorQuery = 'SELECT COUNT(*) as count FROM face_descriptors';
+    let faceQuery = 'SELECT COUNT(*) as count FROM photo_faces';
+    let verifiedQuery = 'SELECT COUNT(*) as count FROM photo_faces WHERE is_verified = true';
+    let queryParams = [];
+
+    if (weddingName) {
+      console.log(`📊 Fetching statistics for wedding: ${weddingName}`);
+
+      // Filter people by sister
+      personQuery += ' WHERE sister = $1 OR sister = \'both\'';
+
+      // Filter descriptors and faces by photo relationship
+      const photoFilter = ' WHERE photo_id IN (SELECT id FROM photos WHERE sister = $1)';
+      descriptorQuery += photoFilter;
+      faceQuery += photoFilter;
+      verifiedQuery += ' AND photo_id IN (SELECT id FROM photos WHERE sister = $1)';
+
+      queryParams = [weddingName];
+    }
+
+    const [
+      { rows: personRows },
+      { rows: descriptorRows },
+      { rows: faceRows },
+      { rows: verifiedRows }
+    ] = await Promise.all([
+      query(personQuery, queryParams),
+      query(descriptorQuery, queryParams),
+      query(faceQuery, queryParams),
+      query(verifiedQuery, queryParams)
+    ]);
 
     const totalPeople = parseInt(personRows[0].count);
     const totalDescriptors = parseInt(descriptorRows[0].count);
     const totalFaces = parseInt(faceRows[0].count);
     const verifiedFaces = parseInt(verifiedRows[0].count);
 
+    // Get total photos for coverage calculation if needed
+    let totalPhotos = 0;
+    if (weddingName) {
+      const { rows: photoRows } = await query('SELECT COUNT(*) as count FROM photos WHERE sister = $1', queryParams);
+      totalPhotos = parseInt(photoRows[0].count);
+    }
+
+    const { rows: photosWithFacesRows } = await query(
+      `SELECT COUNT(DISTINCT photo_id) as count FROM photo_faces ${weddingName ? 'WHERE photo_id IN (SELECT id FROM photos WHERE sister = $1)' : ''}`,
+      queryParams
+    );
+    const photosWithFaces = parseInt(photosWithFacesRows[0].count);
+
     return {
       totalPeople,
       totalDescriptors,
       totalFaces,
       verifiedFaces,
+      totalPhotos,
+      photosWithFaces,
+      photosWithoutFaces: totalPhotos - photosWithFaces,
+      coveragePercent: totalPhotos > 0 ? Math.round((photosWithFaces / totalPhotos) * 100) : 0,
       averageDescriptorsPerPerson: totalPeople > 0
         ? (totalDescriptors / totalPeople).toFixed(2)
         : 0

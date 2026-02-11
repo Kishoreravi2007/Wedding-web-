@@ -13,14 +13,15 @@ import { loadFaceModels, extractFaceDescriptors, areModelsLoaded } from '@/utils
 interface PhotoUploadSimpleProps {
   weddingId: string;
   onUploadSuccess?: (photoId: string) => void; // Callback for successful upload
+  events?: string[];
 }
 
-export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSimpleProps) {
+export function PhotoUploadSimple({ weddingId, onUploadSuccess, events }: PhotoUploadSimpleProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [processingFaces, setProcessingFaces] = useState(false);
-  const [photoTag, setPhotoTag] = useState<'wedding' | 'engagement'>('wedding');
+  const [photoTag, setPhotoTag] = useState<string>('Wedding');
 
   // Load face detection models on component mount
   useEffect(() => {
@@ -29,6 +30,15 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
       // Don't block upload if face detection fails
     });
   }, []);
+
+  // Set default tag to first event if available
+  useEffect(() => {
+    if (events && events.length > 0) {
+      setPhotoTag(events[0]);
+    } else {
+      setPhotoTag('Wedding');
+    }
+  }, [events]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -89,7 +99,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
           weddingId === 'sister-a' ? 'sister-a' : 'sister-b',
           faceData,
           {
-            eventType: photoTag,
+            eventType: photoTag.toLowerCase(),
             tags: [photoTag]
           }
         );
@@ -193,17 +203,27 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess }: PhotoUploadSim
 
           <div className="grid gap-2">
             <Label>Tag</Label>
-            <Select value={photoTag} onValueChange={(value: 'wedding' | 'engagement') => setPhotoTag(value)}>
+            <Select value={photoTag} onValueChange={(value: string) => setPhotoTag(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select tag" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wedding">Wedding</SelectItem>
-                <SelectItem value="engagement">Engagement</SelectItem>
+                {events && events.length > 0 ? (
+                  events.map((event) => (
+                    <SelectItem key={event} value={event}>{event}</SelectItem>
+                  ))
+                ) : (
+                  <>
+                    <SelectItem value="Wedding">Wedding</SelectItem>
+                    <SelectItem value="Engagement">Engagement</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
             <p className="text-sm text-gray-500">
-              Tag helps guests filter between full wedding coverage and engagement sessions.
+              {events && events.length > 0
+                ? "Tag helps guests filter between different scheduled events."
+                : "Tag helps guests filter between full wedding coverage and engagement sessions."}
             </p>
           </div>
 

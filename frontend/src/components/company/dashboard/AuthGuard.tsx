@@ -62,5 +62,80 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         );
     }
 
+    // Role-based restriction: Photographers should NOT access client/company dashboards
+    if (currentUser.role === 'photographer') {
+        const isClientPath = window.location.pathname.startsWith('/client') ||
+            window.location.pathname.startsWith('/company');
+
+        if (isClientPath) {
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans">
+                    <CompanyNavbar />
+                    <main className="container max-w-2xl mx-auto px-4 py-32 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white rounded-3xl p-10 md:p-16 shadow-2xl border border-slate-200"
+                        >
+                            <div className="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
+                                <Lock className="w-10 h-10 text-amber-500" />
+                            </div>
+
+                            <h1 className="text-3xl font-bold text-slate-900 mb-4">Photographer Access Only</h1>
+                            <p className="text-slate-500 text-lg mb-10">
+                                Your account is restricted to the Photographer Portal. You do not have permission to access the Client Dashboard.
+                            </p>
+
+                            <div className="flex justify-center">
+                                <Link to="/photographer">
+                                    <Button className="bg-rose-500 hover:bg-rose-600 text-white px-8 h-12 text-lg rounded-xl shadow-lg transition-all hover:scale-105">
+                                        Back to Photographer Portal
+                                    </Button>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </main>
+                </div>
+            );
+        }
+    }
+
+    // Role-based restriction: Non-photographers should NOT access photographer portal
+    if (window.location.pathname.startsWith('/photographer') && currentUser.role !== 'photographer' && currentUser.role !== 'admin') {
+        const isPhotographerPath = window.location.pathname.startsWith('/photographer');
+
+        if (isPhotographerPath) {
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans">
+                    <CompanyNavbar />
+                    <main className="container max-w-2xl mx-auto px-4 py-32 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white rounded-3xl p-10 md:p-16 shadow-2xl border border-slate-200"
+                        >
+                            <div className="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
+                                <Lock className="w-10 h-10 text-rose-500" />
+                            </div>
+
+                            <h1 className="text-3xl font-bold text-slate-900 mb-4">Access Denied</h1>
+                            <p className="text-slate-500 text-lg mb-10">
+                                The Photographer Portal is reserved for professional accounts. Please use the Client Dashboard to manage your wedding.
+                            </p>
+
+                            <div className="flex justify-center">
+                                <Link to="/client">
+                                    <Button className="bg-rose-500 hover:bg-rose-600 text-white px-8 h-12 text-lg rounded-xl shadow-lg transition-all hover:scale-105">
+                                        Go to Client Dashboard
+                                    </Button>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </main>
+                </div>
+            );
+        }
+    }
+
     return <>{children}</>;
 };

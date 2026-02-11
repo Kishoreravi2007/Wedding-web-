@@ -75,7 +75,19 @@ app.use(cors(corsOptions));
 // Security Headers
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false // Disabled for development, enable in production if needed
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:"],
+      workerSrc: ["'self'", "blob:"],
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", process.env.DEEPFACE_API_URL].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", process.env.FRONTEND_URL].filter(Boolean),
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
 }));
 
 // Rate Limiting (Basic protection)
@@ -185,6 +197,7 @@ const { router: authRouter } = require('./auth-new');
 console.log('🔑 Registering /api/auth routes...');
 app.get('/api/auth/test-inline', (req, res) => res.json({ message: 'w00t' }));
 app.use('/api/auth', authRouter);
+console.log('✅ Registered /api/auth routes.');
 
 // Photos routes (Supabase) - Use new version
 console.log('📦 Registering /api/photos routes...');
@@ -243,6 +256,9 @@ app.use('/api/guests', require('./routes/guests'));
 console.log('📅 Registering /api/timeline routes...');
 app.use('/api/timeline', require('./routes/timeline'));
 
+console.log('🔄 Registering /api/live routes...');
+app.use('/api/live', require('./routes/live-sync'));
+
 // Public Guest Routes (RSVP)
 const publicGuestsRouter = require('./routes/public-guests');
 app.use('/api/public/guests', publicGuestsRouter);
@@ -277,7 +293,9 @@ app.use((req, res) => {
       'POST /api/guests',
       'GET /api/timeline',
       'POST /api/timeline',
-      'POST /api/ai/generate-bio'
+      'POST /api/ai/generate-bio',
+      'POST /api/auth/photographer/credentials',
+      'GET /api/auth/photographer/wedding-details'
     ]
   });
 });

@@ -203,12 +203,86 @@ router.post('/recognize', async (req, res) => {
  */
 router.get('/statistics', async (req, res) => {
   try {
-    const stats = await getStatistics();
+    const { sister, wedding_name } = req.query;
+    const weddingFilter = sister || wedding_name || null;
+
+    const stats = await getStatistics(weddingFilter);
     res.json(stats);
   } catch (error) {
     console.error('Error getting statistics:', error);
     res.status(500).json({
       message: 'Error retrieving statistics',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/faces/auto-detection-status
+ * Check if photos need processing (migration route for frontend)
+ */
+router.get('/auto-detection-status', async (req, res) => {
+  try {
+    const { sister, wedding_name } = req.query;
+    const weddingFilter = sister || wedding_name || null;
+
+    const stats = await getStatistics(weddingFilter);
+
+    res.json({
+      needsProcessing: stats.photosWithoutFaces > 0,
+      unprocessedCount: stats.photosWithoutFaces,
+      totalPhotos: stats.totalPhotos,
+      coveragePercent: stats.coveragePercent
+    });
+  } catch (error) {
+    console.error('Error getting auto-detection status:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * POST /api/faces/store-batch
+ * Store face descriptors for a photo in batch
+ */
+router.post('/store-batch', authenticateToken, async (req, res) => {
+  try {
+    const { photo_id, faces } = req.body;
+
+    if (!photo_id || !faces || !Array.isArray(faces)) {
+      return res.status(400).json({ message: 'photo_id and faces array are required' });
+    }
+
+    console.log(`📥 Storing batch of ${faces.length} faces for photo ${photo_id}`);
+
+    const results = [];
+    for (const faceData of faces) {
+      // 1. Create face descriptor
+      const descriptor = await FaceDescriptorDB.create({
+        photo_id,
+        descriptor: faceData.descriptor || faceData.embedding,
+        confidence: faceData.confidence || 0.8
+      });
+
+      // 2. Create photo face record
+      const photoFace = await PhotoFaceDB.create({
+        photo_id,
+        face_descriptor_id: descriptor.id,
+        bounding_box: faceData.boundingBox || faceData.box || null,
+        confidence: faceData.confidence || 0.8,
+        is_verified: false
+      });
+
+      results.push(photoFace.id);
+    }
+
+    res.status(201).json({
+      message: `Successfully stored ${results.length} face descriptors`,
+      faceIds: results
+    });
+  } catch (error) {
+    console.error('Error storing batch descriptors:', error);
+    res.status(500).json({
+      message: 'Error storing face descriptors',
       error: error.message
     });
   }

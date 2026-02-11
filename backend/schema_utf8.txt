@@ -1,0 +1,22 @@
+﻿[dotenv@17.2.3] injecting env (28) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+Photos table columns:
+- id: uuid
+- filename: text
+- file_path: text
+- public_url: text
+- size: bigint
+- mimetype: text
+- sister: text
+- title: text
+- description: text
+- event_type: text
+- tags: ARRAY
+- storage_provider: text
+- photographer_id: uuid
+- uploaded_at: timestamp with time zone
+- created_at: timestamp with time zone
+- updated_at: timestamp with time zone
+- wedding_id: uuid
+- is_live_sync: boolean
+- sync_timestamp: timestamp without time zone
+- upload_source: text

@@ -1,4 +1,4 @@
-/**
+change /**
  * Electron Entry Point
  * 
  * This file is the compiled output of main.ts

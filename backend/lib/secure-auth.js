@@ -38,8 +38,8 @@ const SecureUserDB = {
 
       // Create user
       const insertQuery = `
-        INSERT INTO users (username, password, role, is_active, email_offers_opt_in, has_premium_access, created_at)
-        VALUES ($1, $2, $3, true, $4, $5, NOW())
+        INSERT INTO users (username, password, role, is_active, email_offers_opt_in, has_premium_access, wedding_id, created_at)
+        VALUES ($1, $2, $3, true, $4, $5, $6, NOW())
         RETURNING id
       `;
 
@@ -48,7 +48,8 @@ const SecureUserDB = {
         hashedPassword,
         role,
         userData.email_offers_opt_in || false,
-        userData.has_premium_access || false
+        userData.has_premium_access || false,
+        userData.wedding_id || null
       ]);
 
       return {
@@ -56,7 +57,8 @@ const SecureUserDB = {
         username,
         role,
         email_offers_opt_in: userData.email_offers_opt_in || false,
-        has_premium_access: userData.has_premium_access || false
+        has_premium_access: userData.has_premium_access || false,
+        wedding_id: userData.wedding_id || null
       };
 
     } catch (error) {
@@ -149,6 +151,8 @@ const SecureUserDB = {
         is_2fa_enabled: user.is_2fa_enabled,
         two_factor_secret: user.two_factor_secret,
         email_offers_opt_in: user.email_offers_opt_in,
+        has_premium_access: user.has_premium_access,
+        wedding_id: user.wedding_id,
         profile: user.profile // Return profile with weddingData
       };
 
@@ -181,7 +185,7 @@ const SecureUserDB = {
   async getUserById(id) {
     try {
       const { rows } = await query(
-        'SELECT id, username, role, is_active, email_offers_opt_in FROM users WHERE id = $1',
+        'SELECT id, username, role, is_active, email_offers_opt_in, has_premium_access, wedding_id FROM users WHERE id = $1',
         [id]
       );
       return rows[0];
@@ -385,6 +389,7 @@ const TokenManager = {
       id: user.id,
       username: user.username,
       role: user.role,
+      wedding_id: user.wedding_id,
       iat: Math.floor(Date.now() / 1000)
     };
 

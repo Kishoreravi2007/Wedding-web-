@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     login_attempts INTEGER DEFAULT 0,
     last_login_attempt TIMESTAMP WITH TIME ZONE,
     locked_until TIMESTAMP WITH TIME ZONE,
+    wedding_id UUID, -- For photographers: links to the wedding they work for
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

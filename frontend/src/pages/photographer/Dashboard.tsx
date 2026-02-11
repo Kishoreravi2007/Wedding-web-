@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -16,17 +17,16 @@ import { Label } from '@/components/ui/label'; // Import Label
 import { useWebsite } from '@/contexts/WebsiteContext';
 import { Photo as PhotoType } from '@/types/photo'; // Import PhotoType
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 const PhotographerDashboard = () => {
   const navigate = useNavigate();
   const { content } = useWebsite();
+  const { currentUser, logout } = useAuth();
 
-  const photographerWeddingOptions = [ // Re-introduced for clarity
-    { value: 'sister-a', label: 'Parvathy Wedding' },
-    { value: 'sister-b', label: 'Sreedevi Wedding' },
-  ];
+  const [weddingDetails, setWeddingDetails] = useState<WeddingDetailsType | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedWeddingId, setSelectedWeddingId] = useState<string>('parvathy-wedding'); // State for selected wedding, defaulting to 'parvathy-wedding' for simplicity
+  const [selectedWeddingId, setSelectedWeddingId] = useState<string>(currentUser?.wedding_id || '');
 
   // Wedding attendees data
   const [people, setPeople] = useState<any[]>([]);
@@ -49,48 +49,78 @@ const PhotographerDashboard = () => {
     }
   }, [content]);
 
-  // Load all existing photos on component mount
+  // Fetch wedding details for the photographer
   useEffect(() => {
-    const loadAllPhotos = async () => {
+    const fetchWeddingDetails = async () => {
+      if (!currentUser?.wedding_id) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        console.log('Loading all photos from API...');
+        const token = localStorage.getItem('auth_token');
+        const res = await fetch(`${API_BASE_URL}/api/auth/photographer/wedding-details`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        const [sisterAResponse, sisterBResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
-          fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
-        ]);
+        if (res.ok) {
+          const data = await res.json();
+          setWeddingDetails(data.wedding);
+          setSelectedWeddingId(data.wedding.id); // Use UUID for unified filtering
+        }
+      } catch (error) {
+        console.error('Error fetching wedding details:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        if (!sisterAResponse.ok || !sisterBResponse.ok) {
+    fetchWeddingDetails();
+  }, [currentUser]);
+
+  // Set loading to false if we don't need to fetch wedding details or if everything is ready
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser && !currentUser.wedding_id) {
+      setIsLoading(false);
+    }
+    if (weddingDetails && content) {
+      setIsLoading(false);
+    }
+  }, [currentUser, weddingDetails, content]);
+
+  // Load photos for the specific wedding
+  useEffect(() => {
+    const loadPhotos = async () => {
+      if (!selectedWeddingId) return;
+
+      try {
+        console.log(`Loading photos for wedding: ${selectedWeddingId}`);
+
+        const response = await fetch(`${API_BASE_URL}/api/photos?weddingId=${selectedWeddingId}`);
+
+        if (!response.ok) {
           console.error('Failed to fetch photos');
           return;
         }
 
-        const [sisterAData, sisterBData] = await Promise.all([
-          sisterAResponse.json(),
-          sisterBResponse.json()
-        ]);
+        const data = await response.json();
+        const photosRaw = Array.isArray(data) ? data : (data.photos || []);
 
-        const sisterAPhotosRaw = Array.isArray(sisterAData) ? sisterAData : (sisterAData.photos || []);
-        const sisterBPhotosRaw = Array.isArray(sisterBData) ? sisterBData : (sisterBData.photos || []);
-
-        const allPhotosRaw = [...sisterAPhotosRaw, ...sisterBPhotosRaw];
-
-        console.log(`Loaded ${allPhotosRaw.length} total photos (${sisterAPhotosRaw.length} Parvathy, ${sisterBPhotosRaw.length} Sreedevi)`);
-
-        const mappedPhotos: PhotoType[] = allPhotosRaw.map(mapApiPhotoToPhotoType);
+        const mappedPhotos: PhotoType[] = photosRaw.map(mapApiPhotoToPhotoType);
         setUploadedPhotos(mappedPhotos);
 
         setStats(prev => ({
           ...prev,
-          totalPhotos: allPhotosRaw.length,
-          uploadedToday: allPhotosRaw.filter((p: any) => {
+          totalPhotos: photosRaw.length,
+          uploadedToday: photosRaw.filter((p: any) => {
             const uploadDate = new Date(p.uploaded_at || p.created_at || p.timestamp);
             const today = new Date();
             return uploadDate.toDateString() === today.toDateString();
           }).length
         }));
 
-        const sortedPhotos = [...allPhotosRaw]
+        const sortedPhotos = [...photosRaw]
           .sort((a: any, b: any) => new Date(b.uploaded_at || b.created_at || b.timestamp).getTime() - new Date(a.uploaded_at || a.created_at || a.timestamp).getTime())
           .slice(0, 5);
 
@@ -99,7 +129,7 @@ const PhotographerDashboard = () => {
           name: photo.title || photo.filename || 'Photo',
           size: formatFileSize(photo.size || 0),
           uploadTime: getTimeAgo(photo.uploaded_at || photo.created_at || photo.timestamp),
-          event: photo.sister === 'sister-a' ? 'Parvathy' : 'Sreedevi'
+          event: weddingDetails?.groom_name || 'Wedding'
         })));
 
       } catch (error) {
@@ -107,8 +137,10 @@ const PhotographerDashboard = () => {
       }
     };
 
-    loadAllPhotos();
-  }, []);
+    if (selectedWeddingId) {
+      loadPhotos();
+    }
+  }, [selectedWeddingId, weddingDetails]);
 
   // Helper function to get time ago
   const getTimeAgo = (date: string | Date): string => {
@@ -365,22 +397,19 @@ const PhotographerDashboard = () => {
               </p>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="wedding-select">Select Wedding</Label>
-                  <Select value={selectedWeddingId} onValueChange={setSelectedWeddingId}>
-                    <SelectTrigger id="wedding-select">
-                      <SelectValue placeholder="Select a wedding" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {photographerWeddingOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="wedding-select">Selected Wedding</Label>
+                  <Input
+                    value={weddingDetails ? `${weddingDetails.groom_name} & ${weddingDetails.bride_name}` : 'Loading...'}
+                    disabled
+                    className="bg-gray-50 italic"
+                  />
                 </div>
                 {selectedWeddingId ? (
-                  <PhotoUploadSimple weddingId={selectedWeddingId} onUploadSuccess={handlePhotoUploadSuccess} />
+                  <PhotoUploadSimple
+                    weddingId={selectedWeddingId}
+                    onUploadSuccess={handlePhotoUploadSuccess}
+                    events={weddingDetails?.events}
+                  />
                 ) : (
                   <p className="text-gray-500 text-center mt-4">Please select a wedding to upload photos.</p>
                 )}
@@ -482,11 +511,11 @@ const PhotographerDashboard = () => {
           </TabsContent>
 
           <TabsContent value="manage" className="space-y-6">
-            <PhotoManager />
+            <PhotoManager weddingId={selectedWeddingId} />
           </TabsContent>
 
           <TabsContent value="faces" className="space-y-6">
-            <FaceProcessor />
+            <FaceProcessor weddingId={selectedWeddingId} />
           </TabsContent>
 
           <TabsContent value="live" className="space-y-6">

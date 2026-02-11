@@ -27,13 +27,14 @@ interface User {
   is_2fa_enabled?: boolean;
   email_offers_opt_in?: boolean;
   has_premium_access?: boolean;
+  wedding_id?: string | null;
 }
 
 interface AuthContextType {
   currentUser: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
+  login: (identifier: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
   verify2FA: (userId: string, code: string) => Promise<void>;
   enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
   signup: (email: string, password: string, emailOptIn?: boolean, fullName?: string) => Promise<any>;
@@ -96,7 +97,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setCurrentUser({
           ...parsedUser,
           profile: profile,
-          has_premium_access: parsedUser.has_premium_access
+          has_premium_access: parsedUser.has_premium_access,
+          wedding_id: parsedUser.wedding_id
         });
       } catch (e) {
         console.error('Error hydrating user', e);
@@ -112,12 +114,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     hydrateUser();
   }, [hydrateUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (identifier: string, password: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password })
+        body: JSON.stringify({ username: identifier, password })
       });
 
       const data = await response.json();
@@ -145,11 +147,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setCurrentUser({
         ...user,
-        email: email,
+        email: identifier.includes('@') ? identifier : user.email,
         profile
       });
 
-      return { require2FA: false };
+      return { require2FA: false, user };
 
     } catch (error) {
       console.error('Login error:', error);

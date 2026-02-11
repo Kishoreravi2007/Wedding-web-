@@ -256,8 +256,13 @@ const ClientDashboard = () => {
     const [roughBio, setRoughBio] = useState("");
     const [showAiDialog, setShowAiDialog] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
-    const [modalTab, setModalTab] = useState<'profile' | 'notifications' | 'security' | 'advanced'>('profile');
+    const [modalTab, setModalTab] = useState<'profile' | 'notifications' | 'security' | 'photographer' | 'advanced'>('profile');
     const [generatedPreview, setGeneratedPreview] = useState("");
+
+    // Photographer Management State
+    const [photoPassword, setPhotoPassword] = useState("");
+    const [photoUsername, setPhotoUsername] = useState("");
+    const [isManagingPhoto, setIsManagingPhoto] = useState(false);
 
     // 2FA State
     const [is2FAEnabled, setIs2FAEnabled] = useState(currentUser?.is_2fa_enabled || false);
@@ -283,8 +288,12 @@ const ClientDashboard = () => {
             setFullName(currentUser.profile?.full_name || "");
             setBioText(currentUser.profile?.bio || "");
             setIs2FAEnabled(currentUser.is_2fa_enabled || false);
+            if (currentUser.role === 'photographer') {
+                // Should not happen on ClientDashboard due to AuthGuard, but for safety
+                navigate('/photographer');
+            }
         }
-    }, [currentUser]);
+    }, [currentUser, navigate]);
 
     // Sync editForm with weddingData when it's loaded
     useEffect(() => {
@@ -381,6 +390,39 @@ const ClientDashboard = () => {
             fetchLoginActivity();
         }
     }, [showProfileModal, modalTab, fetchLoginActivity]);
+
+    const handleManagePhotographer = async () => {
+        if (!photoPassword || photoPassword.length < 4) {
+            showError("Password must be at least 4 characters");
+            return;
+        }
+
+        setIsManagingPhoto(true);
+        try {
+            const token = getAccessToken();
+            const res = await fetch(`${API_BASE_URL}/api/auth/photographer/credentials`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ password: photoPassword })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setPhotoUsername(data.credentials.username);
+                showSuccess("Photographer credentials updated!");
+            } else {
+                const data = await res.json();
+                showError(data.message || "Failed to update photographer credentials");
+            }
+        } catch (error) {
+            showError("Connection error");
+        } finally {
+            setIsManagingPhoto(false);
+        }
+    };
 
     const handleProfileUpdate = async () => {
         setIsSavingProfile(true);
@@ -1349,6 +1391,7 @@ const ClientDashboard = () => {
                                 { id: 'guests', label: 'Guest Management', icon: Users },
                                 { id: 'timeline', label: 'Event Timeline', icon: Clock },
                                 { id: 'music', label: 'Music Settings', icon: Music },
+                                { id: 'photographer', label: 'Photographer', icon: Camera },
                             ].map((item) => (
                                 <Button
                                     key={item.id}
@@ -1398,6 +1441,95 @@ const ClientDashboard = () => {
                     {/* Content Section */}
                     <div className="flex-1 min-w-0 w-full">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                            {/* Photographer Tab */}
+                            <TabsContent value="photographer" className="space-y-6">
+                                <Card className="bg-white/80 backdrop-blur-sm">
+                                    <CardHeader>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                                <Camera className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl">Photographer Access</CardTitle>
+                                                <CardDescription>Manage credentials for your professional photographer</CardDescription>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="max-w-2xl space-y-6">
+                                            <div className="p-6 rounded-2xl border border-indigo-100 bg-indigo-50/30">
+                                                <div className="space-y-4">
+                                                    <p className="text-sm text-indigo-900/70 leading-relaxed">
+                                                        Enable a dedicated portal for your photographer to manage uploads,
+                                                        organize gallery photos, and use face recognition tools. They will
+                                                        not have access to your premium builder settings or guest lists.
+                                                    </p>
+
+                                                    {photoUsername && (
+                                                        <div className="p-4 bg-white border border-indigo-100 rounded-xl space-y-3 animate-fade-in shadow-sm">
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Assigned Username</span>
+                                                                <Badge variant="outline" className="text-xs bg-indigo-50 border-indigo-200 text-indigo-700">Ready for share</Badge>
+                                                            </div>
+                                                            <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                                <code className="text-base font-mono text-indigo-600 font-bold">{photoUsername}</code>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-8 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50"
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(photoUsername);
+                                                                        showSuccess("Username copied to clipboard!");
+                                                                    }}
+                                                                >
+                                                                    <Copy className="w-4 h-4 mr-2" />
+                                                                    Copy
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="space-y-3 pt-2">
+                                                        <Label className="text-sm font-bold text-gray-700">Set Access Password</Label>
+                                                        <div className="flex gap-3">
+                                                            <Input
+                                                                type="text"
+                                                                placeholder="Minimum 4 characters"
+                                                                className="h-11 bg-white border-indigo-100 focus:ring-indigo-500"
+                                                                value={photoPassword}
+                                                                onChange={(e) => setPhotoPassword(e.target.value)}
+                                                            />
+                                                            <Button
+                                                                onClick={handleManagePhotographer}
+                                                                disabled={isManagingPhoto || photoPassword.length < 4}
+                                                                className="bg-indigo-600 hover:bg-indigo-700 h-11 px-8 shadow-lg shadow-indigo-100"
+                                                            >
+                                                                {isManagingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : photoUsername ? "Update Credentials" : "Generate Access"}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="pt-6 mt-6 border-t border-indigo-100">
+                                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sharing Instructions</h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                            {[
+                                                                { step: '1', text: 'Share the username and password with your photographer.' },
+                                                                { step: '2', text: 'They should log in at weddingweb.co.in/login.' },
+                                                                { step: '3', text: 'They will be redirected to their professional portal.' }
+                                                            ].map((item) => (
+                                                                <div key={item.step} className="flex gap-3">
+                                                                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">{item.step}</span>
+                                                                    <p className="text-xs text-slate-500 leading-tight">{item.text}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
                             {/* Horizontal Tabs - Only show on Mobile */}
                             <div className="lg:hidden mb-6 sticky top-[72px] z-40 bg-gray-50/95 backdrop-blur-md py-2 -mx-4 px-4 border-b border-rose-100">
                                 <TabsList className="flex overflow-x-auto bg-white/80 rounded-xl p-1 no-scrollbar border border-rose-100 shadow-sm">
@@ -1407,6 +1539,7 @@ const ClientDashboard = () => {
                                     <TabsTrigger value="guests" className="flex-shrink-0 text-xs px-4">Guests</TabsTrigger>
                                     <TabsTrigger value="timeline" className="flex-shrink-0 text-xs px-4">Timeline</TabsTrigger>
                                     <TabsTrigger value="music" className="flex-shrink-0 text-xs px-4">Music</TabsTrigger>
+                                    <TabsTrigger value="photographer" className="flex-shrink-0 text-xs px-4">Photographer</TabsTrigger>
                                 </TabsList>
                             </div>
 
@@ -2730,486 +2863,488 @@ const ClientDashboard = () => {
                             </TabsContent>
 
                         </Tabs>
+                    </div>
+                </div>
 
 
-                        {/* Profile Management Modal */}
-                        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
-                            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle className="flex items-center gap-2">
-                                        <User className="w-5 h-5 text-rose-500" />
-                                        My Profile & Account
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        Manage your personal information and security settings.
-                                    </DialogDescription>
-                                </DialogHeader>
+                {/* Profile Management Modal */}
+                <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+                    <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <User className="w-5 h-5 text-rose-500" />
+                                My Profile & Account
+                            </DialogTitle>
+                            <DialogDescription>
+                                Manage your personal information and security settings.
+                            </DialogDescription>
+                        </DialogHeader>
 
-                                <div className="flex flex-col md:flex-row gap-0 -mx-6 -mb-6 border-t">
-                                    {/* Sidebar */}
-                                    <div className="w-full md:w-48 bg-gray-50/50 border-r border-gray-100 p-2 md:min-h-[450px]">
-                                        <nav className="space-y-1">
-                                            <button
-                                                onClick={() => setModalTab('profile')}
-                                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'profile' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                                            >
-                                                <User className="w-3.5 h-3.5" />
-                                                Profile
-                                            </button>
-                                            <button
-                                                onClick={() => setModalTab('notifications')}
-                                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'notifications' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                                            >
-                                                <Bell className="w-3.5 h-3.5" />
-                                                Notifications
-                                            </button>
-                                            <button
-                                                onClick={() => setModalTab('security')}
-                                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'security' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                                            >
-                                                <Lock className="w-3.5 h-3.5" />
-                                                Security
-                                            </button>
-                                            <button
-                                                onClick={() => setModalTab('advanced')}
-                                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'advanced' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
-                                            >
-                                                <Settings2 className="w-3.5 h-3.5" />
-                                                Advanced
-                                            </button>
-                                        </nav>
-                                    </div>
+                        <div className="flex flex-col md:flex-row gap-0 -mx-6 -mb-6 border-t">
+                            {/* Sidebar */}
+                            <div className="w-full md:w-48 bg-gray-50/50 border-r border-gray-100 p-2 md:min-h-[450px]">
+                                <nav className="space-y-1">
+                                    <button
+                                        onClick={() => setModalTab('profile')}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'profile' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        <User className="w-3.5 h-3.5" />
+                                        Profile
+                                    </button>
+                                    <button
+                                        onClick={() => setModalTab('notifications')}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'notifications' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        <Bell className="w-3.5 h-3.5" />
+                                        Notifications
+                                    </button>
+                                    <button
+                                        onClick={() => setModalTab('security')}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'security' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        <Lock className="w-3.5 h-3.5" />
+                                        Security
+                                    </button>
+                                    <button
+                                        onClick={() => setModalTab('advanced')}
+                                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${modalTab === 'advanced' ? 'bg-rose-100 text-rose-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        <Settings2 className="w-3.5 h-3.5" />
+                                        Advanced
+                                    </button>
+                                </nav>
+                            </div>
 
-                                    {/* Content Area */}
-                                    <div className="flex-1 p-6 overflow-y-auto">
-                                        {modalTab === 'profile' && (
-                                            <div className="space-y-6">
-                                                <div className="grid grid-cols-1 gap-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-[11px] uppercase tracking-wider text-gray-400">Full Name</Label>
-                                                        <Input
-                                                            value={fullName}
-                                                            onChange={(e) => setFullName(e.target.value)}
-                                                            placeholder="e.g. Kishore Ravi"
-                                                            className="h-9 text-sm"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-[11px] uppercase tracking-wider text-gray-400">Email Address</Label>
-                                                        <Input value={currentUser?.username} disabled className="bg-gray-50 italic h-9 text-sm" />
-                                                    </div>
-                                                </div>
+                            {/* Content Area */}
+                            <div className="flex-1 p-6 overflow-y-auto">
+                                {modalTab === 'profile' && (
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-[11px] uppercase tracking-wider text-gray-400">Full Name</Label>
+                                                <Input
+                                                    value={fullName}
+                                                    onChange={(e) => setFullName(e.target.value)}
+                                                    placeholder="e.g. Kishore Ravi"
+                                                    className="h-9 text-sm"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-[11px] uppercase tracking-wider text-gray-400">Email Address</Label>
+                                                <Input value={currentUser?.username} disabled className="bg-gray-50 italic h-9 text-sm" />
+                                            </div>
+                                        </div>
 
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <Label className="text-[11px] uppercase tracking-wider text-gray-400">Your Story / Bio</Label>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="text-rose-600 hover:text-rose-700 h-7 text-xs gap-1 px-2"
-                                                            onClick={() => setShowAiDialog(true)}
-                                                        >
-                                                            <Sparkles className="w-3 h-3" />
-                                                            AI Imagine
-                                                        </Button>
-                                                    </div>
-                                                    <Textarea
-                                                        value={bioText}
-                                                        onChange={(e) => setBioText(e.target.value)}
-                                                        placeholder="Share your wedding story..."
-                                                        className="min-h-[120px] text-sm"
-                                                    />
-                                                </div>
-
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-[11px] uppercase tracking-wider text-gray-400">Your Story / Bio</Label>
                                                 <Button
-                                                    onClick={async () => {
-                                                        await handleProfileUpdate();
-                                                        setShowProfileModal(false);
-                                                    }}
-                                                    disabled={isSavingProfile}
-                                                    className="w-full bg-rose-600 hover:bg-rose-700"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-rose-600 hover:text-rose-700 h-7 text-xs gap-1 px-2"
+                                                    onClick={() => setShowAiDialog(true)}
                                                 >
-                                                    {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                                    Save Profile
+                                                    <Sparkles className="w-3 h-3" />
+                                                    AI Imagine
                                                 </Button>
                                             </div>
-                                        )}
+                                            <Textarea
+                                                value={bioText}
+                                                onChange={(e) => setBioText(e.target.value)}
+                                                placeholder="Share your wedding story..."
+                                                className="min-h-[120px] text-sm"
+                                            />
+                                        </div>
 
-                                        {modalTab === 'notifications' && (
-                                            <div className="space-y-6">
-                                                <div className="text-center py-12">
-                                                    <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                        <Bell className="w-6 h-6 text-rose-500" />
-                                                    </div>
-                                                    <h3 className="text-sm font-bold text-gray-900">Notification Settings</h3>
-                                                    <p className="text-xs text-gray-500 mt-1 max-w-[200px] mx-auto">Configure how you receive updates about your wedding.</p>
-                                                </div>
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100">
-                                                        <div>
-                                                            <p className="text-xs font-bold">Email Notifications</p>
-                                                            <p className="text-[10px] text-gray-500">Get RSVP updates via email</p>
-                                                        </div>
-                                                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-0 text-[10px]">Active</Badge>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 opacity-50">
-                                                        <div>
-                                                            <p className="text-xs font-bold">WhatsApp Alerts</p>
-                                                            <p className="text-[10px] text-gray-500">Instant updates on WhatsApp</p>
-                                                        </div>
-                                                        <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {modalTab === 'security' && (
-                                            <div className="space-y-6">
-                                                <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/30">
-                                                    <div className="flex items-center gap-3 mb-4">
-                                                        <div className="w-10 h-10 bg-white rounded-lg border border-rose-100 flex items-center justify-center shadow-sm">
-                                                            <Shield className="w-5 h-5 text-rose-500" />
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="text-sm font-bold text-gray-900">Two-Factor Authentication</h3>
-                                                            <p className="text-[10px] text-gray-500">Add an extra layer of security</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between py-3 border-t border-rose-100">
-                                                        <span className="text-xs font-medium text-gray-700">Status</span>
-                                                        {is2FAEnabled ? (
-                                                            <Badge className="text-[10px] bg-green-100 text-green-700 hover:bg-green-100 border-0">Active</Badge>
-                                                        ) : (
-                                                            <Badge variant="outline" className="text-[10px] bg-amber-50 text-amber-600 border-amber-200">Disabled</Badge>
-                                                        )}
-                                                    </div>
-
-                                                    <Dialog open={show2FADialog} onOpenChange={(open) => {
-                                                        setShow2FADialog(open);
-                                                        if (!open) reset2FA();
-                                                    }}>
-                                                        <DialogTrigger asChild>
-                                                            <Button
-                                                                variant={is2FAEnabled ? "destructive" : "outline"}
-                                                                className={`w-full text-xs h-9 ${is2FAEnabled ? "bg-red-50 text-red-600 hover:bg-red-100 border-red-100" : "border-rose-200 text-rose-700 hover:bg-rose-100/50"}`}
-                                                                onClick={(e) => {
-                                                                    if (is2FAEnabled) {
-                                                                        e.preventDefault();
-                                                                        if (confirm("Disable Two-Factor Authentication? This will reduce your account security.")) {
-                                                                            enable2FA(false).then(() => {
-                                                                                setIs2FAEnabled(false);
-                                                                                showSuccess("2FA Disabled successfully");
-                                                                            }).catch(() => showError("Failed to disable 2FA"));
-                                                                        }
-                                                                    } else {
-                                                                        setShow2FADialog(true);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {is2FAEnabled ? "Disable 2FA Security" : "Setup 2FA Security"}
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border-none shadow-2xl">
-                                                            <div className="bg-rose-600 p-6 text-white text-center">
-                                                                <Shield className="w-10 h-10 mx-auto mb-2" />
-                                                                <h3 className="text-lg font-bold">2FA Setup</h3>
-                                                                <p className="text-xs opacity-90">Secure your account with a mobile authenticator</p>
-                                                            </div>
-                                                            <div className="p-6">
-                                                                {tfaStep === 1 && (
-                                                                    <div className="space-y-6 text-center">
-                                                                        <div className="mx-auto w-40 h-40 bg-white p-2 border rounded-xl flex items-center justify-center">
-                                                                            <QRCode
-                                                                                value={`otpauth://totp/WeddingWeb:${currentUser?.username || "user@example.com"}?secret=KR577WEDDINGWEB2FA&issuer=WeddingWeb`}
-                                                                                size={140}
-                                                                                level="M"
-                                                                            />
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <p className="text-sm font-bold text-gray-900">Scan QR Code</p>
-                                                                            <p className="text-xs text-gray-500">Open your authenticator app and scan this code.</p>
-                                                                        </div>
-                                                                        <Button onClick={() => setTfaStep(2)} className="w-full bg-rose-600 hover:bg-rose-700">
-                                                                            I've Scanned It
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
-                                                                {tfaStep === 2 && (
-                                                                    <div className="space-y-6 text-center">
-                                                                        <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto">
-                                                                            <Lock className="w-6 h-6" />
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <p className="text-sm font-bold text-gray-900">Verify Code</p>
-                                                                            <p className="text-xs text-gray-500">Enter the 6-digit code from your app.</p>
-                                                                        </div>
-                                                                        <div className="flex justify-center">
-                                                                            <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
-                                                                                <InputOTPGroup className="gap-1">
-                                                                                    <InputOTPSlot index={0} className="w-10 h-12 text-lg font-bold" />
-                                                                                    <InputOTPSlot index={1} className="w-10 h-12 text-lg font-bold" />
-                                                                                    <InputOTPSlot index={2} className="w-10 h-12 text-lg font-bold" />
-                                                                                    <InputOTPSlot index={3} className="w-10 h-12 text-lg font-bold" />
-                                                                                    <InputOTPSlot index={4} className="w-10 h-12 text-lg font-bold" />
-                                                                                    <InputOTPSlot index={5} className="w-10 h-12 text-lg font-bold" />
-                                                                                </InputOTPGroup>
-                                                                            </InputOTP>
-                                                                        </div>
-                                                                        <Button
-                                                                            onClick={handleEnable2FA}
-                                                                            disabled={otpValue.length !== 6 || isVerifying}
-                                                                            className="w-full bg-rose-600 hover:bg-rose-700"
-                                                                        >
-                                                                            {isVerifying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                                                            Verify & Enable
-                                                                        </Button>
-                                                                        <Button variant="ghost" onClick={() => setTfaStep(1)} className="text-xs text-gray-400">Back</Button>
-                                                                    </div>
-                                                                )}
-                                                                {tfaStep === 3 && (
-                                                                    <div className="py-6 text-center space-y-6">
-                                                                        <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto">
-                                                                            <CheckCircle2 className="w-8 h-8" />
-                                                                        </div>
-                                                                        <div className="space-y-1">
-                                                                            <h3 className="text-xl font-bold text-gray-900">All Set!</h3>
-                                                                            <p className="text-xs text-gray-500">Two-Factor Authentication is now active.</p>
-                                                                        </div>
-                                                                        <Button onClick={() => setShow2FADialog(false)} className="w-full bg-gray-900 hover:bg-black font-bold">
-                                                                            Awesome
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                </div>
-
-                                                <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/30">
-                                                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">Change Password</h4>
-                                                    <form onSubmit={handleChangePassword} className="space-y-3">
-                                                        <div className="space-y-1">
-                                                            <label className="text-[10px] text-gray-400">Current Password</label>
-                                                            <div className="relative">
-                                                                <Input
-                                                                    type={showCurrentPass ? "text" : "password"}
-                                                                    className="h-8 text-xs bg-white pr-8"
-                                                                    placeholder="••••••••"
-                                                                    value={passwordForm.currentPassword}
-                                                                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setShowCurrentPass(!showCurrentPass)}
-                                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                                >
-                                                                    {showCurrentPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            <div className="space-y-1">
-                                                                <label className="text-[10px] text-gray-400">New Password</label>
-                                                                <div className="relative">
-                                                                    <Input
-                                                                        type={showNewPass ? "text" : "password"}
-                                                                        className="h-8 text-xs bg-white pr-8"
-                                                                        placeholder="••••••••"
-                                                                        value={passwordForm.newPassword}
-                                                                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                                                    />
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setShowNewPass(!showNewPass)}
-                                                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                                    >
-                                                                        {showNewPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <label className="text-[10px] text-gray-400">Confirm Password</label>
-                                                                <div className="relative">
-                                                                    <Input
-                                                                        type={showConfirmPass ? "text" : "password"}
-                                                                        className="h-8 text-xs bg-white pr-8"
-                                                                        placeholder="••••••••"
-                                                                        value={passwordForm.confirmPassword}
-                                                                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                                                    />
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setShowConfirmPass(!showConfirmPass)}
-                                                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                                    >
-                                                                        {showConfirmPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <Button
-                                                            type="submit"
-                                                            disabled={isUpdatingPassword}
-                                                            className="w-full h-8 text-[10px] font-bold bg-gray-900 hover:bg-black"
-                                                        >
-                                                            {isUpdatingPassword ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
-                                                            Update Password
-                                                        </Button>
-                                                    </form>
-                                                </div>
-
-                                                <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/30">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Login Activity</h4>
-                                                        <Button
-                                                            variant="ghost"
-                                                            className="h-6 px-2 text-[10px] text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                                                            onClick={fetchLoginActivity}
-                                                            disabled={isLoadingSessions}
-                                                        >
-                                                            {isLoadingSessions ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCw className="w-3 h-3 mr-1" />}
-                                                            Refresh
-                                                        </Button>
-                                                    </div>
-
-                                                    <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                                                        {loginSessions.length > 0 ? (
-                                                            loginSessions.map((session: any, idx: number) => (
-                                                                <div key={session.id || idx} className="p-2 rounded-lg bg-white border border-gray-100 flex items-center justify-between gap-3">
-                                                                    <div className="flex items-center gap-2 overflow-hidden">
-                                                                        <div className="w-7 h-7 bg-gray-50 rounded-md flex items-center justify-center shrink-0">
-                                                                            <Settings2 className="w-3.5 h-3.5 text-gray-400" />
-                                                                        </div>
-                                                                        <div className="min-w-0">
-                                                                            <p className="text-[10px] font-bold text-gray-900 truncate">
-                                                                                {session.action?.replace(/_/g, ' ') || 'Login'} • {session.ip_address || 'Unknown IP'}
-                                                                            </p>
-                                                                            <p className="text-[9px] text-gray-400">
-                                                                                {new Date(session.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <Badge variant="outline" className="text-[8px] h-4 px-1 text-gray-400 border-gray-100 font-normal shrink-0">
-                                                                        {session.details?.user_agent?.includes('Mobile') ? 'Mobile' : 'Desktop'}
-                                                                    </Badge>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <div className="text-center py-6">
-                                                                <p className="text-[10px] text-gray-400 italic">No recent activity found</p>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <p className="text-[9px] text-gray-400 mt-3 flex items-center gap-1">
-                                                        <Shield className="w-2.5 h-2.5" />
-                                                        Only successful logins are shown here.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {modalTab === 'advanced' && (
-                                            <div className="space-y-6">
-                                                <div className="p-4 rounded-xl border border-amber-100 bg-amber-50/30">
-                                                    <h3 className="text-sm font-bold text-amber-800 flex items-center gap-2 mb-2">
-                                                        <Settings2 className="w-4 h-4" />
-                                                        Data Control
-                                                    </h3>
-                                                    <p className="text-xs text-amber-700/80 mb-4">Export your guest list and wedding data for your records.</p>
-                                                    <Button variant="outline" className="w-full text-xs h-9 border-amber-200 text-amber-700 hover:bg-amber-100" disabled>
-                                                        Export Wedding Data (.csv)
-                                                    </Button>
-                                                </div>
-
-                                                <div className="p-4 rounded-xl border border-red-100 bg-red-50/30">
-                                                    <h3 className="text-sm font-bold text-red-600 flex items-center gap-2 mb-2">
-                                                        <Trash2 className="w-4 h-4" />
-                                                        Danger Zone
-                                                    </h3>
-                                                    <p className="text-xs text-red-500/80 mb-4">Permanently delete your account and all associated wedding data. This cannot be undone.</p>
-                                                    <Button
-                                                        variant="destructive"
-                                                        className="w-full text-xs h-9 bg-red-500 hover:bg-red-600"
-                                                        onClick={handleDeleteAccount}
-                                                    >
-                                                        Delete My Account Permanently
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )}
+                                        <Button
+                                            onClick={async () => {
+                                                await handleProfileUpdate();
+                                                setShowProfileModal(false);
+                                            }}
+                                            disabled={isSavingProfile}
+                                            className="w-full bg-rose-600 hover:bg-rose-700"
+                                        >
+                                            {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                            Save Profile
+                                        </Button>
                                     </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
+                                )}
 
-                        {/* AI Bio Dialog */}
-                        <Dialog open={showAiDialog} onOpenChange={setShowAiDialog}>
-                            <DialogContent className="sm:max-w-[500px]">
-                                <DialogHeader>
-                                    <DialogTitle className="flex items-center gap-2 text-rose-600">
-                                        <Sparkles className="w-5 h-5" />
-                                        Imagine Your Story
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        Tell us a few words about your journey, and we'll craft a beautiful wedding bio for you.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-4 py-4">
-                                    <Textarea
-                                        placeholder="e.g., We met in college 5 years ago, love traveling and hiking..."
-                                        value={roughBio}
-                                        onChange={(e) => setRoughBio(e.target.value)}
-                                        className="min-h-[100px]"
-                                    />
-                                    {generatedPreview && (
-                                        <div className="p-4 bg-rose-50 rounded-lg border border-rose-100">
-                                            <p className="text-sm italic text-gray-700">{generatedPreview}</p>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="mt-2 text-rose-600 h-7 text-xs"
-                                                onClick={() => {
-                                                    setBioText(generatedPreview);
-                                                    setShowAiDialog(false);
-                                                    setGeneratedPreview("");
-                                                    setRoughBio("");
-                                                }}
-                                            >
-                                                Use this story
+                                {modalTab === 'notifications' && (
+                                    <div className="space-y-6">
+                                        <div className="text-center py-12">
+                                            <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <Bell className="w-6 h-6 text-rose-500" />
+                                            </div>
+                                            <h3 className="text-sm font-bold text-gray-900">Notification Settings</h3>
+                                            <p className="text-xs text-gray-500 mt-1 max-w-[200px] mx-auto">Configure how you receive updates about your wedding.</p>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100">
+                                                <div>
+                                                    <p className="text-xs font-bold">Email Notifications</p>
+                                                    <p className="text-[10px] text-gray-500">Get RSVP updates via email</p>
+                                                </div>
+                                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-0 text-[10px]">Active</Badge>
+                                            </div>
+                                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 opacity-50">
+                                                <div>
+                                                    <p className="text-xs font-bold">WhatsApp Alerts</p>
+                                                    <p className="text-[10px] text-gray-500">Instant updates on WhatsApp</p>
+                                                </div>
+                                                <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {modalTab === 'security' && (
+                                    <div className="space-y-6">
+                                        <div className="p-4 rounded-xl border border-rose-100 bg-rose-50/30">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-10 h-10 bg-white rounded-lg border border-rose-100 flex items-center justify-center shadow-sm">
+                                                    <Shield className="w-5 h-5 text-rose-500" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-sm font-bold text-gray-900">Two-Factor Authentication</h3>
+                                                    <p className="text-[10px] text-gray-500">Add an extra layer of security</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between py-3 border-t border-rose-100">
+                                                <span className="text-xs font-medium text-gray-700">Status</span>
+                                                {is2FAEnabled ? (
+                                                    <Badge className="text-[10px] bg-green-100 text-green-700 hover:bg-green-100 border-0">Active</Badge>
+                                                ) : (
+                                                    <Badge variant="outline" className="text-[10px] bg-amber-50 text-amber-600 border-amber-200">Disabled</Badge>
+                                                )}
+                                            </div>
+
+                                            <Dialog open={show2FADialog} onOpenChange={(open) => {
+                                                setShow2FADialog(open);
+                                                if (!open) reset2FA();
+                                            }}>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        variant={is2FAEnabled ? "destructive" : "outline"}
+                                                        className={`w-full text-xs h-9 ${is2FAEnabled ? "bg-red-50 text-red-600 hover:bg-red-100 border-red-100" : "border-rose-200 text-rose-700 hover:bg-rose-100/50"}`}
+                                                        onClick={(e) => {
+                                                            if (is2FAEnabled) {
+                                                                e.preventDefault();
+                                                                if (confirm("Disable Two-Factor Authentication? This will reduce your account security.")) {
+                                                                    enable2FA(false).then(() => {
+                                                                        setIs2FAEnabled(false);
+                                                                        showSuccess("2FA Disabled successfully");
+                                                                    }).catch(() => showError("Failed to disable 2FA"));
+                                                                }
+                                                            } else {
+                                                                setShow2FADialog(true);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {is2FAEnabled ? "Disable 2FA Security" : "Setup 2FA Security"}
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border-none shadow-2xl">
+                                                    <div className="bg-rose-600 p-6 text-white text-center">
+                                                        <Shield className="w-10 h-10 mx-auto mb-2" />
+                                                        <h3 className="text-lg font-bold">2FA Setup</h3>
+                                                        <p className="text-xs opacity-90">Secure your account with a mobile authenticator</p>
+                                                    </div>
+                                                    <div className="p-6">
+                                                        {tfaStep === 1 && (
+                                                            <div className="space-y-6 text-center">
+                                                                <div className="mx-auto w-40 h-40 bg-white p-2 border rounded-xl flex items-center justify-center">
+                                                                    <QRCode
+                                                                        value={`otpauth://totp/WeddingWeb:${currentUser?.username || "user@example.com"}?secret=KR577WEDDINGWEB2FA&issuer=WeddingWeb`}
+                                                                        size={140}
+                                                                        level="M"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <p className="text-sm font-bold text-gray-900">Scan QR Code</p>
+                                                                    <p className="text-xs text-gray-500">Open your authenticator app and scan this code.</p>
+                                                                </div>
+                                                                <Button onClick={() => setTfaStep(2)} className="w-full bg-rose-600 hover:bg-rose-700">
+                                                                    I've Scanned It
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        {tfaStep === 2 && (
+                                                            <div className="space-y-6 text-center">
+                                                                <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+                                                                    <Lock className="w-6 h-6" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <p className="text-sm font-bold text-gray-900">Verify Code</p>
+                                                                    <p className="text-xs text-gray-500">Enter the 6-digit code from your app.</p>
+                                                                </div>
+                                                                <div className="flex justify-center">
+                                                                    <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
+                                                                        <InputOTPGroup className="gap-1">
+                                                                            <InputOTPSlot index={0} className="w-10 h-12 text-lg font-bold" />
+                                                                            <InputOTPSlot index={1} className="w-10 h-12 text-lg font-bold" />
+                                                                            <InputOTPSlot index={2} className="w-10 h-12 text-lg font-bold" />
+                                                                            <InputOTPSlot index={3} className="w-10 h-12 text-lg font-bold" />
+                                                                            <InputOTPSlot index={4} className="w-10 h-12 text-lg font-bold" />
+                                                                            <InputOTPSlot index={5} className="w-10 h-12 text-lg font-bold" />
+                                                                        </InputOTPGroup>
+                                                                    </InputOTP>
+                                                                </div>
+                                                                <Button
+                                                                    onClick={handleEnable2FA}
+                                                                    disabled={otpValue.length !== 6 || isVerifying}
+                                                                    className="w-full bg-rose-600 hover:bg-rose-700"
+                                                                >
+                                                                    {isVerifying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                                                    Verify & Enable
+                                                                </Button>
+                                                                <Button variant="ghost" onClick={() => setTfaStep(1)} className="text-xs text-gray-400">Back</Button>
+                                                            </div>
+                                                        )}
+                                                        {tfaStep === 3 && (
+                                                            <div className="py-6 text-center space-y-6">
+                                                                <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto">
+                                                                    <CheckCircle2 className="w-8 h-8" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <h3 className="text-xl font-bold text-gray-900">All Set!</h3>
+                                                                    <p className="text-xs text-gray-500">Two-Factor Authentication is now active.</p>
+                                                                </div>
+                                                                <Button onClick={() => setShow2FADialog(false)} className="w-full bg-gray-900 hover:bg-black font-bold">
+                                                                    Awesome
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+                                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">Change Password</h4>
+                                            <form onSubmit={handleChangePassword} className="space-y-3">
+                                                <div className="space-y-1">
+                                                    <label className="text-[10px] text-gray-400">Current Password</label>
+                                                    <div className="relative">
+                                                        <Input
+                                                            type={showCurrentPass ? "text" : "password"}
+                                                            className="h-8 text-xs bg-white pr-8"
+                                                            placeholder="••••••••"
+                                                            value={passwordForm.currentPassword}
+                                                            onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowCurrentPass(!showCurrentPass)}
+                                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                        >
+                                                            {showCurrentPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[10px] text-gray-400">New Password</label>
+                                                        <div className="relative">
+                                                            <Input
+                                                                type={showNewPass ? "text" : "password"}
+                                                                className="h-8 text-xs bg-white pr-8"
+                                                                placeholder="••••••••"
+                                                                value={passwordForm.newPassword}
+                                                                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowNewPass(!showNewPass)}
+                                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                            >
+                                                                {showNewPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[10px] text-gray-400">Confirm Password</label>
+                                                        <div className="relative">
+                                                            <Input
+                                                                type={showConfirmPass ? "text" : "password"}
+                                                                className="h-8 text-xs bg-white pr-8"
+                                                                placeholder="••••••••"
+                                                                value={passwordForm.confirmPassword}
+                                                                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowConfirmPass(!showConfirmPass)}
+                                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                            >
+                                                                {showConfirmPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type="submit"
+                                                    disabled={isUpdatingPassword}
+                                                    className="w-full h-8 text-[10px] font-bold bg-gray-900 hover:bg-black"
+                                                >
+                                                    {isUpdatingPassword ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Lock className="w-3 h-3 mr-1" />}
+                                                    Update Password
+                                                </Button>
+                                            </form>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Login Activity</h4>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="h-6 px-2 text-[10px] text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                                                    onClick={fetchLoginActivity}
+                                                    disabled={isLoadingSessions}
+                                                >
+                                                    {isLoadingSessions ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCw className="w-3 h-3 mr-1" />}
+                                                    Refresh
+                                                </Button>
+                                            </div>
+
+                                            <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                                                {loginSessions.length > 0 ? (
+                                                    loginSessions.map((session: any, idx: number) => (
+                                                        <div key={session.id || idx} className="p-2 rounded-lg bg-white border border-gray-100 flex items-center justify-between gap-3">
+                                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                                <div className="w-7 h-7 bg-gray-50 rounded-md flex items-center justify-center shrink-0">
+                                                                    <Settings2 className="w-3.5 h-3.5 text-gray-400" />
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-[10px] font-bold text-gray-900 truncate">
+                                                                        {session.action?.replace(/_/g, ' ') || 'Login'} • {session.ip_address || 'Unknown IP'}
+                                                                    </p>
+                                                                    <p className="text-[9px] text-gray-400">
+                                                                        {new Date(session.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <Badge variant="outline" className="text-[8px] h-4 px-1 text-gray-400 border-gray-100 font-normal shrink-0">
+                                                                {session.details?.user_agent?.includes('Mobile') ? 'Mobile' : 'Desktop'}
+                                                            </Badge>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-center py-6">
+                                                        <p className="text-[10px] text-gray-400 italic">No recent activity found</p>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <p className="text-[9px] text-gray-400 mt-3 flex items-center gap-1">
+                                                <Shield className="w-2.5 h-2.5" />
+                                                Only successful logins are shown here.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+
+
+                                {modalTab === 'advanced' && (
+                                    <div className="space-y-6">
+                                        <div className="p-4 rounded-xl border border-amber-100 bg-amber-50/30">
+                                            <h3 className="text-sm font-bold text-amber-800 flex items-center gap-2 mb-2">
+                                                <Settings2 className="w-4 h-4" />
+                                                Data Control
+                                            </h3>
+                                            <p className="text-xs text-amber-700/80 mb-4">Export your guest list and wedding data for your records.</p>
+                                            <Button variant="outline" className="w-full text-xs h-9 border-amber-200 text-amber-700 hover:bg-amber-100" disabled>
+                                                Export Wedding Data (.csv)
                                             </Button>
                                         </div>
-                                    )}
+
+                                        <div className="p-4 rounded-xl border border-red-100 bg-red-50/30">
+                                            <h3 className="text-sm font-bold text-red-600 flex items-center gap-2 mb-2">
+                                                <Trash2 className="w-4 h-4" />
+                                                Danger Zone
+                                            </h3>
+                                            <p className="text-xs text-red-500/80 mb-4">Permanently delete your account and all associated wedding data. This cannot be undone.</p>
+                                            <Button
+                                                variant="destructive"
+                                                className="w-full text-xs h-9 bg-red-500 hover:bg-red-600"
+                                                onClick={handleDeleteAccount}
+                                            >
+                                                Delete My Account Permanently
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* AI Bio Dialog */}
+                <Dialog open={showAiDialog} onOpenChange={setShowAiDialog}>
+                    <DialogContent className="sm:max-w-[500px]">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-rose-600">
+                                <Sparkles className="w-5 h-5" />
+                                Imagine Your Story
+                            </DialogTitle>
+                            <DialogDescription>
+                                Tell us a few words about your journey, and we'll craft a beautiful wedding bio for you.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <Textarea
+                                placeholder="e.g., We met in college 5 years ago, love traveling and hiking..."
+                                value={roughBio}
+                                onChange={(e) => setRoughBio(e.target.value)}
+                                className="min-h-[100px]"
+                            />
+                            {generatedPreview && (
+                                <div className="p-4 bg-rose-50 rounded-lg border border-rose-100">
+                                    <p className="text-sm italic text-gray-700">{generatedPreview}</p>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="mt-2 text-rose-600 h-7 text-xs"
+                                        onClick={() => {
+                                            setBioText(generatedPreview);
+                                            setShowAiDialog(false);
+                                            setGeneratedPreview("");
+                                            setRoughBio("");
+                                        }}
+                                    >
+                                        Use this story
+                                    </Button>
                                 </div>
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setShowAiDialog(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        onClick={handleGenerateBio}
-                                        disabled={isGeneratingBio || !roughBio.trim()}
-                                        className="bg-rose-600 hover:bg-rose-700"
-                                    >
-                                        {isGeneratingBio ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                        Generate Story
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div >
-            </main >
+                            )}
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowAiDialog(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleGenerateBio}
+                                disabled={isGeneratingBio || !roughBio.trim()}
+                                className="bg-rose-600 hover:bg-rose-700"
+                            >
+                                {isGeneratingBio ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                Generate Story
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </main>
 
             {/* Footer */}
-            < footer className="bg-white/80 border-t border-gray-200 py-6 mt-12" >
+            <footer className="bg-white/80 border-t border-gray-200 py-6 mt-12">
                 <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
                     <p>© 2026 WeddingWeb Premium. Need help? <a href="/company/contact" className="text-rose-600 hover:underline">Contact Support</a></p>
                 </div>
-            </footer >
-        </div >
+            </footer>
+        </div>
     );
 };
 

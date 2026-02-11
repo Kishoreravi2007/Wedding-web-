@@ -120,9 +120,14 @@ const App = () => {
       location.pathname === '/sreedevi/schedule';
   }, [location.pathname]);
 
-  // Check if on company pages (hide music player on company pages)
-  const isCompanyPage = useMemo(() => {
-    return location.pathname === '/' || location.pathname.startsWith('/company') || location.pathname.startsWith('/client') || location.pathname === '/privacy' || location.pathname === '/terms';
+  // Check if on company or photographer pages (hide music player)
+  const isExcludedPage = useMemo(() => {
+    return location.pathname === '/' ||
+      location.pathname.startsWith('/company') ||
+      location.pathname.startsWith('/client') ||
+      location.pathname.startsWith('/photographer') ||
+      location.pathname === '/privacy' ||
+      location.pathname === '/terms';
   }, [location.pathname]);
 
   // Note: Music pause/resume is now handled globally in MusicPlayerContext
@@ -164,8 +169,8 @@ const App = () => {
                 </Button>
               </Link>
             )}
-            {/* Music Player Toggle - Hidden on company pages, feedback page, and wedding pages (which have their own player) */}
-            {!isCompanyPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && location.pathname !== '/feedback' && (
+            {/* Music Player Toggle - Hidden on excluded pages, feedback page, and wedding pages (which have their own player) */}
+            {!isExcludedPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && location.pathname !== '/feedback' && (
               <Button
                 variant="outline"
                 size="icon"
@@ -175,12 +180,12 @@ const App = () => {
                 {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
               </Button>
             )}
-            {/* Music Player - Hidden on company pages and wedding pages */}
-            {!isCompanyPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && showMusicPlayer && <MusicPlayer />}
+            {/* Music Player - Hidden on excluded pages and wedding pages */}
+            {!isExcludedPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && showMusicPlayer && <MusicPlayer />}
 
             {/* Feedback Button - Available on all pages except feedback page itself */}
             {location.pathname !== '/feedback' && (
-              <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isCompanyPage ? 'bottom-20' : 'bottom-20'}`}>
+              <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isExcludedPage ? 'bottom-20' : 'bottom-20'}`}>
                 <Button
                   className={`bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 rounded-full ${feedbackCompact ? 'w-12 h-12 p-0' : 'px-5 py-3'
                     }`}
@@ -290,7 +295,7 @@ const App = () => {
 
                 {/* Portal Routes */}
                 <Route path="/photographer-login" element={<PhotographerLogin />} />
-                <Route path="/photographer" element={<PhotographerDashboard />} />
+                <Route path="/photographer" element={<AuthGuard><PhotographerDashboard /></AuthGuard>} />
                 <Route path="/couple-login" element={<CoupleLogin />} />
                 <Route path="/couple" element={<CoupleDashboard />} />
                 <Route path="/feedback" element={<Feedback />} />

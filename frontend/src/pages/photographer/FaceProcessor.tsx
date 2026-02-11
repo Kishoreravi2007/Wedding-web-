@@ -13,13 +13,18 @@ import { CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL, getAuthHeaders, DEEPFACE_API_URL } from '@/lib/api';
 
-const FaceProcessor = () => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [modelsLoaded, setModelsLoaded] = useState(false);
-  const [loadingModels, setLoadingModels] = useState(false);
+interface FaceProcessorProps {
+  weddingId?: string;
+}
+
+const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [currentPhoto, setCurrentPhoto] = useState('');
+  const [stats, setStats] = useState<any>(null);
+  const [autoDetectionStatus, setAutoDetectionStatus] = useState<any>(null);
   const [results, setResults] = useState<{
     processed: number;
     faces_found: number;
@@ -29,72 +34,66 @@ const FaceProcessor = () => {
     faces_found: 0,
     errors: 0
   });
-  const [stats, setStats] = useState<any>(null);
 
   // DeepFace API is external, no models to load here
-  useEffect(() => {
-    setModelsLoaded(true);
-  }, []);
-
-  const loadFaceModels = async () => {
-    setModelsLoaded(true);
-  };
+  // Removed modelsLoaded and loadingModels state and related useEffect/loadFaceModels
 
   // Fetch photos
   const fetchPhotos = async () => {
     try {
-      const [sisterARes, sisterBRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/photos?sister=sister-a`),
-        fetch(`${API_BASE_URL}/api/photos?sister=sister-b`)
-      ]);
-
-      const sisterAData = await sisterARes.json();
-      const sisterBData = await sisterBRes.json();
-
-      const sisterAPhotos = Array.isArray(sisterAData) ? sisterAData : (sisterAData.photos || []);
-      const sisterBPhotos = Array.isArray(sisterBData) ? sisterBData : (sisterBData.photos || []);
-
-      const allPhotos = [...sisterAPhotos, ...sisterBPhotos];
-
-      setPhotos(allPhotos);
-      console.log(`Loaded ${allPhotos.length} photos for processing`);
+      const response = await fetch(`${API_BASE_URL}/api/photos?sister=${weddingId}`);
+      if (response.ok) {
+        const data = await response.json();
+        const allPhotos = Array.isArray(data) ? data : (data.photos || []);
+        setPhotos(allPhotos);
+      }
     } catch (error) {
       console.error('Error fetching photos:', error);
-      alert('Failed to fetch photos');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Fetch stats
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/process-faces/stats`);
-      const data = await response.json();
-      setStats(data);
+      const response = await fetch(`${API_BASE_URL}/api/faces/statistics?sister=${weddingId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
   };
 
+  const checkAutoDetectionStatus = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/faces/auto-detection-status?sister=${weddingId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAutoDetectionStatus(data);
+      }
+    } catch (error) {
+      console.error('Error checking auto detection status:', error);
+    }
+  };
+
   // Process all photos
   const processAllPhotos = async () => {
-    if (!modelsLoaded) {
-      alert('Face detection models are still loading. Please wait...');
-      return;
-    }
-
     if (photos.length === 0) {
-      await fetchPhotos();
-      setTimeout(() => processAllPhotos(), 1000);
+      alert('No photos to process. Please ensure photos are loaded.');
       return;
     }
 
-    setIsProcessing(true);
+    setProcessing(true);
     setResults({ processed: 0, faces_found: 0, errors: 0 });
     setProgress(0);
+    setCurrentPhotoIndex(0);
 
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
-      setCurrentPhoto(photo.filename);
+      setCurrentPhotoIndex(i);
       setProgress(((i + 1) / photos.length) * 100);
 
       try {
@@ -126,19 +125,23 @@ const FaceProcessor = () => {
           }));
 
           // Send to backend
-          const response = await fetch(`${API_BASE_URL}/api/process-faces/store-descriptors`, {
+          const storeResponse = await fetch(`${API_BASE_URL}/api/faces/store-batch`, {
             method: 'POST',
             headers: {
-              ...getAuthHeaders(),
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
             },
             body: JSON.stringify({
               photo_id: photo.id,
-              faces: faces
+              faces: faces.map((f: any) => ({
+                descriptor: f.descriptor,
+                boundingBox: f.boundingBox,
+                confidence: f.confidence
+              }))
             })
           });
 
-          if (response.ok) {
+          if (storeResponse.ok) {
             setResults(prev => ({
               ...prev,
               processed: prev.processed + 1,
@@ -173,10 +176,12 @@ const FaceProcessor = () => {
   };
 
   useEffect(() => {
-    fetchPhotos();
-    fetchStats();
-    checkAndAutoProcess();
-  }, []);
+    if (weddingId) {
+      fetchPhotos();
+      fetchStats();
+      checkAutoDetectionStatus();
+    }
+  }, [weddingId]);
 
   // Auto-process photos if they need processing
   const checkAndAutoProcess = async () => {

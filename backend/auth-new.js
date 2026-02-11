@@ -12,6 +12,8 @@ const { SecureUserDB, TokenManager, authMiddleware } = require('./lib/secure-aut
 const emailService = require('./services/email-service');
 const OTPAuth = require('otpauth');
 
+console.log('🛡️  auth-new.js module loading... (Secure SQL Auth)');
+
 /**
  * Helper to get client IP address consistently
  */
@@ -125,7 +127,8 @@ router.post('/login', async (req, res) => {
         is_active: user.is_active,
         email_offers_opt_in: user.email_offers_opt_in,
         is_2fa_enabled: user.is_2fa_enabled,
-        has_premium_access: user.has_premium_access
+        has_premium_access: user.has_premium_access,
+        wedding_id: user.wedding_id
       },
       token,
       accessToken: token
@@ -261,7 +264,8 @@ router.post('/verify-2fa', async (req, res) => {
         username: user.username,
         role: user.role,
         is_active: user.is_active,
-        email_offers_opt_in: user.email_offers_opt_in
+        email_offers_opt_in: user.email_offers_opt_in,
+        wedding_id: user.wedding_id
       },
       token,
       accessToken: token
@@ -916,5 +920,137 @@ router.put('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/auth/photographer/credentials
+ * Generate or update photographer credentials for the client's wedding
+ */
+router.get('/photographer/wedding-details', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const weddingId = req.user.wedding_id;
+    const { query } = require('./lib/db-gcp');
+
+    if (!weddingId) {
+      return res.status(403).json({ message: 'Not authorized for any wedding portal' });
+    }
+
+    const { rows } = await query(
+      'SELECT id, wedding_code, groom_name, bride_name, wedding_date, theme FROM weddings WHERE id = $1',
+      [weddingId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Wedding not found' });
+    }
+
+    const wedding = rows[0];
+
+    // Fetch events for this wedding's user_id
+    // Note: weddings table user_id links to its owner, event_timeline links to user_id
+    const { rows: events } = await query(
+      'SELECT id, title FROM event_timeline WHERE user_id = (SELECT user_id FROM weddings WHERE id = $1) ORDER BY event_date ASC',
+      [weddingId]
+    );
+
+    res.json({
+      success: true,
+      wedding: {
+        ...wedding,
+        events: events.map(e => e.title)
+      }
+    });
+
+  } catch (error) {
+    console.error('Photographer wedding details error:', error);
+    res.status(500).json({ message: 'Failed to fetch wedding details' });
+  }
+});
+
+router.post('/photographer/credentials', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { password } = req.body;
+    const { query } = require('./lib/db-gcp');
+    const bcrypt = require('bcryptjs');
+
+    if (!password || password.length < 4) {
+      return res.status(400).json({ message: 'Photographer password must be at least 4 characters' });
+    }
+
+    // 1. Get client's wedding (Robust Lookup)
+    console.log(`🔍 Looking up wedding for user: ${userId}`);
+
+    // Strategy A: Check user's profile for wedding_id first
+    const userProfile = await query('SELECT wedding_id FROM users WHERE id = $1', [userId]);
+    let weddingIdProfile = userProfile.rows[0]?.wedding_id;
+    let weddingResult;
+
+    if (weddingIdProfile) {
+      weddingResult = await query('SELECT id, wedding_code FROM weddings WHERE id = $1', [weddingIdProfile]);
+    }
+
+    // Strategy B: Fallback to ownership lookup if Step A failed
+    if (!weddingResult || weddingResult.rows.length === 0) {
+      weddingResult = await query('SELECT id, wedding_code FROM weddings WHERE user_id = $1 LIMIT 1', [userId]);
+    }
+
+    // Log for debugging (using appendFileSync for reliability)
+    try {
+      require('fs').appendFileSync('request_debug.log', `[${new Date().toISOString()}] USER_ID: ${userId} | PROFILE_WID: ${weddingIdProfile} | FOUND: ${weddingResult.rows.length > 0}\n`);
+    } catch (e) { }
+
+    if (weddingResult.rows.length === 0) {
+      return res.status(404).json({ message: 'No wedding found for this account. Create a wedding first.' });
+    }
+
+    const wedding = weddingResult.rows[0];
+    const photoUsername = `photo_${wedding.wedding_code || wedding.id.substring(0, 8)}`.toLowerCase();
+
+    // 2. Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // 3. Create or Update Photographer User
+    const { rows: existingPhotos } = await query(
+      'SELECT id FROM users WHERE role = $1 AND wedding_id = $2',
+      ['photographer', wedding.id]
+    );
+
+    let resultUser;
+    if (existingPhotos.length > 0) {
+      // Update existing
+      const updateResult = await query(
+        `UPDATE users SET 
+          username = $1, 
+          password = $2, 
+          is_active = true 
+        WHERE id = $3 
+        RETURNING id, username, role`,
+        [photoUsername, hashedPassword, existingPhotos[0].id]
+      );
+      resultUser = updateResult.rows[0];
+    } else {
+      // Create new
+      const insertResult = await query(
+        `INSERT INTO users (username, password, role, is_active, wedding_id, created_at)
+        VALUES ($1, $2, $3, $4, $5, NOW())
+        RETURNING id, username, role`,
+        [photoUsername, hashedPassword, 'photographer', true, wedding.id]
+      );
+      resultUser = insertResult.rows[0];
+    }
+
+    res.json({
+      success: true,
+      message: 'Photographer credentials updated successfully',
+      credentials: {
+        username: resultUser.username,
+        password: password
+      }
+    });
+
+  } catch (error) {
+    console.error('Photographer credentials error:', error);
+    res.status(500).json({ message: 'Failed to manage photographer credentials' });
+  }
+});
 
 module.exports = { router, authenticateToken: authMiddleware.verifyToken };

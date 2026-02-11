@@ -69,8 +69,12 @@ const PhotoDB = {
     const conditions = [];
     let paramIndex = 1;
 
-    // Apply filters to main query if possible, or WHERE clause
-    if (filters.sister) {
+    // Apply filters
+    if (filters.weddingId) {
+      conditions.push(`p.wedding_id = $${paramIndex++}`);
+      params.push(filters.weddingId);
+    } else if (filters.sister) {
+      // Fallback/Legacy support for sister
       conditions.push(`p.sister = $${paramIndex++}`);
       params.push(filters.sister);
     }
@@ -200,11 +204,14 @@ const PhotoDB = {
    * Get photo count
    */
   async count(filters = {}) {
-    let text = 'SELECT COUNT(*) as count FROM photos';
+    let text = 'SELECT COUNT(*) as count FROM photos WHERE 1=1';
     const params = [];
     const conditions = [];
 
-    if (filters.sister) {
+    if (filters.weddingId) {
+      conditions.push(`wedding_id = $${params.length + 1}`);
+      params.push(filters.weddingId);
+    } else if (filters.sister) {
       conditions.push(`sister = $${params.length + 1}`);
       params.push(filters.sister);
     }
@@ -218,7 +225,7 @@ const PhotoDB = {
     }
 
     if (conditions.length > 0) {
-      text += ' WHERE ' + conditions.join(' AND ');
+      text += ' AND ' + conditions.join(' AND ');
     }
 
     const { rows } = await query(text, params);

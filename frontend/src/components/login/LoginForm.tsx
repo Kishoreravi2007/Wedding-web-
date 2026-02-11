@@ -20,7 +20,7 @@ interface LoginFormProps {
 const emailPattern = /^\S+@\S+\.\S+$/;
 
 const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -33,20 +33,28 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
     event.preventDefault();
     setErrorMessage(null);
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage("Please enter your email and password.");
+    if (!identifier.trim() || !password.trim()) {
+      setErrorMessage("Please enter your email or username and password.");
       return;
     }
 
-    if (!emailPattern.test(email.trim())) {
+    // Only enforce email pattern if it looks like an email (contains @)
+    // This allows photographer usernames (like photo_kishoreravi) to pass
+    if (identifier.includes("@") && !emailPattern.test(identifier.trim())) {
       setErrorMessage("Please provide a valid email address.");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await login(email.trim(), password);
-      navigate(redirectTo || "/", { replace: true });
+      const { user } = await login(identifier.trim(), password) as any;
+
+      // Role-based redirection
+      if (user?.role === 'photographer') {
+        navigate("/photographer", { replace: true });
+      } else {
+        navigate(redirectTo || "/client", { replace: true });
+      }
     } catch (error: any) {
       setErrorMessage(error?.message || "Unable to sign you in right now.");
     } finally {
@@ -65,16 +73,16 @@ const LoginForm = ({ redirectTo = "/" }: LoginFormProps) => {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-sm font-medium text-slate-700">
-            Email address
+          <Label htmlFor="identifier" className="text-sm font-medium text-slate-700">
+            Email or Username
           </Label>
           <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
+            id="identifier"
+            type="text"
+            placeholder="Email or photographer ID"
+            value={identifier}
+            onChange={(event) => setIdentifier(event.target.value)}
+            autoComplete="username"
             className="h-11 bg-slate-50 border-slate-200 focus:border-rose-500 focus:ring-rose-500/20 transition-all rounded-lg placeholder:text-slate-400"
           />
         </div>
