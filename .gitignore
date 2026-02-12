@@ -77,3 +77,6 @@ backend/whatsapp-qr.txt
 .wwebjs_auth/
 whatsapp-qr.txt
 
+# Large binaries
+backend/binaries/
+

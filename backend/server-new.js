@@ -112,6 +112,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const uploadsPath = path.join(__dirname, process.env.LOCAL_STORAGE_PATH || 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
+// Serve desktop app binaries - support both root and /api prefixed paths for flexibility
+app.use(['/binaries', '/api/binaries'], express.static(path.join(__dirname, 'binaries')));
+
 // Serve static files from the built frontend
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, 'build');

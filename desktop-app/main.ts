@@ -68,6 +68,7 @@ function createWindow() {
         nodeIntegration: false,
         contextIsolation: true,
       },
+      icon: path.join(__dirname, 'assets', 'icon.png'),
       titleBarStyle: 'hiddenInset',
     });
 

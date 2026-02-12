@@ -247,10 +247,16 @@ export default function LiveSyncDashboard() {
                 />
               </div>
 
-              <Button onClick={generateApiKey} disabled={isLoading || !photographerId}>
-                <Key className="w-4 h-4 mr-2" />
-                Generate API Key
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={generateApiKey} disabled={isLoading || !photographerId}>
+                  <Key className="w-4 h-4 mr-2" />
+                  Generate API Key
+                </Button>
+                <Button variant="outline" onClick={() => window.open(`${API_BASE_URL}/binaries/WeddingWeb_Desktop.zip`)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Windows App
+                </Button>
+              </div>
 
               {generatedKey && (
                 <Alert>
