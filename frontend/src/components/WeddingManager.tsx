@@ -31,6 +31,8 @@ interface Wedding {
   max_photos: number;
   storage_used_mb: number;
   created_at: string;
+  photographer_username?: string;
+  photographer_password?: string;
 }
 
 interface WeddingStats {
@@ -102,10 +104,10 @@ const WeddingManager: React.FC = () => {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/api/weddings`);
       const data = await response.json();
-      
+
       if (data.success) {
         setWeddings(data.weddings);
-        
+
         // Fetch stats for each wedding
         data.weddings.forEach((wedding: Wedding) => {
           fetchWeddingStats(wedding.id);
@@ -126,7 +128,7 @@ const WeddingManager: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}/stats`);
       const data = await response.json();
-      
+
       if (data.success) {
         setWeddingStats(prev => ({
           ...prev,
@@ -171,9 +173,9 @@ const WeddingManager: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setIsCreateDialogOpen(false);
         fetchWeddings();
@@ -200,16 +202,16 @@ const WeddingManager: React.FC = () => {
       bride_name: names.bride,
       groom_name: names.groom
     };
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/weddings/${selectedWedding.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setIsEditDialogOpen(false);
         fetchWeddings();
@@ -229,14 +231,14 @@ const WeddingManager: React.FC = () => {
     if (!confirm('Are you sure you want to delete this wedding? This action cannot be undone.')) {
       return;
     }
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}`, {
         method: 'DELETE'
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         fetchWeddings();
         alert('Wedding deleted successfully!');
@@ -255,9 +257,9 @@ const WeddingManager: React.FC = () => {
       const response = await fetch(`${API_BASE_URL}/api/weddings/${weddingId}/archive`, {
         method: 'POST'
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         fetchWeddings();
         alert('Wedding archived successfully!');
@@ -340,7 +342,7 @@ const WeddingManager: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-900">Wedding Customer Management</h1>
           <p className="text-gray-600 mt-2">Manage your wedding clients and their details</p>
         </div>
-        
+
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-pink-600 hover:bg-pink-700" onClick={resetForm}>
@@ -352,9 +354,9 @@ const WeddingManager: React.FC = () => {
               <DialogTitle>Create New Wedding</DialogTitle>
               <DialogDescription>Add a new wedding customer to your system</DialogDescription>
             </DialogHeader>
-            
+
             <WeddingForm formData={formData} setFormData={setFormData} />
-            
+
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
               <Button onClick={handleCreateWedding} className="bg-pink-600 hover:bg-pink-700">
@@ -376,7 +378,7 @@ const WeddingManager: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {weddings.map((wedding) => {
           const stats = weddingStats[wedding.id] || { total_photos: 0, total_people: 0, total_wishes: 0, storage_used_mb: 0 };
-          
+
           return (
             <Card key={wedding.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
@@ -396,7 +398,7 @@ const WeddingManager: React.FC = () => {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 {/* Wedding Code */}
                 <div className="mb-4 p-2 bg-gray-100 rounded text-sm font-mono">
@@ -434,28 +436,28 @@ const WeddingManager: React.FC = () => {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => openEditDialog(wedding)}
                     className="flex-1"
                   >
                     <Edit2 className="h-3 w-3 mr-1" /> Edit
                   </Button>
-                  
+
                   {wedding.status !== 'archived' && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleArchiveWedding(wedding.id)}
                     >
                       <Archive className="h-3 w-3" />
                     </Button>
                   )}
-                  
-                  <Button 
-                    size="sm" 
-                    variant="destructive" 
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
                     onClick={() => handleDeleteWedding(wedding.id)}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -481,9 +483,9 @@ const WeddingManager: React.FC = () => {
             <DialogTitle>Edit Wedding</DialogTitle>
             <DialogDescription>Update wedding details</DialogDescription>
           </DialogHeader>
-          
+
           <WeddingForm formData={formData} setFormData={setFormData} isEdit />
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleUpdateWedding} className="bg-pink-600 hover:bg-pink-700">
@@ -504,6 +506,8 @@ interface WeddingFormProps {
 }
 
 const WeddingForm: React.FC<WeddingFormProps> = ({ formData, setFormData, isEdit = false }) => {
+  const [generatingCreds, setGeneratingCreds] = useState(false);
+
   const handleChange = (field: string, value: any) => {
     setFormData(prev => {
       const updated = { ...prev, [field]: value };
@@ -519,6 +523,33 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ formData, setFormData, isEdit
 
       return updated;
     });
+  };
+
+  const handleGenerateCredentials = async () => {
+    if (!formData.id) return;
+    try {
+      setGeneratingCreds(true);
+      const response = await fetch(`${API_BASE_URL}/api/weddings/${formData.id}/photographer`, {
+        method: 'POST'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setFormData(prev => ({
+          ...prev,
+          photographer_username: data.credentials.username,
+          photographer_password: data.credentials.password
+        }));
+        alert('Photographer credentials generated!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error generating credentials:', err);
+      alert('Failed to generate credentials');
+    } finally {
+      setGeneratingCreds(false);
+    }
   };
 
   return (
@@ -712,6 +743,40 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ formData, setFormData, isEdit
           step="100"
         />
       </div>
+
+      {isEdit && (
+        <div className="border-t pt-4">
+          <Label className="text-base font-semibold mb-3 block">Photographer Access</Label>
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="p-4 space-y-4">
+              {formData.photographer_username ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs text-gray-500">Username</Label>
+                    <div className="font-mono bg-white p-2 rounded border">{formData.photographer_username}</div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Password</Label>
+                    <div className="font-mono bg-white p-2 rounded border">{formData.photographer_password}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 italic">No photographer credentials generated yet.</div>
+              )}
+
+              <Button
+                onClick={handleGenerateCredentials}
+                disabled={generatingCreds}
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                {generatingCreds ? 'Generating...' : (formData.photographer_username ? 'Regenerate Credentials' : 'Generate Credentials')}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

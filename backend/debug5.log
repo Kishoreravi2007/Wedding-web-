@@ -1,0 +1,124 @@
+[dotenv@17.2.3] injecting env (30) from backend\.env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+🔍 Checking available Gemini models...
+[dotenv@17.2.3] injecting env (0) from backend\.env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+🛡️  auth-new.js module loading... (Secure SQL Auth)
+🔑 Registering /api/auth routes...
+✅ Registered /api/auth routes.
+📦 Registering /api/photos routes...
+👤 Registering /api/faces routes...
+👤 Registering /api/profiles routes...
+🤖 Registering /api/ai routes...
+🔔 Registering /api/notifications routes...
+✉️ Registering /api/email/auto-reply-webhook route...
+✅ Registered /api/email/auto-reply-webhook route.
+💍 Registering /api/weddings route...
+✅ Registered /api/weddings route.
+🎵 Registering /api/music routes...
+✅ Registered /api/music routes.
+👥 Registering /api/guests routes...
+🚀 Initializing WhatsApp Web Client...
+📅 Registering /api/timeline routes...
+🔄 Registering /api/live routes...
+⭐ Registering /api/reviews routes...
+✅ Registered /api/reviews routes.
+💎 Registering /api/premium routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+✅ Registered /api/premium routes.
+
+================================================================================
+🎉 Wedding Web Application Server Started
+================================================================================
+📍 Server running on port 5001
+🌐 Environment: development
+
+📋 API Endpoints:
+   Health:         http://localhost:5001/health
+   Wishes:         http://localhost:5001/api/wishes
+   Photos:         http://localhost:5001/api/photos
+   Face Recognition: http://localhost:5001/api/faces
+   Authentication: http://localhost:5001/api/auth
+================================================================================
+
+✅ Reviews table checked/created
+🔐 WhatsApp Authenticated successfully
+✅ WhatsApp Web Client is READY!
+
+--- Incoming Request ---
+[2026-02-12T15:12:08.021Z] POST /api/premium/checkout
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+🔍 Checkout Request Body: {"features":["website","photo-gallery","event-schedule","wishes","music-player","face-detection","photographer-portal","live-sync","photo-booth","guest-management","notifications","custom-branding","custom-domain","mobile-app","analytics","priority-support","backup-restore","email-marketing","sms-notifications","gift-registry"],"duration":1}
+⚠️ [TEST MODE] Capping amount from ₹79480 to ₹5000 for Razorpay testing
+🔍 Calculated Pricing: {"base":79480,"multiplier":1,"duration":1,"features":["website","photo-gallery","event-schedule","wishes","music-player","face-detection","photographer-portal","live-sync","photo-booth","guest-management","notifications","custom-branding","custom-domain","mobile-app","analytics","priority-support","backup-restore","email-marketing","sms-notifications","gift-registry"],"total":5000,"isCapped":true}
+✅ Initializing Razorpay Client with Key ID: rzp_test_S...
+💳 [Razorpay] Creating order with payload: {
+  "amount": 500000,
+  "currency": "INR",
+  "receipt": "dc4a8f2e-6195-41b3-87d5-8ad3e487f14b",
+  "payment_capture": 1,
+  "notes": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "features": "website,photo-gallery,event-schedule,wishes,music-player,face-detection,photographer-portal,live-sync,photo-booth,guest-management,notifications,custom-branding,custom-domain,mobile-app,analytics,priority-support,backup-restore,email-marketing,sms-notifications,gift-registry",
+    "duration": "1 months"
+  },
+  "amount_in_rupees": 5000
+}
+✅ [Razorpay] Order created successfully: order_SFHNWo7V7ZC4TY (₹5000)
+
+--- Incoming Request ---
+[2026-02-12T15:13:53.941Z] POST /api/premium/activate
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+Database query error: error: column "updated_at" of relation "users" does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\premium.js:249:5 {
+  length: 130,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '45',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'analyze.c',
+  line: '2528',
+  routine: 'transformUpdateTargetList'
+}
+Activation error: error: column "updated_at" of relation "users" does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\premium.js:249:5 {
+  length: 130,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '45',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'analyze.c',
+  line: '2528',
+  routine: 'transformUpdateTargetList'
+}
+
+📴 SIGINT received. Closing server gracefully...

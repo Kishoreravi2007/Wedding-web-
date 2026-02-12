@@ -1,6 +1,7 @@
-// Wedding Management API Routes - SQL Version
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { query } = require('../lib/db-gcp');
 const authenticateApiKey = require('../middleware/apiKeyAuth');
 
@@ -355,6 +356,67 @@ router.get('/public/upcoming', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching upcoming weddings:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// =====================================================
+// GENERATE/GET PHOTOGRAPHER CREDENTIALS
+// =====================================================
+router.post('/:id/photographer', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Get wedding details
+    const { rows: weddingRows } = await query('SELECT * FROM weddings WHERE id = $1', [id]);
+    if (weddingRows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Wedding not found' });
+    }
+    const wedding = weddingRows[0];
+
+    // 2. Generate credentials
+    // Username: photo_[wedding_code] (cleaned)
+    const baseCode = wedding.wedding_code.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().substring(0, 15);
+    const username = `photo_${baseCode}`;
+    const password = crypto.randomBytes(4).toString('hex'); // 8 characters
+
+    // 3. Hash password for auth
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 4. Create/Update User
+    // We use a specific prefix to avoid collision, or just rely on the username
+    const userResult = await query(`
+      INSERT INTO users (username, password, role, wedding_id, is_active, created_at)
+      VALUES ($1, $2, 'photographer', $3, true, NOW())
+      ON CONFLICT (username) DO UPDATE 
+      SET password = EXCLUDED.password,
+          wedding_id = EXCLUDED.wedding_id,
+          updated_at = NOW()
+      RETURNING id
+    `, [username, hashedPassword, id]);
+
+    // 5. Store plaintext credentials in weddings table for display
+    await query(`
+      UPDATE weddings 
+      SET photographer_username = $1, 
+          photographer_password = $2 
+      WHERE id = $3
+    `, [username, password, id]);
+
+    res.json({
+      success: true,
+      credentials: {
+        username,
+        password
+      },
+      message: 'Photographer credentials generated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error generating photographer credentials:', error);
     res.status(500).json({
       success: false,
       error: error.message

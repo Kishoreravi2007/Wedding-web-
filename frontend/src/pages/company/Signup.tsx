@@ -225,24 +225,18 @@ const CompanySignup = () => {
     setShowOptInDialog(false);
     try {
       setIsSubmitting(true);
-      const { data, error: signupError } = await signup(email.trim(), password, emailOptIn, fullName.trim());
+      const { data, error: signupError } = await signup(
+        email.trim(),
+        password,
+        emailOptIn,
+        fullName.trim(),
+        location.trim() || undefined,
+        bio.trim() || undefined,
+        photo
+      );
+
       if (signupError) {
         throw signupError;
-      }
-
-      if (data?.user?.id) {
-        await fetch(`${API_BASE_URL}/api/profiles`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: data.user.id,
-            email: email.trim(),
-            full_name: fullName.trim() || null,
-            location: location.trim() || null,
-            bio: bio.trim() || null,
-            avatar_url: photo,
-          }),
-        });
       }
 
       toast({

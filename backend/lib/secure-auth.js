@@ -143,6 +143,9 @@ const SecureUserDB = {
         };
       }
 
+      // Get active premium features
+      const premiumFeatures = await this.getActiveFeatures(user.id);
+
       return {
         id: user.id,
         username: user.username,
@@ -151,9 +154,10 @@ const SecureUserDB = {
         is_2fa_enabled: user.is_2fa_enabled,
         two_factor_secret: user.two_factor_secret,
         email_offers_opt_in: user.email_offers_opt_in,
-        has_premium_access: user.has_premium_access,
+        has_premium_access: user.has_premium_access, // Keep for backward compatibility
+        premium_features: premiumFeatures, // New atomic features list
         wedding_id: user.wedding_id,
-        profile: user.profile // Return profile with weddingData
+        profile: user.profile
       };
 
     } catch (error) {
@@ -188,10 +192,46 @@ const SecureUserDB = {
         'SELECT id, username, role, is_active, email_offers_opt_in, has_premium_access, wedding_id FROM users WHERE id = $1',
         [id]
       );
-      return rows[0];
+
+      if (!rows[0]) return null;
+
+      const user = rows[0];
+      user.premium_features = await this.getActiveFeatures(id);
+
+      return user;
     } catch (error) {
       console.error('Error getting user:', error);
       throw error;
+    }
+  },
+
+  /**
+   * Get all active premium features for a user
+   * Merges features from all active memberships
+   */
+  async getActiveFeatures(userId) {
+    try {
+      const { rows } = await query(
+        `SELECT features 
+         FROM premium_memberships 
+         WHERE user_id = $1 
+         AND status = 'active' 
+         AND expiry_date > NOW()`,
+        [userId]
+      );
+
+      // Flatten and uniquify features from all active memberships
+      const allFeatures = new Set();
+      rows.forEach(row => {
+        if (Array.isArray(row.features)) {
+          row.features.forEach(f => allFeatures.add(f));
+        }
+      });
+
+      return Array.from(allFeatures);
+    } catch (error) {
+      console.error('Error fetching active features:', error);
+      return []; // Fail safe to empty array
     }
   },
 

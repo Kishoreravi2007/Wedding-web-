@@ -68,7 +68,9 @@ export const apiCall = async (endpoint: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(error.message || `HTTP ${response.status}`);
+    // Backend might return { error: "msg" } or { message: "msg" }
+    const errorMessage = error.error || error.message || error.description || `HTTP ${response.status}`;
+    throw new Error(errorMessage);
   }
 
   return response.json();

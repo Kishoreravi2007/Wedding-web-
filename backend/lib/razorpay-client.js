@@ -1,76 +1,84 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-const {
-  RAZORPAY_KEY_ID,
-  RAZORPAY_KEY_SECRET,
-  PREMIUM_PAYMENT_CURRENCY = 'INR'
-} = process.env;
-
 let razorpayClient = null;
 
-/**
- * Lazily initialize the Razorpay SDK client using service credentials
- */
 const getRazorpayClient = () => {
-  if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    console.warn('Razorpay credentials missing, skipping order creation.');
-    return null;
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
+    throw new Error('Razorpay credentials missing from server environment');
   }
 
   if (!razorpayClient) {
-    razorpayClient = new Razorpay({
-      key_id: RAZORPAY_KEY_ID,
-      key_secret: RAZORPAY_KEY_SECRET
-    });
+    console.log(`✅ Initializing Razorpay Client with Key ID: ${keyId.substring(0, 10)}...`);
+    try {
+      razorpayClient = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret
+      });
+    } catch (err) {
+      console.error('❌ Failed to initialize Razorpay client:', err.message);
+      throw new Error('Failed to initialize Razorpay client: ' + err.message);
+    }
   }
 
   return razorpayClient;
 };
 
-/**
- * Create an order in Razorpay so the front-end can open the checkout modal
- */
-const createRazorpayOrder = async ({ amount, receipt, notes = {}, currency = PREMIUM_PAYMENT_CURRENCY }) => {
+const createRazorpayOrder = async ({ amount, receipt, notes = {}, currency = (process.env.PREMIUM_PAYMENT_CURRENCY || 'INR') }) => {
   const client = getRazorpayClient();
 
   if (!client) {
-    return null;
+    throw new Error('Razorpay client could not be initialized');
   }
 
-  const orderPayload = {
-    amount: Math.round(amount * 100), // Razorpay expects paise
-    currency,
-    receipt,
-    payment_capture: 1,
-    notes
-  };
+  try {
+    const orderPayload = {
+      amount: Math.round(amount * 100), // Razorpay expects paise
+      currency,
+      receipt,
+      payment_capture: 1,
+      notes
+    };
 
-  return client.orders.create(orderPayload);
+    console.log('💳 [Razorpay] Creating order with payload:', JSON.stringify({
+      ...orderPayload,
+      amount_in_rupees: amount
+    }, null, 2));
+
+    const order = await client.orders.create(orderPayload);
+    console.log(`✅ [Razorpay] Order created successfully: ${order.id} (₹${amount})`);
+    return order;
+  } catch (err) {
+    console.error('❌ Razorpay order creation failed:', err);
+    // Throw specific error from Razorpay response if available
+    const errorMessage = err.error?.description || err.message || 'Razorpay order creation failed';
+    throw new Error(errorMessage);
+  }
 };
 
-/**
- * Verify the Razorpay webhook/signature after payment completes
- */
 const verifyRazorpaySignature = ({ orderId, paymentId, signature }) => {
-  if (!RAZORPAY_KEY_SECRET || !orderId || !paymentId || !signature) {
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keySecret || !orderId || !paymentId || !signature) {
     return false;
   }
 
   const payload = `${orderId}|${paymentId}`;
-  const expectedSignature = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET).update(payload).digest('hex');
+  const expectedSignature = crypto.createHmac('sha256', keySecret).update(payload).digest('hex');
   return expectedSignature === signature;
 };
 
-/**
- * Expose the key id so the front-end can initialize the SDK
- */
-const getRazorpayKeyId = () => RAZORPAY_KEY_ID || null;
+const getRazorpayKeyId = () => {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  if (!keyId) return null;
+  return keyId;
+};
 
 module.exports = {
   createRazorpayOrder,
   verifyRazorpaySignature,
   getRazorpayKeyId,
-  PREMIUM_PAYMENT_CURRENCY
+  PREMIUM_PAYMENT_CURRENCY: process.env.PREMIUM_PAYMENT_CURRENCY || 'INR'
 };
-

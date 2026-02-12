@@ -27,7 +27,7 @@ import {
     MessageCircle, Settings, Eye, Share2, Edit3, Palette, Music,
     Clock, MapPin, Phone, Mail, ExternalLink, Copy, QrCode, Plus,
     Check, Sparkles, Layout, Bell, Crown, Trash2, User, Loader2, Shield, Settings2, Lock,
-    CheckCircle2, RefreshCw, EyeOff, X, Upload, Search, Download
+    CheckCircle2, RefreshCw, EyeOff, X, Upload, Search, Download, AlertTriangle
 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import {
@@ -58,6 +58,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getAccessToken, API_BASE_URL } from '@/lib/api';
 import ClockPicker from '@/components/premium/ClockPicker';
 import CountdownTimer from '@/components/premium/CountdownTimer';
+import PremiumGate from '@/components/premium/PremiumGate';
 
 // --- Advanced Theme Engine (Shared Config) ---
 type ThemeLayout = 'minimal-split' | 'luxury-serif' | 'rustic-overlay' | 'boho-frame' | 'modern-glass' | 'classic-centered';
@@ -241,7 +242,10 @@ const ClientDashboard = () => {
         musicUrl: null as string | null,
         musicSource: 'upload', // 'upload' | 'spotify' | 'youtube' | 'applemusic'
         playlistUrl: null as string | null,
-        volume: 50
+        playlistUrl: null as string | null,
+        volume: 50,
+        photographer_username: '',
+        photographer_password: ''
     });
 
     const [previewTheme, setPreviewTheme] = useState<string | null>(null);
@@ -411,8 +415,20 @@ const ClientDashboard = () => {
 
             if (res.ok) {
                 const data = await res.json();
-                setPhotoUsername(data.credentials.username);
-                showSuccess("Photographer credentials updated!");
+                if (data.success) {
+                    setWeddingData(prev => ({
+                        ...prev,
+                        photographer_username: data.credentials.username,
+                        photographer_password: data.credentials.password
+                    }));
+                    // Also update local state for immediate feedback if needed, though weddingData drives the UI now
+                    setPhotoUsername(data.credentials.username);
+                    setPhotoPassword(data.credentials.password);
+
+                    showSuccess('Photographer access updated successfully');
+                } else {
+                    showError(data.message || "Failed to update photographer credentials");
+                }
             } else {
                 const data = await res.json();
                 showError(data.message || "Failed to update photographer credentials");
@@ -672,7 +688,10 @@ const ClientDashboard = () => {
                         musicUrl: data.wedding.musicUrl || prev.musicUrl,
                         musicSource: data.wedding.musicSource || prev.musicSource,
                         playlistUrl: data.wedding.playlistUrl || prev.playlistUrl,
-                        volume: data.wedding.volume !== null ? data.wedding.volume : prev.volume
+                        playlistUrl: data.wedding.playlistUrl || prev.playlistUrl,
+                        volume: data.wedding.volume !== null ? data.wedding.volume : prev.volume,
+                        photographer_username: data.wedding.photographer_username || '',
+                        photographer_password: data.wedding.photographer_password || ''
                     }));
                 }
             }
@@ -1468,36 +1487,53 @@ const ClientDashboard = () => {
                                                         not have access to your premium builder settings or guest lists.
                                                     </p>
 
-                                                    {photoUsername && (
-                                                        <div className="p-4 bg-white border border-indigo-100 rounded-xl space-y-3 animate-fade-in shadow-sm">
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Assigned Username</span>
-                                                                <Badge variant="outline" className="text-xs bg-indigo-50 border-indigo-200 text-indigo-700">Ready for share</Badge>
+                                                    {weddingData.photographer_username ? (
+                                                        <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6">
+                                                            <div className="flex justify-between items-center mb-3">
+                                                                <h4 className="text-sm font-bold text-indigo-900">Active Credentials</h4>
+                                                                <Badge variant="outline" className="text-xs bg-white border-indigo-200 text-indigo-700">Ready for share</Badge>
                                                             </div>
-                                                            <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                                                <code className="text-base font-mono text-indigo-600 font-bold">{photoUsername}</code>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="h-8 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50"
-                                                                    onClick={() => {
-                                                                        navigator.clipboard.writeText(photoUsername);
-                                                                        showSuccess("Username copied to clipboard!");
-                                                                    }}
-                                                                >
-                                                                    <Copy className="w-4 h-4 mr-2" />
-                                                                    Copy
-                                                                </Button>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <Label className="text-xs text-indigo-500 font-semibold uppercase tracking-wider">Username</Label>
+                                                                    <div className="mt-1 flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100">
+                                                                        <code className="text-sm font-mono text-indigo-900">{weddingData.photographer_username}</code>
+                                                                        <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-400 hover:text-indigo-600" onClick={() => { navigator.clipboard.writeText(weddingData.photographer_username); showSuccess('Username copied'); }}>
+                                                                            <Copy className="w-3 h-3" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <Label className="text-xs text-indigo-500 font-semibold uppercase tracking-wider">Password</Label>
+                                                                    <div className="mt-1 flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100">
+                                                                        <code className="text-sm font-mono text-indigo-900">{weddingData.photographer_password}</code>
+                                                                        <Button size="icon" variant="ghost" className="h-6 w-6 text-indigo-400 hover:text-indigo-600" onClick={() => { navigator.clipboard.writeText(weddingData.photographer_password); showSuccess('Password copied'); }}>
+                                                                            <Copy className="w-3 h-3" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-6">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="p-1 bg-amber-100 rounded-full">
+                                                                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="text-sm font-bold text-amber-900">No Access Configured</h4>
+                                                                    <p className="text-xs text-amber-700 mt-1">Generate credentials below to allow your photographer to upload photos.</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     )}
 
                                                     <div className="space-y-3 pt-2">
-                                                        <Label className="text-sm font-bold text-gray-700">Set Access Password</Label>
+                                                        <Label className="text-sm font-bold text-gray-700">{weddingData.photographer_username ? 'Rotate Password' : 'Set Access Password'}</Label>
                                                         <div className="flex gap-3">
                                                             <Input
                                                                 type="text"
-                                                                placeholder="Minimum 4 characters"
+                                                                placeholder="New Password (min 4 chars)"
                                                                 className="h-11 bg-white border-indigo-100 focus:ring-indigo-500"
                                                                 value={photoPassword}
                                                                 onChange={(e) => setPhotoPassword(e.target.value)}
@@ -1507,7 +1543,7 @@ const ClientDashboard = () => {
                                                                 disabled={isManagingPhoto || photoPassword.length < 4}
                                                                 className="bg-indigo-600 hover:bg-indigo-700 h-11 px-8 shadow-lg shadow-indigo-100"
                                                             >
-                                                                {isManagingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : photoUsername ? "Update Credentials" : "Generate Access"}
+                                                                {isManagingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : (weddingData.photographer_username ? "Update & Rotate" : "Generate Access")}
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -2138,731 +2174,739 @@ const ClientDashboard = () => {
 
                             {/* Gallery Tab */}
                             <TabsContent value="gallery" className="space-y-6">
-                                <Card className="bg-white/80 backdrop-blur-sm">
-                                    <CardHeader className="flex flex-row items-center justify-between">
-                                        <div>
-                                            <CardTitle className="flex items-center gap-2">
-                                                <Camera className="w-5 h-5 text-green-500" />
-                                                Photo Gallery
-                                            </CardTitle>
-                                            <CardDescription>Upload and manage your wedding photos</CardDescription>
-                                        </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={handleDownloadAll}
-                                            disabled={galleryPhotos.length === 0 || isDownloadingAll}
-                                        >
-                                            {isDownloadingAll ? (
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                            ) : (
-                                                <Download className="w-4 h-4 mr-2" />
-                                            )}
-                                            {isDownloadingAll ? 'Preparing ZIP...' : 'Download All'}
-                                        </Button>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-rose-400 transition-colors cursor-pointer relative bg-slate-50">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                onChange={handleGalleryUpload}
-                                                disabled={isUploadingGallery}
-                                            />
-                                            {isUploadingGallery ? (
-                                                <div className="flex flex-col items-center">
-                                                    <Loader2 className="w-12 h-12 text-rose-500 animate-spin mb-4" />
-                                                    <p className="text-sm text-gray-500">Uploading...</p>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">Upload Photos</h3>
-                                                    <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select photos</p>
-                                                    <Button variant="outline" className="pointer-events-none">
-                                                        <Plus className="w-4 h-4 mr-2" />
-                                                        Select Photos
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </div>
-
-                                        {/* Gallery Grid */}
-                                        {galleryPhotos.length > 0 && (
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                                                {galleryPhotos.map((photo) => (
-                                                    <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden group bg-gray-100 border border-gray-200">
-                                                        <img
-                                                            src={photo.publicUrl}
-                                                            alt={photo.title}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                            <Button
-                                                                size="icon"
-                                                                variant="ghost"
-                                                                className="text-white hover:bg-white/20"
-                                                                onClick={() => window.open(photo.publicUrl, '_blank')}
-                                                            >
-                                                                <ExternalLink className="w-4 h-4" />
-                                                            </Button>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="ghost"
-                                                                className="text-white hover:bg-rose-500/20 hover:text-rose-400"
-                                                                onClick={() => handleDeletePhoto(photo.id)}
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        </div>
+                                <PremiumGate feature="photo-gallery" title="Photo Gallery Locked" description="Upgrade to unlock the photo gallery and share memories with your guests.">
+                                    <Card className="bg-white/80 backdrop-blur-sm">
+                                        <CardHeader className="flex flex-row items-center justify-between">
+                                            <div>
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <Camera className="w-5 h-5 text-green-500" />
+                                                    Photo Gallery
+                                                </CardTitle>
+                                                <CardDescription>Upload and manage your wedding photos</CardDescription>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleDownloadAll}
+                                                disabled={galleryPhotos.length === 0 || isDownloadingAll}
+                                            >
+                                                {isDownloadingAll ? (
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                ) : (
+                                                    <Download className="w-4 h-4 mr-2" />
+                                                )}
+                                                {isDownloadingAll ? 'Preparing ZIP...' : 'Download All'}
+                                            </Button>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-rose-400 transition-colors cursor-pointer relative bg-slate-50">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                    onChange={handleGalleryUpload}
+                                                    disabled={isUploadingGallery}
+                                                />
+                                                {isUploadingGallery ? (
+                                                    <div className="flex flex-col items-center">
+                                                        <Loader2 className="w-12 h-12 text-rose-500 animate-spin mb-4" />
+                                                        <p className="text-sm text-gray-500">Uploading...</p>
                                                     </div>
-                                                ))}
+                                                ) : (
+                                                    <>
+                                                        <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                                        <h3 className="text-lg font-medium text-gray-700 mb-2">Upload Photos</h3>
+                                                        <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select photos</p>
+                                                        <Button variant="outline" className="pointer-events-none">
+                                                            <Plus className="w-4 h-4 mr-2" />
+                                                            Select Photos
+                                                        </Button>
+                                                    </>
+                                                )}
                                             </div>
-                                        )}
 
-                                        {weddingData.photosCount === 0 && (
-                                            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                                                <p className="text-sm text-blue-700">
-                                                    <strong>Pro Tip:</strong> Upload photos and we'll automatically detect faces for easy tagging and guest photo finding!
-                                                </p>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
+                                            {/* Gallery Grid */}
+                                            {galleryPhotos.length > 0 && (
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                                                    {galleryPhotos.map((photo) => (
+                                                        <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden group bg-gray-100 border border-gray-200">
+                                                            <img
+                                                                src={photo.publicUrl}
+                                                                alt={photo.title}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="text-white hover:bg-white/20"
+                                                                    onClick={() => window.open(photo.publicUrl, '_blank')}
+                                                                >
+                                                                    <ExternalLink className="w-4 h-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="text-white hover:bg-rose-500/20 hover:text-rose-400"
+                                                                    onClick={() => handleDeletePhoto(photo.id)}
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {weddingData.photosCount === 0 && (
+                                                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                                                    <p className="text-sm text-blue-700">
+                                                        <strong>Pro Tip:</strong> Upload photos and we'll automatically detect faces for easy tagging and guest photo finding!
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </PremiumGate>
                             </TabsContent>
 
                             {/* Guests Tab */}
                             <TabsContent value="guests" className="space-y-6">
-                                <Card className="bg-white/80 backdrop-blur-sm">
-                                    <input
-                                        type="file"
-                                        id="guest-csv-upload"
-                                        accept=".csv"
-                                        className="hidden"
-                                        onChange={handleCsvImport}
-                                    />
-                                    <CardHeader className="flex flex-row items-center justify-between">
-                                        <div>
-                                            <CardTitle className="flex items-center gap-2">
-                                                <Users className="w-5 h-5 text-blue-500" />
-                                                Guest Management
-                                            </CardTitle>
-                                            <CardDescription>Manage your guest list and track RSVPs</CardDescription>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            {guests.length > 0 && (
-                                                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-rose-500" onClick={handleResetAllGuests}>
-                                                    <Trash2 className="w-4 h-4 mr-2" />
-                                                    Reset All
-                                                </Button>
-                                            )}
-                                            <Button variant="outline" size="sm" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
-                                                <Upload className="w-4 h-4 mr-2" />
-                                                Import CSV
-                                            </Button>
-                                            <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button size="sm">
-                                                        <Plus className="w-4 h-4 mr-2" />
-                                                        Add Guest
+                                <PremiumGate feature="guest-management" title="Guest Management Locked" description="Upgrade to manage your guest list, RSVPs, and invitations.">
+                                    <Card className="bg-white/80 backdrop-blur-sm">
+                                        <input
+                                            type="file"
+                                            id="guest-csv-upload"
+                                            accept=".csv"
+                                            className="hidden"
+                                            onChange={handleCsvImport}
+                                        />
+                                        <CardHeader className="flex flex-row items-center justify-between">
+                                            <div>
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <Users className="w-5 h-5 text-blue-500" />
+                                                    Guest Management
+                                                </CardTitle>
+                                                <CardDescription>Manage your guest list and track RSVPs</CardDescription>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {guests.length > 0 && (
+                                                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-rose-500" onClick={handleResetAllGuests}>
+                                                        <Trash2 className="w-4 h-4 mr-2" />
+                                                        Reset All
                                                     </Button>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Add New Guest</DialogTitle>
-                                                    </DialogHeader>
-                                                    <div className="space-y-4 py-4">
-                                                        <div className="space-y-2">
-                                                            <Label>Guest Name</Label>
-                                                            <Input id="guestNameHeader" placeholder="Full Name" />
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                )}
+                                                <Button variant="outline" size="sm" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
+                                                    <Upload className="w-4 h-4 mr-2" />
+                                                    Import CSV
+                                                </Button>
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button size="sm">
+                                                            <Plus className="w-4 h-4 mr-2" />
+                                                            Add Guest
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle>Add New Guest</DialogTitle>
+                                                        </DialogHeader>
+                                                        <div className="space-y-4 py-4">
                                                             <div className="space-y-2">
-                                                                <Label>Email</Label>
-                                                                <Input id="guestEmailHeader" type="email" placeholder="email@example.com" />
+                                                                <Label>Guest Name</Label>
+                                                                <Input id="guestNameHeader" placeholder="Full Name" />
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-2">
+                                                                    <Label>Email</Label>
+                                                                    <Input id="guestEmailHeader" type="email" placeholder="email@example.com" />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <Label>Phone</Label>
+                                                                    <Input id="guestPhoneHeader" placeholder="+91..." />
+                                                                </div>
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <Label>Phone</Label>
-                                                                <Input id="guestPhoneHeader" placeholder="+91..." />
+                                                                <Label>RSVP Status</Label>
+                                                                <select id="guestRsvpHeader" className="w-full p-2 border rounded-md">
+                                                                    <option value="pending">Pending</option>
+                                                                    <option value="attending">Attending</option>
+                                                                    <option value="declined">Declined</option>
+                                                                </select>
                                                             </div>
                                                         </div>
-                                                        <div className="space-y-2">
-                                                            <Label>RSVP Status</Label>
-                                                            <select id="guestRsvpHeader" className="w-full p-2 border rounded-md">
-                                                                <option value="pending">Pending</option>
-                                                                <option value="attending">Attending</option>
-                                                                <option value="declined">Declined</option>
-                                                            </select>
-                                                        </div>
+                                                        <DialogFooter>
+                                                            <DialogClose asChild>
+                                                                <Button onClick={async () => {
+                                                                    const name = (document.getElementById('guestNameHeader') as HTMLInputElement).value;
+                                                                    const email = (document.getElementById('guestEmailHeader') as HTMLInputElement).value;
+                                                                    const phone = (document.getElementById('guestPhoneHeader') as HTMLInputElement).value;
+                                                                    const rsvp_status = (document.getElementById('guestRsvpHeader') as HTMLSelectElement).value;
+                                                                    if (name) await handleAddGuest({ name, email, phone, rsvp_status });
+                                                                }}>Add Guest</Button>
+                                                            </DialogClose>
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
+                                                {guests.length > 0 && (
+                                                    <Button
+                                                        variant="outline"
+                                                        className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                                        onClick={handleSendWhatsAppAll}
+                                                    >
+                                                        <MessageCircle className="w-4 h-4 mr-2" />
+                                                        Send to All
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            {guests.length === 0 ? (
+                                                <div className="text-center py-12">
+                                                    <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                    <h3 className="text-lg font-medium text-gray-700 mb-2">No Guests Yet</h3>
+                                                    <p className="text-sm text-gray-500 mb-4">Start by adding your first guest or importing a list</p>
+                                                    <div className="flex gap-3 justify-center">
+                                                        <Button variant="outline" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
+                                                            Import CSV
+                                                        </Button>
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button>
+                                                                    <Plus className="w-4 h-4 mr-2" />
+                                                                    Add Guest
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent>
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Add New Guest</DialogTitle>
+                                                                </DialogHeader>
+                                                                <div className="space-y-4 py-4">
+                                                                    <div className="space-y-2">
+                                                                        <Label>Guest Name</Label>
+                                                                        <Input id="guestName" placeholder="Full Name" />
+                                                                    </div>
+                                                                    <div className="grid grid-cols-2 gap-4">
+                                                                        <div className="space-y-2">
+                                                                            <Label>Email</Label>
+                                                                            <Input id="guestEmail" type="email" placeholder="email@example.com" />
+                                                                        </div>
+                                                                        <div className="space-y-2">
+                                                                            <Label>Phone</Label>
+                                                                            <Input id="guestPhone" placeholder="+91..." />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <Label>RSVP Status</Label>
+                                                                        <select id="guestRsvp" className="w-full p-2 border rounded-md">
+                                                                            <option value="pending">Pending</option>
+                                                                            <option value="attending">Attending</option>
+                                                                            <option value="declined">Declined</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <DialogFooter>
+                                                                    <DialogClose asChild>
+                                                                        <Button onClick={async () => {
+                                                                            const name = (document.getElementById('guestName') as HTMLInputElement).value;
+                                                                            const email = (document.getElementById('guestEmail') as HTMLInputElement).value;
+                                                                            const phone = (document.getElementById('guestPhone') as HTMLInputElement).value;
+                                                                            const rsvp_status = (document.getElementById('guestRsvp') as HTMLSelectElement).value;
+                                                                            if (name) await handleAddGuest({ name, email, phone, rsvp_status });
+                                                                        }}>Add Guest</Button>
+                                                                    </DialogClose>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </div>
-                                                    <DialogFooter>
-                                                        <DialogClose asChild>
-                                                            <Button onClick={async () => {
-                                                                const name = (document.getElementById('guestNameHeader') as HTMLInputElement).value;
-                                                                const email = (document.getElementById('guestEmailHeader') as HTMLInputElement).value;
-                                                                const phone = (document.getElementById('guestPhoneHeader') as HTMLInputElement).value;
-                                                                const rsvp_status = (document.getElementById('guestRsvpHeader') as HTMLSelectElement).value;
-                                                                if (name) await handleAddGuest({ name, email, phone, rsvp_status });
-                                                            }}>Add Guest</Button>
-                                                        </DialogClose>
-                                                    </DialogFooter>
-                                                </DialogContent>
-                                            </Dialog>
-                                            {guests.length > 0 && (
-                                                <Button
-                                                    variant="outline"
-                                                    className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                                    onClick={handleSendWhatsAppAll}
-                                                >
-                                                    <MessageCircle className="w-4 h-4 mr-2" />
-                                                    Send to All
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {guests.length === 0 ? (
-                                            <div className="text-center py-12">
-                                                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                                <h3 className="text-lg font-medium text-gray-700 mb-2">No Guests Yet</h3>
-                                                <p className="text-sm text-gray-500 mb-4">Start by adding your first guest or importing a list</p>
-                                                <div className="flex gap-3 justify-center">
-                                                    <Button variant="outline" onClick={() => document.getElementById('guest-csv-upload')?.click()}>
-                                                        Import CSV
-                                                    </Button>
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button>
-                                                                <Plus className="w-4 h-4 mr-2" />
-                                                                Add Guest
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent>
-                                                            <DialogHeader>
-                                                                <DialogTitle>Add New Guest</DialogTitle>
-                                                            </DialogHeader>
-                                                            <div className="space-y-4 py-4">
-                                                                <div className="space-y-2">
-                                                                    <Label>Guest Name</Label>
-                                                                    <Input id="guestName" placeholder="Full Name" />
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-4">
-                                                                    <div className="space-y-2">
-                                                                        <Label>Email</Label>
-                                                                        <Input id="guestEmail" type="email" placeholder="email@example.com" />
-                                                                    </div>
-                                                                    <div className="space-y-2">
-                                                                        <Label>Phone</Label>
-                                                                        <Input id="guestPhone" placeholder="+91..." />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="space-y-2">
-                                                                    <Label>RSVP Status</Label>
-                                                                    <select id="guestRsvp" className="w-full p-2 border rounded-md">
-                                                                        <option value="pending">Pending</option>
-                                                                        <option value="attending">Attending</option>
-                                                                        <option value="declined">Declined</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <DialogFooter>
-                                                                <DialogClose asChild>
-                                                                    <Button onClick={async () => {
-                                                                        const name = (document.getElementById('guestName') as HTMLInputElement).value;
-                                                                        const email = (document.getElementById('guestEmail') as HTMLInputElement).value;
-                                                                        const phone = (document.getElementById('guestPhone') as HTMLInputElement).value;
-                                                                        const rsvp_status = (document.getElementById('guestRsvp') as HTMLSelectElement).value;
-                                                                        if (name) await handleAddGuest({ name, email, phone, rsvp_status });
-                                                                    }}>Add Guest</Button>
-                                                                </DialogClose>
-                                                            </DialogFooter>
-                                                        </DialogContent>
-                                                    </Dialog>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full text-sm text-left">
-                                                    <thead className="bg-gray-50 text-gray-500 uppercase text-[10px] tracking-wider">
-                                                        <tr>
-                                                            <th className="px-4 py-3">Name</th>
-                                                            <th className="px-4 py-3">Contact</th>
-                                                            <th className="px-4 py-3">RSVP</th>
-                                                            <th className="px-4 py-3">Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-gray-100">
-                                                        {guests.map((guest) => (
-                                                            <tr key={guest.id} className="hover:bg-gray-50 transition-colors">
-                                                                <td className="px-4 py-3 font-medium">{guest.name}</td>
-                                                                <td className="px-4 py-3 text-gray-500">{guest.email || guest.phone || '-'}</td>
-                                                                <td className="px-4 py-3">
-                                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${guest.rsvp_status === 'attending' ? 'bg-green-100 text-green-700' :
-                                                                        guest.rsvp_status === 'declined' ? 'bg-red-100 text-red-700' :
-                                                                            'bg-amber-100 text-amber-700'
-                                                                        }`}>
-                                                                        {guest.rsvp_status}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-4 py-3">
-                                                                    <div className="flex items-center gap-1">
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                                            onClick={() => handleSendWhatsApp(guest.id)}
-                                                                            title="Send WhatsApp Invitation"
-                                                                        >
-                                                                            <MessageCircle className="w-4 h-4" />
-                                                                        </Button>
-                                                                        <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteGuest(guest.id)}>
-                                                                            <Trash2 className="w-4 h-4" />
-                                                                        </Button>
-                                                                    </div>
-                                                                </td>
+                                            ) : (
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full text-sm text-left">
+                                                        <thead className="bg-gray-50 text-gray-500 uppercase text-[10px] tracking-wider">
+                                                            <tr>
+                                                                <th className="px-4 py-3">Name</th>
+                                                                <th className="px-4 py-3">Contact</th>
+                                                                <th className="px-4 py-3">RSVP</th>
+                                                                <th className="px-4 py-3">Actions</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-100">
+                                                            {guests.map((guest) => (
+                                                                <tr key={guest.id} className="hover:bg-gray-50 transition-colors">
+                                                                    <td className="px-4 py-3 font-medium">{guest.name}</td>
+                                                                    <td className="px-4 py-3 text-gray-500">{guest.email || guest.phone || '-'}</td>
+                                                                    <td className="px-4 py-3">
+                                                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${guest.rsvp_status === 'attending' ? 'bg-green-100 text-green-700' :
+                                                                            guest.rsvp_status === 'declined' ? 'bg-red-100 text-red-700' :
+                                                                                'bg-amber-100 text-amber-700'
+                                                                            }`}>
+                                                                            {guest.rsvp_status}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-4 py-3">
+                                                                        <div className="flex items-center gap-1">
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                                                onClick={() => handleSendWhatsApp(guest.id)}
+                                                                                title="Send WhatsApp Invitation"
+                                                                            >
+                                                                                <MessageCircle className="w-4 h-4" />
+                                                                            </Button>
+                                                                            <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteGuest(guest.id)}>
+                                                                                <Trash2 className="w-4 h-4" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </PremiumGate>
                             </TabsContent>
 
                             {/* Timeline Tab */}
                             <TabsContent value="timeline" className="space-y-6">
-                                <Card className="bg-white/80 backdrop-blur-sm">
-                                    <CardHeader className="flex flex-row items-center justify-between">
-                                        <div>
-                                            <CardTitle className="flex items-center gap-2">
-                                                <Clock className="w-5 h-5 text-amber-500" />
-                                                Event Timeline
-                                            </CardTitle>
-                                            <CardDescription>Plan your wedding day schedule</CardDescription>
-                                        </div>
-                                        <Dialog open={showEventDialog} onOpenChange={(open) => {
-                                            setShowEventDialog(open);
-                                            if (!open) {
-                                                setIsEditingEvent(false);
-                                                setEventForm({
-                                                    id: '',
-                                                    date: weddingData.weddingDate,
-                                                    time: '10:00',
-                                                    title: '',
-                                                    location: '',
-                                                    locationMapUrl: '',
-                                                    photoFile: null,
-                                                    photoUrl: '',
-                                                    description: '',
-                                                    sortOrder: 0
-                                                });
-                                            }
-                                        }}>
-                                            <DialogTrigger asChild>
-                                                <Button onClick={() => setIsEditingEvent(false)}>
-                                                    <Plus className="w-4 h-4 mr-2" />
-                                                    Add Event
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>{isEditingEvent ? 'Edit Timeline Event' : 'Add Timeline Event'}</DialogTitle>
-                                                </DialogHeader>
-                                                <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                        <div className="space-y-2">
-                                                            <Label>Event Date</Label>
-                                                            <Input
-                                                                type="date"
-                                                                value={eventForm.date}
-                                                                onChange={(e) => setEventForm(prev => ({ ...prev, date: e.target.value }))}
-                                                            />
+                                <PremiumGate feature="event-schedule" title="Event Timeline Locked" description="Upgrade to create and share your wedding day schedule.">
+                                    <Card className="bg-white/80 backdrop-blur-sm">
+                                        <CardHeader className="flex flex-row items-center justify-between">
+                                            <div>
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <Clock className="w-5 h-5 text-amber-500" />
+                                                    Event Timeline
+                                                </CardTitle>
+                                                <CardDescription>Plan your wedding day schedule</CardDescription>
+                                            </div>
+                                            <Dialog open={showEventDialog} onOpenChange={(open) => {
+                                                setShowEventDialog(open);
+                                                if (!open) {
+                                                    setIsEditingEvent(false);
+                                                    setEventForm({
+                                                        id: '',
+                                                        date: weddingData.weddingDate,
+                                                        time: '10:00',
+                                                        title: '',
+                                                        location: '',
+                                                        locationMapUrl: '',
+                                                        photoFile: null,
+                                                        photoUrl: '',
+                                                        description: '',
+                                                        sortOrder: 0
+                                                    });
+                                                }
+                                            }}>
+                                                <DialogTrigger asChild>
+                                                    <Button onClick={() => setIsEditingEvent(false)}>
+                                                        <Plus className="w-4 h-4 mr-2" />
+                                                        Add Event
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>{isEditingEvent ? 'Edit Timeline Event' : 'Add Timeline Event'}</DialogTitle>
+                                                    </DialogHeader>
+                                                    <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label>Event Date</Label>
+                                                                <Input
+                                                                    type="date"
+                                                                    value={eventForm.date}
+                                                                    onChange={(e) => setEventForm(prev => ({ ...prev, date: e.target.value }))}
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label>Time</Label>
+                                                                <ClockPicker
+                                                                    value={eventForm.time}
+                                                                    onChange={(val) => setEventForm(prev => ({ ...prev, time: val }))}
+                                                                />
+                                                            </div>
                                                         </div>
                                                         <div className="space-y-2">
-                                                            <Label>Time</Label>
-                                                            <ClockPicker
-                                                                value={eventForm.time}
-                                                                onChange={(val) => setEventForm(prev => ({ ...prev, time: val }))}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label>Event Title</Label>
-                                                        <Input
-                                                            value={eventForm.title}
-                                                            onChange={(e) => setEventForm(prev => ({ ...prev, title: e.target.value }))}
-                                                            placeholder="e.g. Wedding Ceremony"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label>Location (Optional)</Label>
-                                                        <Input
-                                                            value={eventForm.location}
-                                                            onChange={(e) => setEventForm(prev => ({ ...prev, location: e.target.value }))}
-                                                            placeholder="e.g. Grand Ballroom"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="flex items-center gap-2">
-                                                            <MapPin className="w-4 h-4 text-rose-500" />
-                                                            Location Map Link (URL)
-                                                        </Label>
-                                                        <Input
-                                                            value={eventForm.locationMapUrl}
-                                                            onChange={(e) => setEventForm(prev => ({ ...prev, locationMapUrl: e.target.value }))}
-                                                            placeholder="e.g. https://maps.google.com/..."
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="flex items-center gap-2">
-                                                            <Image className="w-4 h-4 text-purple-500" />
-                                                            Event Photo
-                                                        </Label>
-                                                        <div className="flex flex-col gap-2">
-                                                            {eventForm.photoUrl && !eventForm.photoFile && (
-                                                                <div className="relative w-fit">
-                                                                    <img src={eventForm.photoUrl} alt="Preview" className="h-20 w-auto rounded border" />
-                                                                    <Button
-                                                                        type="button"
-                                                                        variant="destructive"
-                                                                        size="icon"
-                                                                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                                                                        onClick={() => setEventForm(prev => ({ ...prev, photoUrl: '' }))}
-                                                                    >
-                                                                        <X className="w-3 h-3" />
-                                                                    </Button>
-                                                                </div>
-                                                            )}
+                                                            <Label>Event Title</Label>
                                                             <Input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                onChange={(e) => {
-                                                                    if (e.target.files && e.target.files[0]) {
-                                                                        setEventForm(prev => ({
-                                                                            ...prev,
-                                                                            photoFile: e.target.files![0]
-                                                                        }));
-                                                                    }
-                                                                }}
+                                                                value={eventForm.title}
+                                                                onChange={(e) => setEventForm(prev => ({ ...prev, title: e.target.value }))}
+                                                                placeholder="e.g. Wedding Ceremony"
                                                             />
-                                                            <p className="text-[10px] text-gray-500">Supported formats: JPEG, PNG, WEBP (Max 5MB)</p>
                                                         </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label>Description</Label>
-                                                        <textarea
-                                                            className="w-full p-2 border rounded-md text-sm"
-                                                            rows={3}
-                                                            value={eventForm.description}
-                                                            onChange={(e) => setEventForm(prev => ({ ...prev, description: e.target.value }))}
-                                                            placeholder="Tell guests what to expect..."
-                                                        ></textarea>
-                                                    </div>
-                                                </div>
-                                                <DialogFooter>
-                                                    <Button onClick={async () => {
-                                                        const { id, date: event_date, time: event_time, title, description, location, locationMapUrl: location_map_url, photoFile, sortOrder: sort_order } = eventForm;
-                                                        if (event_time && title) {
-                                                            let success = false;
-                                                            if (isEditingEvent && id) {
-                                                                success = await handleUpdateEvent(id, { event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
-                                                            } else {
-                                                                success = await handleAddEvent({ event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
-                                                            }
-
-                                                            if (success) {
-                                                                setShowEventDialog(false);
-                                                                setEventForm({
-                                                                    id: '',
-                                                                    date: weddingData.weddingDate,
-                                                                    time: '10:00',
-                                                                    title: '',
-                                                                    location: '',
-                                                                    locationMapUrl: '',
-                                                                    photoFile: null,
-                                                                    photoUrl: '',
-                                                                    description: '',
-                                                                    sortOrder: 0
-                                                                });
-                                                                setIsEditingEvent(false);
-                                                            }
-                                                        } else {
-                                                            showError('Time and title are required');
-                                                        }
-                                                    }}>{isEditingEvent ? 'Update Event' : 'Add Event'}</Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-4">
-                                            {timeline.length === 0 ? (
-                                                <div className="text-center py-8 text-gray-500 italic">
-                                                    No events added to the timeline yet.
-                                                </div>
-                                            ) : (
-                                                timeline.map((item) => (
-                                                    <div key={item.id} className="flex gap-4 items-start p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                                                        <div className="text-center min-w-[100px] border-r border-gray-100 pr-4">
-                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                                                                {item.event_date ? new Date(item.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Date TBD'}
-                                                            </p>
-                                                            <p className="font-bold text-rose-600">{item.event_time}</p>
+                                                        <div className="space-y-2">
+                                                            <Label>Location (Optional)</Label>
+                                                            <Input
+                                                                value={eventForm.location}
+                                                                onChange={(e) => setEventForm(prev => ({ ...prev, location: e.target.value }))}
+                                                                placeholder="e.g. Grand Ballroom"
+                                                            />
                                                         </div>
-                                                        <div className="flex-1">
-                                                            <p className="font-medium">{item.title}</p>
-                                                            <p className="text-sm text-gray-500">{item.description}</p>
-                                                            {item.location && <div className="flex flex-wrap items-center gap-2 mt-1">
-                                                                {item.location_map_url ? (
-                                                                    <a
-                                                                        href={item.location_map_url}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="text-[10px] text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium bg-blue-50 px-2 py-0.5 rounded"
-                                                                    >
-                                                                        <MapPin className="w-3 h-3" /> {item.location}
-                                                                    </a>
-                                                                ) : (
-                                                                    <p className="text-[10px] text-gray-400 flex items-center gap-1">
-                                                                        <MapPin className="w-3 h-3" /> {item.location}
-                                                                    </p>
+                                                        <div className="space-y-2">
+                                                            <Label className="flex items-center gap-2">
+                                                                <MapPin className="w-4 h-4 text-rose-500" />
+                                                                Location Map Link (URL)
+                                                            </Label>
+                                                            <Input
+                                                                value={eventForm.locationMapUrl}
+                                                                onChange={(e) => setEventForm(prev => ({ ...prev, locationMapUrl: e.target.value }))}
+                                                                placeholder="e.g. https://maps.google.com/..."
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="flex items-center gap-2">
+                                                                <Image className="w-4 h-4 text-purple-500" />
+                                                                Event Photo
+                                                            </Label>
+                                                            <div className="flex flex-col gap-2">
+                                                                {eventForm.photoUrl && !eventForm.photoFile && (
+                                                                    <div className="relative w-fit">
+                                                                        <img src={eventForm.photoUrl} alt="Preview" className="h-20 w-auto rounded border" />
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="destructive"
+                                                                            size="icon"
+                                                                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
+                                                                            onClick={() => setEventForm(prev => ({ ...prev, photoUrl: '' }))}
+                                                                        >
+                                                                            <X className="w-3 h-3" />
+                                                                        </Button>
+                                                                    </div>
                                                                 )}
-                                                            </div>}
+                                                                <Input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={(e) => {
+                                                                        if (e.target.files && e.target.files[0]) {
+                                                                            setEventForm(prev => ({
+                                                                                ...prev,
+                                                                                photoFile: e.target.files![0]
+                                                                            }));
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <p className="text-[10px] text-gray-500">Supported formats: JPEG, PNG, WEBP (Max 5MB)</p>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex gap-1">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="text-amber-500"
-                                                                onClick={() => {
-                                                                    setEventForm({
-                                                                        id: item.id,
-                                                                        date: item.event_date ? new Date(item.event_date).toISOString().split('T')[0] : weddingData.weddingDate,
-                                                                        time: item.event_time,
-                                                                        title: item.title,
-                                                                        location: item.location || '',
-                                                                        locationMapUrl: item.location_map_url || '',
-                                                                        photoFile: null,
-                                                                        photoUrl: item.photo_url || '', // Set existing URL for display
-                                                                        description: item.description || '',
-                                                                        sortOrder: item.sort_order || 0
-                                                                    });
-                                                                    setIsEditingEvent(true);
-                                                                    setShowEventDialog(true);
-                                                                }}
-                                                            >
-                                                                <Edit3 className="w-4 h-4" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteEvent(item.id)}>
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
+                                                        <div className="space-y-2">
+                                                            <Label>Description</Label>
+                                                            <textarea
+                                                                className="w-full p-2 border rounded-md text-sm"
+                                                                rows={3}
+                                                                value={eventForm.description}
+                                                                onChange={(e) => setEventForm(prev => ({ ...prev, description: e.target.value }))}
+                                                                placeholder="Tell guests what to expect..."
+                                                            ></textarea>
                                                         </div>
                                                     </div>
-                                                ))
-                                            )}
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                                    <DialogFooter>
+                                                        <Button onClick={async () => {
+                                                            const { id, date: event_date, time: event_time, title, description, location, locationMapUrl: location_map_url, photoFile, sortOrder: sort_order } = eventForm;
+                                                            if (event_time && title) {
+                                                                let success = false;
+                                                                if (isEditingEvent && id) {
+                                                                    success = await handleUpdateEvent(id, { event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
+                                                                } else {
+                                                                    success = await handleAddEvent({ event_date, event_time, title, description, location, location_map_url, photoFile, sort_order });
+                                                                }
+
+                                                                if (success) {
+                                                                    setShowEventDialog(false);
+                                                                    setEventForm({
+                                                                        id: '',
+                                                                        date: weddingData.weddingDate,
+                                                                        time: '10:00',
+                                                                        title: '',
+                                                                        location: '',
+                                                                        locationMapUrl: '',
+                                                                        photoFile: null,
+                                                                        photoUrl: '',
+                                                                        description: '',
+                                                                        sortOrder: 0
+                                                                    });
+                                                                    setIsEditingEvent(false);
+                                                                }
+                                                            } else {
+                                                                showError('Time and title are required');
+                                                            }
+                                                        }}>{isEditingEvent ? 'Update Event' : 'Add Event'}</Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-4">
+                                                {timeline.length === 0 ? (
+                                                    <div className="text-center py-8 text-gray-500 italic">
+                                                        No events added to the timeline yet.
+                                                    </div>
+                                                ) : (
+                                                    timeline.map((item) => (
+                                                        <div key={item.id} className="flex gap-4 items-start p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                                                            <div className="text-center min-w-[100px] border-r border-gray-100 pr-4">
+                                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
+                                                                    {item.event_date ? new Date(item.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Date TBD'}
+                                                                </p>
+                                                                <p className="font-bold text-rose-600">{item.event_time}</p>
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <p className="font-medium">{item.title}</p>
+                                                                <p className="text-sm text-gray-500">{item.description}</p>
+                                                                {item.location && <div className="flex flex-wrap items-center gap-2 mt-1">
+                                                                    {item.location_map_url ? (
+                                                                        <a
+                                                                            href={item.location_map_url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="text-[10px] text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium bg-blue-50 px-2 py-0.5 rounded"
+                                                                        >
+                                                                            <MapPin className="w-3 h-3" /> {item.location}
+                                                                        </a>
+                                                                    ) : (
+                                                                        <p className="text-[10px] text-gray-400 flex items-center gap-1">
+                                                                            <MapPin className="w-3 h-3" /> {item.location}
+                                                                        </p>
+                                                                    )}
+                                                                </div>}
+                                                            </div>
+                                                            <div className="flex gap-1">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="text-amber-500"
+                                                                    onClick={() => {
+                                                                        setEventForm({
+                                                                            id: item.id,
+                                                                            date: item.event_date ? new Date(item.event_date).toISOString().split('T')[0] : weddingData.weddingDate,
+                                                                            time: item.event_time,
+                                                                            title: item.title,
+                                                                            location: item.location || '',
+                                                                            locationMapUrl: item.location_map_url || '',
+                                                                            photoFile: null,
+                                                                            photoUrl: item.photo_url || '', // Set existing URL for display
+                                                                            description: item.description || '',
+                                                                            sortOrder: item.sort_order || 0
+                                                                        });
+                                                                        setIsEditingEvent(true);
+                                                                        setShowEventDialog(true);
+                                                                    }}
+                                                                >
+                                                                    <Edit3 className="w-4 h-4" />
+                                                                </Button>
+                                                                <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteEvent(item.id)}>
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </PremiumGate>
                             </TabsContent>
 
                             {/* Music Tab */}
                             <TabsContent value="music" className="space-y-6">
-                                <Card className="bg-white/80 backdrop-blur-sm">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Music className="w-5 h-5 text-pink-500" />
-                                            Background Music
-                                        </CardTitle>
-                                        <CardDescription>Set the mood for your wedding website</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-6">
-                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                            <div className="space-y-0.5">
-                                                <Label className="text-base font-bold">Enable Music</Label>
-                                                <p className="text-sm text-gray-500">Play music when guests visit your site</p>
-                                            </div>
-                                            <Switch
-                                                checked={isEditing ? editForm.musicEnabled : weddingData.musicEnabled}
-                                                onCheckedChange={(checked) => {
-                                                    if (isEditing) {
-                                                        setEditForm(prev => ({ ...prev, musicEnabled: checked }));
-                                                    } else {
-                                                        // If not in explicit edit mode, update state and trigger save
-                                                        setWeddingData(prev => ({ ...prev, musicEnabled: checked }));
-                                                        setEditForm(prev => ({ ...prev, musicEnabled: checked }));
-                                                        // We need to trigger save manually or assume user will click save somewhere?
-                                                        // Let's force "Edit Mode" if they change it?
-                                                        // Or just toggle it and provide a specific "Save" button if not in global edit mode.
-                                                        // For now, let's auto-enable editing if they toggle it?
-                                                        setIsEditing(true);
-                                                        setEditForm(prev => ({ ...prev, musicEnabled: checked })); // Ensure edit form catches it
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            {/* Source Selection */}
-                                            <div className="space-y-3">
-                                                <Label>Music Source</Label>
-                                                <div className="flex gap-4">
-                                                    <div onClick={() => setEditForm(prev => ({ ...prev, musicSource: 'upload' }))}
-                                                        className={`flex-1 p-4 border rounded-lg cursor-pointer transition-all ${editForm.musicSource === 'upload' ? 'border-rose-500 bg-rose-50' : 'border-gray-200 hover:border-rose-200'}`}>
-                                                        <div className="flex items-center gap-2 mb-2">
-                                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${editForm.musicSource === 'upload' ? 'border-rose-500' : 'border-gray-300'}`}>
-                                                                {editForm.musicSource === 'upload' && <div className="w-2 h-2 rounded-full bg-rose-500" />}
-                                                            </div>
-                                                            <span className="font-medium">Upload Song</span>
-                                                        </div>
-                                                        <p className="text-xs text-gray-500">Upload your own MP3 file</p>
-                                                    </div>
-
+                                <PremiumGate feature="music-player" title="Music Player Locked" description="Upgrade to add background music to your wedding website.">
+                                    <Card className="bg-white/80 backdrop-blur-sm">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <Music className="w-5 h-5 text-pink-500" />
+                                                Background Music
+                                            </CardTitle>
+                                            <CardDescription>Set the mood for your wedding website</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                                <div className="space-y-0.5">
+                                                    <Label className="text-base font-bold">Enable Music</Label>
+                                                    <p className="text-sm text-gray-500">Play music when guests visit your site</p>
                                                 </div>
-                                            </div>
-
-                                            {/* Spotify Section */}
-
-
-                                            {/* Upload Section */}
-                                            {editForm.musicSource === 'upload' && (
-                                                <div className="space-y-4">
-                                                    <Label>Custom Playlist (MP3)</Label>
-
-                                                    {/* List of uploaded songs */}
-                                                    {(() => {
-                                                        const rawUrl = isEditing ? editForm.musicUrl : weddingData.musicUrl;
-                                                        let urls: string[] = [];
-                                                        if (rawUrl) {
-                                                            try {
-                                                                if (rawUrl.startsWith('[')) {
-                                                                    urls = JSON.parse(rawUrl);
-                                                                } else {
-                                                                    urls = [rawUrl];
-                                                                }
-                                                            } catch (e) {
-                                                                urls = [rawUrl];
-                                                            }
+                                                <Switch
+                                                    checked={isEditing ? editForm.musicEnabled : weddingData.musicEnabled}
+                                                    onCheckedChange={(checked) => {
+                                                        if (isEditing) {
+                                                            setEditForm(prev => ({ ...prev, musicEnabled: checked }));
+                                                        } else {
+                                                            // If not in explicit edit mode, update state and trigger save
+                                                            setWeddingData(prev => ({ ...prev, musicEnabled: checked }));
+                                                            setEditForm(prev => ({ ...prev, musicEnabled: checked }));
+                                                            // We need to trigger save manually or assume user will click save somewhere?
+                                                            // Let's force "Edit Mode" if they change it?
+                                                            // Or just toggle it and provide a specific "Save" button if not in global edit mode.
+                                                            // For now, let's auto-enable editing if they toggle it?
+                                                            setIsEditing(true);
+                                                            setEditForm(prev => ({ ...prev, musicEnabled: checked })); // Ensure edit form catches it
                                                         }
-
-                                                        if (urls.length > 0) {
-                                                            return (
-                                                                <div className="space-y-2 mb-4">
-                                                                    {urls.map((url, index) => (
-                                                                        <div key={index} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg animate-fade-in">
-                                                                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
-                                                                                <span className="text-xs font-bold">{index + 1}</span>
-                                                                            </div>
-                                                                            <div className="flex-1 overflow-hidden">
-                                                                                <p className="text-sm font-medium text-green-800 truncate">
-                                                                                    {url.split('/').pop()?.split('_').slice(1).join('_') || `Song ${index + 1}`}
-                                                                                </p>
-                                                                            </div>
-                                                                            <Button
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                                                                                onClick={() => handleRemoveMusic(index)}
-                                                                            >
-                                                                                <Trash2 className="w-4 h-4" />
-                                                                            </Button>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return null;
-                                                    })()}
-
-                                                    {/* Upload Dropzone */}
-                                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
-                                                        <div className="flex flex-col items-center">
-                                                            {isUploadingMusic ? (
-                                                                <Loader2 className="w-10 h-10 text-rose-500 animate-spin mb-2" />
-                                                            ) : (
-                                                                <Upload className="w-10 h-10 text-gray-400 mb-2" />
-                                                            )}
-                                                            <p className="text-sm font-medium text-gray-900">
-                                                                {isUploadingMusic ? 'Uploading...' : 'Add a Song'}
-                                                            </p>
-                                                            <p className="text-xs text-gray-500 mb-4">MP3, WAV, or M4A (Max 15MB)</p>
-                                                            <Input
-                                                                type="file"
-                                                                accept="audio/*"
-                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                                onChange={handleMusicUpload}
-                                                                disabled={isUploadingMusic}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Playlist Section */}
-                                            {editForm.musicSource === 'playlist' && (
-                                                <div className="space-y-4">
-                                                    <div className="space-y-2">
-                                                        <Label>Playlist URL (Embed Link)</Label>
-                                                        <Input
-                                                            value={isEditing ? editForm.playlistUrl || '' : weddingData.playlistUrl || ''}
-                                                            onChange={(e) => {
-                                                                setEditForm(prev => ({ ...prev, playlistUrl: e.target.value }));
-                                                                if (!isEditing) setIsEditing(true);
-                                                            }}
-                                                            placeholder="https://open.spotify.com/embed/playlist/..."
-                                                        />
-                                                        <p className="text-[10px] text-gray-500">
-                                                            Paste the <strong>embed code src</strong> or embed URL from Spotify, YouTube, or SoundCloud.
-                                                        </p>
-                                                    </div>
-
-                                                    {editForm.playlistUrl && (
-                                                        <div className="aspect-video w-full rounded-lg overflow-hidden border bg-gray-100">
-                                                            <iframe
-                                                                src={editForm.playlistUrl}
-                                                                width="100%"
-                                                                height="100%"
-                                                                frameBorder="0"
-                                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                                                loading="lazy"
-                                                            ></iframe>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {/* Volume Control */}
-                                            <div className="space-y-4 pt-4 border-t border-gray-100">
-                                                <div className="flex items-center justify-between">
-                                                    <Label>Background Volume</Label>
-                                                    <span className="text-sm font-medium text-gray-500">{editForm.volume || 50}%</span>
-                                                </div>
-                                                <input
-                                                    type="range"
-                                                    min="0"
-                                                    max="100"
-                                                    value={isEditing ? editForm.volume || 0 : weddingData.volume || 0}
-                                                    onChange={(e) => {
-                                                        const newVal = parseInt(e.target.value);
-                                                        setEditForm(prev => ({ ...prev, volume: newVal }));
-                                                        if (!isEditing) setIsEditing(true);
                                                     }}
-                                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
                                                 />
                                             </div>
-                                        </div>
 
-                                        {(isEditing) && (
-                                            <div className="flex justify-end sticky bottom-4">
-                                                <Button onClick={handleSaveChanges} className="shadow-lg">
-                                                    <Check className="w-4 h-4 mr-2" />
-                                                    Save Changes
-                                                </Button>
+                                            <div className="space-y-6">
+                                                {/* Source Selection */}
+                                                <div className="space-y-3">
+                                                    <Label>Music Source</Label>
+                                                    <div className="flex gap-4">
+                                                        <div onClick={() => setEditForm(prev => ({ ...prev, musicSource: 'upload' }))}
+                                                            className={`flex-1 p-4 border rounded-lg cursor-pointer transition-all ${editForm.musicSource === 'upload' ? 'border-rose-500 bg-rose-50' : 'border-gray-200 hover:border-rose-200'}`}>
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${editForm.musicSource === 'upload' ? 'border-rose-500' : 'border-gray-300'}`}>
+                                                                    {editForm.musicSource === 'upload' && <div className="w-2 h-2 rounded-full bg-rose-500" />}
+                                                                </div>
+                                                                <span className="font-medium">Upload Song</span>
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">Upload your own MP3 file</p>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                {/* Spotify Section */}
+
+
+                                                {/* Upload Section */}
+                                                {editForm.musicSource === 'upload' && (
+                                                    <div className="space-y-4">
+                                                        <Label>Custom Playlist (MP3)</Label>
+
+                                                        {/* List of uploaded songs */}
+                                                        {(() => {
+                                                            const rawUrl = isEditing ? editForm.musicUrl : weddingData.musicUrl;
+                                                            let urls: string[] = [];
+                                                            if (rawUrl) {
+                                                                try {
+                                                                    if (rawUrl.startsWith('[')) {
+                                                                        urls = JSON.parse(rawUrl);
+                                                                    } else {
+                                                                        urls = [rawUrl];
+                                                                    }
+                                                                } catch (e) {
+                                                                    urls = [rawUrl];
+                                                                }
+                                                            }
+
+                                                            if (urls.length > 0) {
+                                                                return (
+                                                                    <div className="space-y-2 mb-4">
+                                                                        {urls.map((url, index) => (
+                                                                            <div key={index} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg animate-fade-in">
+                                                                                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                                                                    <span className="text-xs font-bold">{index + 1}</span>
+                                                                                </div>
+                                                                                <div className="flex-1 overflow-hidden">
+                                                                                    <p className="text-sm font-medium text-green-800 truncate">
+                                                                                        {url.split('/').pop()?.split('_').slice(1).join('_') || `Song ${index + 1}`}
+                                                                                    </p>
+                                                                                </div>
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8 p-0"
+                                                                                    onClick={() => handleRemoveMusic(index)}
+                                                                                >
+                                                                                    <Trash2 className="w-4 h-4" />
+                                                                                </Button>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                );
+                                                            }
+                                                            return null;
+                                                        })()}
+
+                                                        {/* Upload Dropzone */}
+                                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer relative">
+                                                            <div className="flex flex-col items-center">
+                                                                {isUploadingMusic ? (
+                                                                    <Loader2 className="w-10 h-10 text-rose-500 animate-spin mb-2" />
+                                                                ) : (
+                                                                    <Upload className="w-10 h-10 text-gray-400 mb-2" />
+                                                                )}
+                                                                <p className="text-sm font-medium text-gray-900">
+                                                                    {isUploadingMusic ? 'Uploading...' : 'Add a Song'}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500 mb-4">MP3, WAV, or M4A (Max 15MB)</p>
+                                                                <Input
+                                                                    type="file"
+                                                                    accept="audio/*"
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                    onChange={handleMusicUpload}
+                                                                    disabled={isUploadingMusic}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Playlist Section */}
+                                                {editForm.musicSource === 'playlist' && (
+                                                    <div className="space-y-4">
+                                                        <div className="space-y-2">
+                                                            <Label>Playlist URL (Embed Link)</Label>
+                                                            <Input
+                                                                value={isEditing ? editForm.playlistUrl || '' : weddingData.playlistUrl || ''}
+                                                                onChange={(e) => {
+                                                                    setEditForm(prev => ({ ...prev, playlistUrl: e.target.value }));
+                                                                    if (!isEditing) setIsEditing(true);
+                                                                }}
+                                                                placeholder="https://open.spotify.com/embed/playlist/..."
+                                                            />
+                                                            <p className="text-[10px] text-gray-500">
+                                                                Paste the <strong>embed code src</strong> or embed URL from Spotify, YouTube, or SoundCloud.
+                                                            </p>
+                                                        </div>
+
+                                                        {editForm.playlistUrl && (
+                                                            <div className="aspect-video w-full rounded-lg overflow-hidden border bg-gray-100">
+                                                                <iframe
+                                                                    src={editForm.playlistUrl}
+                                                                    width="100%"
+                                                                    height="100%"
+                                                                    frameBorder="0"
+                                                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                                    loading="lazy"
+                                                                ></iframe>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Volume Control */}
+                                                <div className="space-y-4 pt-4 border-t border-gray-100">
+                                                    <div className="flex items-center justify-between">
+                                                        <Label>Background Volume</Label>
+                                                        <span className="text-sm font-medium text-gray-500">{editForm.volume || 50}%</span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="100"
+                                                        value={isEditing ? editForm.volume || 0 : weddingData.volume || 0}
+                                                        onChange={(e) => {
+                                                            const newVal = parseInt(e.target.value);
+                                                            setEditForm(prev => ({ ...prev, volume: newVal }));
+                                                            if (!isEditing) setIsEditing(true);
+                                                        }}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                                                    />
+                                                </div>
                                             </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
+
+                                            {(isEditing) && (
+                                                <div className="flex justify-end sticky bottom-4">
+                                                    <Button onClick={handleSaveChanges} className="shadow-lg">
+                                                        <Check className="w-4 h-4 mr-2" />
+                                                        Save Changes
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </PremiumGate>
                             </TabsContent>
 
                         </Tabs>

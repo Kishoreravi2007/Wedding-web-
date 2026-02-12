@@ -27,6 +27,7 @@ interface User {
   is_2fa_enabled?: boolean;
   email_offers_opt_in?: boolean;
   has_premium_access?: boolean;
+  premium_features?: string[];
   wedding_id?: string | null;
 }
 
@@ -37,7 +38,7 @@ interface AuthContextType {
   login: (identifier: string, password: string) => Promise<{ require2FA?: boolean; userId?: string }>;
   verify2FA: (userId: string, code: string) => Promise<void>;
   enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
-  signup: (email: string, password: string, emailOptIn?: boolean, fullName?: string) => Promise<any>;
+  signup: (email: string, password: string, emailOptIn?: boolean, fullName?: string, location?: string, bio?: string, avatarUrl?: string | null) => Promise<any>;
   updateEmailPreference: (enabled: boolean) => Promise<void>;
   verifyStepUp2FA: (code: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -86,28 +87,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Hydrate user from local storage token
   const hydrateUser = useCallback(async () => {
     const token = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-    if (token && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
+    try {
+      // Verify token with backend to get FRESH user data
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.valid && data.user) {
         setToken(token);
-        const profile = await fetchUserProfile(parsedUser.id, token);
+        const user = data.user;
+
+        // Save fresh user data back to localStorage
+        localStorage.setItem('auth_user', JSON.stringify(user));
+
+        // Fetch profile
+        const profile = await fetchUserProfile(user.id, token);
 
         setCurrentUser({
-          ...parsedUser,
-          profile: profile,
-          has_premium_access: parsedUser.has_premium_access,
-          wedding_id: parsedUser.wedding_id
+          ...user,
+          profile: profile
         });
-      } catch (e) {
-        console.error('Error hydrating user', e);
+      } else {
+        // Token invalid or expired
+        console.warn('Auth token invalid or expired during hydration');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
         setToken(null);
+        setCurrentUser(null);
       }
+    } catch (e) {
+      console.error('Error hydrating user:', e);
+      // Fail gracefully - maybe keep what we have in localStorage if offline?
+      // For now, let's just clear to be safe
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      setToken(null);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [fetchUserProfile]);
 
   useEffect(() => {
@@ -279,7 +304,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (email: string, password: string, emailOptIn: boolean = false, fullName?: string) => {
+  const signup = async (email: string, password: string, emailOptIn: boolean = false, fullName?: string, location?: string, bio?: string, avatarUrl?: string | null) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -289,7 +314,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           password,
           role: 'company',
           email_offers_opt_in: emailOptIn,
-          fullName
+          fullName,
+          location,
+          bio,
+          avatarUrl
         })
       });
 

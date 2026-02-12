@@ -63,6 +63,7 @@ const Settings = () => {
     const [roughBio, setRoughBio] = useState("");
     const [fullName, setFullName] = useState(currentUser?.profile?.full_name || "");
     const [bioText, setBioText] = useState(currentUser?.profile?.bio || "Wedding Photographer & Content Creator");
+    const [photo, setPhoto] = useState<string | null>(currentUser?.profile?.avatar_url || null);
     const [generatedPreview, setGeneratedPreview] = useState("");
 
     // Location Search State
@@ -77,6 +78,12 @@ const Settings = () => {
     useEffect(() => {
         if (currentUser?.email_offers_opt_in !== undefined) {
             setEmailOptIn(currentUser.email_offers_opt_in);
+        }
+        if (currentUser?.profile) {
+            if (currentUser.profile.full_name) setFullName(currentUser.profile.full_name);
+            if (currentUser.profile.bio) setBioText(currentUser.profile.bio);
+            if (currentUser.profile.location) setLocationText(currentUser.profile.location);
+            if (currentUser.profile.avatar_url) setPhoto(currentUser.profile.avatar_url);
         }
     }, [currentUser]);
 
@@ -208,6 +215,7 @@ const Settings = () => {
                     full_name: fullName,
                     location: locationText,
                     bio: bioText,
+                    avatar_url: photo,
                     email: currentUser?.email || currentUser?.username
                 })
             });
@@ -337,6 +345,41 @@ const Settings = () => {
                                                 <CardDescription>Update your personal details and bio.</CardDescription>
                                             </CardHeader>
                                             <CardContent className="p-6 space-y-6">
+                                                {/* Avatar Upload */}
+                                                <div className="flex flex-col items-center justify-center space-y-3 pb-6 border-b border-slate-100">
+                                                    <div className="relative group">
+                                                        <div className="w-24 h-24 rounded-full border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden transition-all group-hover:border-rose-300 group-hover:bg-rose-50/30">
+                                                            {photo ? (
+                                                                <img src={photo} alt="Profile" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <User className="w-10 h-10 text-slate-300" />
+                                                            )}
+                                                        </div>
+                                                        <label
+                                                            htmlFor="profile-photo"
+                                                            className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-lg border border-slate-100 cursor-pointer text-slate-500 hover:text-rose-500 hover:scale-110 transition-all font-sans"
+                                                            title="Update photo"
+                                                        >
+                                                            <span className="sr-only">Upload photo</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                                                            <input
+                                                                id="profile-photo"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={async (event) => {
+                                                                    const file = event.target.files?.[0];
+                                                                    if (!file) return;
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => setPhoto(reader.result as string);
+                                                                    reader.readAsDataURL(file);
+                                                                }}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Profile Image</p>
+                                                </div>
+
                                                 <div className="grid md:grid-cols-2 gap-6">
                                                     <div className="space-y-2">
                                                         <Label className="text-slate-700">Full Name</Label>

@@ -78,12 +78,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", process.env.DEEPFACE_API_URL].filter(Boolean),
-      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", process.env.FRONTEND_URL].filter(Boolean),
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", process.env.DEEPFACE_API_URL].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
@@ -267,6 +268,11 @@ app.use('/api/public/guests', publicGuestsRouter);
 console.log('⭐ Registering /api/reviews routes...');
 app.use('/api/reviews', require('./routes/reviews'));
 console.log('✅ Registered /api/reviews routes.');
+
+// Premium Routes (Razorpay checkout)
+console.log('💎 Registering /api/premium routes...');
+app.use('/api/premium', require('./routes/premium'));
+console.log('✅ Registered /api/premium routes.');
 
 // =============================================================================
 // ERROR HANDLING

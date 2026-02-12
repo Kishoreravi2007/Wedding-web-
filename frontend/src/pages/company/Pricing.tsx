@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
 import { LandingToolbar } from "@/components/LandingToolbar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,6 +19,7 @@ import {
   Calendar,
   Image,
   MessageSquare,
+  MessageCircle,
   Radio,
   Music,
   Gift,
@@ -29,13 +30,40 @@ import {
   Smartphone,
   Mail,
   Phone,
-  Star
+  Star,
+  Loader2,
+  CreditCard,
+  Crown,
+  CheckCircle2,
+  XCircle,
+  Pencil
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import StreamingQualityModal, {
   StreamingQuality,
   streamingBasePrices
 } from "@/components/StreamingQualityModal";
+import { apiCall } from "@/lib/api";
+import { showError, showSuccess } from "@/utils/toast";
+
+declare global {
+  interface Window {
+    Razorpay?: any;
+  }
+}
+
+const loadRazorpayScript = () => {
+  return new Promise<void>((resolve, reject) => {
+    if (window.Razorpay) return resolve();
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Unable to load Razorpay checkout"));
+    document.body.appendChild(script);
+  });
+};
 
 interface PricingFeature {
   id: string;
@@ -48,13 +76,22 @@ interface PricingFeature {
 }
 
 const pricingFeatures: PricingFeature[] = [
-  // Core Features - Essential
+  // Core Features
   {
     id: 'website',
     name: 'Wedding Website',
-    description: 'Beautiful, responsive wedding website with custom domain',
+    description: 'Beautiful, responsive wedding website',
     basePrice: 4999,
     icon: <Globe className="w-5 h-5" />,
+    category: 'core',
+    popular: true
+  },
+  {
+    id: 'visual-editor',
+    name: 'Visual Website Builder',
+    description: 'Drag-and-drop editor to customize your website design',
+    basePrice: 8999,
+    icon: <Pencil className="w-5 h-5" />,
     category: 'core',
     popular: true
   },
@@ -66,6 +103,39 @@ const pricingFeatures: PricingFeature[] = [
     icon: <Image className="w-5 h-5" />,
     category: 'core',
     popular: true
+  },
+  {
+    id: 'face-detection',
+    name: 'AI Face Detection',
+    description: 'Smart face recognition - guests find their photos instantly',
+    basePrice: 4999,
+    icon: <Sparkles className="w-5 h-5" />,
+    category: 'premium',
+    popular: true
+  },
+  {
+    id: 'email-marketing',
+    name: 'Email Invitations',
+    description: 'Send beautiful email invitations, reminders, and updates',
+    basePrice: 2499,
+    icon: <Mail className="w-5 h-5" />,
+    category: 'features'
+  },
+  {
+    id: 'whatsapp-updates',
+    name: 'WhatsApp Updates',
+    description: 'Send automated event updates and reminders via WhatsApp',
+    basePrice: 2999,
+    icon: <MessageCircle className="w-5 h-5" />,
+    category: 'features'
+  },
+  {
+    id: 'guest-management',
+    name: 'Guest Management',
+    description: 'Guest list management with RSVP tracking',
+    basePrice: 2499,
+    icon: <Users className="w-5 h-5" />,
+    category: 'core'
   },
   {
     id: 'event-schedule',
@@ -92,138 +162,37 @@ const pricingFeatures: PricingFeature[] = [
     category: 'core'
   },
 
-  // Advanced Features
-  {
-    id: 'face-detection',
-    name: 'AI Face Detection',
-    description: 'Smart face recognition - guests find their photos instantly',
-    basePrice: 4999,
-    icon: <Sparkles className="w-5 h-5" />,
-    category: 'features',
-    popular: true
-  },
-  {
-    id: 'live-streaming',
-    name: 'Live Streaming',
-    description: 'Flexible live streaming with HD or 4K options',
-    basePrice: 0,
-    icon: <Video className="w-5 h-5" />,
-    category: 'features'
-  },
-  {
-    id: 'photographer-portal',
-    name: 'Photographer Portal',
-    description: 'Dedicated portal for photographers to upload & manage photos',
-    basePrice: 3999,
-    icon: <Camera className="w-5 h-5" />,
-    category: 'features'
-  },
-  {
-    id: 'live-sync',
-    name: 'Live Photo Sync',
-    description: 'Real-time photo upload from cameras via desktop app',
-    basePrice: 5999,
-    icon: <Radio className="w-5 h-5" />,
-    category: 'features'
-  },
-  {
-    id: 'photo-booth',
-    name: 'Photo Booth',
-    description: 'Interactive photo booth with instant sharing',
-    basePrice: 3499,
-    icon: <Camera className="w-5 h-5" />,
-    category: 'features'
-  },
-  {
-    id: 'guest-management',
-    name: 'Guest Management',
-    description: 'Guest list management with RSVP tracking',
-    basePrice: 2499,
-    icon: <Users className="w-5 h-5" />,
-    category: 'features'
-  },
-  {
-    id: 'notifications',
-    name: 'Push Notifications',
-    description: 'Send updates and reminders to guests',
-    basePrice: 1999,
-    icon: <Bell className="w-5 h-5" />,
-    category: 'features'
-  },
-
-  // Premium Features
-  {
-    id: 'custom-branding',
-    name: 'Custom Branding',
-    description: 'Fully customized design, colors, fonts, and logo',
-    basePrice: 8999,
-    icon: <Heart className="w-5 h-5" />,
-    category: 'premium'
-  },
-  {
-    id: 'custom-domain',
-    name: 'Custom Domain',
-    description: 'Use your own domain (e.g., ourwedding.com)',
-    basePrice: 1999,
-    icon: <Globe className="w-5 h-5" />,
-    category: 'premium'
-  },
-  {
-    id: 'mobile-app',
-    name: 'Mobile App',
-    description: 'Native iOS & Android app for your wedding',
-    basePrice: 14999,
-    icon: <Smartphone className="w-5 h-5" />,
-    category: 'premium'
-  },
-  {
-    id: 'analytics',
-    name: 'Advanced Analytics',
-    description: 'Detailed insights, engagement reports, and visitor stats',
-    basePrice: 2999,
-    icon: <FileText className="w-5 h-5" />,
-    category: 'premium'
-  },
-
-  // Add-ons
+  // Optional Add-ons
   {
     id: 'priority-support',
-    name: 'Priority Support',
-    description: '24/7 priority customer support with dedicated manager',
+    name: '24/7 Priority Support',
+    description: 'Dedicated support manager and round-the-clock assistance',
     basePrice: 3999,
     icon: <Shield className="w-5 h-5" />,
     category: 'addons'
   },
   {
-    id: 'backup-restore',
-    name: 'Backup & Restore',
-    description: 'Automatic backups and easy data restoration',
-    basePrice: 2499,
-    icon: <Download className="w-5 h-5" />,
-    category: 'addons'
-  },
-  {
-    id: 'email-marketing',
-    name: 'Email Marketing',
-    description: 'Send beautiful email invitations and updates',
-    basePrice: 2999,
-    icon: <Mail className="w-5 h-5" />,
-    category: 'addons'
-  },
-  {
-    id: 'sms-notifications',
-    name: 'SMS Notifications',
-    description: 'Send SMS updates to guests (1000 messages)',
+    id: 'custom-domain',
+    name: 'Custom Name',
+    description: 'Use your own personalized name (e.g., names.wedding.in)',
     basePrice: 1999,
-    icon: <Phone className="w-5 h-5" />,
+    icon: <Globe className="w-5 h-5" />,
     category: 'addons'
   },
   {
-    id: 'gift-registry',
-    name: 'Gift Registry',
-    description: 'Create and manage your wedding gift registry',
-    basePrice: 3499,
-    icon: <Gift className="w-5 h-5" />,
+    id: 'analytics',
+    name: 'Advanced Analytics',
+    description: 'Visitor stats, RSVP insights, and engagement reports',
+    basePrice: 2999,
+    icon: <FileText className="w-5 h-5" />,
+    category: 'addons'
+  },
+  {
+    id: 'concierge-setup',
+    name: 'Concierge Setup',
+    description: 'We build your website for you - just send us the details',
+    basePrice: 4999,
+    icon: <Crown className="w-5 h-5" />,
     category: 'addons'
   }
 ];
@@ -296,6 +265,8 @@ const BillingDurationSelector = ({
 type CouponStatus = 'idle' | 'applied' | 'invalid';
 
 const Pricing = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
   const [duration, setDuration] = useState<DurationKey>('1M');
   const [couponCode, setCouponCode] = useState('');
@@ -304,6 +275,8 @@ const Pricing = () => {
   const [storageExtraGB, setStorageExtraGB] = useState(0);
   const [selectedStreamingQuality, setSelectedStreamingQuality] = useState<StreamingQuality>('HD');
   const [isStreamingModalOpen, setStreamingModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle');
 
   const STORAGE_STEP = 5;
   const STORAGE_RATE_PER_GB = 20;
@@ -406,6 +379,101 @@ const Pricing = () => {
     }
   };
 
+  const handleBookNow = async () => {
+    if (selectedFeatures.size === 0) {
+      showError('Please select at least one feature before booking.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setPaymentStatus('idle');
+
+    try {
+      // Map pricing page feature IDs to backend feature keys
+      const featureKeys = Array.from(selectedFeatures);
+      const activeDur = durationOptions.find((o) => o.key === duration);
+      const months = activeDur?.months ?? 1;
+
+      const response = await apiCall('/api/premium/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          features: featureKeys,
+          duration: months
+        })
+      });
+
+      console.log('🔍 Checkout API Response:', response);
+
+      if (response.isCapped) {
+        showSuccess(`Note: Transaction capped at ₹${response.amount} for Testing.`);
+      }
+
+      if (!response.razorpayOrder?.id || !response.razorpayKeyId) {
+        showError('Razorpay is not configured. Please contact support.');
+        setIsProcessing(false);
+        return;
+      }
+
+      await loadRazorpayScript();
+
+      const rzpOptions = {
+        key: response.razorpayKeyId,
+        amount: response.razorpayOrder.amount,
+        currency: response.currency || 'INR',
+        name: 'WeddingWeb',
+        description: 'Premium Wedding Package',
+        order_id: response.razorpayOrder.id,
+        handler: async (payload: any) => {
+          try {
+            await apiCall('/api/premium/activate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                paymentId: response.checkoutId,
+                razorpay_payment_id: payload.razorpay_payment_id,
+                razorpay_order_id: payload.razorpay_order_id,
+                razorpay_signature: payload.razorpay_signature
+              })
+            });
+            setPaymentStatus('success');
+            showSuccess('Payment successful! Your premium membership is active.');
+          } catch (err: any) {
+            setPaymentStatus('failed');
+            showError(err.message || 'Payment verification failed. Please contact support.');
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {},
+        notes: {
+          features: featureKeys.join(', '),
+          duration: `${months} month(s)`
+        },
+        theme: { color: '#e11d48' },
+        modal: {
+          ondismiss: () => {
+            setIsProcessing(false);
+            setPaymentStatus('failed');
+            showError('Payment was cancelled. You can try again anytime.');
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(rzpOptions);
+      razorpay.on('payment.failed', (resp: any) => {
+        setIsProcessing(false);
+        setPaymentStatus('failed');
+        showError(resp?.error?.description || 'Payment failed. Please try again.');
+      });
+      razorpay.open();
+    } catch (err: any) {
+      setIsProcessing(false);
+      setPaymentStatus('failed');
+      showError(err.message || 'Failed to start checkout. Please log in and try again.');
+    }
+  };
+
   const calculateBaseSubtotal = () => {
     let base = 0;
     selectedFeatures.forEach((featureId) => {
@@ -432,6 +500,57 @@ const Pricing = () => {
   const totalWithoutDiscount = undiscountedSubtotal;
   const savings = Math.max(totalWithoutDiscount - total, 0);
   const showSavings = duration !== '1M' && savings > 0;
+
+  if (currentUser?.has_premium_access) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <CompanyNavbar />
+        <LandingToolbar />
+        <section className="relative pt-32 pb-20 px-4 flex flex-col items-center justify-center min-h-[80vh] text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-2xl px-8 py-12 rounded-3xl bg-white shadow-2xl border-2 border-amber-100 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4">
+              <Crown className="w-12 h-12 text-amber-500 opacity-20 rotate-12" />
+            </div>
+
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <CheckCircle2 className="w-12 h-12 text-amber-600" />
+            </div>
+
+            <h1 className="text-4xl font-extrabold text-slate-900 mb-4">
+              You are a <span className="text-amber-600">Premium Member!</span>
+            </h1>
+
+            <p className="text-lg text-slate-600 mb-10">
+              Your account is active and you have access to all premium wedding tools.
+              Start building your dream wedding experience now.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 px-10 rounded-2xl shadow-xl transition-all hover:-translate-y-1"
+                onClick={() => navigate('/company')}
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-slate-200 hover:bg-slate-50 py-6 px-10 rounded-2xl font-semibold"
+                onClick={() => navigate('/client')}
+              >
+                Open Premium Builder
+              </Button>
+            </div>
+          </motion.div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
@@ -933,14 +1052,53 @@ const Pricing = () => {
                             One-time payment • No recurring charges • All prices in INR
                           </p>
                         </div>
-                        <Link to="/company/contact" className="block">
+                        {paymentStatus === 'success' ? (
+                          <div className="flex flex-col items-center gap-3 py-4">
+                            <CheckCircle2 className="w-12 h-12 text-green-500" />
+                            <p className="text-lg font-bold text-green-700">Payment Successful!</p>
+                            <p className="text-sm text-slate-500">Your premium membership is now active.</p>
+                            <Button
+                              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-lg py-6"
+                              size="lg"
+                              onClick={() => navigate('/client')}
+                            >
+                              <Crown className="w-5 h-5 mr-2" />
+                              Go to Dashboard
+                            </Button>
+                          </div>
+                        ) : paymentStatus === 'failed' ? (
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="flex items-center gap-2 text-rose-600 mb-1">
+                              <XCircle className="w-5 h-5" />
+                              <span className="text-sm font-medium">Payment failed or cancelled</span>
+                            </div>
+                            <Button
+                              className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg py-6 shadow-lg hover:shadow-xl transition-all"
+                              size="lg"
+                              onClick={() => { setPaymentStatus('idle'); handleBookNow(); }}
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Processing…</span>
+                              ) : (
+                                <span className="flex items-center gap-2"><CreditCard className="w-5 h-5" /> Try Again</span>
+                              )}
+                            </Button>
+                          </div>
+                        ) : (
                           <Button
                             className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-lg py-6 shadow-lg hover:shadow-xl transition-all"
                             size="lg"
+                            onClick={handleBookNow}
+                            disabled={isProcessing || selectedFeatures.size === 0}
                           >
-                            Book a Slot
+                            {isProcessing ? (
+                              <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Processing…</span>
+                            ) : (
+                              <span className="flex items-center gap-2"><CreditCard className="w-5 h-5" /> Book</span>
+                            )}
                           </Button>
-                        </Link>
+                        )}
                         <Button
                           variant="outline"
                           className="w-full border-2"

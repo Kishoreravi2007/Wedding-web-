@@ -31,7 +31,7 @@ const getClientIp = (req) => {
  */
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, role = 'user', fullName } = req.body;
+    const { username, email, password, role = 'user', fullName, location, bio, avatarUrl } = req.body;
 
     // Support both username and email fields (map email to username if needed)
     const effectiveUsername = username || email;
@@ -72,6 +72,20 @@ router.post('/register', async (req, res) => {
       token,
       accessToken: token
     });
+
+    // Create User Profile (SQL)
+    try {
+      const { query } = require('./lib/db-gcp');
+      await query(
+        `INSERT INTO profiles (user_id, full_name, email, location, bio, avatar_url, created_at, updated_at) 
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
+        [newUser.id, fullName || effectiveUsername.split('@')[0], effectiveUsername, location || null, bio || null, avatarUrl || null]
+      );
+      console.log(`👤 Profile created for user ${newUser.id}`);
+    } catch (profileError) {
+      console.error('Failed to create user profile during registration:', profileError);
+      // Non-blocking: user is still created
+    }
 
     // Send AI Welcome Email (Non-blocking)
     try {
@@ -771,7 +785,9 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
         playlistUrl: row.playlist_url || null,
         playlistUrl: row.playlist_url || null,
         volume: row.volume !== null ? row.volume : 50,
-        customizations: row.customizations || {}
+        customizations: row.customizations || {},
+        photographer_username: row.photographer_username,
+        photographer_password: row.photographer_password
       };
 
       // Also fetch the username/slug from users table if needed for correctness
@@ -1037,6 +1053,15 @@ router.post('/photographer/credentials', authMiddleware.verifyToken, async (req,
       );
       resultUser = insertResult.rows[0];
     }
+
+    // 4. Store plaintext credentials in weddings table for display
+    await query(
+      `UPDATE weddings 
+       SET photographer_username = $1, 
+           photographer_password = $2 
+       WHERE id = $3`,
+      [photoUsername, password, wedding.id]
+    );
 
     res.json({
       success: true,

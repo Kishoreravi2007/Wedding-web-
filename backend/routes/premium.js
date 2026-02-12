@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../lib/supabase');
+const { query } = require('../lib/db-gcp');
 const { sendEmail } = require('../lib/email');
 const {
   FEATURE_CATALOG,
@@ -13,21 +13,12 @@ const {
   getRazorpayKeyId,
   PREMIUM_PAYMENT_CURRENCY
 } = require('../lib/razorpay-client');
-const { authenticateToken } = require('../auth-simple');
+const { authMiddleware } = require('../lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
 
 const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://weddingweb.co.in').replace(/\/$/, '');
 const DEFAULT_THEME = process.env.PREMIUM_DEFAULT_THEME || 'modern-classic';
 const PREMIUM_UPI_ID = process.env.RAZORPAY_UPI_ID || null;
-
-/**
- * Ensure Supabase client is configured before any route runs
- */
-const ensureSupabase = () => {
-  if (!supabase) {
-    throw new Error('Supabase client not initialized. Set SUPABASE_URL and key in environment.');
-  }
-  return supabase;
-};
 
 /**
  * Add months to a Date object while avoiding DST/month rollover glitches
@@ -41,6 +32,44 @@ const addMonths = (date, months) => {
   }
   return result;
 };
+
+/**
+ * Ensure required tables exist
+ */
+const ensureTables = async () => {
+  await query(`
+    CREATE TABLE IF NOT EXISTS payment_history (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL,
+      amount NUMERIC(10,2) NOT NULL,
+      duration INTEGER NOT NULL DEFAULT 1,
+      features TEXT[] DEFAULT '{}',
+      status VARCHAR(20) DEFAULT 'pending',
+      payment_gateway VARCHAR(50),
+      payment_gateway_response JSONB,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS premium_memberships (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL,
+      features TEXT[] DEFAULT '{}',
+      duration INTEGER NOT NULL DEFAULT 1,
+      start_date TIMESTAMPTZ NOT NULL,
+      expiry_date TIMESTAMPTZ NOT NULL,
+      payment_id UUID,
+      status VARCHAR(20) DEFAULT 'active',
+      notes TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+};
+
+// Run table check on load
+ensureTables().catch(err => console.warn('Premium tables check warning:', err.message));
 
 /**
  * Surface available feature/duration combos for front-end pricing logic
@@ -75,66 +104,46 @@ router.post('/checkout', authenticateToken, async (req, res) => {
     }
 
     const { features, duration } = req.body;
+    console.log('🔍 Checkout Request Body:', JSON.stringify(req.body));
+
     if (!Array.isArray(features) || features.length === 0) {
       return res.status(400).json({ success: false, error: 'Select at least one feature before checkout' });
     }
 
     const pricing = calculatePremiumTotal({ features, duration });
-    const client = ensureSupabase();
+    console.log('🔍 Calculated Pricing:', JSON.stringify(pricing));
 
-    const { data, error } = await client
-      .from('payment_history')
-      .insert([{
+    const { rows } = await query(
+      `INSERT INTO payment_history (user_id, amount, duration, features, status)
+       VALUES ($1, $2, $3, $4, 'pending')
+       RETURNING *`,
+      [userId, pricing.total, pricing.duration, pricing.features]
+    );
+
+    const data = rows[0];
+
+    const razorpayOrder = await createRazorpayOrder({
+      amount: pricing.total,
+      receipt: data.id,
+      notes: {
         user_id: userId,
-        amount: pricing.total,
-        duration: pricing.duration,
-        features: pricing.features,
-        status: 'pending'
-      }])
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    let razorpayOrder = null;
-    try {
-      razorpayOrder = await createRazorpayOrder({
-        amount: pricing.total,
-        receipt: data.id,
-        notes: {
-          user_id: userId,
-          features: pricing.features.join(','),
-          duration: `${pricing.duration} months`
-        }
-      });
-    } catch (orderError) {
-      console.warn('Razorpay order creation failed:', orderError);
-    }
-
-    const paymentUpdatePayload = {
-      payment_gateway: razorpayOrder ? 'razorpay' : 'offline',
-      payment_gateway_response: razorpayOrder ? {
-        order_id: razorpayOrder.id,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        status: razorpayOrder.status
-      } : {
-        initializedAt: new Date().toISOString(),
-        currency: PREMIUM_PAYMENT_CURRENCY,
-        features: pricing.features
+        features: pricing.features.join(','),
+        duration: `${pricing.duration} months`
       }
+    });
+
+    const gatewayName = 'razorpay';
+    const gatewayResponse = {
+      order_id: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      status: razorpayOrder.status
     };
 
-    const { error: updateError } = await client
-      .from('payment_history')
-      .update(paymentUpdatePayload)
-      .eq('id', data.id);
-
-    if (updateError) {
-      throw updateError;
-    }
+    await query(
+      `UPDATE payment_history SET payment_gateway = $1, payment_gateway_response = $2 WHERE id = $3`,
+      [gatewayName, JSON.stringify(gatewayResponse), data.id]
+    );
 
     res.json({
       success: true,
@@ -143,13 +152,13 @@ router.post('/checkout', authenticateToken, async (req, res) => {
       base: pricing.base,
       multiplier: pricing.multiplier,
       currency: PREMIUM_PAYMENT_CURRENCY,
-      razorpayOrder: razorpayOrder ? {
+      razorpayOrder: {
         id: razorpayOrder.id,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         status: razorpayOrder.status
-      } : null,
-      razorpayKeyId: razorpayOrder ? getRazorpayKeyId() : null,
+      },
+      razorpayKeyId: getRazorpayKeyId(),
       features: pricing.features,
       message: 'Checkout saved. Complete the payment to activate your premium membership.'
     });
@@ -175,16 +184,16 @@ router.post('/activate', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, error: 'paymentId is required' });
     }
 
-    const client = ensureSupabase();
-    const { data: payment, error: paymentError } = await client
-      .from('payment_history')
-      .select('*')
-      .eq('id', paymentId)
-      .single();
+    const { rows: paymentRows } = await query(
+      'SELECT * FROM payment_history WHERE id = $1',
+      [paymentId]
+    );
 
-    if (paymentError || !payment) {
+    if (paymentRows.length === 0) {
       return res.status(404).json({ success: false, error: 'Payment record not found' });
     }
+
+    const payment = paymentRows[0];
 
     if (payment.user_id !== userId) {
       return res.status(403).json({ success: false, error: 'Payment does not belong to the current user' });
@@ -222,105 +231,208 @@ router.post('/activate', authenticateToken, async (req, res) => {
 
     const gatewayName = isRazorpayPayment ? 'razorpay' : (transactionReference ? 'manual' : (payment.payment_gateway || 'offline'));
 
-    const { error: updateError } = await client
-      .from('payment_history')
-      .update({
-        status: 'completed',
-        payment_gateway: gatewayName,
-        payment_gateway_response: gatewayResponse
-      })
-      .eq('id', paymentId);
+    await query(
+      `UPDATE payment_history SET status = 'completed', payment_gateway = $1, payment_gateway_response = $2, updated_at = NOW() WHERE id = $3`,
+      [gatewayName, JSON.stringify(gatewayResponse), paymentId]
+    );
 
-    if (updateError) {
-      throw updateError;
-    }
+    const { rows: membershipRows } = await query(
+      `INSERT INTO premium_memberships (user_id, features, duration, start_date, expiry_date, payment_id, status, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, 'active', $7)
+       RETURNING *`,
+      [userId, payment.features, payment.duration, start.toISOString(), expiry.toISOString(), payment.id, transactionReference ? `Transaction ${transactionReference}` : null]
+    );
 
-    const { data: membership } = await client
-      .from('premium_memberships')
-      .insert([{
-        user_id: userId,
-        features: payment.features,
-        duration: payment.duration,
-        start_date: start.toISOString(),
-        expiry_date: expiry.toISOString(),
-        payment_id: payment.id,
-        status: 'active',
-        notes: transactionReference ? `Transaction ${transactionReference}` : null
-      }])
-      .select()
-      .single();
+    const membership = membershipRows[0];
 
-    const { data: existingSite } = await client
-      .from('user_sites')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
+    // Update user's premium status
+    await query(
+      `UPDATE users SET has_premium_access = true WHERE id = $1`,
+      [userId]
+    );
 
-    let siteData = existingSite;
+    // Get user info for email (username is used as email)
+    const { rows: userRows } = await query('SELECT username FROM users WHERE id = $1', [userId]);
+    const userRecord = userRows[0];
 
-    if (!siteData) {
-      const { data: createdSite } = await client
-        .from('user_sites')
-        .insert([{
-          user_id: userId,
-          theme: DEFAULT_THEME,
-          event_metadata: { status: 'pending_setup' }
-        }])
-        .select()
-        .single();
-
-      siteData = createdSite;
-    }
-
-    const { data: userRecord } = await client
-      .from('users')
-      .select('username, email')
-      .eq('id', userId)
-      .single();
-
-    const notificationMessage = `Your WeddingWeb premium builder is now active until ${expiry.toDateString()}.`;
+    // Try to get the user's display name from the profiles table
+    let displayName = userRecord?.username?.split('@')[0] || 'Customer';
     try {
-      await client
-        .from('user_notifications')
-        .insert([{
-          user_id: userId,
-          title: 'Premium builder unlocked',
-          message: notificationMessage,
-          type: 'premium'
-        }]);
-    } catch (notifyError) {
-      console.warn('Non-blocking: failed to insert premium notification', notifyError);
-    }
+      const { rows: profileRows } = await query(
+        "SELECT display_name, full_name FROM profiles WHERE user_id = $1::text LIMIT 1",
+        [userId]
+      );
+      if (profileRows[0]?.display_name) displayName = profileRows[0].display_name;
+      else if (profileRows[0]?.full_name) displayName = profileRows[0].full_name;
+    } catch (e) { /* profiles table may not have these cols, ignore */ }
 
-    if (userRecord?.email) {
+    const txnId = razorpay_payment_id || transactionReference || payment.id;
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://weddingweb.in';
+
+    // Check if username looks like an email
+    if (userRecord?.username && userRecord.username.includes('@')) {
       try {
-        await sendEmail({
-          to: userRecord.email,
-          subject: 'WeddingWeb Premium Builder Activated',
-          text: `
-Hi ${userRecord.username || 'there'},
+        const invoiceNumber = `WW-${payment.id.substring(0, 8).toUpperCase()}`;
+        const invoiceDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
 
-Your premium website builder has been activated for ${payment.duration} month(s).
+        // Build feature rows from payment.features using the catalog
+        const featureRows = (payment.features || []).map(featureKey => {
+          const catalogEntry = FEATURE_CATALOG.find(f => f.key === featureKey);
+          return {
+            name: catalogEntry ? catalogEntry.label : featureKey,
+            price: catalogEntry ? catalogEntry.price : 0
+          };
+        });
 
-- Total paid: ₹${payment.amount}
-- Start: ${start.toDateString()}
-- Expires: ${expiry.toDateString()}
+        const featureRowsHtml = featureRows.map(f => `
+          <tr>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #334155; font-size: 14px;">
+              ${f.name}
+            </td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #334155; font-size: 14px; text-align: right;">
+              ₹${f.price.toLocaleString('en-IN')}
+            </td>
+          </tr>
+        `).join('');
 
-Access your dashboard: ${FRONTEND_URL}/premium-builder
+        const featureListText = featureRows.map(f => `  • ${f.name} — ₹${f.price}`).join('\n');
+
+        const htmlInvoice = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 24px;">
+
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #e11d48 0%, #9333ea 100%); border-radius: 16px 16px 0 0; padding: 32px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">WeddingWeb</h1>
+      <p style="margin: 8px 0 0; color: rgba(255,255,255,0.85); font-size: 14px;">Premium Membership Invoice</p>
+    </div>
+
+    <!-- Body -->
+    <div style="background: #ffffff; padding: 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+
+      <p style="color: #475569; font-size: 15px; margin: 0 0 24px;">
+        Hi <strong>${displayName}</strong>, thank you for your purchase! Here is your invoice:
+      </p>
+
+      <!-- Invoice Meta -->
+      <table style="width: 100%; margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 10px; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 12px;">
+            <p style="margin: 0 0 4px; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Invoice No.</p>
+            <p style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 600;">${invoiceNumber}</p>
+          </td>
+          <td style="padding: 8px 12px;">
+            <p style="margin: 0 0 4px; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Date</p>
+            <p style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 600;">${invoiceDate}</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 12px;">
+            <p style="margin: 0 0 4px; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Transaction ID</p>
+            <p style="margin: 0; color: #1e293b; font-size: 13px; font-weight: 600; font-family: monospace;">${txnId}</p>
+          </td>
+          <td style="padding: 8px 12px;">
+            <p style="margin: 0 0 4px; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Duration</p>
+            <p style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 600;">${payment.duration} Month(s)</p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Features Table -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        <thead>
+          <tr style="background: #f1f5f9;">
+            <th style="padding: 12px 16px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Feature</th>
+            <th style="padding: 12px 16px; text-align: right; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Base Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${featureRowsHtml}
+        </tbody>
+      </table>
+
+      <!-- Totals -->
+      <div style="border-top: 2px solid #e2e8f0; padding-top: 16px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #64748b; font-size: 14px;">Duration Multiplier</span>
+          <span style="color: #334155; font-size: 14px; font-weight: 500;">× ${payment.duration} month(s)</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 16px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px; margin-top: 12px;">
+          <span style="color: #92400e; font-size: 16px; font-weight: 700;">Total Paid</span>
+          <span style="color: #92400e; font-size: 20px; font-weight: 800;">₹${Number(payment.amount).toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+
+      <!-- Membership Details -->
+      <div style="margin-top: 24px; padding: 16px; background: #f0fdf4; border-radius: 10px; border-left: 4px solid #22c55e;">
+        <p style="margin: 0 0 8px; color: #166534; font-size: 14px; font-weight: 600;">✅ Membership Active</p>
+        <p style="margin: 0; color: #15803d; font-size: 13px;">
+          <strong>Start:</strong> ${start.toDateString()}<br>
+          <strong>Expires:</strong> ${expiry.toDateString()}
+        </p>
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align: center; margin-top: 32px;">
+        <a href="${FRONTEND_URL}/client"
+           style="display: inline-block; background: linear-gradient(135deg, #e11d48, #9333ea); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: 600; letter-spacing: 0.3px;">
+          Go to Premium Dashboard →
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align: center; padding: 24px; color: #94a3b8; font-size: 12px;">
+      <p style="margin: 0 0 4px;">WeddingWeb — Build your dream wedding experience</p>
+      <p style="margin: 0;">This is an automated invoice. Please keep it for your records.</p>
+    </div>
+
+  </div>
+</body>
+</html>
+        `;
+
+        const textInvoice = `
+INVOICE — WeddingWeb Premium Membership
+========================================
+Invoice No: ${invoiceNumber}
+Date: ${invoiceDate}
+Transaction ID: ${txnId}
+Duration: ${payment.duration} Month(s)
+
+Features Purchased:
+${featureListText}
+
+Total Paid: ₹${payment.amount}
+
+Membership Active:
+  Start: ${start.toDateString()}
+  Expires: ${expiry.toDateString()}
+
+Access your dashboard: ${FRONTEND_URL}/client
 
 Thanks for building with WeddingWeb!
-        `.trim()
+        `.trim();
+
+        await sendEmail({
+          to: userRecord.username,
+          subject: `WeddingWeb Invoice ${invoiceNumber} — Premium Membership Activated`,
+          text: textInvoice,
+          html: htmlInvoice
         });
+        console.log(`📧 Invoice email sent to ${userRecord.username}`);
       } catch (emailError) {
-        console.warn('Premium activation email failed (non-blocking):', emailError);
+        console.warn('Premium invoice email failed (non-blocking):', emailError);
       }
     }
 
     res.json({
       success: true,
       membership,
-      site: siteData,
-      message: 'Premium membership activated and notification queued.'
+      message: 'Premium membership activated successfully.'
     });
   } catch (error) {
     console.error('Activation error:', error);
@@ -330,7 +442,7 @@ Thanks for building with WeddingWeb!
 
 /**
  * GET /api/premium/status
- * Return membership and site status for gating the dashboard
+ * Return membership status for gating the dashboard
  */
 router.get('/status', authenticateToken, async (req, res) => {
   try {
@@ -339,25 +451,14 @@ router.get('/status', authenticateToken, async (req, res) => {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
 
-    const client = ensureSupabase();
-    const { data: membership } = await client
-      .from('premium_memberships')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const { data: site } = await client
-      .from('user_sites')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
+    const { rows: membershipRows } = await query(
+      `SELECT * FROM premium_memberships WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [userId]
+    );
 
     res.json({
       success: true,
-      membership,
-      site
+      membership: membershipRows[0] || null
     });
   } catch (error) {
     console.error('Premium status error:', error);
@@ -366,4 +467,3 @@ router.get('/status', authenticateToken, async (req, res) => {
 });
 
 module.exports = router;
-

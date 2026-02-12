@@ -1,0 +1,2312 @@
+[dotenv@17.2.3] injecting env (30) from backend\.env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+🔍 Checking available Gemini models...
+[dotenv@17.2.3] injecting env (0) from backend\.env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+🛡️  auth-new.js module loading... (Secure SQL Auth)
+🔑 Registering /api/auth routes...
+✅ Registered /api/auth routes.
+📦 Registering /api/photos routes...
+👤 Registering /api/faces routes...
+👤 Registering /api/profiles routes...
+🤖 Registering /api/ai routes...
+🔔 Registering /api/notifications routes...
+✉️ Registering /api/email/auto-reply-webhook route...
+✅ Registered /api/email/auto-reply-webhook route.
+💍 Registering /api/weddings route...
+✅ Registered /api/weddings route.
+🎵 Registering /api/music routes...
+✅ Registered /api/music routes.
+👥 Registering /api/guests routes...
+🚀 Initializing WhatsApp Web Client...
+📅 Registering /api/timeline routes...
+🔄 Registering /api/live routes...
+⭐ Registering /api/reviews routes...
+✅ Registered /api/reviews routes.
+💎 Registering /api/premium routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+✅ Registered /api/premium routes.
+
+================================================================================
+🎉 Wedding Web Application Server Started
+================================================================================
+📍 Server running on port 5001
+🌐 Environment: development
+
+📋 API Endpoints:
+   Health:         http://localhost:5001/health
+   Wishes:         http://localhost:5001/api/wishes
+   Photos:         http://localhost:5001/api/photos
+   Face Recognition: http://localhost:5001/api/faces
+   Authentication: http://localhost:5001/api/auth
+================================================================================
+
+✅ Reviews table checked/created
+🔐 WhatsApp Authenticated successfully
+✅ WhatsApp Web Client is READY!
+
+--- Incoming Request ---
+[2026-02-12T15:24:52.398Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:24:52.408Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:24:52.605Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:52.647Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:57.880Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:57.881Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:57.913Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:57.921Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:57.924Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:58.666Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:58.667Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:58.872Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.594Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.596Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.708Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.784Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.787Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:24:59.984Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:25:11.666Z] POST /api/guests/send-whatsapp-all
+------------------------
+
+📡 Guests Router: POST /send-whatsapp-all
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📣 Starting bulk WhatsApp invitations for 1 guests...
+💬 Sending WhatsApp invitation to Kishore Ravi (917907177841@c.us)...
+✅ Message sent to Kishore Ravi
+✅ Bulk WhatsApp completed. Sent 1/1 messages.
+
+--- Incoming Request ---
+[2026-02-12T15:26:03.332Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: b7931da5-e3a9-465f-bcf6-b10295922f20
+
+--- Incoming Request ---
+[2026-02-12T15:26:03.334Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: b7931da5-e3a9-465f-bcf6-b10295922f20
+
+--- Incoming Request ---
+[2026-02-12T15:26:04.786Z] GET /api/profiles/b7931da5-e3a9-465f-bcf6-b10295922f20
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:04.874Z] GET /api/profiles/b7931da5-e3a9-465f-bcf6-b10295922f20
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:05.518Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: b7931da5-e3a9-465f-bcf6-b10295922f20
+
+--- Incoming Request ---
+[2026-02-12T15:26:05.519Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: b7931da5-e3a9-465f-bcf6-b10295922f20
+
+--- Incoming Request ---
+[2026-02-12T15:26:05.603Z] GET /api/profiles/b7931da5-e3a9-465f-bcf6-b10295922f20
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:05.698Z] GET /api/profiles/b7931da5-e3a9-465f-bcf6-b10295922f20
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:33.542Z] POST /api/auth/login
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:33.948Z] GET /api/profiles/800466da-f390-4b47-b30c-495b5423074a
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.007Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.008Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.049Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.050Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.058Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.256Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.258Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:34.305Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:26:41.224Z] DELETE /api/auth/delete
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 800466da-f390-4b47-b30c-495b5423074a
+
+--- Incoming Request ---
+[2026-02-12T15:26:41.896Z] GET /api/reviews
+------------------------
+
+Database query error: error: column p.partner_name does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\reviews.js:31:24 {
+  length: 112,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '39',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3716',
+  routine: 'errorMissingColumn'
+}
+Error fetching reviews: error: column p.partner_name does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\reviews.js:31:24 {
+  length: 112,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '39',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3716',
+  routine: 'errorMissingColumn'
+}
+
+--- Incoming Request ---
+[2026-02-12T15:26:42.270Z] GET /api/reviews
+------------------------
+
+Database query error: error: column p.partner_name does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\reviews.js:31:24 {
+  length: 112,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '39',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3716',
+  routine: 'errorMissingColumn'
+}
+Error fetching reviews: error: column p.partner_name does not exist
+    at C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async query (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\db-gcp.js:55:21)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\routes\reviews.js:31:24 {
+  length: 112,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '39',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3716',
+  routine: 'errorMissingColumn'
+}
+
+--- Incoming Request ---
+[2026-02-12T15:26:58.159Z] POST /api/auth/login
+------------------------
+
+Authentication error: Error: Invalid credentials
+    at Object.authenticateUser (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\secure-auth.js:92:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\auth-new.js:109:18
+Login error: Error: Invalid credentials
+    at Object.authenticateUser (C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\lib\secure-auth.js:92:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async C:\Users\kr577\OneDrive\Documents\Project\Wedding-web-\backend\auth-new.js:109:18
+
+--- Incoming Request ---
+[2026-02-12T15:28:02.191Z] POST /api/auth/register
+------------------------
+
+🤖 Generating AI welcome email for Kishore Ravi...
+[AI Service] 🛰️ Attempting gemini-1.5-flash...
+
+--- Incoming Request ---
+[2026-02-12T15:28:03.265Z] POST /api/profiles
+------------------------
+
+[AI Service] ⚠️ Model gemini-1.5-flash failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent: [404 Not Found] models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[AI Service] 🛰️ Attempting gemini-1.5-flash-latest...
+[AI Service] ⚠️ Model gemini-1.5-flash-latest failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent: [404 Not Found] models/gemini-1.5-flash-latest is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[AI Service] 🛰️ Attempting gemini-1.5-pro...
+[AI Service] ⚠️ Model gemini-1.5-pro failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent: [404 Not Found] models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[AI Service] 🛰️ Attempting gemini-pro...
+[AI Service] ⚠️ Model gemini-pro failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent: [404 Not Found] models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[AI Service] 🛰️ Attempting gemini-2.0-flash-exp...
+[AI Service] ⚠️ Model gemini-2.0-flash-exp failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent: [404 Not Found] models/gemini-2.0-flash-exp is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[AI Service] 📉 All models failed or reached quota. Falling back to MOCK.
+📧 Email sent: <fb9393d7-5f33-9bcb-2380-71bbe05954ad@gmail.com>
+
+--- Incoming Request ---
+[2026-02-12T15:28:50.010Z] POST /api/auth/login
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:50.901Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:51.013Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:51.013Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:51.160Z] GET /api/contact-messages
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:51.161Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:51.422Z] GET /api/weddings
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:52.182Z] GET /api/photos?limit=1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:52.183Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:28:52.345Z] GET /api/wishes
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.017Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.018Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.028Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.030Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.057Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.060Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.199Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.205Z] GET /api/auth/photographer/wedding-details
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.250Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.252Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.266Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.454Z] GET /api/photos?weddingId=51e8511f-2eb9-49b2-95ce-c00c150d70a0
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.464Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.513Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.552Z] GET /api/auth/photographer/wedding-details
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.554Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.718Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.867Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.868Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.883Z] GET /api/photos?weddingId=51e8511f-2eb9-49b2-95ce-c00c150d70a0
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.903Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:14.911Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.027Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.028Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.029Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.047Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.058Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.075Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.083Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.187Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.215Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.232Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.250Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.369Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.381Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.402Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:15.532Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.139Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.141Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.143Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.145Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.146Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.148Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.253Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.255Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.428Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.431Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.529Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.531Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.532Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.891Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:23.894Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.027Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.049Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.050Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.056Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.117Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:38:24.278Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.275Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.279Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.298Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.300Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.314Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.317Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.496Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.497Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.604Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.605Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.734Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.752Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.760Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.900Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.909Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.934Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.948Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.967Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.993Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:32.995Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.042Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.157Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.158Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.159Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.176Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.187Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.188Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.202Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.241Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.319Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.320Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.321Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.322Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.413Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.508Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.510Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:33.602Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.145Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.146Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.149Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.286Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.363Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.364Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.367Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:39:57.561Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.130Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.132Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.137Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.138Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.139Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.140Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.141Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.143Z] POST /api/auth/verify-token
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 3ab59a24-0716-46d6-b262-0cb191f5bc3e
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.170Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.207Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.235Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.266Z] GET /api/profiles/0e6f3505-15f0-4051-a520-56c3c31e3eb1
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.270Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.271Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.343Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.352Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.430Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.489Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.579Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.580Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.751Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.784Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:40:16.867Z] GET /api/auth/client/wedding
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+📡 [GET /client/wedding] Sending response (wrapped): {
+  "wedding": {
+    "user_id": "0e6f3505-15f0-4051-a520-56c3c31e3eb1",
+    "groom_name": "Kishore Ravi",
+    "bride_name": "Bride",
+    "wedding_date": "2026-03-28",
+    "venue": "Not specified",
+    "guest_count": 1,
+    "theme": "Rustic Charm",
+    "created_at": "2026-01-31T10:12:52.284Z",
+    "updated_at": "2026-02-05T00:28:33.603Z",
+    "wedding_time": "10:00",
+    "show_countdown": true,
+    "music_enabled": true,
+    "music_url": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "music_source": "upload",
+    "playlist_url": null,
+    "volume": 50,
+    "slug": "kishoreravi",
+    "wedding_code": "kishoreravi",
+    "customizations": {
+      "heroBgImage": "",
+      "heroBgAdjustments": {
+        "blur": 1.5,
+        "contrast": 100,
+        "brightness": 100,
+        "saturation": 100
+      }
+    },
+    "id": "51e8511f-2eb9-49b2-95ce-c00c150d70a0",
+    "photographer_username": null,
+    "photographer_password": null,
+    "groomName": "Kishore Ravi",
+    "brideName": "Bride",
+    "weddingDate": "2026-03-28",
+    "weddingTime": "10:00",
+    "showCountdown": true,
+    "guestCount": 1,
+    "musicEnabled": true,
+    "musicUrl": "[\"http://localhost:5001/uploads/music/kishoreravi/1770265277756_Chiri_Thottu__Sarvam_Maya__Nivin_Pauly__Preity__Justin_Prabhakaran__Chinmayi__Akhil_Sathyan.mp3\"]",
+    "musicSource": "upload",
+    "playlistUrl": null
+  }
+}
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.224Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.234Z] GET /api/guests
+------------------------
+
+📡 Guests Router: GET /
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.289Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.343Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.394Z] GET /api/timeline
+------------------------
+
+🛡️ Attempting to verify token: eyJhbGciOi...
+🔓 Token decoded successfully for ID: 0e6f3505-15f0-4051-a520-56c3c31e3eb1
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.663Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.686Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+--- Incoming Request ---
+[2026-02-12T15:40:17.711Z] GET /api/profiles/3ab59a24-0716-46d6-b262-0cb191f5bc3e
+------------------------
+
+
+📴 SIGINT received. Closing server gracefully...

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAccessToken, API_BASE_URL } from '@/lib/api';
 import BackgroundAdjusterModal, { ImageAdjustments } from '@/components/premium/BackgroundAdjusterModal';
+import PremiumGate from '@/components/premium/PremiumGate';
 
 const VisualEditor = () => {
     console.log("🛠️ VisualEditor Mounting...");
@@ -358,163 +359,165 @@ const VisualEditor = () => {
     }
 
     return (
-        <div className="relative min-h-screen bg-black/5">
-            {/* Main Editor Canvas - Full Screen */}
-            <div className={`transition-all duration-500 ${previewMode ? '' : 'pb-24'}`}>
-                <WeddingTemplate
-                    weddingData={weddingData}
-                    timeline={timeline}
-                    photos={photos}
-                    // If preview mode is ON, isEditing is FALSE (hides pencils)
-                    isEditing={!previewMode}
-                    onUpdateCustomization={handleUpdateCustomization}
-                />
-            </div>
+        <PremiumGate feature="visual-editor" title="Visual Editor Locked" description="Upgrade to unlock the drag-and-drop visual editor and customize your wedding website to perfection.">
+            <div className="relative min-h-screen bg-black/5">
+                {/* Main Editor Canvas - Full Screen */}
+                <div className={`transition-all duration-500 ${previewMode ? '' : 'pb-24'}`}>
+                    <WeddingTemplate
+                        weddingData={weddingData}
+                        timeline={timeline}
+                        photos={photos}
+                        // If preview mode is ON, isEditing is FALSE (hides pencils)
+                        isEditing={!previewMode}
+                        onUpdateCustomization={handleUpdateCustomization}
+                    />
+                </div>
 
-            {/* HUD Floating Dock - Draggable */}
-            <motion.div
-                drag
-                dragConstraints={{ left: -500, right: 500, top: -800, bottom: 50 }}
-                initial={{ y: 100, x: "-50%", opacity: 0 }}
-                animate={{ y: 0, x: "-50%", opacity: 1 }}
-                className="fixed bottom-6 left-1/2 z-50 cursor-grab active:cursor-grabbing"
-            >
-                <div className="flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-black/20 text-white">
-                    {/* Drag Handle */}
-                    <div className="pl-2 text-white/30">
-                        <GripVertical className="w-5 h-5" />
-                    </div>
-
-                    <TooltipProvider delayDuration={0}>
-                        {/* Exit Button */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => navigate('/client')}
-                                    className="rounded-full w-10 h-10 hover:bg-white/10 hover:text-white text-white/70"
-                                >
-                                    <ArrowLeft className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Exit Editor</TooltipContent>
-                        </Tooltip>
-
-                        {/* Edit Current Background */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleEditCurrentBg}
-                                    className="rounded-full w-10 h-10 hover:bg-indigo-500/20 hover:text-indigo-400 text-white/70"
-                                >
-                                    <ImageIcon className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Adjust Background</TooltipContent>
-                        </Tooltip>
-
-                        {/* Reset All Designs */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleResetEditor}
-                                    className="rounded-full w-10 h-10 hover:bg-rose-500/20 hover:text-rose-400 text-white/70"
-                                >
-                                    <RefreshCw className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Reset All Designs</TooltipContent>
-                        </Tooltip>
-
-                        <div className="w-px h-6 bg-white/20 mx-1"></div>
-
-                        {/* Preview Toggle */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant={previewMode ? "default" : "ghost"}
-                                    size="icon"
-                                    onClick={() => setPreviewMode(!previewMode)}
-                                    className={`rounded-full w-10 h-10 transition-all ${previewMode ? 'bg-indigo-500 hover:bg-indigo-600 text-white' : 'hover:bg-white/10 hover:text-white text-white/70'}`}
-                                >
-                                    {previewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">
-                                {previewMode ? "Exit Preview" : "Preview Mode"}
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* View Live */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => window.open(`/weddings/${weddingData.slug}`, '_blank')}
-                                    className="rounded-full w-10 h-10 hover:bg-white/10 hover:text-white text-white/70"
-                                >
-                                    <ExternalLink className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">View Live Site</TooltipContent>
-                        </Tooltip>
-
-                        <div className="w-px h-6 bg-white/20 mx-1"></div>
-
-                        {/* Save Status / Live Indicator */}
-                        <div className="px-4 flex items-center gap-2">
-                            {saving ? (
-                                <div className="flex items-center text-xs font-medium text-white/70">
-                                    <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                                    Saving...
-                                </div>
-                            ) : (
-                                <div className="flex items-center text-xs font-medium text-emerald-400">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
-                                    Live Edit
-                                </div>
-                            )}
+                {/* HUD Floating Dock - Draggable */}
+                <motion.div
+                    drag
+                    dragConstraints={{ left: -500, right: 500, top: -800, bottom: 50 }}
+                    initial={{ y: 100, x: "-50%", opacity: 0 }}
+                    animate={{ y: 0, x: "-50%", opacity: 1 }}
+                    className="fixed bottom-6 left-1/2 z-50 cursor-grab active:cursor-grabbing"
+                >
+                    <div className="flex items-center gap-2 p-2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-black/20 text-white">
+                        {/* Drag Handle */}
+                        <div className="pl-2 text-white/30">
+                            <GripVertical className="w-5 h-5" />
                         </div>
-                    </TooltipProvider>
 
-                </div>
-            </motion.div>
+                        <TooltipProvider delayDuration={0}>
+                            {/* Exit Button */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => navigate('/client')}
+                                        className="rounded-full w-10 h-10 hover:bg-white/10 hover:text-white text-white/70"
+                                    >
+                                        <ArrowLeft className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Exit Editor</TooltipContent>
+                            </Tooltip>
 
-            {/* Hidden BG Upload Input */}
-            <input
-                id="bg-upload-input"
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleBgUpload}
-            />
+                            {/* Edit Current Background */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleEditCurrentBg}
+                                        className="rounded-full w-10 h-10 hover:bg-indigo-500/20 hover:text-indigo-400 text-white/70"
+                                    >
+                                        <ImageIcon className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Adjust Background</TooltipContent>
+                            </Tooltip>
 
-            {/* Hint Toast (Visible briefly) */}
-            {!previewMode && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white px-4 py-2 rounded-full text-sm pointer-events-none animate-in fade-in slide-in-from-top-4 duration-700 delay-500 opacity-0 fill-mode-forwards">
-                    Hover over elements to edit
-                </div>
-            )}
+                            {/* Reset All Designs */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleResetEditor}
+                                        className="rounded-full w-10 h-10 hover:bg-rose-500/20 hover:text-rose-400 text-white/70"
+                                    >
+                                        <RefreshCw className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Reset All Designs</TooltipContent>
+                            </Tooltip>
 
-            {/* Background Adjuster Modal */}
-            {selectedImageSrc && (
-                <BackgroundAdjusterModal
-                    isOpen={isAdjusterOpen}
-                    onClose={() => {
-                        setIsAdjusterOpen(false);
-                        setSelectedImageSrc(null);
-                    }}
-                    imageSrc={selectedImageSrc}
-                    onConfirm={handleAdjustedUpload}
+                            <div className="w-px h-6 bg-white/20 mx-1"></div>
+
+                            {/* Preview Toggle */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={previewMode ? "default" : "ghost"}
+                                        size="icon"
+                                        onClick={() => setPreviewMode(!previewMode)}
+                                        className={`rounded-full w-10 h-10 transition-all ${previewMode ? 'bg-indigo-500 hover:bg-indigo-600 text-white' : 'hover:bg-white/10 hover:text-white text-white/70'}`}
+                                    >
+                                        {previewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">
+                                    {previewMode ? "Exit Preview" : "Preview Mode"}
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* View Live */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => window.open(`/weddings/${weddingData.slug}`, '_blank')}
+                                        className="rounded-full w-10 h-10 hover:bg-white/10 hover:text-white text-white/70"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">View Live Site</TooltipContent>
+                            </Tooltip>
+
+                            <div className="w-px h-6 bg-white/20 mx-1"></div>
+
+                            {/* Save Status / Live Indicator */}
+                            <div className="px-4 flex items-center gap-2">
+                                {saving ? (
+                                    <div className="flex items-center text-xs font-medium text-white/70">
+                                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                        Saving...
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center text-xs font-medium text-emerald-400">
+                                        <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></div>
+                                        Live Edit
+                                    </div>
+                                )}
+                            </div>
+                        </TooltipProvider>
+
+                    </div>
+                </motion.div>
+
+                {/* Hidden BG Upload Input */}
+                <input
+                    id="bg-upload-input"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleBgUpload}
                 />
-            )}
-        </div>
+
+                {/* Hint Toast (Visible briefly) */}
+                {!previewMode && (
+                    <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white px-4 py-2 rounded-full text-sm pointer-events-none animate-in fade-in slide-in-from-top-4 duration-700 delay-500 opacity-0 fill-mode-forwards">
+                        Hover over elements to edit
+                    </div>
+                )}
+
+                {/* Background Adjuster Modal */}
+                {selectedImageSrc && (
+                    <BackgroundAdjusterModal
+                        isOpen={isAdjusterOpen}
+                        onClose={() => {
+                            setIsAdjusterOpen(false);
+                            setSelectedImageSrc(null);
+                        }}
+                        imageSrc={selectedImageSrc}
+                        onConfirm={handleAdjustedUpload}
+                    />
+                )}
+            </div>
+        </PremiumGate>
     );
 };
 

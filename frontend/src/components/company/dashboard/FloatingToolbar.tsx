@@ -39,6 +39,7 @@ export function FloatingToolbar() {
     // Unified role logic
     const isProfessional = ['vendor', 'photographer', 'admin'].includes(currentUser?.role || '');
     const isClient = !isProfessional;
+    const hasPremium = currentUser?.has_premium_access || (currentUser?.premium_features && currentUser.premium_features.length > 0);
 
     const actions = useMemo(() => {
         if (isProfessional) {
@@ -56,7 +57,7 @@ export function FloatingToolbar() {
                 { id: 'contact', label: "Contact", icon: Mail, color: "text-rose-600", hoverBg: "hover:bg-rose-50" },
             ];
 
-            if (!currentUser?.has_premium_access) {
+            if (!hasPremium) {
                 baseActions.push({ id: 'upgrade', label: "Upgrade", icon: Zap, color: "text-amber-600", hoverBg: "hover:bg-amber-50" });
             } else {
                 baseActions.push({ id: 'builder', label: "Enter Premium Builder", icon: Sparkles, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" });
@@ -65,7 +66,7 @@ export function FloatingToolbar() {
             baseActions.push({ id: 'share', label: "Share", icon: Share2, color: "text-indigo-600", hoverBg: "hover:bg-indigo-50" });
             return baseActions;
         }
-    }, [isProfessional, currentUser?.has_premium_access]);
+    }, [isProfessional, hasPremium]);
 
     const handleAction = async (id: string) => {
         switch (id) {
@@ -101,7 +102,7 @@ export function FloatingToolbar() {
                 navigate('/company/wishes');
                 break;
             case 'builder':
-                if (currentUser?.has_premium_access) {
+                if (hasPremium) {
                     navigate('/client');
                 } else {
                     navigate('/company/pricing');
