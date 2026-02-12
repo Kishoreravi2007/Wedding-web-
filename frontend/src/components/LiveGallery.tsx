@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useLiveSync } from '@/hooks/useLiveSync';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 import { Camera, Wifi, WifiOff, RefreshCw, Download } from 'lucide-react';
 import axios from 'axios';
 
@@ -68,7 +68,9 @@ export function LiveGallery({ eventId, sister, maxPhotos = 50 }: LiveGalleryProp
       if (sister) params.append('sister', sister);
       params.append('limit', maxPhotos.toString());
 
-      const response = await axios.get(`${API_BASE_URL}/api/live/photos?${params.toString()}`);
+      const response = await axios.get(`${API_BASE_URL}/api/live/photos?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
       setPhotos(response.data.photos || []);
     } catch (err: any) {
       console.error('Error loading photos:', err);

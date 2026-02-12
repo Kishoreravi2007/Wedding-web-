@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { API_BASE_URL } from '@/lib/api';
+import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
 interface UseLiveSyncOptions {
   eventId?: string;
@@ -48,6 +48,7 @@ async function checkPhotoForFace(
     const response = await fetch(`${API_BASE_URL}/api/photos/check-face-match`, {
       method: 'POST',
       body: formData,
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {

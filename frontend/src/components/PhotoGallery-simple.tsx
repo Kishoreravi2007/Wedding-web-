@@ -167,12 +167,14 @@ interface PhotoGallerySimpleProps {
   isPhotographerView?: boolean;
   uploadedPhotos?: any[];
   galleryPath?: string;
+  weddingId?: string;
 }
 
 const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   isPhotographerView = false,
   uploadedPhotos = [],
   galleryPath,
+  weddingId,
 }) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [filteredPhotos, setFilteredPhotos] = useState<Photo[]>([]);
@@ -186,13 +188,19 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
   // Fetch photos from backend API
   useEffect(() => {
     const fetchPhotos = async () => {
-      if (!galleryPath) return;
+      // If we have weddingId, use it. Otherwise require galleryPath.
+      if (!weddingId && !galleryPath) return;
 
       try {
-        // Determine sister parameter from gallery path
-        const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
+        let photosEndpoint = `${API_BASE_URL}/api/photos?limit=50`;
 
-        const photosEndpoint = `${API_BASE_URL}/api/photos?sister=${sister}`;
+        if (weddingId) {
+          photosEndpoint += `&weddingId=${weddingId}`;
+        } else {
+          // Determine sister parameter from gallery path (Legacy fallback)
+          const sister = galleryPath === '/sister-a-gallery' ? 'sister-a' : 'sister-b';
+          photosEndpoint += `&sister=${sister}`;
+        }
 
         setIsLoading(true);
         const response = await fetch(photosEndpoint);
@@ -233,7 +241,7 @@ const PhotoGallerySimple: React.FC<PhotoGallerySimpleProps> = ({
 
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
-  }, [galleryPath]);
+  }, [galleryPath, weddingId]);
 
   // Memoize uploaded photo objects based on uploadedPhotos
   const uploadedPhotoObjects = useMemo(() => {

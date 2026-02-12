@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:electron\" \"npm run dev:react\"",
     "dev:react": "vite",
-    "dev:electron": "tsc -p tsconfig.electron.json && electron .",
+    "dev:electron": "tsc -p tsconfig.electron.json && electron . --user-data-dir=./temp-electron-data",
     "build": "npm run build:react && npm run build:electron",
     "build:react": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",

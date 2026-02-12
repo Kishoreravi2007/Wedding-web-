@@ -33,16 +33,23 @@ const WeddingPage = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
 
-    const fetchPhotos = async () => {
+    const fetchPhotos = async (weddingId?: string) => {
         try {
             const apiUrl = API_BASE_URL;
-            // Use slug as the primary identifier (sister) since this is the public page
-            if (slug) {
-                const response = await fetch(`${apiUrl}/api/photos?sister=${slug}&limit=20`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setPhotos(data.photos || []);
-                }
+            // Prefer weddingId if available, fallback to slug (sister)
+            let url = `${apiUrl}/api/photos?limit=50`;
+            if (weddingId) {
+                url += `&weddingId=${weddingId}`;
+            } else if (slug) {
+                url += `&sister=${slug}`;
+            } else {
+                return;
+            }
+
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                setPhotos(data.photos || []);
             }
         } catch (error) {
             console.error('Error fetching photos:', error);
@@ -52,10 +59,16 @@ const WeddingPage = () => {
     };
 
     useEffect(() => {
-        if (slug) {
+        if (slug && !weddingData) {
             fetchPhotos();
         }
-    }, [slug]);
+    }, [slug, weddingData]);
+
+    useEffect(() => {
+        if (weddingData?.id) {
+            fetchPhotos(weddingData.id);
+        }
+    }, [weddingData?.id]);
 
     const handlePhotoUpload = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -65,6 +78,9 @@ const WeddingPage = () => {
         const formData = new FormData();
         formData.append('photo', uploadFile);
         formData.append('sister', slug);
+        if (weddingData?.id) {
+            formData.append('wedding_id', weddingData.id);
+        }
         formData.append('title', 'Guest Capture');
         formData.append('description', 'Uploaded via Wedding Page');
         formData.append('eventType', 'photobooth');
@@ -79,7 +95,7 @@ const WeddingPage = () => {
             if (response.ok) {
                 setShowUploadDialog(false);
                 setUploadFile(null);
-                fetchPhotos(); // Refresh gallery
+                fetchPhotos(weddingData?.id); // Refresh gallery
             } else {
                 console.error('Upload failed');
             }

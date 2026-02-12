@@ -739,8 +739,8 @@ const ClientDashboard = () => {
             if (tData.success) setTimeline(tData.timeline);
 
             // Fetch Gallery Photos
-            if (weddingData.slug) {
-                const pRes = await fetch(`${apiUrl}/api/photos?sister=${weddingData.slug}&limit=50`, {
+            if (weddingData.id) {
+                const pRes = await fetch(`${apiUrl}/api/photos?weddingId=${weddingData.id}&limit=50`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (pRes.ok) {
@@ -764,6 +764,9 @@ const ClientDashboard = () => {
         const formData = new FormData();
         formData.append('photo', file);
         formData.append('sister', weddingData.slug);
+        if (weddingData.id) {
+            formData.append('wedding_id', weddingData.id);
+        }
         formData.append('title', 'Photographer Upload');
         formData.append('description', 'Uploaded via Dashboard');
         formData.append('eventType', 'wedding');
@@ -785,7 +788,7 @@ const ClientDashboard = () => {
                 const data = await res.json();
                 // Add new photo to start of list (assuming backend returns full photo object or we construct it)
                 // Re-fetch to be safe and get processed URLs/faces
-                const pRes = await fetch(`${apiUrl}/api/photos?sister=${weddingData.slug}&limit=50`, {
+                const pRes = await fetch(`${apiUrl}/api/photos?weddingId=${weddingData.id}&limit=50`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (pRes.ok) {

@@ -39,6 +39,20 @@ log('--- App Starting ---');
 log(`Working Dir: ${process.cwd()}`);
 log(`Entry Dir: ${__dirname}`);
 
+// Handle dev mode user data path
+if (!app.isPackaged || process.env.NODE_ENV === 'development') {
+  const userDataPath = path.join(process.cwd(), 'temp-electron-data');
+  try {
+    if (!fs.existsSync(userDataPath)) {
+      fs.mkdirSync(userDataPath, { recursive: true });
+    }
+    app.setPath('userData', userDataPath);
+    log(`Set User Data Path: ${userDataPath}`);
+  } catch (e: any) {
+    log(`Failed to set User Data Path: ${e.message}`);
+  }
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {

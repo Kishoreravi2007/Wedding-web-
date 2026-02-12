@@ -52,7 +52,8 @@ export default function App() {
     loadConfig();
     checkWatchingStatus();
     loadQueueStats();
-    setupListeners();
+    const cleanup = setupListeners();
+    return () => cleanup();
   }, []);
 
   // Check connection when config changes
@@ -112,9 +113,13 @@ export default function App() {
   };
 
   const setupListeners = () => {
-    window.electronAPI.onQueueUpdate((data) => {
+    return window.electronAPI.onQueueUpdate((data) => {
       setQueueStats(data.stats);
-      setRecentUploads(prev => [data.item, ...prev].slice(0, 10));
+      setRecentUploads(prev => {
+        // Filter out existing version of this item to avoid duplicate keys
+        const filtered = prev.filter(item => item.id !== data.item.id);
+        return [data.item, ...filtered].slice(0, 10);
+      });
     });
   };
 

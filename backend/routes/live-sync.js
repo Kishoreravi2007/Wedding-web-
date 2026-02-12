@@ -10,11 +10,11 @@ const router = express.Router();
 const multer = require('multer');
 const { query } = require('../lib/db-gcp');
 const { PhotoDB } = require('../lib/sql-db');
-const { uploadFile } = require('../lib/gcs-storage');
+const { uploadFile } = require('../lib/supabase-storage');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const path = require('path');
-const authenticateApiKey = require('../middleware/apiKeyAuth');
+const unifiedAuth = require('../middleware/unifiedAuth');
 
 // Multer configuration for in-memory storage
 const upload = multer({
@@ -36,11 +36,19 @@ const upload = multer({
 /**
  * POST /api/live/uploadPhoto
  */
-router.post('/uploadPhoto', authenticateApiKey, upload.single('photo'), async (req, res) => {
+router.post('/uploadPhoto', unifiedAuth, upload.single('photo'), async (req, res) => {
   try {
-    const { eventId, sister, timestamp } = req.body;
-    const photographerId = req.photographer.id;
-    const weddingId = req.photographer.weddingId;
+    const photographerId = req.photographer?.id;
+    const weddingId = req.photographer?.weddingId;
+
+    console.log(`[LiveSync] Photographer context:`, JSON.stringify(req.photographer));
+
+    if (!weddingId) {
+      console.error('[LiveSync] Missing weddingId in photographer context');
+      return res.status(400).json({ success: false, error: 'No wedding assigned to this photographer' });
+    }
+
+    console.log(`[LiveSync] Upload attempt - Photographer: ${photographerId}, Wedding: ${weddingId}, Sister: ${sister}`);
 
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No photo file provided' });
@@ -50,8 +58,9 @@ router.post('/uploadPhoto', authenticateApiKey, upload.single('photo'), async (r
     const fileName = `${photoId}${path.extname(req.file.originalname)}`;
     const destination = `photos/${weddingId}/${fileName}`;
 
-    // Upload to GCS
-    const publicUrl = await uploadFile(destination, req.file.buffer, req.file.mimetype);
+    // Upload to Supabase Storage
+    const bucketName = 'photos';
+    const publicUrl = await uploadFile(bucketName, destination, req.file.buffer, req.file.mimetype);
 
     // Save to SQL Database
     const photoData = {
@@ -105,7 +114,10 @@ router.post('/uploadPhoto', authenticateApiKey, upload.single('photo'), async (r
     });
 
   } catch (error) {
-    console.error('Live upload error:', error);
+    console.error('[LiveSync] Critical Upload Failure:', error);
+    if (error.response) {
+      console.error('[LiveSync] Error response data:', error.response.data);
+    }
     res.status(500).json({
       success: false,
       error: error.message
@@ -116,10 +128,12 @@ router.post('/uploadPhoto', authenticateApiKey, upload.single('photo'), async (r
 /**
  * GET /api/live/photos
  */
-router.get('/photos', authenticateApiKey, async (req, res) => {
+router.get('/photos', unifiedAuth, async (req, res) => {
   try {
     const { eventId, sister, limit = 50, offset = 0 } = req.query;
     const weddingId = req.photographer.weddingId;
+
+    console.log(`[LiveSync] Fetch photos - Wedding: ${weddingId}, Sister: ${sister}`);
 
     if (!weddingId && !sister) {
       return res.status(400).json({ message: 'Either wedding context or sister must be provided' });

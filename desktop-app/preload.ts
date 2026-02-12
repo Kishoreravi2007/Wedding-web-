@@ -66,8 +66,8 @@ export interface ElectronAPI {
   getVersion: () => Promise<string>;
 
   // Events
-  onUploadProgress: (callback: (data: any) => void) => void;
-  onQueueUpdate: (callback: (data: { item: QueueItem; stats: QueueStats }) => void) => void;
+  onUploadProgress: (callback: (data: any) => void) => () => void;
+  onQueueUpdate: (callback: (data: { item: QueueItem; stats: QueueStats }) => void) => () => void;
 }
 
 const electronAPI: ElectronAPI = {
@@ -104,10 +104,14 @@ const electronAPI: ElectronAPI = {
 
   // Events
   onUploadProgress: (callback) => {
-    ipcRenderer.on('upload-progress', (_, data) => callback(data));
+    const listener = (_: any, data: any) => callback(data);
+    ipcRenderer.on('upload-progress', listener);
+    return () => ipcRenderer.removeListener('upload-progress', listener);
   },
   onQueueUpdate: (callback) => {
-    ipcRenderer.on('queue-update', (_, data) => callback(data));
+    const listener = (_: any, data: any) => callback(data);
+    ipcRenderer.on('queue-update', listener);
+    return () => ipcRenderer.removeListener('queue-update', listener);
   },
 };
 
