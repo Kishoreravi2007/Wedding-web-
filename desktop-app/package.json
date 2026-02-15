@@ -58,6 +58,7 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
+      "assets/**/*",
       "node_modules/**/*",
       "!node_modules/**/README*",
       "!node_modules/**/*.md"

@@ -50,7 +50,7 @@ export default function LiveSyncDashboard() {
   const [newKeyName, setNewKeyName] = useState('');
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [photographerId, setPhotographerId] = useState<string | null>(null);
-  const [selectedSister, setSelectedSister] = useState<'sister-a' | 'sister-b' | 'none'>('none');
+  const [selectedSister, setSelectedSister] = useState<string>('none');
   const [timelineEvents, setTimelineEvents] = useState<string[]>([]);
   const [currentWedding, setCurrentWedding] = useState<any>(null);
 
@@ -417,7 +417,10 @@ export default function LiveSyncDashboard() {
                 )}
               </div>
 
-              <LiveGallery sister={selectedSister} />
+              <LiveGallery
+                sister={selectedSister === 'sister-a' || selectedSister === 'sister-b' ? selectedSister : undefined}
+                eventId={selectedSister !== 'sister-a' && selectedSister !== 'sister-b' && selectedSister !== 'none' ? selectedSister : undefined}
+              />
             </CardContent>
           </Card>
         </TabsContent>

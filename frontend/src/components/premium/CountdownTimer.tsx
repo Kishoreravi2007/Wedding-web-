@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { themeConfigs } from '@/lib/themeConfig';
 
 interface CountdownTimerProps {
     targetDate: string; // YYYY-MM-DD
@@ -9,19 +10,14 @@ interface CountdownTimerProps {
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, targetTime = '10:00', theme = 'Minimalist' }) => {
     const [timeLeft, setTimeLeft] = useState<{ days: number, hours: number, minutes: number, seconds: number } | null>(null);
 
-    // Get theme-specific colors
+    // Get theme-specific colors from shared config
     const getThemeColors = () => {
-        switch (theme) {
-            case 'Modern Elegance': return { container: 'bg-white/10 border-white/20', text: 'text-white', subtext: 'text-white/70' };
-            case 'Classic Romance': return { container: 'bg-rose-100/50 border-rose-200', text: 'text-rose-900', subtext: 'text-rose-600' };
-            case 'Rustic Charm': return { container: 'bg-amber-100/50 border-amber-200', text: 'text-amber-900', subtext: 'text-amber-600' };
-            case 'Minimalist': return { container: 'bg-gray-100 border-gray-200', text: 'text-gray-900', subtext: 'text-gray-500' };
-            case 'Vintage Glamour': return { container: 'bg-[#4a403a]/10 border-[#4a403a]/20', text: 'text-[#4a403a]', subtext: 'text-[#4a403a]/70' };
-            case 'Boho Chic': return { container: 'bg-[#5c4b37]/10 border-[#5c4b37]/20', text: 'text-[#5c4b37]', subtext: 'text-[#5c4b37]/70' };
-            case 'Beach Bliss': return { container: 'bg-cyan-100/50 border-cyan-200', text: 'text-cyan-900', subtext: 'text-cyan-600' };
-            case 'Royal Luxury': return { container: 'bg-white/10 border-white/20', text: 'text-white', subtext: 'text-white/70' };
-            default: return { container: 'bg-gray-100 border-gray-200', text: 'text-gray-900', subtext: 'text-gray-500' };
+        const config = themeConfigs[theme];
+        if (config?.timer) {
+            return config.timer;
         }
+        // Fallback default
+        return { container: 'bg-gray-100 border-gray-200', text: 'text-gray-900', subtext: 'text-gray-500' };
     };
 
     const colors = getThemeColors();

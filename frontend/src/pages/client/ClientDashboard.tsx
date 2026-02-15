@@ -60,171 +60,15 @@ import ClockPicker from '@/components/premium/ClockPicker';
 import CountdownTimer from '@/components/premium/CountdownTimer';
 import PremiumGate from '@/components/premium/PremiumGate';
 
-// --- Advanced Theme Engine (Shared Config) ---
-type ThemeLayout = 'minimal-split' | 'luxury-serif' | 'rustic-overlay' | 'boho-frame' | 'modern-glass' | 'classic-centered';
-
-interface ThemeConfig {
-    layout: ThemeLayout;
-    fontHeading: string;
-    fontBody: string;
-    colors: {
-        bg: string;
-        text: string;
-        accent: string;
-        secondary: string;
-    };
-    radius: string;
-    decoration: 'none' | 'floral' | 'geometric' | 'gold-border';
-}
-
-const themeConfigs: Record<string, ThemeConfig> = {
-    // --- Originals ---
-    'Modern Elegance': {
-        layout: 'minimal-split',
-        fontHeading: 'font-playfair',
-        fontBody: 'font-montserrat',
-        colors: { bg: 'bg-slate-900', text: 'text-white', accent: 'text-rose-400', secondary: 'text-gray-400' },
-        radius: 'rounded-none',
-        decoration: 'geometric'
-    },
-    'Classic Romance': {
-        layout: 'classic-centered',
-        fontHeading: 'font-playfair',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-rose-50', text: 'text-rose-900', accent: 'text-rose-500', secondary: 'text-rose-700' },
-        radius: 'rounded-xl',
-        decoration: 'floral'
-    },
-    'Rustic Charm': {
-        layout: 'rustic-overlay',
-        fontHeading: 'font-cinzel',
-        fontBody: 'font-cormorant',
-        colors: { bg: 'bg-stone-100', text: 'text-stone-800', accent: 'text-amber-600', secondary: 'text-stone-600' },
-        radius: 'rounded-2xl',
-        decoration: 'none'
-    },
-    'Royal Luxury': {
-        layout: 'luxury-serif',
-        fontHeading: 'font-cinzel',
-        fontBody: 'font-montserrat',
-        colors: { bg: 'bg-purple-950', text: 'text-purple-50', accent: 'text-yellow-400', secondary: 'text-purple-200' },
-        radius: 'rounded-md',
-        decoration: 'gold-border'
-    },
-
-    // --- Nature ---
-    'Forest Fern': {
-        layout: 'rustic-overlay',
-        fontHeading: 'font-playfair',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-emerald-900', text: 'text-emerald-50', accent: 'text-emerald-300', secondary: 'text-emerald-200' },
-        radius: 'rounded-lg',
-        decoration: 'none'
-    },
-    'Ocean Breeze': {
-        layout: 'minimal-split',
-        fontHeading: 'font-montserrat',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-sky-50', text: 'text-sky-900', accent: 'text-sky-500', secondary: 'text-sky-700' },
-        radius: 'rounded-3xl',
-        decoration: 'none'
-    },
-    'Sunset Glow': { layout: 'minimal-split', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-orange-50', text: 'text-orange-900', accent: 'text-orange-500', secondary: 'text-orange-700' }, radius: 'rounded-lg', decoration: 'none' },
-    'Mountain Mist': { layout: 'rustic-overlay', fontHeading: 'font-raleway', fontBody: 'font-sans', colors: { bg: 'bg-gray-100', text: 'text-slate-800', accent: 'text-slate-500', secondary: 'text-slate-600' }, radius: 'rounded-sm', decoration: 'none' },
-    'Desert Bloom': { layout: 'boho-frame', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-rose-100', text: 'text-stone-800', accent: 'text-stone-500', secondary: 'text-stone-600' }, radius: 'rounded-2xl', decoration: 'none' },
-
-    // --- Classic ---
-    'Gold & Ivory': {
-        layout: 'luxury-serif',
-        fontHeading: 'font-alex-brush',
-        fontBody: 'font-poppins',
-        colors: { bg: 'bg-[#fffff0]', text: 'text-[#c5a059]', accent: 'text-[#d4af37]', secondary: 'text-[#8a7e5f]' },
-        radius: 'rounded-sm',
-        decoration: 'gold-border'
-    },
-    'Black Tie': {
-        layout: 'minimal-split',
-        fontHeading: 'font-playfair',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-neutral-950', text: 'text-white', accent: 'text-neutral-400', secondary: 'text-neutral-500' },
-        radius: 'rounded-none',
-        decoration: 'geometric'
-    },
-    'Silver Soiree': { layout: 'luxury-serif', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-slate-50', text: 'text-slate-600', accent: 'text-slate-400', secondary: 'text-slate-500' }, radius: 'rounded-md', decoration: 'none' },
-    'Pearl White': { layout: 'classic-centered', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-white', text: 'text-stone-500', accent: 'text-stone-400', secondary: 'text-stone-300' }, radius: 'rounded-full', decoration: 'none' },
-    'Champagne Toast': { layout: 'luxury-serif', fontHeading: 'font-alex-brush', fontBody: 'font-poppins', colors: { bg: 'bg-[#f7e7ce]', text: 'text-[#5c5346]', accent: 'text-[#8e7e6a]', secondary: 'text-[#a69886]' }, radius: 'rounded-lg', decoration: 'none' },
-
-    // --- Modern ---
-    'City Lights': {
-        layout: 'modern-glass',
-        fontHeading: 'font-montserrat',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-zinc-950', text: 'text-yellow-50', accent: 'text-yellow-400', secondary: 'text-zinc-400' },
-        radius: 'rounded-none',
-        decoration: 'none'
-    },
-    'Midnight Blue': {
-        layout: 'modern-glass',
-        fontHeading: 'font-cormorant',
-        fontBody: 'font-montserrat',
-        colors: { bg: 'bg-[#0f172a]', text: 'text-blue-50', accent: 'text-blue-400', secondary: 'text-blue-200' },
-        radius: 'rounded-xl',
-        decoration: 'geometric'
-    },
-    'Charcoal & Rose': { layout: 'minimal-split', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-stone-800', text: 'text-rose-200', accent: 'text-rose-400', secondary: 'text-stone-600' }, radius: 'rounded-none', decoration: 'none' },
-    'Monochrome': { layout: 'minimal-split', fontHeading: 'font-montserrat', fontBody: 'font-lato', colors: { bg: 'bg-white', text: 'text-black', accent: 'text-gray-800', secondary: 'text-gray-400' }, radius: 'rounded-none', decoration: 'geometric' },
-    'Geometric Pop': { layout: 'modern-glass', fontHeading: 'font-raleway', fontBody: 'font-lato', colors: { bg: 'bg-white', text: 'text-indigo-600', accent: 'text-indigo-400', secondary: 'text-indigo-200' }, radius: 'rounded-lg', decoration: 'geometric' },
-
-    // --- Romantic ---
-    'Blushing Bride': {
-        layout: 'boho-frame',
-        fontHeading: 'font-great-vibes',
-        fontBody: 'font-raleway',
-        colors: { bg: 'bg-pink-50', text: 'text-pink-900', accent: 'text-pink-400', secondary: 'text-pink-700' },
-        radius: 'rounded-[3rem]',
-        decoration: 'floral'
-    },
-    'Lavender Haze': {
-        layout: 'boho-frame',
-        fontHeading: 'font-alex-brush',
-        fontBody: 'font-lato',
-        colors: { bg: 'bg-purple-50', text: 'text-purple-900', accent: 'text-purple-400', secondary: 'text-purple-700' },
-        radius: 'rounded-2xl',
-        decoration: 'floral'
-    },
-    'Peachy Keen': { layout: 'boho-frame', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-orange-100', text: 'text-orange-800', accent: 'text-orange-500', secondary: 'text-orange-600' }, radius: 'rounded-3xl', decoration: 'none' },
-    'Red Velvet': { layout: 'luxury-serif', fontHeading: 'font-cinzel', fontBody: 'font-lato', colors: { bg: 'bg-red-900', text: 'text-rose-50', accent: 'text-rose-200', secondary: 'text-red-700' }, radius: 'rounded-md', decoration: 'none' },
-    'Sweetheart Pink': { layout: 'classic-centered', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-rose-200', text: 'text-rose-900', accent: 'text-rose-600', secondary: 'text-rose-800' }, radius: 'rounded-xl', decoration: 'none' },
-
-    // --- Cultural ---
-    'Royal Red': {
-        layout: 'luxury-serif',
-        fontHeading: 'font-cinzel',
-        fontBody: 'font-poppins',
-        colors: { bg: 'bg-red-900', text: 'text-amber-50', accent: 'text-amber-400', secondary: 'text-red-200' },
-        radius: 'rounded-none',
-        decoration: 'gold-border'
-    },
-    'Teal & Gold': {
-        layout: 'luxury-serif',
-        fontHeading: 'font-cormorant',
-        fontBody: 'font-raleway',
-        colors: { bg: 'bg-teal-900', text: 'text-teal-50', accent: 'text-amber-300', secondary: 'text-teal-200' },
-        radius: 'rounded-lg',
-        decoration: 'gold-border'
-    },
-    'Saffron Sun': { layout: 'rustic-overlay', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-yellow-500', text: 'text-red-900', accent: 'text-red-700', secondary: 'text-yellow-700' }, radius: 'rounded-lg', decoration: 'none' },
-    'Magenta Magic': { layout: 'modern-glass', fontHeading: 'font-montserrat', fontBody: 'font-lato', colors: { bg: 'bg-fuchsia-800', text: 'text-fuchsia-100', accent: 'text-fuchsia-300', secondary: 'text-fuchsia-600' }, radius: 'rounded-xl', decoration: 'none' },
-    'Emerald Elegance': { layout: 'luxury-serif', fontHeading: 'font-playfair', fontBody: 'font-lato', colors: { bg: 'bg-emerald-800', text: 'text-emerald-100', accent: 'text-emerald-400', secondary: 'text-emerald-600' }, radius: 'rounded-md', decoration: 'none' }
-};
+import { themeConfigs, ThemeConfig, ThemeLayout } from '@/lib/themeConfig';
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
     const { currentUser, logout, refreshProfile, enable2FA } = useAuth();
     const [activeTab, setActiveTab] = useState('overview');
 
-    // Initialize with real user data
     const [weddingData, setWeddingData] = useState({
+        id: '',
         groomName: currentUser?.profile?.full_name?.split('&')[0]?.trim() || currentUser?.username?.split('@')[0] || 'Groom',
         brideName: currentUser?.profile?.full_name?.split('&')[1]?.trim() || 'Bride',
         weddingDate: '2026-03-15', // Default for now
@@ -241,7 +85,6 @@ const ClientDashboard = () => {
         musicEnabled: false,
         musicUrl: null as string | null,
         musicSource: 'upload', // 'upload' | 'spotify' | 'youtube' | 'applemusic'
-        playlistUrl: null as string | null,
         playlistUrl: null as string | null,
         volume: 50,
         photographer_username: '',
@@ -303,6 +146,7 @@ const ClientDashboard = () => {
     useEffect(() => {
         if (!isEditing) {
             setEditForm({
+                id: weddingData.id,
                 groomName: weddingData.groomName,
                 brideName: weddingData.brideName,
                 weddingDate: weddingData.weddingDate,
@@ -545,6 +389,7 @@ const ClientDashboard = () => {
     };
 
     const [editForm, setEditForm] = useState({
+        id: weddingData.id,
         groomName: weddingData.groomName,
         brideName: weddingData.brideName,
         weddingDate: weddingData.weddingDate,
@@ -674,6 +519,7 @@ const ClientDashboard = () => {
                         ...prev,
                         ...data.wedding,
                         // Convert DB snake_case to frontend camelCase if needed
+                        id: data.wedding.id || prev.id,
                         groomName: data.wedding.groom_name || prev.groomName,
                         brideName: data.wedding.bride_name || prev.brideName,
                         weddingDate: data.wedding.wedding_date ? new Date(data.wedding.wedding_date).toISOString().split('T')[0] : prev.weddingDate,
@@ -687,7 +533,6 @@ const ClientDashboard = () => {
                         musicEnabled: data.wedding.musicEnabled !== undefined ? data.wedding.musicEnabled : prev.musicEnabled,
                         musicUrl: data.wedding.musicUrl || prev.musicUrl,
                         musicSource: data.wedding.musicSource || prev.musicSource,
-                        playlistUrl: data.wedding.playlistUrl || prev.playlistUrl,
                         playlistUrl: data.wedding.playlistUrl || prev.playlistUrl,
                         volume: data.wedding.volume !== null ? data.wedding.volume : prev.volume,
                         photographer_username: data.wedding.photographer_username || '',
@@ -1993,7 +1838,25 @@ const ClientDashboard = () => {
                                                 'Blushing Bride', 'Lavender Haze', 'Peachy Keen', 'Red Velvet', 'Sweetheart Pink',
 
                                                 // Cultural
-                                                'Royal Red', 'Saffron Sun', 'Teal & Gold', 'Magenta Magic', 'Emerald Elegance'
+                                                'Royal Red', 'Saffron Sun', 'Teal & Gold', 'Magenta Magic', 'Emerald Elegance',
+
+                                                // Botanical (The Knot Inspired)
+                                                'Botanical Blooms', 'Garden Party', 'Tropical Paradise',
+
+                                                // Ethereal
+                                                'Ethereal Blur', 'Dreamy Watercolor',
+
+                                                // Destination
+                                                'Amalfi Coast', 'Tuscan Villa', 'Parisian Romance',
+
+                                                // Vintage / Retro
+                                                'Art Deco Glam', 'Vintage Lace',
+
+                                                // Seasonal
+                                                'Autumn Harvest', 'Winter Wonderland', 'Spring Blossom',
+
+                                                // Statement
+                                                'Moody Romance', 'Whimsical Garden'
                                             ].filter(t => t.toLowerCase().includes(themeSearch.toLowerCase())).map((theme) => (
                                                 <div
                                                     key={theme}
@@ -2041,7 +1904,34 @@ const ClientDashboard = () => {
                                                                                                                                                                             theme === 'Teal & Gold' ? 'bg-teal-700' :
                                                                                                                                                                                 theme === 'Magenta Magic' ? 'bg-fuchsia-800' :
                                                                                                                                                                                     theme === 'Emerald Elegance' ? 'bg-emerald-800' :
-                                                                                                                                                                                        'bg-gray-100'
+
+                                                                                                                                                                                        // Botanical (The Knot)
+                                                                                                                                                                                        theme === 'Botanical Blooms' ? 'bg-[#f5f0eb]' :
+                                                                                                                                                                                            theme === 'Garden Party' ? 'bg-[#eef3e5]' :
+                                                                                                                                                                                                theme === 'Tropical Paradise' ? 'bg-[#0a4d3a]' :
+
+                                                                                                                                                                                                    // Ethereal
+                                                                                                                                                                                                    theme === 'Ethereal Blur' ? 'bg-violet-100' :
+                                                                                                                                                                                                        theme === 'Dreamy Watercolor' ? 'bg-[#f0e6f3]' :
+
+                                                                                                                                                                                                            // Destination
+                                                                                                                                                                                                            theme === 'Amalfi Coast' ? 'bg-[#1a4063]' :
+                                                                                                                                                                                                                theme === 'Tuscan Villa' ? 'bg-[#f5eadb]' :
+                                                                                                                                                                                                                    theme === 'Parisian Romance' ? 'bg-[#f7f0f5]' :
+
+                                                                                                                                                                                                                        // Vintage / Retro
+                                                                                                                                                                                                                        theme === 'Art Deco Glam' ? 'bg-[#1a1a2e]' :
+                                                                                                                                                                                                                            theme === 'Vintage Lace' ? 'bg-[#faf6f0]' :
+
+                                                                                                                                                                                                                                // Seasonal
+                                                                                                                                                                                                                                theme === 'Autumn Harvest' ? 'bg-[#4a2c17]' :
+                                                                                                                                                                                                                                    theme === 'Winter Wonderland' ? 'bg-[#1a2744]' :
+                                                                                                                                                                                                                                        theme === 'Spring Blossom' ? 'bg-[#fff5f5]' :
+
+                                                                                                                                                                                                                                            // Statement
+                                                                                                                                                                                                                                            theme === 'Moody Romance' ? 'bg-[#1a1a1a]' :
+                                                                                                                                                                                                                                                theme === 'Whimsical Garden' ? 'bg-[#fef9ef]' :
+                                                                                                                                                                                                                                                    'bg-gray-100'
                                                         }`}></div>
                                                     <p className="text-sm font-medium text-center truncate" title={theme}>{theme}</p>
 

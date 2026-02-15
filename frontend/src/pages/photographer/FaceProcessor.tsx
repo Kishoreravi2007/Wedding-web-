@@ -19,9 +19,12 @@ interface FaceProcessorProps {
 
 const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [currentPhoto, setCurrentPhoto] = useState('');
+  const [modelsLoaded, setModelsLoaded] = useState(true);
+  const [loadingModels, setLoadingModels] = useState(false);
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState<any>(null);
   const [autoDetectionStatus, setAutoDetectionStatus] = useState<any>(null);
@@ -34,9 +37,6 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
     faces_found: 0,
     errors: 0
   });
-
-  // DeepFace API is external, no models to load here
-  // Removed modelsLoaded and loadingModels state and related useEffect/loadFaceModels
 
   // Fetch photos
   const fetchPhotos = async () => {
@@ -86,7 +86,7 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
       return;
     }
 
-    setProcessing(true);
+    setIsProcessing(true);
     setResults({ processed: 0, faces_found: 0, errors: 0 });
     setProgress(0);
     setCurrentPhotoIndex(0);
@@ -94,6 +94,7 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
       setCurrentPhotoIndex(i);
+      setCurrentPhoto(photo.filename || `Photo ${i + 1}`);
       setProgress(((i + 1) / photos.length) * 100);
 
       try {
@@ -112,7 +113,6 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
         console.log(`${photo.filename}: Found ${detectedFaces?.length || 0} face(s) via DeepFace`);
 
         if (detectedFaces && detectedFaces.length > 0) {
-          // Prepare face data (DeepFace returns bbox as [x, y, w, h])
           const faces = detectedFaces.map((face: any) => ({
             descriptor: face.embedding,
             boundingBox: {
@@ -156,7 +156,6 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
             processed: prev.processed + 1
           }));
         }
-
       } catch (error) {
         console.error(`Error processing ${photo.filename}:`, error);
         setResults(prev => ({
@@ -182,37 +181,6 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
       checkAutoDetectionStatus();
     }
   }, [weddingId]);
-
-  // Auto-process photos if they need processing
-  const checkAndAutoProcess = async () => {
-    try {
-      // Check if auto-processing is needed
-      const response = await fetch(`${API_BASE_URL}/api/auto-face-detection/status`);
-      const data = await response.json();
-
-      if (data.needsProcessing && data.unprocessedCount > 0) {
-        console.log(`🤖 Auto-processing ${data.unprocessedCount} unprocessed photos...`);
-
-        // Wait for models to load before auto-processing
-        const checkModels = setInterval(() => {
-          if (modelsLoaded && !isProcessing) {
-            clearInterval(checkModels);
-            console.log('🚀 Starting automatic face detection...');
-            processAllPhotos();
-          }
-        }, 1000);
-
-        // Timeout after 30 seconds if models don't load
-        setTimeout(() => {
-          clearInterval(checkModels);
-        }, 30000);
-      } else {
-        console.log('✅ All photos already have face descriptors');
-      }
-    } catch (error) {
-      console.error('Error checking auto-process status:', error);
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -337,4 +305,3 @@ const FaceProcessor: React.FC<FaceProcessorProps> = ({ weddingId }) => {
 };
 
 export default FaceProcessor;
-

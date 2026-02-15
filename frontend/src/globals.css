@@ -182,6 +182,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -193,13 +194,16 @@
       opacity: 0;
       transform: scale(0.3) translateY(-50px);
     }
+
     50% {
       opacity: 1;
       transform: scale(1.05) translateY(0);
     }
+
     70% {
       transform: scale(0.9);
     }
+
     100% {
       opacity: 1;
       transform: scale(1);
@@ -207,10 +211,13 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% {
+
+    0%,
+    100% {
       opacity: 0.3;
       transform: scale(1);
     }
+
     50% {
       opacity: 0.6;
       transform: scale(1.1);
@@ -218,9 +225,12 @@
   }
 
   @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateY(0px);
     }
+
     50% {
       transform: translateY(-10px);
     }
@@ -230,21 +240,27 @@
     0% {
       background-position: -200% 0;
     }
+
     100% {
       background-position: 200% 0;
     }
   }
 
   @keyframes heart-beat {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: scale(1);
     }
+
     25% {
       transform: scale(1.1);
     }
+
     50% {
       transform: scale(1.2);
     }
+
     75% {
       transform: scale(1.1);
     }
@@ -255,6 +271,7 @@
       opacity: 0;
       transform: translateX(-50px);
     }
+
     to {
       opacity: 1;
       transform: translateX(0);
@@ -266,6 +283,7 @@
       opacity: 0;
       transform: translateX(50px);
     }
+
     to {
       opacity: 1;
       transform: translateX(0);
@@ -277,6 +295,7 @@
       opacity: 0;
       transform: scale(0.8);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
@@ -300,7 +319,7 @@
   }
 
   .animate-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
@@ -347,9 +366,12 @@
   }
 
   @keyframes gradient-shift {
-    0%, 100% {
+
+    0%,
+    100% {
       background-position: 0% 50%;
     }
+
     50% {
       background-position: 100% 50%;
     }
@@ -370,15 +392,19 @@
   }
 
   .support-text {
-    font-size: clamp(0.5rem, 1.8vw, 0.875rem); /* Adjusted clamp values for smaller font */
+    font-size: clamp(0.5rem, 1.8vw, 0.875rem);
+    /* Adjusted clamp values for smaller font */
     white-space: nowrap;
-    overflow: hidden; /* Hide overflowing text */
-    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+    overflow: hidden;
+    /* Hide overflowing text */
+    text-overflow: ellipsis;
+    /* Add ellipsis for overflowing text */
   }
 
   /* Malayalam language specific styling */
   html[lang="ml"] {
-    font-size: 98%; /* Slightly reduce overall font size for Malayalam */
+    font-size: 98%;
+    /* Slightly reduce overall font size for Malayalam */
   }
 
   html[lang="ml"] body {
@@ -392,8 +418,10 @@
   html[lang="ml"] h4,
   html[lang="ml"] h5,
   html[lang="ml"] h6 {
-    font-size: 0.97em; /* Slightly reduce heading sizes */
-    letter-spacing: 0; /* Remove extra letter spacing for Malayalam */
+    font-size: 0.97em;
+    /* Slightly reduce heading sizes */
+    letter-spacing: 0;
+    /* Remove extra letter spacing for Malayalam */
   }
 
   html[lang="ml"] p,
@@ -401,7 +429,8 @@
   html[lang="ml"] div,
   html[lang="ml"] button,
   html[lang="ml"] a {
-    font-size: 0.98em; /* Minimal reduction in text size */
+    font-size: 0.98em;
+    /* Minimal reduction in text size */
   }
 
   /* Override decorative fonts for Malayalam */
@@ -414,27 +443,62 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
   }
 }
+
+/* Theme Fonts */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-lato {
+  font-family: 'Lato', sans-serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.font-alex-brush {
+  font-family: 'Alex Brush', cursive;
+}
+
+.font-great-vibes {
+  font-family: 'Great Vibes', cursive;
+}
+
+.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
 @layer utilities {
   @keyframes move-gradient {
     0% {
       background-position: 0% 50%;
     }
+
     50% {
       background-position: 100% 50%;
     }
+
     100% {
       background-position: 0% 50%;
     }
   }
+
   .animated-gradient-background {
     background-size: 200% 200%;
-    background-image: linear-gradient(
-      -45deg,
-      #FFF8E1,
-      #FFF5D1,
-      #FFE8A3,
-      #D4AF37
-    );
+    background-image: linear-gradient(-45deg,
+        #FFF8E1,
+        #FFF5D1,
+        #FFE8A3,
+        #D4AF37);
     animation: move-gradient 15s ease-in-out infinite;
   }
 }

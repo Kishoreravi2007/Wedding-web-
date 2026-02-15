@@ -63,13 +63,15 @@ function createWindow() {
       height: 800,
       minWidth: 900,
       minHeight: 600,
+      frame: false, // Make it frameless for a premium look
+      autoHideMenuBar: true, // Hide the default menu bar
+      titleBarStyle: 'hidden', // Hide title bar on macOS
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
       },
-      icon: path.join(__dirname, 'assets', 'icon.png'),
-      titleBarStyle: 'hiddenInset',
+      icon: path.join(__dirname, '..', 'assets', 'icon.png'),
     });
 
     log(`Preload path: ${path.join(__dirname, 'preload.js')}`);

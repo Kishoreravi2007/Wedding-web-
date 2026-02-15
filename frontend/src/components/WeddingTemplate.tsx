@@ -17,54 +17,15 @@ import {
 } from "@/components/ui/dialog";
 
 // Helper to get theme styles (copied from WeddingPage)
+import { themeConfigs } from '@/lib/themeConfig';
+
+// Helper to get theme styles from shared config
 const getThemeStyles = (theme: string) => {
-    switch (theme) {
-        case 'Modern Elegance': return 'bg-slate-900 text-white';
-        case 'Classic Romance': return 'bg-rose-50 text-rose-900';
-        case 'Rustic Charm': return 'bg-amber-50 text-amber-900';
-        case 'Minimalist': return 'bg-white text-gray-900';
-        case 'Vintage Glamour': return 'bg-[#e5dcd6] text-[#4a403a]';
-        case 'Boho Chic': return 'bg-[#fdf6e3] text-[#5c4b37]';
-        case 'Beach Bliss': return 'bg-cyan-50 text-cyan-900';
-        case 'Royal Luxury': return 'bg-purple-900 text-purple-50';
+    const config = themeConfigs[theme];
+    if (!config) return 'bg-white text-gray-900 font-sans';
 
-        // Nature
-        case 'Forest Fern': return 'bg-emerald-50 text-emerald-900';
-        case 'Ocean Breeze': return 'bg-sky-50 text-sky-900';
-        case 'Sunset Glow': return 'bg-orange-50 text-orange-900';
-        case 'Mountain Mist': return 'bg-gray-100 text-slate-800';
-        case 'Desert Bloom': return 'bg-rose-100 text-stone-800';
-
-        // Classic
-        case 'Gold & Ivory': return 'bg-[#fffff0] text-[#c5a059]';
-        case 'Silver Soiree': return 'bg-slate-50 text-slate-600';
-        case 'Pearl White': return 'bg-white text-stone-500';
-        case 'Black Tie': return 'bg-black text-white';
-        case 'Champagne Toast': return 'bg-[#f7e7ce] text-[#5c5346]';
-
-        // Modern
-        case 'City Lights': return 'bg-zinc-900 text-yellow-100';
-        case 'Midnight Blue': return 'bg-[#1a237e] text-white';
-        case 'Charcoal & Rose': return 'bg-stone-800 text-rose-200';
-        case 'Monochrome': return 'bg-white text-black border-4 border-black';
-        case 'Geometric Pop': return 'bg-white text-indigo-600';
-
-        // Romantic
-        case 'Blushing Bride': return 'bg-pink-100 text-pink-900';
-        case 'Lavender Haze': return 'bg-purple-100 text-purple-900';
-        case 'Peachy Keen': return 'bg-orange-100 text-orange-800';
-        case 'Red Velvet': return 'bg-red-900 text-rose-50';
-        case 'Sweetheart Pink': return 'bg-rose-200 text-rose-900';
-
-        // Cultural
-        case 'Royal Red': return 'bg-red-700 text-yellow-200';
-        case 'Saffron Sun': return 'bg-yellow-500 text-red-900';
-        case 'Teal & Gold': return 'bg-teal-700 text-yellow-100';
-        case 'Magenta Magic': return 'bg-fuchsia-800 text-fuchsia-100';
-        case 'Emerald Elegance': return 'bg-emerald-800 text-emerald-100';
-
-        default: return 'bg-white text-gray-900';
-    }
+    // Combine colors and fonts
+    return `${config.colors.bg} ${config.colors.text} ${config.fontBody}`;
 };
 
 interface WeddingTemplateProps {
@@ -110,6 +71,8 @@ export const WeddingTemplate = ({
 }: WeddingTemplateProps) => {
 
     const themeClass = getThemeStyles(weddingData.theme);
+    const config = themeConfigs[weddingData.theme];
+    const headingFont = config?.fontHeading || 'font-serif';
     const customizations = weddingData.customizations || {};
 
     // Section Ordering Logic
@@ -184,78 +147,224 @@ export const WeddingTemplate = ({
                     <motion.header
                         key="hero"
                         layout
-                        className="relative z-10 flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[60vh] group"
+                        className="relative z-10 flex-1 flex flex-col min-h-[60vh] group"
                     >
                         <SectionControls sectionId="hero" />
-                        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-                            <EditableText
-                                initialValue={customizations.heroPreTitle || "The Wedding Of"}
-                                onSave={(val) => onUpdateCustomization('heroPreTitle', val)}
-                                isEditing={isEditing}
-                                className="text-sm uppercase tracking-[0.2em] opacity-80"
-                                tag="p"
-                            />
+                        {(() => {
+                            switch (config?.layout) {
+                                case 'minimal-split':
+                                    return (
+                                        <div className="grid md:grid-cols-2 min-h-[85vh] w-full">
+                                            <div className="relative bg-gray-200 flex items-center justify-center overflow-hidden min-h-[50vh] md:min-h-0">
+                                                {customizations.heroBgImage ? (
+                                                    <img src={customizations.heroBgImage} className="absolute inset-0 w-full h-full object-cover" alt="Couple" />
+                                                ) : (
+                                                    <div className="text-gray-400 flex flex-col items-center gap-2">
+                                                        <ImageIcon className="w-12 h-12 opacity-50" />
+                                                        <span>Add Hero Image</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className={`flex flex-col items-center justify-center p-8 md:p-12 text-center space-y-6 ${themeClass}`}>
+                                                <EditableText
+                                                    initialValue={customizations.heroPreTitle || "The Wedding Of"}
+                                                    onSave={(val) => onUpdateCustomization('heroPreTitle', val)}
+                                                    isEditing={isEditing}
+                                                    className={`text-xs uppercase tracking-[0.4em] opacity-60 ${config.colors.accent}`}
+                                                    tag="p"
+                                                />
+                                                <h1 className={`text-5xl md:text-7xl ${headingFont} leading-tight`}>
+                                                    <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />
+                                                    <br />
+                                                    <span className="text-2xl opacity-40 block my-4">&</span>
+                                                    <EditableText initialValue={weddingData.brideName} onSave={val => onUpdateCustomization('brideName', val)} isEditing={isEditing} tag="span" />
+                                                </h1>
+                                                <div className="flex items-center gap-4 text-sm opacity-60 pt-4">
+                                                    <EditableText initialValue={weddingData.weddingDate} onSave={val => onUpdateCustomization('weddingDate', val)} isEditing={isEditing} tag="span" />
+                                                    <span>|</span>
+                                                    <EditableText initialValue={weddingData.venue || "Venue"} onSave={val => onUpdateCustomization('venue', val)} isEditing={isEditing} tag="span" />
+                                                </div>
 
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-4 flex flex-col md:block items-center">
-                                <EditableText
-                                    initialValue={weddingData.groomName}
-                                    onSave={(val) => onUpdateCustomization('groomName', val)}
-                                    isEditing={isEditing}
-                                    tag="span"
-                                />
-                                <span className="text-rose-500 mx-3">&</span>
-                                <EditableText
-                                    initialValue={weddingData.brideName}
-                                    onSave={(val) => onUpdateCustomization('brideName', val)}
-                                    isEditing={isEditing}
-                                    tag="span"
-                                />
-                            </h1>
+                                                {weddingData.showCountdown && (
+                                                    <div className="pt-8 w-full">
+                                                        <div className="flex justify-center scale-90 sm:scale-100 origin-top">
+                                                            <CountdownTimer
+                                                                targetDate={weddingData.weddingDate}
+                                                                targetTime={weddingData.weddingTime}
+                                                                theme={weddingData.theme}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                case 'rustic-overlay':
+                                    return (
+                                        <div className="flex-1 flex items-center justify-center p-8 text-center relative min-h-[85vh]">
+                                            <div className="absolute inset-0 bg-black/40 z-0"></div>
+                                            <div className="relative z-10 border border-white/30 p-8 md:p-16 backdrop-blur-sm rounded-lg max-w-3xl w-full mx-auto shadow-2xl">
+                                                <EditableText
+                                                    initialValue={customizations.heroPreTitle || "We Are Getting Married"}
+                                                    onSave={(val) => onUpdateCustomization('heroPreTitle', val)}
+                                                    isEditing={isEditing}
+                                                    className="text-sm uppercase tracking-widest text-white/90 mb-6 block font-medium"
+                                                    tag="span"
+                                                />
+                                                <h1 className={`text-5xl md:text-8xl ${headingFont} text-white drop-shadow-xl mb-8 leading-tight`}>
+                                                    <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />
+                                                    <span className="mx-4 text-white/80">&</span>
+                                                    <br className="md:hidden" />
+                                                    <EditableText initialValue={weddingData.brideName} onSave={val => onUpdateCustomization('brideName', val)} isEditing={isEditing} tag="span" />
+                                                </h1>
+                                                <div className="text-white/90 text-lg">
+                                                    <EditableText initialValue={weddingData.weddingDate} onSave={val => onUpdateCustomization('weddingDate', val)} isEditing={isEditing} tag="span" className="font-serif italic" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                case 'luxury-serif':
+                                    return (
+                                        <div className={`flex-1 flex items-center justify-center p-8 md:p-12 text-center min-h-[80vh] border-[16px] ${config.colors.secondary || 'border-rose-100'} border-opacity-30 m-4 md:m-8 bg-white/40`}>
+                                            <div className="space-y-10 max-w-4xl">
+                                                <div className={`w-28 h-28 mx-auto rounded-full border-2 border-current flex items-center justify-center text-4xl ${headingFont} opacity-80 shadow-sm`}>
+                                                    {weddingData.groomName && weddingData.groomName.charAt(0)}{weddingData.brideName && weddingData.brideName.charAt(0)}
+                                                </div>
+                                                <h1 className={`text-5xl md:text-8xl ${headingFont} tracking-widest uppercase leading-tight`}>
+                                                    <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />
+                                                    <span className="opacity-50 mx-6 text-2xl normal-case italic block md:inline my-4 md:my-0 font-serif">and</span>
+                                                    <EditableText initialValue={weddingData.brideName} onSave={val => onUpdateCustomization('brideName', val)} isEditing={isEditing} tag="span" />
+                                                </h1>
+                                                <div className="h-0.5 w-32 bg-current mx-auto opacity-30"></div>
+                                                <EditableText initialValue={weddingData.weddingDate} onSave={val => onUpdateCustomization('weddingDate', val)} isEditing={isEditing} className="text-xl uppercase tracking-[0.2em] opacity-80" tag="p" />
+                                            </div>
+                                        </div>
+                                    );
+                                case 'modern-glass':
+                                    return (
+                                        <div className="flex-1 flex items-center justify-center relative overflow-hidden min-h-[85vh] py-20 px-4">
+                                            {/* Decorative Orbs */}
+                                            <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-blue-400/20 blur-[120px] animate-pulse"></div>
+                                            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-rose-400/20 blur-[130px] animate-pulse delay-700"></div>
 
-                            <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-lg opacity-90">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5" />
-                                    <EditableText
-                                        initialValue={weddingData.weddingDate}
-                                        onSave={(val) => onUpdateCustomization('weddingDate', val)}
-                                        isEditing={isEditing}
-                                        className="inline-block"
-                                        tag="span"
-                                        type="date"
-                                    />
-                                </div>
-                                <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
-                                <div className="flex items-center gap-2">
-                                    <MapPin className="w-5 h-5" />
-                                    <EditableText
-                                        initialValue={weddingData.venue || "Venue TBD"}
-                                        onSave={(val) => onUpdateCustomization('venue', val)}
-                                        isEditing={isEditing}
-                                        className="inline-block"
-                                        tag="span"
+                                            <div className="relative z-10 bg-white/20 backdrop-blur-xl border border-white/40 p-12 md:p-24 rounded-[3rem] shadow-2xl text-center max-w-5xl mx-auto transform hover:scale-[1.01] transition-transform duration-500">
+                                                <h1 className={`text-6xl md:text-9xl ${headingFont} bg-clip-text text-transparent bg-gradient-to-br from-gray-900 via-gray-700 to-gray-500 mb-8 leading-[1.1] drop-shadow-sm`}>
+                                                    <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />
+                                                    <br />
+                                                    <EditableText initialValue={weddingData.brideName} onSave={val => onUpdateCustomization('brideName', val)} isEditing={isEditing} tag="span" />
+                                                </h1>
+                                                <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-xl font-medium tracking-wide text-gray-700">
+                                                    <EditableText initialValue={weddingData.weddingDate} onSave={val => onUpdateCustomization('weddingDate', val)} isEditing={isEditing} tag="span" />
+                                                    <span className="hidden md:block w-2 h-2 rounded-full bg-current opacity-40"></span>
+                                                    <EditableText initialValue={weddingData.venue || "Venue"} onSave={val => onUpdateCustomization('venue', val)} isEditing={isEditing} tag="span" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                case 'boho-frame':
+                                    return (
+                                        <div className="flex-1 flex items-center justify-center p-4 min-h-[85vh]">
+                                            <div className={`p-16 md:p-24 border-4 ${config.colors.secondary || 'border-rose-200'} border-double rounded-t-full rounded-b-[45%] bg-white/70 backdrop-blur-md max-w-4xl w-full text-center shadow-xl`}>
+                                                <EditableText
+                                                    initialValue={customizations.heroPreTitle || "Join Us For The Wedding Of"}
+                                                    onSave={(val) => onUpdateCustomization('heroPreTitle', val)}
+                                                    isEditing={isEditing}
+                                                    className="text-sm font-bold uppercase tracking-widest opacity-50 mb-8 block"
+                                                    tag="span"
+                                                />
+                                                <h1 className={`text-6xl md:text-8xl ${headingFont} rotate-[-3deg] mb-10 origin-center transform text-gray-800`}>
+                                                    <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />
+                                                    <span className="mx-6 text-rose-500">&</span>
+                                                    <br className="md:hidden" />
+                                                    <EditableText initialValue={weddingData.brideName} onSave={val => onUpdateCustomization('brideName', val)} isEditing={isEditing} tag="span" />
+                                                </h1>
+                                                <EditableText
+                                                    initialValue={weddingData.weddingDate}
+                                                    onSave={val => onUpdateCustomization('weddingDate', val)}
+                                                    isEditing={isEditing}
+                                                    className="text-2xl italic opacity-80 font-serif"
+                                                    tag="p"
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                default:
+                                    // Default centered layout
+                                    return (
+                                        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in py-20">
+                                            <EditableText
+                                                initialValue={customizations.heroPreTitle || "The Wedding Of"}
+                                                onSave={(val) => onUpdateCustomization('heroPreTitle', val)}
+                                                isEditing={isEditing}
+                                                className="text-sm uppercase tracking-[0.2em] opacity-80"
+                                                tag="p"
+                                            />
+
+                                            <h1 className={`text-4xl md:text-6xl lg:text-7xl ${headingFont} font-bold mb-4 flex flex-col md:block items-center`}>
+                                                <EditableText
+                                                    initialValue={weddingData.groomName}
+                                                    onSave={(val) => onUpdateCustomization('groomName', val)}
+                                                    isEditing={isEditing}
+                                                    tag="span"
+                                                />
+                                                <span className="text-rose-500 mx-3">&</span>
+                                                <EditableText
+                                                    initialValue={weddingData.brideName}
+                                                    onSave={(val) => onUpdateCustomization('brideName', val)}
+                                                    isEditing={isEditing}
+                                                    tag="span"
+                                                />
+                                            </h1>
+
+                                            {/* Date/Venue */}
+                                            <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-lg opacity-90">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-5 h-5" />
+                                                    <EditableText
+                                                        initialValue={weddingData.weddingDate}
+                                                        onSave={(val) => onUpdateCustomization('weddingDate', val)}
+                                                        isEditing={isEditing}
+                                                        className="inline-block"
+                                                        tag="span"
+                                                        type="date"
+                                                    />
+                                                </div>
+                                                <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="w-5 h-5" />
+                                                    <EditableText
+                                                        initialValue={weddingData.venue || "Venue TBD"}
+                                                        onSave={(val) => onUpdateCustomization('venue', val)}
+                                                        isEditing={isEditing}
+                                                        className="inline-block"
+                                                        tag="span"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                            }
+                        })()}
+
+                        {/* Shared Countdown (if enabled) - Visible for all except split which has its own */}
+                        {weddingData.showCountdown && config?.layout !== 'minimal-split' && (
+                            <div className="pt-12 animate-fade-in-up pb-12 w-full z-20">
+                                <EditableText
+                                    initialValue={customizations.countdownLabel || "Counting Down To Our Day"}
+                                    onSave={(val) => onUpdateCustomization('countdownLabel', val)}
+                                    isEditing={isEditing}
+                                    className="text-xs uppercase tracking-[0.3em] mb-6 opacity-70 text-center block"
+                                    tag="p"
+                                />
+                                <div className="flex justify-center">
+                                    <CountdownTimer
+                                        targetDate={weddingData.weddingDate}
+                                        targetTime={weddingData.weddingTime}
+                                        theme={weddingData.theme}
                                     />
                                 </div>
                             </div>
-
-                            {weddingData.showCountdown && (
-                                <div className="pt-8 animate-fade-in-up">
-                                    <EditableText
-                                        initialValue={customizations.countdownLabel || "Counting Down To Our Day"}
-                                        onSave={(val) => onUpdateCustomization('countdownLabel', val)}
-                                        isEditing={isEditing}
-                                        className="text-xs uppercase tracking-[0.3em] mb-4 opacity-70"
-                                        tag="p"
-                                    />
-                                    <div className="flex justify-center">
-                                        <CountdownTimer
-                                            targetDate={weddingData.weddingDate}
-                                            targetTime={weddingData.weddingTime}
-                                            theme={weddingData.theme}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </motion.header>
                 );
             case 'timeline':
@@ -276,14 +385,14 @@ export const WeddingTemplate = ({
                                     initialValue={customizations.timelineTitle || "The Celebration"}
                                     onSave={(val) => onUpdateCustomization('timelineTitle', val)}
                                     isEditing={isEditing}
-                                    className="text-4xl md:text-5xl font-serif font-bold tracking-tight"
+                                    className={`text-4xl md:text-5xl ${headingFont} font-bold tracking-tight`}
                                     tag="h2"
                                 />
                                 <EditableText
                                     initialValue={customizations.timelineSubtitle || "Every moment is a memory in the making"}
                                     onSave={(val) => onUpdateCustomization('timelineSubtitle', val)}
                                     isEditing={isEditing}
-                                    className="text-lg opacity-60 italic font-serif"
+                                    className={`text-lg opacity-60 italic ${headingFont}`}
                                     tag="p"
                                 />
                             </div>
