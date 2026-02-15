@@ -13,7 +13,27 @@ const multer = require('multer');
 const axios = require('axios');
 const FormData = require('form-data');
 const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db'); // Use SQL implementation
-const { uploadFile, deleteFile, getPublicUrl } = require('./lib/supabase-storage'); // Switched to Supabase Storage
+const storageProvider = process.env.STORAGE_PROVIDER || 'supabase';
+let storage;
+
+try {
+  if (storageProvider === 'gcs') {
+    console.log('📦 Using Google Cloud Storage Provider');
+    storage = require('./lib/gcs-storage');
+  } else if (storageProvider === 'local') {
+    console.log('📂 Using Local Disk Storage Provider');
+    storage = require('./lib/local-storage');
+  } else {
+    console.log('⚡ Using Supabase Storage Provider');
+    storage = require('./lib/supabase-storage');
+  }
+} catch (err) {
+  console.error(`❌ Failed to load storage provider '${storageProvider}':`, err);
+  console.log('⚠️ Falling back to Supabase Storage');
+  storage = require('./lib/supabase-storage');
+}
+
+const { uploadFile, deleteFile, getPublicUrl } = storage;
 const { matchFace, validateDescriptor } = require('./lib/face-recognition-logic');
 const JSZip = require('jszip'); // For download-all feature
 const { authMiddleware } = require('./lib/secure-auth');
@@ -21,9 +41,10 @@ const authenticateToken = authMiddleware.verifyToken;
 
 const DEEPFACE_API_URL = process.env.DEEPFACE_API_URL || 'http://localhost:8002';
 
-// Ensure Supabase bucket exists on startup
-const { createBucketIfNotExists } = require('./lib/supabase-storage');
-createBucketIfNotExists('photos').catch(err => console.error('Failed to ensure bucket:', err));
+// Ensure bucket exists on startup (if supported by provider)
+if (storage.createBucketIfNotExists) {
+  storage.createBucketIfNotExists('photos').catch(err => console.error('Failed to ensure bucket:', err));
+}
 
 /**
  * Extract faces from image buffer using DeepFace API

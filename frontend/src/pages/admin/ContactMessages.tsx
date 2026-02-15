@@ -20,6 +20,7 @@ import {
   CalendarClock
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { API_BASE_URL } from '@/lib/api';
 
 interface ContactMessage {
   id: string;
@@ -41,9 +42,6 @@ const ContactMessages: React.FC = () => {
   const [error, setError] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [isCalling, setIsCalling] = useState(false);
-
-  // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-  import { API_BASE_URL } from '@/lib/api';
 
   useEffect(() => {
     fetchMessages();

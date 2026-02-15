@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import MusicPlayer from "./components/MusicPlayer";
@@ -15,7 +15,6 @@ import { Button } from "./components/ui/button";
 import { X, Music, MessageSquare } from "lucide-react";
 import CountdownTimer from "./components/CountdownTimer";
 import LanguageSwitcher from './LanguageSwitcher';
-import { useLocation } from "react-router-dom";
 
 import Index from "./pages/Index";
 import LoginPage from "./pages/login/page";
@@ -78,6 +77,7 @@ import AdminContactMessages from "./pages/admin/ContactMessages";
 import AdminFeedback from "./pages/admin/Feedback";
 import AdminCallSchedules from "./pages/admin/CallSchedules";
 import AdminSettings from "./pages/admin/Settings";
+import { AdminAuthGuard } from "./pages/admin/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +105,13 @@ const App = () => {
     document.documentElement.setAttribute('lang', i18n.language);
   }, [i18n.language]);
 
+  // Admin Subdomain Routing
+  const isAdminSubdomain = window.location.hostname.startsWith('admin.');
+
+  // Redirect root to admin dashboard if on admin subdomain
+  if (isAdminSubdomain && location.pathname === '/') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   // Check if current route has bottom navigation
   const hasBottomNav = useMemo(() => {
@@ -249,11 +256,11 @@ const App = () => {
                 {/* Admin Routes */}
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
-                <Route path="/admin/feedback" element={<AdminFeedback />} />
-                <Route path="/admin/call-schedules" element={<AdminCallSchedules />} />
-                <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/dashboard" element={<AdminAuthGuard><AdminDashboard /></AdminAuthGuard>} />
+                <Route path="/admin/contact-messages" element={<AdminAuthGuard><AdminContactMessages /></AdminAuthGuard>} />
+                <Route path="/admin/feedback" element={<AdminAuthGuard><AdminFeedback /></AdminAuthGuard>} />
+                <Route path="/admin/call-schedules" element={<AdminAuthGuard><AdminCallSchedules /></AdminAuthGuard>} />
+                <Route path="/admin/settings" element={<AdminAuthGuard><AdminSettings /></AdminAuthGuard>} />
 
                 {/* Public Routes */}
                 <Route path="/countdown" element={
