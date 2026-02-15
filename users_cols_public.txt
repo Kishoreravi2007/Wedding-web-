@@ -1,0 +1,1 @@
+created_at, email_offers_opt_in, has_premium_access, id, is_2fa_enabled, is_active, last_login_attempt, locked_until, login_attempts, password, password_reset_expires, password_reset_token, role, two_factor_secret, username, wedding_id

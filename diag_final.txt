@@ -1,0 +1,7 @@
+{
+  "message": "duplicate key value violates unique constraint \"users_username_key\"",
+  "code": "23505",
+  "detail": "Key (username)=(test) already exists.",
+  "table": "users",
+  "schema": "public"
+}
