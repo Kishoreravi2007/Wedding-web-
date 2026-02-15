@@ -46,7 +46,7 @@ const PORT = process.env.PORT || 5001;
 const whitelist = [
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
-  'https://wedding-backend-rst3dulcnq-el.a.run.app',
+  'https://wedding-backend-979970479540.asia-south1.run.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -80,8 +80,8 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", process.env.DEEPFACE_API_URL].filter(Boolean),
-      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", process.env.FRONTEND_URL].filter(Boolean),
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-979970479540.asia-south1.run.app", "https://wedding-deepface-979970479540.asia-south1.run.app", process.env.DEEPFACE_API_URL].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-979970479540.asia-south1.run.app", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com"],
@@ -115,17 +115,6 @@ app.use('/uploads', express.static(uploadsPath));
 // Serve desktop app binaries - support both root and /api prefixed paths for flexibility
 app.use(['/binaries', '/api/binaries'], express.static(path.join(__dirname, 'binaries')));
 
-// Serve static files from the built frontend
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, 'build');
-  app.use(express.static(buildPath));
-
-  // All other requests should serve index.html for SPA routing
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
-    res.sendFile(path.join(buildPath, 'index.html'));
-  });
-}
 
 // Request logging middleware (Development only)
 if (process.env.NODE_ENV !== 'production') {
@@ -276,6 +265,23 @@ console.log('✅ Registered /api/reviews routes.');
 console.log('💎 Registering /api/premium routes...');
 app.use('/api/premium', require('./routes/premium'));
 console.log('✅ Registered /api/premium routes.');
+
+// =============================================================================
+// =============================================================================
+// FRONTEND SERVING (Production Only)
+// =============================================================================
+// This must be placed AFTER API routes to ensure they are handled first
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = path.join(__dirname, 'build');
+  app.use(express.static(buildPath));
+
+  // All other requests should serve index.html for SPA routing
+  app.use((req, res, next) => {
+    // API and uploads are already handled or should fall through to 404
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
 
 // =============================================================================
 // ERROR HANDLING
