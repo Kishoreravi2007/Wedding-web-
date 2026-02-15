@@ -3,18 +3,18 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Home, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  User, 
-  MessageSquare, 
-  CheckCircle, 
-  Clock, 
+import {
+  Home,
+  Users,
+  Settings,
+  LogOut,
+  Mail,
+  Phone,
+  Calendar,
+  User,
+  MessageSquare,
+  CheckCircle,
+  Clock,
   Trash2,
   RefreshCcw,
   CalendarClock
@@ -42,7 +42,8 @@ const ContactMessages: React.FC = () => {
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [isCalling, setIsCalling] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+  // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+  import { API_BASE_URL } from '@/lib/api';
 
   useEffect(() => {
     fetchMessages();
@@ -53,7 +54,7 @@ const ContactMessages: React.FC = () => {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/api/contact-messages`);
       const data = await response.json();
-      
+
       if (data.success) {
         setMessages(data.messages);
       } else {
@@ -217,7 +218,7 @@ const ContactMessages: React.FC = () => {
                 </Link>
               </nav>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" onClick={fetchMessages}>
                 <RefreshCcw className="mr-2 h-4 w-4" />
@@ -270,11 +271,10 @@ const ContactMessages: React.FC = () => {
               {/* Messages List */}
               <div className="space-y-4">
                 {messages.map((message) => (
-                  <Card 
+                  <Card
                     key={message.id}
-                    className={`cursor-pointer transition-all hover:shadow-lg ${
-                      selectedMessage?.id === message.id ? 'border-rose-500 border-2' : ''
-                    }`}
+                    className={`cursor-pointer transition-all hover:shadow-lg ${selectedMessage?.id === message.id ? 'border-rose-500 border-2' : ''
+                      }`}
                     onClick={() => setSelectedMessage(message)}
                   >
                     <CardHeader className="pb-3">
@@ -334,7 +334,7 @@ const ContactMessages: React.FC = () => {
                           <Mail className="w-4 h-4" />
                           Email
                         </label>
-                        <a 
+                        <a
                           href={`mailto:${selectedMessage.email}`}
                           className="text-blue-600 hover:underline mt-1 block"
                         >
@@ -348,7 +348,7 @@ const ContactMessages: React.FC = () => {
                             <Phone className="w-4 h-4" />
                             Phone
                           </label>
-                          <a 
+                          <a
                             href={`tel:${selectedMessage.phone}`}
                             className="text-blue-600 hover:underline mt-1 block"
                           >
@@ -401,16 +401,16 @@ const ContactMessages: React.FC = () => {
                       <div className="pt-4 border-t space-y-2">
                         <p className="text-sm font-semibold text-gray-700 mb-2">Mark as:</p>
                         <div className="grid grid-cols-2 gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => updateStatus(selectedMessage.id, 'read')}
                             className="w-full"
                           >
                             Read
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => updateStatus(selectedMessage.id, 'replied')}
                             className="w-full"
@@ -418,16 +418,16 @@ const ContactMessages: React.FC = () => {
                             <CheckCircle className="w-4 h-4 mr-1" />
                             Replied
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => updateStatus(selectedMessage.id, 'archived')}
                             className="w-full"
                           >
                             Archive
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="destructive"
                             onClick={() => deleteMessage(selectedMessage.id)}
                             className="w-full"
@@ -439,7 +439,7 @@ const ContactMessages: React.FC = () => {
                       </div>
 
                       {selectedMessage.phone && (
-                        <Button 
+                        <Button
                           size="lg"
                           className="w-full bg-gradient-to-r from-green-500 to-emerald-600 mb-2"
                           onClick={() => triggerCall(selectedMessage)}
@@ -449,7 +449,7 @@ const ContactMessages: React.FC = () => {
                           {isCalling ? 'Sending...' : 'Send WhatsApp'}
                         </Button>
                       )}
-                      <Button 
+                      <Button
                         size="lg"
                         className="w-full bg-gradient-to-r from-rose-500 to-purple-600"
                         asChild

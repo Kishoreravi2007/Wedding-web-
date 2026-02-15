@@ -1629,36 +1629,22 @@ const ClientDashboard = () => {
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-3 p-3 bg-white border border-rose-100 rounded-lg shadow-sm">
                                                 <div className="flex-1">
-                                                    <p className="text-[10px] uppercase tracking-wider text-rose-500 font-bold mb-1">Local Development URL</p>
+                                                    <p className="text-[10px] uppercase tracking-wider text-rose-500 font-bold mb-1">Public URL</p>
                                                     <div className="flex items-center gap-2">
                                                         <Input
-                                                            value={`http://localhost:3001/weddings/${weddingData.slug}`}
+                                                            value={`${window.location.origin}/weddings/${weddingData.slug}`}
                                                             readOnly
                                                             className="bg-gray-50 font-mono text-xs h-8"
                                                         />
                                                         <Button size="sm" variant="ghost" onClick={() => {
-                                                            navigator.clipboard.writeText(`http://localhost:3001/weddings/${weddingData.slug}`);
-                                                            showSuccess('Local URL copied');
+                                                            navigator.clipboard.writeText(`${window.location.origin}/weddings/${weddingData.slug}`);
+                                                            showSuccess('URL copied to clipboard');
                                                         }}>
                                                             <Copy className="w-3.5 h-3.5" />
                                                         </Button>
-                                                        <Button size="sm" variant="ghost" onClick={() => window.open(`http://localhost:3001/weddings/${weddingData.slug}`, '_blank')}>
+                                                        <Button size="sm" variant="ghost" onClick={() => window.open(`${window.location.origin}/weddings/${weddingData.slug}`, '_blank')}>
                                                             <ExternalLink className="w-3.5 h-3.5" />
                                                         </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-lg opacity-60">
-                                                <div className="flex-1">
-                                                    <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-1">Production URL (Live Site)</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <Input
-                                                            value={`https://weddingweb.co.in/weddings/${weddingData.slug}`}
-                                                            readOnly
-                                                            className="bg-white/50 font-mono text-xs h-8"
-                                                        />
-                                                        <Badge variant="outline" className="text-[9px] h-5 bg-blue-50">Production</Badge>
                                                     </div>
                                                 </div>
                                             </div>

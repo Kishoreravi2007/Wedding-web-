@@ -23,8 +23,9 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import heic2any from 'heic2any';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
+import { API_BASE_URL as BACKEND_URL, DEEPFACE_API_URL } from '@/lib/api';
+// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+// const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8002';
 
 interface FaceMatch {
   id: string;

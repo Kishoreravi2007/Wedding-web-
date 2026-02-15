@@ -27,8 +27,9 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
+import { API_BASE_URL as BACKEND_URL, DEEPFACE_API_URL } from '@/lib/api';
+// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+// const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
 
 interface UploadProgress {
   filename: string;

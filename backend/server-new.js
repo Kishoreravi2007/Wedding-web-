@@ -80,7 +80,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "http://localhost:5001", "http://localhost:8002", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-979970479540.asia-south1.run.app", "https://wedding-deepface-979970479540.asia-south1.run.app", process.env.DEEPFACE_API_URL].filter(Boolean),
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-979970479540.asia-south1.run.app", "https://wedding-deepface-979970479540.asia-south1.run.app", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
       imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-979970479540.asia-south1.run.app", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],

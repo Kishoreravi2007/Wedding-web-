@@ -42,7 +42,8 @@ interface WeddingStats {
   storage_used_mb: number;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+import { API_BASE_URL } from '@/lib/api';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 const slugifyName = (value: string) =>
   value

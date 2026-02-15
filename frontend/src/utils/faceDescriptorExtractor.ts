@@ -5,7 +5,8 @@
  * using DeepFace + YOLOv8-face backend for fast and accurate face detection
  */
 
-const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
+import { DEEPFACE_API_URL } from '@/lib/api';
+// const DEEPFACE_API_URL = import.meta.env.VITE_DEEPFACE_API_URL || 'http://localhost:8080';
 
 /**
  * Load DeepFace API (no client-side models needed)

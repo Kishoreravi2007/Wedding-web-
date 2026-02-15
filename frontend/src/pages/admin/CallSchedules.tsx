@@ -1,35 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Button 
+import {
+  Button
 } from '@/components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  CalendarClock, 
-  Home, 
-  Users, 
-  Mail, 
-  Phone, 
-  Clock, 
-  Globe, 
-  MessageSquare, 
-  Settings, 
-  LogOut, 
-  RefreshCcw, 
-  ClipboardList, 
-  CheckCircle2, 
-  XCircle, 
-  Trash2 
+import {
+  CalendarClock,
+  Home,
+  Users,
+  Mail,
+  Phone,
+  Clock,
+  Globe,
+  MessageSquare,
+  Settings,
+  LogOut,
+  RefreshCcw,
+  ClipboardList,
+  CheckCircle2,
+  XCircle,
+  Trash2
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { API_BASE_URL } from '@/lib/api';
 
 type CallScheduleStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'deleted';
 
@@ -56,20 +57,6 @@ const statusMap: Record<CallScheduleStatus, { label: string; color: string }> = 
   deleted: { label: 'Deleted', color: 'bg-red-500' }
 };
 
-const resolveApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (envUrl) return envUrl.replace(/\/$/, '');
-
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:5001';
-    }
-  }
-
-  return 'https://wedding-backend.onrender.com';
-};
-
 const CallSchedules: React.FC = () => {
   const [schedules, setSchedules] = useState<CallSchedule[]>([]);
   const [selectedSchedule, setSelectedSchedule] = useState<CallSchedule | null>(null);
@@ -78,18 +65,17 @@ const CallSchedules: React.FC = () => {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
+
   const statusFilters = [
     { id: 'all', label: 'All' },
-    { id: 'confirmed', label: 'Conformed' },
-    { id: 'completed', label: 'Complated' },
+    { id: 'confirmed', label: 'Confirmed' },
+    { id: 'completed', label: 'Completed' },
     { id: 'pending', label: 'Pending' },
     { id: 'cancelled', label: 'Cancelled' },
     { id: 'deleted', label: 'Deleted' }
   ] as const;
   type StatusFilter = typeof statusFilters[number]['id'];
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-
-  const API_BASE_URL = resolveApiBaseUrl();
 
   const fetchSchedules = async () => {
     try {
@@ -350,9 +336,8 @@ const CallSchedules: React.FC = () => {
                 {filteredSchedules.map((schedule) => (
                   <Card
                     key={schedule.id}
-                    className={`cursor-pointer transition-all hover:shadow-lg ${
-                      selectedSchedule?.id === schedule.id ? 'border-rose-500 border-2' : ''
-                    }`}
+                    className={`cursor-pointer transition-all hover:shadow-lg ${selectedSchedule?.id === schedule.id ? 'border-rose-500 border-2' : ''
+                      }`}
                     onClick={() => setSelectedSchedule(schedule)}
                   >
                     <CardHeader className="pb-3">
