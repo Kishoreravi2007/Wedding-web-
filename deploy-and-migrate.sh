@@ -16,7 +16,7 @@ gcloud run deploy wedding-backend \
   --source . \
   --region=asia-south1 \
   --allow-unauthenticated \
-  --set-env-vars="DEEPFACE_API_URL=https://deepface-979970479540.asia-south1.run.app" \
+  --set-env-vars="DEEPFACE_API_URL=https://wedding-deepface-rst3dulcnq-el.a.run.app" \
   --timeout=3600
 
 if [ $? -ne 0 ]; then
