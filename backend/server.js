@@ -65,7 +65,8 @@ app.use(cors({
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   maxAge: 86400 // 24 hours
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check endpoint - useful for frontend to verify backend connectivity
 app.get('/api/health', (req, res) => {
@@ -109,8 +110,8 @@ console.log('📁 Serving static files from:', path.join(__dirname, '../uploads'
 app.use('/backend', express.static(path.join(__dirname)));
 console.log('📁 Serving backend files from:', path.join(__dirname));
 
-// Use Supabase wishes endpoint (switched back from Firebase)
-const wishesRouter = require('./wishes-supabase');
+// Use wishes endpoint
+const wishesRouter = require('./wishes');
 app.use('/api/wishes', wishesRouter);
 
 // Contact messages endpoint
@@ -128,6 +129,10 @@ app.use('/api/feedback', feedbackRouter);
 // N8N Integration endpoint
 const n8nRouter = require('./routes/n8n-integration');
 app.use('/api/n8n', n8nRouter);
+
+// Email Webhook endpoint
+const emailWebhookRouter = require('./routes/email-webhook');
+app.use('/api/email', emailWebhookRouter);
 
 // Firebase wishes endpoint (commented out - keeping for future migration)
 // const wishesFirebaseRouter = require('./wishes');
@@ -158,8 +163,8 @@ app.use('/api/analytics', analyticsRouter); // Public track, admin read
 const weddingsRouter = require('./routes/weddings');
 app.use('/api/weddings', weddingsRouter); // Wedding customer management
 
-// Use Supabase photos endpoint (switched back from Firebase)
-const photosRouter = require('./photos-supabase');
+// Use photos endpoint
+const photosRouter = require('./photos-new');
 app.use('/api/photos', photosRouter); // Authentication handled per-route in photos-supabase.js
 
 // Firebase photos endpoint (commented out - keeping for future migration)
@@ -175,19 +180,19 @@ app.use('/api/photos-local', photosLocalRouter);
 // const photosEnhancedRouter = require('./photos-enhanced');
 // app.use('/api/photos-enhanced', authenticateToken, photosEnhancedRouter);
 
-// Face recognition API (Temporarily disabled during Supabase to Firebase migration)
-// const facesRouter = require('./faces');
-// app.use('/api/faces', facesRouter);
+// Face recognition API - Re-enabled for photographer portal face matching
+const facesRouter = require('./faces');
+app.use('/api/faces', facesRouter);
 
 // Face detection routes - Enabled for face descriptor processing
 const processFacesRouter = require('./routes/process-faces');
 app.use('/api/process-faces', processFacesRouter);
 
-// Other face detection routes (temporarily disabled)
-// const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
-// app.use('/api/face-detection', faceDetectionTriggerRouter);
-// const autoFaceDetectionRouter = require('./routes/auto-face-detection');
-// app.use('/api/auto-face-detection', autoFaceDetectionRouter);
+// Auto face detection routes - Enabled for automated processing
+const faceDetectionTriggerRouter = require('./routes/face-detection-trigger');
+app.use('/api/face-detection', faceDetectionTriggerRouter);
+const autoFaceDetectionRouter = require('./routes/auto-face-detection');
+app.use('/api/auto-face-detection', autoFaceDetectionRouter);
 
 // Live sync API routes
 const liveSyncRouter = require('./routes/live-sync');
@@ -197,11 +202,25 @@ app.use('/api/live', liveSyncRouter);
 const premiumRouter = require('./routes/premium');
 app.use('/api/premium', premiumRouter);
 
+// Resolve 404 errors on Client Portal
+const profilesRouter = require('./routes/profiles');
+app.use('/api/profiles', profilesRouter);
+
+const guestsRouter = require('./routes/guests');
+app.use('/api/guests', guestsRouter);
+
+const timelineRouter = require('./routes/timeline');
+app.use('/api/timeline', timelineRouter);
+
+const aiRouter = require('./routes/ai');
+app.use('/api/ai', aiRouter);
+
+
 // Face recognition endpoint (for photo booth feature)
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
-const { matchFace } = require('./lib/face-recognition');
-const { PhotoDB } = require('./lib/supabase-db');
+const { matchFace } = require('./lib/face-recognition-logic');
+const { PhotoDB } = require('./lib/sql-db');
 
 // POST /api/recognize - Find photos by face descriptor
 app.post('/api/recognize', upload.none(), async (req, res) => {

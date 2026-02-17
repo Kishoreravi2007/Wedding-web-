@@ -9,7 +9,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { supabase } = require('./server');
-const { PhotoDB } = require('./lib/supabase-db');
+const { PhotoDB } = require('./lib/sql-db');
 const { faceProcessingService } = require('./services/face-processing-service');
 
 // Multer configuration for in-memory storage
@@ -36,11 +36,11 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       return res.status(400).json({ message: 'No photo file uploaded' });
     }
 
-    const { 
-      sister, 
-      title, 
-      description, 
-      eventType, 
+    const {
+      sister,
+      title,
+      description,
+      eventType,
       tags,
       faceDescriptors // Sent from frontend after detection
     } = req.body;
@@ -67,8 +67,8 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     let parsedFaceDescriptors = [];
     if (faceDescriptors) {
       try {
-        parsedFaceDescriptors = typeof faceDescriptors === 'string' 
-          ? JSON.parse(faceDescriptors) 
+        parsedFaceDescriptors = typeof faceDescriptors === 'string'
+          ? JSON.parse(faceDescriptors)
           : faceDescriptors;
       } catch (parseError) {
         return res.status(400).json({ message: 'Invalid face descriptors format' });
@@ -78,7 +78,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     // Upload to Supabase Storage
     const file = req.file;
     const fileName = `${sister}/${Date.now()}_${file.originalname}`;
-    
+
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('wedding-photos')
       .upload(fileName, file.buffer, {
@@ -88,9 +88,9 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
 
     if (uploadError) {
       console.error('Error uploading to Supabase Storage:', uploadError);
-      return res.status(500).json({ 
+      return res.status(500).json({
         message: 'Error uploading photo to storage',
-        error: uploadError.message 
+        error: uploadError.message
       });
     }
 
@@ -98,7 +98,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     const { data: publicUrlData } = supabase.storage
       .from('wedding-photos')
       .getPublicUrl(fileName);
-    
+
     const publicUrl = publicUrlData.publicUrl;
 
     // Create photo record in database
@@ -153,9 +153,9 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
 
   } catch (error) {
     console.error('Error in photo upload:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error uploading photo',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -187,7 +187,7 @@ router.post('/upload-batch', upload.array('photos', 50), async (req, res) => {
     for (const file of req.files) {
       try {
         const fileName = `${sister}/${Date.now()}_${file.originalname}`;
-        
+
         // Upload to storage
         const { error: uploadError } = await supabase.storage
           .from('wedding-photos')
@@ -219,7 +219,7 @@ router.post('/upload-batch', upload.array('photos', 50), async (req, res) => {
         };
 
         const photo = await PhotoDB.create(photoData);
-        
+
         uploadResults.successful++;
         uploadResults.photos.push({
           id: photo.id,
@@ -244,9 +244,9 @@ router.post('/upload-batch', upload.array('photos', 50), async (req, res) => {
 
   } catch (error) {
     console.error('Error in batch upload:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error in batch upload',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -277,9 +277,9 @@ router.post('/:photoId/process-faces', async (req, res) => {
 
   } catch (error) {
     console.error('Error processing faces:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error processing faces',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -307,9 +307,9 @@ router.post('/process-batch', async (req, res) => {
 
   } catch (error) {
     console.error('Error queuing batch:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error queuing batch processing',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -324,9 +324,9 @@ router.get('/processing-stats', async (req, res) => {
     res.json(stats);
   } catch (error) {
     console.error('Error getting stats:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving statistics',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -338,7 +338,7 @@ router.get('/processing-stats', async (req, res) => {
 router.get('/unidentified-faces', async (req, res) => {
   try {
     const { limit, offset, photoId } = req.query;
-    
+
     const result = await faceProcessingService.getUnidentifiedFaces({
       limit: parseInt(limit) || 50,
       offset: parseInt(offset) || 0,
@@ -349,9 +349,9 @@ router.get('/unidentified-faces', async (req, res) => {
 
   } catch (error) {
     console.error('Error getting unidentified faces:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving unidentified faces',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -380,9 +380,9 @@ router.post('/reprocess-faces', async (req, res) => {
 
   } catch (error) {
     console.error('Error reprocessing faces:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error reprocessing faces',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -394,9 +394,9 @@ router.post('/reprocess-faces', async (req, res) => {
 router.get('/:photoId/face-quality', async (req, res) => {
   try {
     const { photoId } = req.params;
-    
+
     const report = await faceProcessingService.getFaceQualityReport(photoId);
-    
+
     if (!report) {
       return res.status(404).json({ message: 'Photo not found or no faces detected' });
     }
@@ -405,9 +405,9 @@ router.get('/:photoId/face-quality', async (req, res) => {
 
   } catch (error) {
     console.error('Error getting quality report:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving quality report',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -451,7 +451,7 @@ router.get('/by-person/:personId', async (req, res) => {
 
     if (offset) {
       query = query.range(
-        parseInt(offset), 
+        parseInt(offset),
         parseInt(offset) + (parseInt(limit) || 10) - 1
       );
     }
@@ -475,9 +475,9 @@ router.get('/by-person/:personId', async (req, res) => {
 
   } catch (error) {
     console.error('Error getting photos by person:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error retrieving photos',
-      error: error.message 
+      error: error.message
     });
   }
 });

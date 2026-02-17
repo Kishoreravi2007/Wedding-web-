@@ -159,7 +159,7 @@ export function HeroSection() {
                         {/* Main Banner Image */}
                         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl">
                             <img
-                                src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop"
+                                src="/hero-wedding.jpg"
                                 alt="Company Work"
                                 className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                             />

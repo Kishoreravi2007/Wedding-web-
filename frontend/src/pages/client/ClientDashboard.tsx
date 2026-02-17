@@ -1430,7 +1430,7 @@ const ClientDashboard = () => {
                             <TabsContent value="overview" className="space-y-6">
                                 {/* Welcome Banner */}
                                 <Card className="bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 text-white border-0 shadow-xl overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10"></div>
+                                    <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20200%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cfilter%20id%3D%22noiseFilter%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.65%22%20numOctaves%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23noiseFilter)%22%2F%3E%3C%2Fsvg%3E')] opacity-10"></div>
                                     <CardContent className="p-6 sm:p-8 relative">
                                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                             <div>
@@ -3264,7 +3264,7 @@ const ClientDashboard = () => {
             {/* Footer */}
             <footer className="bg-white/80 border-t border-gray-200 py-6 mt-12">
                 <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-                    <p>© 2026 WeddingWeb Premium. Need help? <a href="/company/contact" className="text-rose-600 hover:underline">Contact Support</a></p>
+                    <p>© 2026 WeddingWeb AI Inc. Need help? <a href="/company/contact" className="text-rose-600 hover:underline">Contact Support</a></p>
                 </div>
             </footer>
         </div>

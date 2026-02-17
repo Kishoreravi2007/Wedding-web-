@@ -42,7 +42,8 @@ import Feedback from "./pages/Feedback";
 import ViewFeedback from "./pages/ViewFeedback";
 
 // Company Pages
-import CompanyLanding from "./pages/company/Landing";
+// import CompanyLanding from "./pages/company/Landing";
+import LandingNew from "./pages/company/LandingNew"; // New Landing Page
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import CompanyLogin from "./pages/company/Login";
 import CompanySignup from "./pages/company/Signup";
@@ -133,6 +134,7 @@ const App = () => {
       location.pathname.startsWith('/company') ||
       location.pathname.startsWith('/client') ||
       location.pathname.startsWith('/photographer') ||
+      location.pathname.startsWith('/admin') ||
       location.pathname === '/privacy' ||
       location.pathname === '/terms';
   }, [location.pathname]);
@@ -230,7 +232,7 @@ const App = () => {
                 <Route path="/client" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
                 <Route path="/client/*" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
 
-                <Route path="/about-platform" element={<CompanyLanding />} />
+                <Route path="/about-platform" element={<LandingNew />} />
                 <Route path="/privacy" element={<CompanyLegal />} />
                 <Route path="/terms" element={<CompanyLegal />} />
                 <Route path="/all-weddings" element={<Index />} />
@@ -268,11 +270,11 @@ const App = () => {
                     <h1 className="text-4xl font-bold mb-4">{t('weddingCountdown')}</h1>
                     <div className="mb-8">
                       <h2 className="text-2xl">{t('sister1Muhurtham')}</h2>
-                      <CountdownTimer targetDate={'2024-08-04T10:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500" />
+                      <CountdownTimer targetDate={'2026-12-25T10:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500" />
                     </div>
                     <div>
                       <h2 className="text-2xl">{t('sister2Muhurtham')}</h2>
-                      <CountdownTimer targetDate={'2024-08-05T11:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500" />
+                      <CountdownTimer targetDate={'2026-12-31T11:00:00'} gradient="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500" />
                     </div>
                   </div>
                 } />

@@ -49,6 +49,10 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    --background-light: 240 7% 97%;
+    /* #f6f6f8 */
+    --background-dark: 221 32% 10%;
+    /* #111621 */
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -56,7 +60,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 220 80% 45%;
+    /* #1754cf */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -382,14 +387,18 @@
     font-family: 'Dancing Script', cursive;
   }
 
+  .font-display {
+    font-family: 'Manrope', sans-serif;
+  }
+
   .font-sans {
     font-family: 'Poppins', sans-serif;
   }
 
   /* Attempt to hide the "SP" logo */
-  .fixed.top-4.left-4 {
-    display: none !important;
-  }
+
+  /* Deleted suspicious rule hiding .fixed.top-4.left-4 */
+
 
   .support-text {
     font-size: clamp(0.5rem, 1.8vw, 0.875rem);

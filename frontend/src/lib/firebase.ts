@@ -34,7 +34,7 @@ try {
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
-  
+
   // Initialize analytics only in browser environment
   if (typeof window !== 'undefined') {
     try {
@@ -43,7 +43,7 @@ try {
       console.warn('Analytics not available:', error);
     }
   }
-  
+
   console.log('✅ Firebase initialized successfully');
 } catch (error) {
   console.error('❌ Firebase initialization error:', error);

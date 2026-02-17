@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../lib/db-gcp');
 const { writeContactMessageToSheet, deleteContactMessageFromSheet } = require('../lib/google-sheets');
 const NotificationService = require('../services/notification-service');
+const AIService = require('../services/ai-service');
+const EmailService = require('../services/email-service');
 const { SecureUserDB } = require('../lib/secure-auth');
 
 // Get all contact messages (for admin)
@@ -56,6 +58,7 @@ router.post('/', async (req, res) => {
                     id SERIAL PRIMARY KEY,
                     name TEXT NOT NULL,
                     email TEXT NOT NULL,
+                    subject TEXT,
                     phone TEXT,
                     event_date TEXT,
                     guest_count INTEGER,
@@ -73,6 +76,41 @@ router.post('/', async (req, res) => {
     }
 
     const newMessage = result.rows[0];
+
+    // AI Auto-Reply & Email Notification
+    (async () => {
+      try {
+        console.log(`🤖 Processing AI Auto-Reply for ${name}...`);
+        const aiResponse = await AIService.generateSupportResponse({
+          from: name,
+          subject: `Inquiry about WeddingWeb services`,
+          body: message
+        });
+
+        const aiReply = aiResponse.text;
+        const trackingId = `ENQ_${newMessage.id}_${Date.now().toString().slice(-4)}`;
+
+        // Update DB with AI Reply
+        await db.query(
+          'UPDATE contact_messages SET response = $1 WHERE id = $2',
+          [aiReply, newMessage.id]
+        );
+
+        // Send Emails (Customer & Admin)
+        await EmailService.sendContactEnquiryEmails({
+          name,
+          email,
+          message,
+          trackingId,
+          context: 'Website Contact Form',
+          aiReply
+        });
+
+        console.log(`✅ AI Auto-Reply sent to ${email}`);
+      } catch (aiError) {
+        console.error('❌ Error in AI Auto-Reply flow:', aiError);
+      }
+    })();
 
     // Create Notification for Admin/Users
     try {
@@ -131,6 +169,66 @@ router.patch('/:id', async (req, res) => {
     res.json({ success: true, message: 'Message updated successfully!', data: rows[0] });
   } catch (error) {
     console.error('Error updating contact message:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Reply to a message
+router.post('/:id/reply', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { replyText, subject } = req.body;
+
+    if (!replyText) {
+      return res.status(400).json({ success: false, error: 'Reply text is required' });
+    }
+
+    // Get the original message to get recipient email
+    const { rows: existing } = await db.query('SELECT * FROM contact_messages WHERE id = $1', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ success: false, error: 'Message not found' });
+    }
+    const originalMsg = existing[0];
+
+    // Send the email
+    console.log(`📧 Sending reply to ${originalMsg.email}...`);
+    const emailResult = await EmailService.sendEmail({
+      to: originalMsg.email,
+      subject: subject || `Re: ${originalMsg.subject || 'WeddingWeb Inquiry'}`,
+      text: replyText,
+      html: `
+        <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
+          <p>${replyText.replace(/\n/g, '<br>')}</p>
+          <br>
+          <div style="padding: 20px; background: #f9f9f9; border-left: 4px solid #e11d48; margin-top: 20px;">
+            <p style="font-size: 12px; color: #666; margin: 0;"><b>Original Message:</b></p>
+            <p style="font-size: 13px; color: #444; margin-top: 10px;">${originalMsg.message}</p>
+          </div>
+          <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;">
+          <p style="font-size: 12px; color: #888;">
+            Thank you for choosing WeddingWeb.
+          </p>
+        </div>
+      `
+    });
+
+    if (!emailResult.success) {
+      throw new Error(emailResult.error || 'Failed to send email');
+    }
+
+    // Update DB status and store reply
+    const { rows } = await db.query(
+      `UPDATE contact_messages 
+       SET status = 'replied', 
+           response = $1
+       WHERE id = $2 
+       RETURNING *`,
+      [replyText, id]
+    );
+
+    res.json({ success: true, message: 'Reply sent successfully!', data: rows[0] });
+  } catch (error) {
+    console.error('Error sending reply:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

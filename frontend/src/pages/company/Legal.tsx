@@ -42,7 +42,7 @@ const Legal = () => {
                     {isPrivacy ? (
                         <div className="prose prose-slate max-w-none">
                             <h1 className="text-3xl font-bold mb-6 text-slate-900">Privacy Policy</h1>
-                            <p className="text-slate-600 mb-4">Last Updated: January 2025</p>
+                            <p className="text-slate-600 mb-4">Last Updated: February 2026</p>
 
                             <h2 className="text-xl font-bold mt-8 mb-4 text-slate-800">1. Information We Collect</h2>
                             <p className="text-slate-600 mb-4">
@@ -73,7 +73,7 @@ const Legal = () => {
                     ) : (
                         <div className="prose prose-slate max-w-none">
                             <h1 className="text-3xl font-bold mb-6 text-slate-900">Terms of Service</h1>
-                            <p className="text-slate-600 mb-4">Last Updated: January 2025</p>
+                            <p className="text-slate-600 mb-4">Last Updated: February 2026</p>
 
                             <h2 className="text-xl font-bold mt-8 mb-4 text-slate-800">1. Acceptance of Terms</h2>
                             <p className="text-slate-600 mb-4">
@@ -90,7 +90,7 @@ const Legal = () => {
 
                             <h2 className="text-xl font-bold mt-8 mb-4 text-slate-800">3. Intellectual Property</h2>
                             <p className="text-slate-600 mb-4">
-                                The WeddingWeb platform, brand, and technology are property of WeddingWeb Inc.
+                                The WeddingWeb platform, brand, and technology are property of WeddingWeb AI Inc.
                                 Your wedding photos remain your property, but you grant us a license to
                                 host and process them to provide our services.
                             </p>
@@ -138,7 +138,7 @@ const Legal = () => {
                             <ul className="space-y-3 text-slate-400">
                                 <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
                                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Careers</a></li>
                             </ul>
                         </div>
                         <div>
@@ -154,13 +154,13 @@ const Legal = () => {
                                         Documentation
                                     </a>
                                 </li>
-                                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">FAQ</a></li>
                                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                             </ul>
                         </div>
                     </div>
                     <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
-                        <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+                        <p>&copy; 2026 WeddingWeb AI Inc. All rights reserved.</p>
                         <p className="text-sm flex items-center justify-center gap-2">
                             Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
                         </p>

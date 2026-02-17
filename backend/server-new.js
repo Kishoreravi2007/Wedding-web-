@@ -47,6 +47,7 @@ const whitelist = [
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
   'https://wedding-backend-rst3dulcnq-el.a.run.app',
+  'https://wedding-backend-979970479540.asia-south1.run.app', // Added from .env
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -78,13 +79,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://apis.google.com", "https://www.gstatic.com", "https://www.googletagmanager.com"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://wedding-deepface-rst3dulcnq-el.a.run.app", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
-      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", process.env.FRONTEND_URL].filter(Boolean),
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://wedding-deepface-rst3dulcnq-el.a.run.app", "https://*.firebaseio.com", "https://firebaseinstallations.googleapis.com", "https://*.googleapis.com", "https://www.google-analytics.com", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://storage.googleapis.com", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com"],
+      frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://*.firebaseapp.com", "https://*.google.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
@@ -225,9 +226,9 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
 });
 
 // AI Email Webhook (for Google Apps Script fallback)
-console.log('✉️ Registering /api/email/auto-reply-webhook route...');
+console.log('✉️ Registering /api/email routes...');
 app.use('/api/email', require('./routes/email-webhook'));
-console.log('✅ Registered /api/email/auto-reply-webhook route.');
+console.log('✅ Registered /api/email routes.');
 
 
 // Wedding Routes

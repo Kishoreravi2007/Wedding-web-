@@ -1,7 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import CompanyDashboard from "@/pages/company/CompanyDashboard";
-import CompanyLanding from "@/pages/company/Landing";
+// import CompanyLanding from "@/pages/company/Landing";
+import LandingNew from "@/pages/company/LandingNew";
 import { AuthGuard } from "@/components/company/dashboard/AuthGuard";
 
 export const HomeRoute = () => {
@@ -20,5 +21,5 @@ export const HomeRoute = () => {
     }
 
     // If not logged in, show the public landing page
-    return <CompanyLanding />;
+    return <LandingNew />;
 };

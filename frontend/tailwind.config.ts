@@ -21,17 +21,21 @@ export default {
       fontFamily: {
         heading: ["'Dancing Script'", "cursive"],
         sans: ["Poppins", "sans-serif"],
+        display: ["Manrope", "sans-serif"], // Added Manrope
       },
       colors: {
+        "primary": "#1754cf", // Updated Primary
+        "background-light": "#f6f6f8", // Added Light BG
+        "background-dark": "#111621", // Added Dark BG
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
+        // primary: { // Keeping original as primary-old for fallback if needed, or just overwriting?
+        //   DEFAULT: "hsl(var(--primary))",
+        //   foreground: "hsl(var(--primary-foreground))",
+        // },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

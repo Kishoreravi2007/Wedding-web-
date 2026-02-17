@@ -31,17 +31,17 @@ try {
   try {
     const path = require('path');
     const fs = require('fs');
-    
+
     // Try to find the service account key file
     const possiblePaths = [
       path.join(__dirname, '..', 'weddingweb-9421e-firebase-adminsdk-fbsvc-184b677d23 (2).json'),
       path.join(__dirname, '..', 'firebase-service-account.json'),
       path.join(__dirname, '..', 'serviceAccountKey.json')
     ];
-    
+
     let credential;
     let foundServiceAccount = false;
-    
+
     for (const filePath of possiblePaths) {
       if (fs.existsSync(filePath)) {
         try {
@@ -55,22 +55,22 @@ try {
         }
       }
     }
-    
+
     if (!foundServiceAccount) {
       console.warn('⚠️  No service account file found, initializing without credentials');
       // Initialize without credentials (will work for some operations if GOOGLE_APPLICATION_CREDENTIALS is set)
       credential = null;
     }
-    
+
     const initConfig = {
       projectId: firebaseConfig.projectId,
       storageBucket: firebaseConfig.storageBucket
     };
-    
+
     if (credential) {
       initConfig.credential = credential;
     }
-    
+
     firebaseApp = admin.initializeApp(initConfig);
     console.log('✅ Firebase Admin SDK initialized');
   } catch (initError) {

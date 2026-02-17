@@ -62,7 +62,7 @@ const initializeClient = () => {
 };
 
 // Start initialization
-initializeClient();
+// initializeClient();
 
 /**
  * Send a wedding invitation via WhatsApp Web

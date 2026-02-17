@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { WeddingTemplate } from '@/components/WeddingTemplate';
+import { PremiumWeddingTemplate } from '@/components/PremiumWeddingTemplate';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart, Search as SearchIcon } from 'lucide-react';
 import FaceSearch from '@/components/FaceSearch';
 import { API_BASE_URL } from '@/lib/api';
 import {
@@ -173,6 +175,128 @@ const WeddingPage = () => {
                 <Heart className="w-12 h-12 text-gray-300 mb-4" />
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">404</h1>
                 <p className="text-gray-600">{error || 'Page not found'}</p>
+            </div>
+        );
+    }
+
+    if (weddingData.theme === 'premium-masonry') {
+        return (
+            <div className="min-h-screen bg-background font-sans text-foreground">
+                <PremiumWeddingTemplate
+                    weddingData={weddingData}
+                    timeline={timeline}
+                    photos={photos}
+                    isEditing={false}
+                    slug={slug}
+                    onUploadPhoto={handlePhotoUpload} // Changed from handleUploadPhoto to handlePhotoUpload
+                    uploadFile={uploadFile}
+                    setUploadFile={setUploadFile}
+                    isUploading={isUploading}
+                    showUploadDialog={showUploadDialog}
+                    setShowUploadDialog={setShowUploadDialog}
+                    setSelectedPhoto={setSelectedPhoto}
+                    selectedPhoto={selectedPhoto}
+                    onSearchPhotos={() => setShowSearchDialog(true)}
+                />
+                {/* Shared Music Player */}
+                <AnimatePresence>
+                    {weddingData.musicEnabled && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="fixed bottom-6 left-6 z-40"
+                        >
+                            {/* Upload Mode */}
+                            {musicSource === 'upload' && weddingData.musicUrl && (
+                                <div className={`p-4 rounded-2xl shadow-xl backdrop-blur-md border border-white/20 transition-colors duration-300 ${isPlaying ? 'bg-white/90 text-slate-900' : 'bg-black/60 text-white'}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className={`p-3 rounded-full transition-colors ${isPlaying ? 'bg-rose-100 text-rose-500' : 'bg-white/10 text-white'}`}>
+                                            <Music className={`w-5 h-5 ${isPlaying ? 'animate-pulse' : ''}`} />
+                                        </div>
+                                        <div className="hidden md:block">
+                                            <p className="text-sm font-bold">Wedding Playlist</p>
+                                            <p className="text-xs opacity-70">Playing your favorites</p>
+                                        </div>
+                                        <button
+                                            onClick={togglePlay}
+                                            className={`p-3 rounded-full hover:scale-105 active:scale-95 transition-all ${isPlaying ? 'bg-rose-500 text-white shadow-rose-500/30' : 'bg-white text-black'}`}
+                                        >
+                                            {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Playlist Mode */}
+                            {musicSource === 'playlist' && playlistUrl && (
+                                <div className="shadow-2xl rounded-xl overflow-hidden border border-white/20">
+                                    {/* Reusing the iframe logic from below or simplifying for now. 
+                                      For brevity, I will just render the container and iframes can be added if needed, 
+                                      but let's try to include the iframes to be complete since I have the code. */}
+                                    {playlistUrl.includes('spotify.com') && (
+                                        <iframe
+                                            style={{ borderRadius: '12px' }}
+                                            src={playlistUrl.replace('open.spotify.com', 'open.spotify.com/embed')}
+                                            width="300"
+                                            height="80"
+                                            frameBorder="0"
+                                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                            loading="lazy"
+                                        ></iframe>
+                                    )}
+                                    {/* Apple Music Embed */}
+                                    {playlistUrl.includes('music.apple.com') && (
+                                        <iframe
+                                            allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                                            frameBorder="0"
+                                            height="175"
+                                            style={{ width: '100%', maxWidth: '300px', overflow: 'hidden', background: 'transparent' }}
+                                            sandbox="allow-forms allow-popups allow-same-origin allow-scripts storage-access-api-by-user-activation"
+                                            src={playlistUrl.replace('music.apple.com', 'embed.music.apple.com')}
+                                        ></iframe>
+                                    )}
+                                    {/* YouTube Embed */}
+                                    {(playlistUrl.includes('youtube.com') || playlistUrl.includes('youtu.be')) && (
+                                        <iframe
+                                            width="300"
+                                            height="170"
+                                            src={`https://www.youtube.com/embed/?listType=playlist&list=${new URL(playlistUrl).searchParams.get('list') || 'PL'}`}
+                                            title="YouTube video player"
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        ></iframe>
+                                    )}
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Face Search Dialog - Reused */}
+                <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Find Your Photos</DialogTitle>
+                            <DialogDescription>
+                                Upload a selfie to instantly find photos of you from the wedding.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-rose-500/50 hover:bg-rose-50/50 transition-colors cursor-pointer">
+                                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500">
+                                    <SearchIcon className="w-8 h-8" />
+                                </div>
+                                <p className="text-sm font-medium text-gray-900">Click to upload selfie</p>
+                                <p className="text-xs text-gray-500 mt-1">or drag and drop here</p>
+                            </div>
+                            <Button className="w-full bg-rose-500 hover:bg-rose-600">
+                                Search Gallery
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         );
     }

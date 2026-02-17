@@ -186,7 +186,7 @@ const CompanyLanding = () => {
               {/* Main Banner Image */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop"
+                  src="/hero-wedding.jpg"
                   alt="Wedding Couple"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />
@@ -325,7 +325,7 @@ const CompanyLanding = () => {
             >
               <div className="aspect-square rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
                 <img
-                  src="https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=2070&auto=format&fit=crop"
+                  src="/wedding.jpg"
                   alt="Happy wedding couple celebration"
                   className="w-full h-full object-cover"
                 />
@@ -480,7 +480,7 @@ const CompanyLanding = () => {
               <ul className="space-y-3 text-slate-400">
                 <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
@@ -496,13 +496,13 @@ const CompanyLanding = () => {
                     <FileText className="w-4 h-4" /> Documentation
                   </a>
                 </li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">FAQ</a></li>
                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
-            <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p>&copy; 2026 WeddingWeb AI Inc. All rights reserved.</p>
             <p className="text-sm flex items-center justify-center gap-2">
               Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
             </p>

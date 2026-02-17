@@ -51,10 +51,8 @@ const LandingMinimal = () => {
       {/* Fixed Navigation */}
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-slate-200">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
-              <Heart className="w-7 h-7 fill-white" />
-            </div>
+          <Link to="/" className="flex items-center gap-4 group">
+            <img src="/logo.png" alt="WeddingWeb" className="w-12 h-12 rounded-xl object-contain transition-transform group-hover:scale-105" />
             <span className="hidden md:block text-2xl font-bold text-slate-900">
               WeddingWeb
             </span>
@@ -112,9 +110,7 @@ const LandingMinimal = () => {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-3 text-left">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white">
-                    <Heart className="w-6 h-6 fill-white" />
-                  </div>
+                  <img src="/logo.png" alt="WeddingWeb" className="w-10 h-10 rounded-xl object-contain" />
                   <span className="text-slate-900 text-xl font-semibold">WeddingWeb</span>
                 </SheetTitle>
               </SheetHeader>
@@ -687,7 +683,7 @@ const LandingMinimal = () => {
           }}
         >
           <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-            © 2025 WeddingWeb. All rights reserved.
+            © 2026 WeddingWeb AI Inc. All rights reserved.
           </p>
           <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '0.5rem' }}>
             Made with love from Kerala ❤️

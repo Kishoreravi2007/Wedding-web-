@@ -91,7 +91,7 @@ const Index = () => {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/WhatsApp%20Image%202025-11-05%20at%205.21.53%20PM.jpeg')",
+          backgroundImage: "url('/hero-wedding.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'
@@ -249,10 +249,11 @@ const Index = () => {
                     whileHover={{ scale: 1.1 }}
                   >
                     <motion.div
-                      whileHover={{ scale: 1.3, rotate: 10 }}
+                      whileHover={{ scale: 1.1, rotate: 10 }}
                       transition={{ duration: 0.2 }}
+                      className="bg-white/10 p-1.5 rounded-lg backdrop-blur-sm border border-white/20"
                     >
-                      <Heart className="w-5 h-5 text-[#FFD700]" />
+                      <img src="/logo.png" alt="WeddingWeb" className="w-5 h-5 object-contain" />
                     </motion.div>
                     <Link to="/couple-login">
                       <motion.div

@@ -124,15 +124,17 @@ const AIService = {
      * @returns {Promise<Object>} - { subject, body }
      */
     async generateWelcomeEmail(name) {
-        const prompt = `You are a warm and professional community manager for WeddingWeb. 
+        const prompt = `You are a warm and professional community manager for WeddingWeb (weddingweb.co.in). 
         Write a welcoming, engaging welcome email for a new user named "${name}" who just joined our platform.
-        WeddingWeb is a digital platform for couples and wedding vendors (photographers, planners, etc).
+        WeddingWeb is an Indian digital platform for couples and wedding vendors (photographers, planners, etc).
+        Our brand color is blue (#1754cf) and we are based in Kerala, India.
         
         Requirements:
         1. Tone: Warm, exciting, and professional.
         2. Keep it concise (3-4 short paragraphs).
         3. Mention that they can now manage their wedding details or professional profile.
         4. Subject line should be catchy.
+        5. Do NOT use any markdown formatting (no asterisks, no bold, no headers).
         
         Output format:
         Subject: [Catchy Subject]
@@ -140,7 +142,7 @@ const AIService = {
 
         const mockBody = `Hi ${name}, welcome to WeddingWeb! We're thrilled to have you join our community. Whether you're planning your big day or showcasing your professional services, we're here to help you every step of the way.`;
 
-        const result = await this.generateContent(prompt, `Subject: Welcome to the Family, ${name}! 💍\n\nBody: ${mockBody}`);
+        const result = await this.generateContent(prompt, `Subject: Welcome to the WeddingWeb Family, ${name}! 💍\n\nBody: ${mockBody}`);
 
         // Parse subject and body
         const text = result.text;

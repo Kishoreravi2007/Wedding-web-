@@ -220,7 +220,7 @@ const CompanyDashboard = () => {
             {/* Simple Footer */}
             <footer className="bg-white border-t border-slate-200 py-12">
                 <div className="container px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-                    <p>© 2025 WeddingWeb Inc. All rights reserved.</p>
+                    <p>© 2026 WeddingWeb AI Inc. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link to="/privacy" className="hover:text-slate-900">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-slate-900">Terms of Service</Link>

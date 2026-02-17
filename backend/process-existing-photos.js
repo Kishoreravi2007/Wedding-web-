@@ -7,7 +7,7 @@
 
 require('dotenv').config();
 const { supabase } = require('./lib/supabase');
-const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/supabase-db');
+const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('./lib/sql-db');
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
 
@@ -19,13 +19,13 @@ faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 async function loadModels() {
   console.log('📥 Loading face-api models...');
   const modelPath = './models';
-  
+
   await Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromDisk(modelPath),
     faceapi.nets.faceLandmark68Net.loadFromDisk(modelPath),
     faceapi.nets.faceRecognitionNet.loadFromDisk(modelPath)
   ]);
-  
+
   console.log('✅ Models loaded successfully\n');
 }
 
@@ -33,22 +33,22 @@ async function loadModels() {
 async function processPhoto(photo) {
   try {
     console.log(`\n🔍 Processing: ${photo.filename}`);
-    
+
     // Download photo from Supabase storage
     const { data: photoBlob, error: downloadError } = await supabase.storage
       .from('wedding-photos')
       .download(photo.file_path);
-    
+
     if (downloadError) {
       throw new Error(`Download failed: ${downloadError.message}`);
     }
-    
+
     // Convert blob to buffer
     const buffer = Buffer.from(await photoBlob.arrayBuffer());
-    
+
     // Create image from buffer
     const img = await canvas.loadImage(buffer);
-    
+
     // Detect faces
     const detections = await faceapi
       .detectAllFaces(
@@ -60,14 +60,14 @@ async function processPhoto(photo) {
       )
       .withFaceLandmarks()
       .withFaceDescriptors();
-    
+
     console.log(`   Found ${detections.length} face(s)`);
-    
+
     if (detections.length === 0) {
       console.log('   ⚠️  No faces detected in this photo');
       return { success: true, faces: 0 };
     }
-    
+
     // Store face descriptors
     let storedFaces = 0;
     for (const detection of detections) {
@@ -78,7 +78,7 @@ async function processPhoto(photo) {
           descriptor: Array.from(detection.descriptor),
           confidence: detection.detection.score
         });
-        
+
         // Create photo_face record
         await PhotoFaceDB.create({
           photo_id: photo.id,
@@ -92,16 +92,16 @@ async function processPhoto(photo) {
           confidence: detection.detection.score,
           is_verified: false
         });
-        
+
         storedFaces++;
       } catch (faceError) {
         console.error('   ❌ Error storing face:', faceError.message);
       }
     }
-    
+
     console.log(`   ✅ Stored ${storedFaces} face descriptor(s)`);
     return { success: true, faces: storedFaces };
-    
+
   } catch (error) {
     console.error(`   ❌ Error processing photo: ${error.message}`);
     return { success: false, error: error.message };
@@ -112,44 +112,44 @@ async function processPhoto(photo) {
 async function processAllPhotos() {
   console.log('🎯 Face Detection Processing for Existing Photos\n');
   console.log('='.repeat(60));
-  
+
   try {
     // Load models
     await loadModels();
-    
+
     // Get all photos
     const allPhotos = await PhotoDB.findAll();
     console.log(`📷 Found ${allPhotos.length} photos in database\n`);
-    
+
     let processed = 0;
     let skipped = 0;
     let totalFaces = 0;
     let errors = 0;
-    
+
     for (const photo of allPhotos) {
       // Check if photo already has face data
       const existingFaces = await PhotoFaceDB.findByPhotoId(photo.id);
-      
+
       if (existingFaces && existingFaces.length > 0) {
         console.log(`⏭️  Skipping ${photo.filename} (already processed)`);
         skipped++;
         continue;
       }
-      
+
       // Process photo
       const result = await processPhoto(photo);
-      
+
       if (result.success) {
         processed++;
         totalFaces += result.faces;
       } else {
         errors++;
       }
-      
+
       // Small delay to avoid overwhelming the system
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    
+
     // Summary
     console.log('\n' + '='.repeat(60));
     console.log('PROCESSING COMPLETE');
@@ -159,17 +159,17 @@ async function processAllPhotos() {
     console.log(`❌ Errors: ${errors} photos`);
     console.log(`👤 Total Faces Detected: ${totalFaces}`);
     console.log('='.repeat(60));
-    
+
     if (totalFaces > 0) {
       console.log('\n🎉 SUCCESS! Face detection is now ready to use!');
       console.log('   Guests can now use the Photo Booth to find their photos.');
     }
-    
+
   } catch (error) {
     console.error('\n❌ Fatal error:', error);
     process.exit(1);
   }
-  
+
   process.exit(0);
 }
 

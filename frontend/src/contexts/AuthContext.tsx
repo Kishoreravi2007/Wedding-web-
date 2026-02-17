@@ -44,6 +44,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshProfile?: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  loginWithGoogle: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -180,6 +181,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const { auth } = await import('@/lib/firebase');
+      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idToken,
+          user: {
+            email: result.user.email,
+            name: result.user.displayName,
+            photoURL: result.user.photoURL
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Google login failed');
+      }
+
+      const { token: authToken, user } = data;
+
+      // Save to local storage
+      localStorage.setItem('auth_token', authToken);
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      setToken(authToken);
+
+      // Fetch profile
+      const profile = await fetchUserProfile(user.id, authToken);
+
+      setCurrentUser({
+        ...user,
+        profile
+      });
+
+      return { user };
+    } catch (error) {
+      console.error('Google login error:', error);
       throw error;
     }
   };
@@ -377,9 +428,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     updateEmailPreference,
     verifyStepUp2FA,
-    logout,
     refreshProfile,
     resetPassword,
+    loginWithGoogle,
   };
 
   return (

@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { PhotoDB, PhotoFaceDB, FaceDescriptorDB } = require('../lib/supabase-db');
+const { PhotoDB, PhotoFaceDB, FaceDescriptorDB } = require('../lib/sql-db');
 const { authenticateToken } = require('../auth-simple');
 
 /**
@@ -97,7 +97,7 @@ router.post('/store-descriptors', authenticateToken, async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    const { PhotoDB, PhotoFaceDB } = require('../lib/supabase-db');
+    const { PhotoDB, PhotoFaceDB } = require('../lib/sql-db');
 
     const { sister } = req.query;
     const filters = sister ? { sister } : {};

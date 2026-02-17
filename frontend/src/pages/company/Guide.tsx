@@ -258,7 +258,7 @@ const Guide = () => {
                         <img src="/logo.png" className="w-8 h-8" alt="Logo" />
                         <span className="text-2xl font-bold text-slate-900">WeddingWeb</span>
                     </div>
-                    <p className="text-slate-500 font-medium">&copy; 2025 WeddingWeb. All rights reserved.</p>
+                    <p className="text-slate-500 font-medium">&copy; 2026 WeddingWeb AI Inc. All rights reserved.</p>
                     <p className="text-slate-400 text-sm flex items-center justify-center gap-1">
                         Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
                     </p>

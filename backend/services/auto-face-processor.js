@@ -9,7 +9,7 @@
  * that the frontend Face Processor can call to get the list of unprocessed photos.
  */
 
-const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('../lib/supabase-db');
+const { PhotoDB, FaceDescriptorDB, PhotoFaceDB } = require('../lib/sql-db');
 
 class AutoFaceProcessor {
   constructor() {
@@ -67,10 +67,10 @@ class AutoFaceProcessor {
   async getUnprocessedPhotosList() {
     try {
       const unprocessedPhotos = await this.checkUnprocessedPhotos();
-      
+
       console.log(`\n📊 Face Detection Status Check:`);
       console.log(`   Total unprocessed photos: ${unprocessedPhotos.length}`);
-      
+
       return {
         status: 'success',
         unprocessedPhotos: unprocessedPhotos,
@@ -95,9 +95,9 @@ class AutoFaceProcessor {
     try {
       console.log('\n🤖 AUTO FACE DETECTION - Startup Check');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      
+
       const unprocessedPhotos = await this.checkUnprocessedPhotos();
-      
+
       if (unprocessedPhotos.length === 0) {
         console.log('✅ All photos have face descriptors!');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');

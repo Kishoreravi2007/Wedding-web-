@@ -22,7 +22,7 @@ const dbConfig = process.env.DATABASE_URL
 // Add pool settings
 dbConfig.max = 20;
 dbConfig.idleTimeoutMillis = 30000;
-dbConfig.connectionTimeoutMillis = 2000;
+dbConfig.connectionTimeoutMillis = 10000;
 
 // Validate configuration
 const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_NAME', 'DB_HOST'];

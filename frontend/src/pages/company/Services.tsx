@@ -32,7 +32,7 @@ const Services = () => {
       title: "Build Your Own Wedding Website",
       description: "Create a beautiful, personalized wedding website in minutes with our easy-to-use builder",
       color: "from-rose-500 to-pink-500",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop",
+      image: "/wedding.jpg",
       features: [
         "Drag-and-drop website builder",
         "Beautiful customizable templates",
@@ -47,7 +47,7 @@ const Services = () => {
       title: "AI-Powered Face Detection",
       description: "Revolutionary face recognition technology that helps guests find their photos instantly",
       color: "from-purple-500 to-pink-500",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
+      image: "/kishore-photo.jpg",
       features: [
         "Advanced facial recognition algorithms",
         "99%+ accuracy rate",
@@ -62,7 +62,7 @@ const Services = () => {
       title: "Smart Photo Gallery",
       description: "Beautiful, organized galleries that make sharing and downloading photos effortless",
       color: "from-blue-500 to-cyan-500",
-      image: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=2070&auto=format&fit=crop",
+      image: "/hero-gallery.jpg",
       features: [
         "Unlimited photo storage",
         "Auto-categorization by event",
@@ -77,7 +77,7 @@ const Services = () => {
       title: "Live Streaming",
       description: "Broadcast your special moments to family and friends around the world in real-time",
       color: "from-red-500 to-orange-500",
-      image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2073&auto=format&fit=crop",
+      image: "/reception-background.jpg",
       features: [
         "HD video streaming",
         "No viewer limits",
@@ -92,7 +92,7 @@ const Services = () => {
       title: "Photographer Portal",
       description: "Professional dashboard for photographers to upload and manage photos seamlessly",
       color: "from-green-500 to-emerald-500",
-      image: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?q=80&w=2070&auto=format&fit=crop",
+      image: "/ganapathy.jpg",
       features: [
         "Bulk photo upload",
         "Automatic face processing",
@@ -107,7 +107,7 @@ const Services = () => {
       title: "Digital Wishes",
       description: "Collect heartfelt messages and blessings from your guests in a beautiful digital guestbook",
       color: "from-pink-500 to-rose-500",
-      image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=2070&auto=format&fit=crop",
+      image: "/ayinoon-background.jpg",
       features: [
         "Customizable wish forms",
         "Moderation tools",
@@ -122,7 +122,7 @@ const Services = () => {
       title: "Event Management",
       description: "Keep guests informed with detailed schedules, countdowns, and real-time updates",
       color: "from-indigo-500 to-purple-500",
-      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop",
+      image: "/thiruvathirakali-background.jpg",
       features: [
         "Interactive event timeline",
         "Countdown timers",
@@ -238,7 +238,7 @@ const Services = () => {
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop"
+                  src="/hero-wedding.jpg"
                   alt="Wedding Features"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />
@@ -442,7 +442,7 @@ const Services = () => {
               <ul className="space-y-3 text-slate-400">
                 <li><Link to="/company/about" className="hover:text-white transition-colors">About Us</Link></li>
                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
@@ -456,13 +456,13 @@ const Services = () => {
                     <FileText className="w-4 h-4" /> Platform Guide
                   </Link>
                 </li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li><a href="javascript:void(0)" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">FAQ</a></li>
                 <li><Link to="/company/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-400 space-y-2">
-            <p>&copy; 2025 WeddingWeb. All rights reserved.</p>
+            <p>&copy; 2026 WeddingWeb AI Inc. All rights reserved.</p>
             <p className="text-sm flex items-center justify-center gap-2">
               Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> in Kerala
             </p>
