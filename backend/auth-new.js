@@ -823,8 +823,8 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
       };
     }
 
-    console.log('📡 [GET /client/wedding] Sending response (wrapped):', JSON.stringify({ wedding: weddingData }, null, 2));
-    res.json({ wedding: weddingData });
+    console.log('📡 [GET /client/wedding] Sending response:', JSON.stringify(weddingData, null, 2));
+    res.json(weddingData);
 
   } catch (error) {
     console.error('Get client wedding error:', error);

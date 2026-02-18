@@ -13,7 +13,7 @@ import { getAnalytics, Analytics } from 'firebase/analytics';
 
 // Firebase configuration - Use environment variables or fallback to defaults
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJO3Bvdevh792Gh8A9Uj8",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJ03Bvdevh792Gh8A9Uj8",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "kishore-75492.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "kishore-75492",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "kishore-75492.firebasestorage.app",
@@ -47,7 +47,8 @@ try {
   console.log('✅ Firebase initialized successfully');
 } catch (error) {
   console.error('❌ Firebase initialization error:', error);
-  throw error;
+  // Log but do not re-throw, allowing the app to at least mount
+  // throw error; 
 }
 
 // Database types (matching previous Supabase schema)

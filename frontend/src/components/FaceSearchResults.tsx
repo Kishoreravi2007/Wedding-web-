@@ -158,7 +158,7 @@ const FaceSearchResults: React.FC<FaceSearchResultsProps> = ({
                                 console.error('❌ Failed to load image:', photoUrl);
                                 const isHEIC = photoUrl.toLowerCase().includes('.heic');
                                 const fallbackText = isHEIC ? 'HEIC+Format+Not+Supported' : 'Image+Not+Available';
-                                (e.target as HTMLImageElement).src = `https://via.placeholder.com/400x300?text=${fallbackText}`;
+                                (e.target as HTMLImageElement).src = `https://placehold.co/400x300?text=${fallbackText}`;
                               }}
                             />
                           </div>

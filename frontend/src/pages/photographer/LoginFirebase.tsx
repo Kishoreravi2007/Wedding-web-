@@ -13,12 +13,12 @@ import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
-import { useFirebaseAuth } from '@/contexts/FirebaseAuthContext';
+import { useFirebaseAuth } from '@/contexts/AuthContext';
 
 const PhotographerLoginFirebase = () => {
   const navigate = useNavigate();
   const { signIn, loading } = useFirebaseAuth();
-  
+
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
@@ -32,16 +32,16 @@ const PhotographerLoginFirebase = () => {
 
     try {
       const user = await signIn(credentials.email, credentials.password);
-      
+
       // Check if user has photographer role
       if (user.role !== 'photographer') {
         showError('Access denied. Photographer role required.');
         return;
       }
-      
+
       showSuccess('Login successful! Welcome to the Photographer Portal.');
       navigate('/photographer');
-      
+
     } catch (error: any) {
       showError(error.message || 'Authentication failed. Please try again.');
     } finally {
@@ -76,7 +76,7 @@ const PhotographerLoginFirebase = () => {
             <CardTitle className="text-3xl font-bold text-gray-900">Photographer Portal</CardTitle>
             <p className="text-gray-600 mt-2">Sign in with your Firebase account to upload and manage wedding photos.</p>
           </CardHeader>
-          
+
           <CardContent className="pt-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
@@ -139,7 +139,7 @@ const PhotographerLoginFirebase = () => {
                 )}
               </Button>
             </form>
-            
+
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <h4 className="font-semibold text-blue-900 mb-2">Demo Credentials:</h4>
               <div className="text-sm text-blue-800 space-y-1">

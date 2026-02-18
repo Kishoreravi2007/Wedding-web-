@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WeddingWeb - Botanical Garden Celebration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#fdf8f9", /* Soft pink tint */
+                        "background-dark": "#111621",
+                        "botanical-green": "#2d5a27",
+                        "petal-pink": "#fce7f3",
+                        "leafy-accent": "#ecfdf5"
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .floral-gradient {
+            background: linear-gradient(135deg, #fdf8f9 0%, #ecfdf5 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#1754cf]/10 bg-white/80 backdrop-blur-md px-6 md:px-20 py-4">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">local_florist</span>
+</div>
+<h2 class="text-primary text-xl font-extrabold leading-tight tracking-tight">WeddingWeb</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-10 items-center">
+<nav class="flex items-center gap-8">
+<a class="text-[#111318] hover:text-primary transition-colors text-sm font-semibold uppercase tracking-wider" href="#story">Our Story</a>
+<a class="text-[#111318] hover:text-primary transition-colors text-sm font-semibold uppercase tracking-wider" href="#gallery">Gallery</a>
+<a class="text-[#111318] hover:text-primary transition-colors text-sm font-semibold uppercase tracking-wider" href="#guestbook">Guestbook</a>
+<a class="text-[#111318] hover:text-primary transition-colors text-sm font-semibold uppercase tracking-wider" href="#">Registry</a>
+</nav>
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-full h-11 px-6 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95">
+<span>RSVP Now</span>
+</button>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</header>
+<main class="flex-1">
+<!-- Hero Section -->
+<section class="relative px-4 md:px-10 lg:px-20 pt-6 pb-12">
+<div class="relative w-full h-[600px] md:h-[700px] rounded-[2rem] overflow-hidden group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="Luxurious botanical garden wedding ceremony setup with white flowers" style='background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVEx4cO9D9q-uGTczLlOyvKGhXxd8ZBrJk1HzUx86IGVt5jWoIwhmtZdp9ftBVrsBw9l0wA2rOoEsSBzRjiu_jg7UxX99sfCT1dRGRAYHkogpvoZfF9imaAmzgqgum5bT_Cw8tWwC9RYKrrEd1UhzKt0CZ1w8RlOOjyA-DeA3cr40XpSfI-VQ2It9dBH8-BcCiqyjo33xRS0zRuMWj97gb-uaZIfzcrow2qEMYOpqpk2NssTPXv58Gcl70Lp0qCYka0Cbf3f_2LJW6");'>
+</div>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+<span class="inline-block px-4 py-1.5 mb-6 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold uppercase tracking-[0.2em] border border-white/30">Save the Date • June 24, 2024</span>
+<h1 class="text-white text-5xl md:text-7xl font-extrabold leading-[1.1] mb-6 max-w-4xl tracking-tight">
+                            Growing Together <br/><span class="text-petal-pink">in Eternal Love</span>
+</h1>
+<p class="text-white/90 text-lg md:text-xl font-light mb-10 max-w-2xl leading-relaxed">
+                            Join us for a botanical celebration of our union in the Heart of the Royal Gardens.
+                        </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-white text-primary text-base font-bold shadow-xl hover:bg-petal-pink transition-colors">
+<span>Get Directions</span>
+</button>
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-base font-bold shadow-xl hover:bg-primary/90 transition-colors">
+<span>RSVP Today</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Countdown Section -->
+<section class="max-w-[960px] mx-auto px-4 py-12">
+<div class="flex flex-wrap justify-center gap-6 md:gap-12">
+<div class="flex flex-col items-center gap-2">
+<div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm border border-petal-pink">
+<p class="text-primary text-3xl font-black">124</p>
+</div>
+<p class="text-botanical-green text-xs font-bold uppercase tracking-widest">Days</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm border border-petal-pink">
+<p class="text-primary text-3xl font-black">10</p>
+</div>
+<p class="text-botanical-green text-xs font-bold uppercase tracking-widest">Hours</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm border border-petal-pink">
+<p class="text-primary text-3xl font-black">45</p>
+</div>
+<p class="text-botanical-green text-xs font-bold uppercase tracking-widest">Minutes</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm border border-petal-pink">
+<p class="text-primary text-3xl font-black">30</p>
+</div>
+<p class="text-botanical-green text-xs font-bold uppercase tracking-widest">Seconds</p>
+</div>
+</div>
+</section>
+<!-- Blooming Love Section -->
+<section class="py-24 px-4 bg-leafy-accent/30 relative overflow-hidden" id="story">
+<div class="absolute top-0 right-0 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[300px]">filter_vintage</span>
+</div>
+<div class="max-w-5xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-primary text-4xl md:text-5xl font-black tracking-tight mb-4">Blooming Love</h2>
+<div class="h-1 w-24 bg-primary mx-auto rounded-full opacity-20"></div>
+<p class="mt-4 text-[#636f88] font-medium">The chapters of our garden romance</p>
+</div>
+<div class="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-primary/20 before:to-transparent">
+<!-- Event 1 -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-petal-pink text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+<span class="material-symbols-outlined text-sm">spa</span>
+</div>
+<div class="w-[calc(100%-4rem)] md:w-[45%] p-6 rounded-2xl bg-white border border-petal-pink shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-1">
+<div class="font-bold text-primary">The First Seed</div>
+<time class="text-xs font-bold text-botanical-green bg-botanical-green/10 px-2 py-0.5 rounded">SPRING 2020</time>
+</div>
+<div class="text-[#636f88]">We first crossed paths amidst the blooming cherry blossoms. A simple coffee turned into a three-hour stroll through the park.</div>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-petal-pink text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+<span class="material-symbols-outlined text-sm">eco</span>
+</div>
+<div class="w-[calc(100%-4rem)] md:w-[45%] p-6 rounded-2xl bg-white border border-petal-pink shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-1">
+<div class="font-bold text-primary">Nurturing Our Bond</div>
+<time class="text-xs font-bold text-botanical-green bg-botanical-green/10 px-2 py-0.5 rounded">SUMMER 2021</time>
+</div>
+<div class="text-[#636f88]">Our first road trip to the mountain botanical reserves. We realized then that our roots were growing deep and strong together.</div>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-petal-pink text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+<span class="material-symbols-outlined text-sm">local_florist</span>
+</div>
+<div class="w-[calc(100%-4rem)] md:w-[45%] p-6 rounded-2xl bg-white border border-petal-pink shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-1">
+<div class="font-bold text-primary">In Full Bloom</div>
+<time class="text-xs font-bold text-botanical-green bg-botanical-green/10 px-2 py-0.5 rounded">AUTUMN 2023</time>
+</div>
+<div class="text-[#636f88]">Under a canopy of golden leaves, he asked the question. The garden was our witness as we promised forever.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Floral Memories Gallery -->
+<section class="py-24 px-4 bg-white" id="gallery">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div>
+<h2 class="text-[#111318] text-4xl font-black tracking-tight mb-2">Floral Memories</h2>
+<p class="text-[#636f88] text-lg">Captured moments of our favorite days</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-bold hover:underline">
+                            View All Photos <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="col-span-2 row-span-2 overflow-hidden rounded-3xl group">
+<img alt="Gallery 1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Happy couple walking through a greenhouse filled with flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO3OY1ULWdOI8WTE79o3-IWTRd-Mj3iT6Baoz34Md6eGYlIDFotEHGFBzfY_b8sHioy1rQyAtPC-XI2zbxNjSobwla0AQWvBQjaF9lzKVNt79t8pNMoSoskBTUTSLtLpO_rrIp0KdHjrs8bRN1Uj3D6l131gxviojk-VNSXRycssjgIaW8dRKrmBsq0QsnAEqQxiDG1wVxtd_EgBXu5I-S-PHTg6SDKh9JGKItThHGjwekyOd1SMxKN6gMeOnCGLF589OPNlb6LNMx"/>
+</div>
+<div class="overflow-hidden rounded-3xl group h-64">
+<img alt="Gallery 2" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Close up of a bride's bouquet with pink peonies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjWBPXJyhDps4KLMAUmDpu8Y1chpYI7L4EkiTSu_sc2nfwUgSaiarQpvRuEMj9cZkHuayRu15lr9lVt3PJGY4C1TEqIlcHuJo6rvDFrpA_byjBTPLxJHQ1Lp8U77mAXNwfMD3Jzjn-Rl9oxwElFUJKghPKYIRlwx47tXbqyxBPDkG2tbKXyJzBx1v_zYkIeNXH5zenxMwBcHtdV_w4M5V-Z0h6Kt6S15nvHIruMpFjg6W5Wyl-eUtnhXJrMdDuXlfthhk_pT9ez-_0"/>
+</div>
+<div class="overflow-hidden rounded-3xl group h-64">
+<img alt="Gallery 3" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Engagement ring resting on a green leaf" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvI54wtyZrismXpubolHr7vw4VmdsCC-cDakXAmP_qrdjQyoBPjuA2BIwj-KLeFrL5FG-txVZZT4cRKlTAI0JtP4eDPTMDitsA3QXFmRWNbPme8COyOS22RBmgFK6Cv1rVvCaoAvWFw99rr56ap-Qu5xnvFs5SSacPntYy9So_QC27C95McxozX588Rce1_l1P-kQAaLP0lrYDe0O3Rnp0I6_mW6SoDmOACFe38-Ou8YfQ_RbHslbO8O_ztXGG1UYKQrwjRoN6WSm0"/>
+</div>
+<div class="col-span-2 overflow-hidden rounded-3xl group h-80">
+<img alt="Gallery 4" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Sunset at a garden wedding venue with string lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnS_dr5pFSflY4QinwiRnZyTSMqmr_aCq8F0NdKCUcifs9q7rE0YdmrgnnC1-O3xGW_WUbD7_JZVWcb24D8wEsk1F4m_BUCVC8IDC9mcAUX8WBOKEjN9AmIefQ3OhF4FHB3eXvZ8fsrg7kiyKTJcgz5EVyXqJXTHV5BemVKO3Xx4J6lasmg9kwQjn_w_MgKLD_6BgT_Dgo60BrOM4Ee9xLWNxylHdvB7MUca2qYjWQgfT110NJLCUn--ZHQXAeNxu1n3PtItby6Bm3"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall / Guestbook -->
+<section class="py-24 px-4 bg-background-light" id="guestbook">
+<div class="max-w-5xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-primary text-4xl font-black tracking-tight mb-4">Wishes Wall</h2>
+<p class="text-[#636f88] max-w-xl mx-auto">Leave your blessing for the happy couple. Your words are the most beautiful flowers in our garden.</p>
+<button class="mt-8 flex mx-auto items-center gap-2 bg-primary text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all">
+<span class="material-symbols-outlined">edit_note</span> Write a Message
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Guest Card 1 -->
+<div class="p-6 bg-white rounded-2xl border border-petal-pink shadow-sm relative overflow-hidden">
+<div class="absolute -top-4 -right-4 text-petal-pink/40">
+<span class="material-symbols-outlined text-6xl">format_quote</span>
+</div>
+<p class="text-[#111318] font-medium leading-relaxed italic mb-4">"May your love grow more beautiful with every passing year, just like a well-tended garden. So happy for both of you!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-botanical-green/10 flex items-center justify-center text-botanical-green font-bold">EM</div>
+<div>
+<p class="text-sm font-bold">The Miller Family</p>
+<p class="text-xs text-[#636f88]">March 12, 2024</p>
+</div>
+</div>
+</div>
+<!-- Guest Card 2 -->
+<div class="p-6 bg-white rounded-2xl border border-petal-pink shadow-sm relative overflow-hidden">
+<div class="absolute -top-4 -right-4 text-petal-pink/40">
+<span class="material-symbols-outlined text-6xl">format_quote</span>
+</div>
+<p class="text-[#111318] font-medium leading-relaxed italic mb-4">"Cheers to the most beautiful couple in the most beautiful garden! Can't wait to celebrate with you guys."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">JS</div>
+<div>
+<p class="text-sm font-bold">Jessica &amp; Sam</p>
+<p class="text-xs text-[#636f88]">March 15, 2024</p>
+</div>
+</div>
+</div>
+<!-- Guest Card 3 -->
+<div class="p-6 bg-white rounded-2xl border border-petal-pink shadow-sm relative overflow-hidden">
+<div class="absolute -top-4 -right-4 text-petal-pink/40">
+<span class="material-symbols-outlined text-6xl">format_quote</span>
+</div>
+<p class="text-[#111318] font-medium leading-relaxed italic mb-4">"What a stunning theme! Wishing you both a lifetime of happiness, laughter, and blooming joy."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-petal-pink flex items-center justify-center text-[#111318] font-bold">AL</div>
+<div>
+<p class="text-sm font-bold">Aunt Linda</p>
+<p class="text-xs text-[#636f88]">April 01, 2024</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Section -->
+<footer class="bg-white border-t border-petal-pink py-16 px-4">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 justify-between">
+<div class="max-w-sm">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-3xl text-primary">local_florist</span>
+<h2 class="text-primary text-xl font-extrabold tracking-tight">WeddingWeb</h2>
+</div>
+<p class="text-[#636f88] leading-relaxed mb-6">
+                        Celebrating the growth of love in the beauty of nature. We look forward to seeing you at the Royal Gardens this June.
+                    </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-petal-pink flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-petal-pink flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-8">
+<div>
+<h4 class="font-bold mb-4">Wedding Info</h4>
+<ul class="space-y-2 text-sm text-[#636f88]">
+<li><a class="hover:text-primary" href="#">Schedule</a></li>
+<li><a class="hover:text-primary" href="#">Travel &amp; Stay</a></li>
+<li><a class="hover:text-primary" href="#">Wedding Party</a></li>
+<li><a class="hover:text-primary" href="#">FAQs</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-4">Quick Links</h4>
+<ul class="space-y-2 text-sm text-[#636f88]">
+<li><a class="hover:text-primary" href="#story">Our Story</a></li>
+<li><a class="hover:text-primary" href="#gallery">Gallery</a></li>
+<li><a class="hover:text-primary" href="#guestbook">Guestbook</a></li>
+<li><a class="hover:text-primary" href="#">RSVP</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-4">Details</h4>
+<p class="text-sm text-[#636f88] leading-snug">
+                            Royal Botanical Gardens<br/>
+                            123 Heritage Lane<br/>
+                            London, UK
+                        </p>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-petal-pink text-center text-xs text-[#636f88] font-medium tracking-widest uppercase">
+                © 2024 WeddingWeb. Designed with Love for a Blooming Future.
+            </div>
+</footer>
+</div>
+</div>
+</body></html>

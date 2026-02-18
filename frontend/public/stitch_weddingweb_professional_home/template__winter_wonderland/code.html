@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                        "ice-blue": "#f0f4fa",
+                        "silver": "#d1d5db",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .frosted-glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .silver-gradient {
+            background: linear-gradient(145deg, #f9fafb, #e5e7eb);
+        }
+    </style>
+</head>
+<body class="bg-background-light text-[#111318] selection:bg-primary/20">
+<div class="relative flex min-h-screen flex-col">
+<!-- Navigation -->
+<header class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
+<nav class="max-w-7xl mx-auto frosted-glass rounded-xl px-8 py-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">ac_unit</span>
+<span class="text-xl font-extrabold tracking-tight text-[#111318]">W&amp;M</span>
+</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#story">Our Story</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#details">Details</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#gallery">Gallery</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#wishes">Wishes</a>
+</div>
+<button class="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm tracking-wide hover:bg-primary/90 transition-all shadow-md">
+                    RSVP
+                </button>
+</nav>
+</header>
+<!-- Hero Section -->
+<section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Winter Landscape" class="w-full h-full object-cover" data-alt="Snow covered pine trees in a mountain landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJWovfVv30oKvdM3bA8UvN4ganViSELuvw5bTcX6ReQJyp5rafS-QECl7CjFWSvB5Q_ZzYJlH59fDW7qHZfRsomyI8-S-qA4KKgCjlXUmRpRVHuVkBikc0lXTi3blFaq-s32-ZNL-tD84Ypj3NRW_mR3c0J50z4bgza0mYJ1OfBkYZi-ee5NkwobGBed64wGqDL9sGFbVEuje_yo07ypU7gPnWK5py6XMJ7_z4AJzSQJRCnIsBrAMa8DLjBF7F5S2E45Tfuqr0MiMt"/>
+<div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/80"></div>
+</div>
+<div class="relative z-10 text-center px-4">
+<p class="text-white text-lg font-medium tracking-[0.4em] uppercase mb-4 drop-shadow-md">The Wedding of</p>
+<h1 class="text-white text-6xl md:text-8xl font-black mb-6 tracking-tighter drop-shadow-xl">
+                    William <span class="text-ice-blue">&amp;</span> Madeline
+                </h1>
+<div class="h-[1px] w-24 bg-white/50 mx-auto mb-6"></div>
+<p class="text-white text-xl md:text-2xl font-light mb-10 tracking-wide drop-shadow-md">
+                    {{WeddingDate}} • Aspen, Colorado
+                </p>
+<button class="bg-white/20 backdrop-blur-md border border-white/40 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-primary transition-all duration-300">
+                    Join the Celebration
+                </button>
+</div>
+<!-- Scroll Indicator -->
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-white animate-bounce">
+<span class="material-symbols-outlined text-4xl">expand_more</span>
+</div>
+</section>
+<!-- Countdown Section -->
+<section class="bg-white py-16 px-6">
+<div class="max-w-4xl mx-auto">
+<h3 class="text-center text-primary font-bold tracking-[0.2em] uppercase mb-12">Counting down to the big day</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="flex flex-col items-center bg-ice-blue p-8 rounded-xl border border-primary/10">
+<span class="text-4xl md:text-5xl font-black text-primary mb-2">142</span>
+<span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Days</span>
+</div>
+<div class="flex flex-col items-center bg-ice-blue p-8 rounded-xl border border-primary/10">
+<span class="text-4xl md:text-5xl font-black text-primary mb-2">08</span>
+<span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Hours</span>
+</div>
+<div class="flex flex-col items-center bg-ice-blue p-8 rounded-xl border border-primary/10">
+<span class="text-4xl md:text-5xl font-black text-primary mb-2">45</span>
+<span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Minutes</span>
+</div>
+<div class="flex flex-col items-center bg-ice-blue p-8 rounded-xl border border-primary/10">
+<span class="text-4xl md:text-5xl font-black text-primary mb-2">12</span>
+<span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Seconds</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Our Story -->
+<section class="py-24 bg-background-light" id="story">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-2 gap-16 items-center">
+<div class="relative">
+<div class="absolute -top-4 -left-4 w-full h-full border-2 border-primary/20 rounded-xl"></div>
+<img alt="Couple Story" class="relative z-10 rounded-xl shadow-2xl w-full aspect-[4/5] object-cover" data-alt="Happy couple walking through a snowy forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCemM1tDrDn_XHEOLH0u72k9T6Rd4jmIBAmhDi6CaZUrQpdUIBEA_ivnEx3_Ym2fMeqtGtrzlIXF9XR2GsnrsABG7Ss3ZFfAuryQbzN6h31VX9puFb1KwPDP1e_O_ZdaU0LpwRntYDqhNmokKyy6ITRNEp0iZRJM0VppkgTFV3vP3fSJSuB3SPRqQ8HQwDBLEE7oeyjnzYJdUmHO5ORqSUvxMZvDv0Nrjr3EcwdYmC1pY7bg4uS2K4D3UY298Mz387J6VhxjxKA4fTD"/>
+</div>
+<div>
+<h2 class="text-4xl font-black text-[#111318] mb-8 tracking-tight">How it all began...</h2>
+<div class="space-y-6 text-gray-600 leading-relaxed text-lg font-light">
+<p>It was a snowy evening in Chicago when we first met at a small coffee shop. The scent of pine and cinnamon was in the air, and as the flakes began to fall outside, we realized we had found something truly special.</p>
+<p>Four years later, under the dancing lights of the Aurora Borealis in Iceland, William asked the question that would change our lives forever. It was only fitting that we return to the magic of winter for our wedding day.</p>
+<p>We can't wait to share this icy wonderland with our closest family and friends, surrounded by the warmth of love and flickering candlelight.</p>
+</div>
+<div class="mt-10 flex gap-4">
+<div class="size-12 rounded-full border border-primary flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<div>
+<h4 class="font-bold text-[#111318]">The Proposal</h4>
+<p class="text-sm text-gray-500 italic">Reykjavik, Winter 2023</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Event Details -->
+<section class="py-24 bg-white" id="details">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-black text-[#111318] mb-4">Event Details</h2>
+<p class="text-gray-500 tracking-widest uppercase text-sm font-bold">The Magic Unfolds</p>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<!-- Ceremony -->
+<div class="silver-gradient p-1 rounded-xl shadow-sm">
+<div class="bg-white p-10 rounded-[calc(0.75rem-1px)] h-full">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">church</span>
+<h3 class="text-2xl font-bold mb-4">The Ceremony</h3>
+<p class="text-gray-600 mb-6 font-light">Join us as we exchange vows in a candlelit sanctuary filled with white roses and frosted greenery.</p>
+<div class="space-y-3 mb-8">
+<div class="flex items-center gap-3 text-gray-700">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>4:30 PM, {{WeddingDate}}</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>The Alpine Chapel, Aspen</span>
+</div>
+</div>
+<button class="w-full py-3 rounded-lg border border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all">
+                                View Map
+                            </button>
+</div>
+</div>
+<!-- Reception -->
+<div class="silver-gradient p-1 rounded-xl shadow-sm">
+<div class="bg-white p-10 rounded-[calc(0.75rem-1px)] h-full">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">celebration</span>
+<h3 class="text-2xl font-bold mb-4">The Reception</h3>
+<p class="text-gray-600 mb-6 font-light">Dinner, dancing, and drinks in the Grand Ballroom. Attire: Black Tie Optional - Winter Formal.</p>
+<div class="space-y-3 mb-8">
+<div class="flex items-center gap-3 text-gray-700">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>{{EventTime}} - Midnight</span>
+</div>
+<div class="flex items-center gap-3 text-gray-700">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>Starlight Resort &amp; Spa</span>
+</div>
+</div>
+<button class="w-full py-3 rounded-lg border border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all">
+                                View Map
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Section -->
+<section class="py-24 bg-ice-blue" id="gallery">
+<div class="max-w-7xl mx-auto px-6 text-center">
+<h2 class="text-4xl font-black text-[#111318] mb-12">Winter Inspiration</h2>
+<div id="wedding-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-4>
+<div id="wedding-gallery" class="space-y-4">
+<img class="rounded-xl w-full h-64 object-cover shadow-md" data-alt="Indoor wedding ceremony with hundreds of candles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3aWOqCzNExHxR1IzgpSyt_nUeSiwX8AohHyxSVdhWmSxqMByUuNYHMpthXlNowP1skzKo-G4R0clGVG-F3-d2LE7kqwhscKNewe3s--FW2hMX-xiLYyrGRq63Wv5QlFnO3jTUHD2IiRqQYm2LCpsrCeoQAbMuvTm95IItRyrn9jv5AdLGUdSh0gWQ-bwLHIydXUtFhlMZmPey1YuK1vJHNLfkbES3quMPxHVhRRhv8d-ydRw6sEanonLNraPNEeI4beznEZNc_Alu"/>
+<img class="rounded-xl w-full h-80 object-cover shadow-md" data-alt="Elegant white rose winter floral arrangement" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAzkZCF2a4z49rzXzz7pCSEBD05N-4mFaTKw_8U5xUJY39g4-5HZZiKHbuaEwPKYeJ0hOSIcg4PuyjjSO9Y74ZUpHEYIJsVbCAUD-qy0fk4bA5XepfWAyYXPGWSschTU30OAzn6EFuHTwsI-tBtO3PhEPcSGBbZ3x0wG2JmIZBLPAtY4gpSW_-FUa0lDcreNBzTIK4S9xK7G5DrXdS1FTauUC1u-nBOdW1vQ4Y6fV3DnxZubQ3el-tagJ2TMEkCyc7NDyqc-Sr9ykD"/>
+</div>
+<div class="space-y-4">
+<img class="rounded-xl w-full h-80 object-cover shadow-md" data-alt="Close up of a sparkling diamond wedding ring on ice" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD61A0tPxGXgRNj-pbOvs94UXtwxpuRM3h2-vs2xqJYcDg2Xsp7W1JnjQfEfWej-39ofzYbR0jdZEg6lY9NgeetRR7hIuUjm8urO7QFHlEmNow03tJ8jW7mBZhnTB0IGDlm2uFrqv1AC217fo54-vGKT7zwoPvVXkCYJXmThCfXzVMcSetw4iKLY2nXJ33wLgcGqF12X7Uww1MRWI_Cg6J02_0GSz7uvi_bluePPtkYk7yrnOzUL2UkJGmGvAM57vAKK-Wrzloc3FaS"/>
+<img class="rounded-xl w-full h-64 object-cover shadow-md" data-alt="Cozy winter reception table setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPzyrhaZNYbUy0PkgNKtwAqSetlpGCKqHJiTsGFkK5iTiadV1o6xWOH_Azjcyyo89JBAHQ3REkd8CfK2cz_31UH7tJo5GeonXaa9rIfcCYdHKGc1On5ZHteGtR17FGErWarwy2mciy-8mWBHG9_naOdMBzTC77WeOVlBYvifIO_7LWunYZU2YAyRkPNVNGCJ32BxD4SuDK_NbajHReAbe2G-XblM0MHQVR_IYLuDM8a7RGvbTYGCYW4cWb1Mb3B-1puqkMKFYd6PX1"/>
+</div>
+<div class="space-y-4">
+<img class="rounded-xl w-full h-64 object-cover shadow-md" data-alt="Outdoor snowy wedding aisle with pine branches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEmBXTXJBVYeBsgrK735TYflMasSq81Xi9AYNOWPgXQyDSOBgJaIrgrTQCHh0uvEwrCklkw2Fh-JNqJiY3HjwRovRbFV67dajK6sO69WHWPM2OK9rUfQnm7KqXgYL98odhFnt8TAg0tbBxH4F7sYgc1_n3ytGZXA485VC6Vekk_oPikOQ-nYvn9c_UAsYOuHUbt9_zCZv5_zsMQ1pKOkG6syH-ACMtxyukqkLdGAWkPLKWvXDQaD5cYSHwWhfkdhVC_afzY5cEEe8L"/>
+<img class="rounded-xl w-full h-80 object-cover shadow-md" data-alt="Tall silver candelabra centerpieces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXUv2oyIvTtBVylzaE3AntmHYZa2QdJ1Zvoef4dAWkwF7ZuQU3rC9RrfT5ITAFIHD13WG5OwJpA-4lsGaMe_QX8DFVwcpIom8gIqb0YZ2NOPbnaOYR8tv5kNCGpVTtJWODoZ-0qv8Mf8Eja5sqAFCftfoBnE7EcJs_q6ZRxubBnhWsIgCCXIAh8x3bKC4g0mkkvnMMm8vddmGQERDDGTQx7ghe6cN_wvHRXuG_IKguWv2xyFDgeZ8Qrz_GzNWiBv8mhwyKg8mGBFlZ"/>
+</div>
+<div class="space-y-4">
+<img class="rounded-xl w-full h-80 object-cover shadow-md" data-alt="Couples hands holding hot chocolate in the snow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk045z_cuvhUpYNymTlE7_lDpNf2mnYDA1N4qIB1PsiEkwF9igDXQz1fMVqC_Z9-1TfMjAuO0B_mX0O13_PCh-iLk6tWPDYleT6IFwC8wcEETp2w7X06Ikla40XsKoiL3YCoR_LhjFA_jW9AtbvnGCcTaaFu4VO-aqPCa97jO-Vdod5yXK-DeoLPcQQ42YLHHh-8H03S6RHA5c2DsAVke2EoWZ2gy3qVUiEtgLq_Z8Bfm4sd5KYq_3g1ZYxPU4yNivBtUX6x37BUyo"/>
+<img class="rounded-xl w-full h-64 object-cover shadow-md" data-alt="Elegant silver and blue wedding invitations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBliCaSX48uKKBsSk_Xu_IkX1Z80dNTq-yUyUmVSVL3-v4daPHHzjrLXKA2MJPommoPUV2cWhG4z0pKg77AqmETVae3zq_USBW7RYWsxiS7Dfjj4gLmdZUw08ZdmPgwUINOdiYAJCB07KdMrpV_aPGqx88T5EbYTC0zgsZrGnkZSUnTkUVa_5RAnHg2mYcNQbvG8p3Dw_1d2vtXTCbuAOOAw6JcjBNcXJZqlngCN37gm_DpSQVcrSumlfyS4iiIWuyQYS7UL8ws04yP"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall Section -->
+<section class="py-24 bg-white" id="wishes">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-black text-[#111318] mb-4">Wishes Wall</h2>
+<p class="text-gray-500 tracking-widest uppercase text-sm font-bold">Warm Wishes for the Cold Season</p>
+</div>
+<div class="grid md:grid-cols-3 gap-6 mb-12">
+<!-- Wish Card 1 -->
+<div class="frosted-glass p-8 rounded-xl border-silver shadow-sm flex flex-col justify-between">
+<p class="text-gray-700 italic font-light mb-6">"So happy for both of you! May your life together be as magical as this winter wonderland you've created. Sending so much love from London!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">SM</div>
+<span class="font-bold text-sm">Sarah Mitchell</span>
+</div>
+</div>
+<!-- Wish Card 2 -->
+<div class="frosted-glass p-8 rounded-xl border-silver shadow-sm flex flex-col justify-between">
+<p class="text-gray-700 italic font-light mb-6">"Counting down the days! This is going to be the most beautiful wedding ever. We're bringing our warmest coats and hearts!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">JD</div>
+<span class="font-bold text-sm">The Davis Family</span>
+</div>
+</div>
+<!-- Wish Card 3 -->
+<div class="frosted-glass p-8 rounded-xl border-silver shadow-sm flex flex-col justify-between">
+<p class="text-gray-700 italic font-light mb-6">"William &amp; Madeline, you were made for each other. Can't wait to celebrate under the stars in Aspen. Wishing you a lifetime of joy."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">RK</div>
+<span class="font-bold text-sm">Robert King</span>
+</div>
+</div>
+</div>
+<!-- Add Wish Form -->
+<div class="max-w-2xl mx-auto bg-ice-blue p-8 rounded-2xl border border-primary/5">
+<h4 class="text-xl font-bold mb-6 text-center">Leave your wish for the couple</h4>
+<form class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<input class="w-full bg-white border-none rounded-lg focus:ring-2 focus:ring-primary/20 p-3" placeholder="Your Name" type="text"/>
+<input class="w-full bg-white border-none rounded-lg focus:ring-2 focus:ring-primary/20 p-3" placeholder="Location (Optional)" type="text"/>
+</div>
+<textarea class="w-full bg-white border-none rounded-lg focus:ring-2 focus:ring-primary/20 p-3" placeholder="Your Message..." rows="4"></textarea>
+<button class="w-full bg-primary text-white py-4 rounded-lg font-bold tracking-wide hover:bg-primary/90 transition-all">
+                            Post Wish
+                        </button>
+</form>
+</div>
+</div>
+</section>
+<!-- RSVP Form Section -->
+<section class="py-24 bg-background-light">
+<div class="max-w-3xl mx-auto px-6 text-center">
+<div class="size-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+<span class="material-symbols-outlined text-3xl">mail</span>
+</div>
+<h2 class="text-4xl font-black text-[#111318] mb-4">Will You Join Us?</h2>
+<p class="text-gray-600 mb-10 text-lg">Please kindly respond by {{WeddingDate}}</p>
+<form class="bg-white p-10 rounded-2xl shadow-xl text-left space-y-6">
+<div class="grid md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-2">Guest Full Name</label>
+<input class="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary" placeholder="Enter your name" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-2">Number of Guests</label>
+<select class="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary">
+<option>1 Guest</option>
+<option>2 Guests</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-2">Meal Preference</label>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+<label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-ice-blue transition-colors">
+<input class="text-primary" name="meal" type="radio"/>
+<span class="text-sm">Glazed Duck</span>
+</label>
+<label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-ice-blue transition-colors">
+<input class="text-primary" name="meal" type="radio"/>
+<span class="text-sm">Arctic Char</span>
+</label>
+<label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-ice-blue transition-colors">
+<input class="text-primary" name="meal" type="radio"/>
+<span class="text-sm">Winter Risotto</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-2">Any Dietary Restrictions?</label>
+<textarea class="w-full border-gray-200 rounded-lg focus:ring-primary focus:border-primary" placeholder="Let us know..." rows="2"></textarea>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all" type="submit">
+                        Confirm Attendance
+                    </button>
+</form>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-white py-12 border-t border-silver/30">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">ac_unit</span>
+<span class="text-xl font-black">W&amp;M</span>
+</div>
+<div class="text-gray-500 text-sm font-medium">
+                    © 2024 William &amp; Madeline. All Rights Reserved.
+                </div>
+<div class="flex gap-6">
+<a class="text-gray-400 hover:text-primary transition-colors" href="#">Instagram</a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#">Wedding Registry</a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+</div>
+<div class="mt-8 text-center">
+<p class="text-[10px] uppercase tracking-[0.4em] text-gray-300">Handcrafted with love for a winter dream</p>
+</div>
+</footer>
+</div>
+
+    <!-- WeddingWeb Watermark -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
+        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            WeddingWeb AI
+        </div>
+    </div>
+    
+</body></html>

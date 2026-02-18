@@ -2,6 +2,7 @@
 import React from 'react';
 import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink, Camera, Image as ImageIcon, Upload, X, Play, Pause, Volume2, Music, ChevronUp, ChevronDown, Search as SearchIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ProfessionalStitchV2 from '@/components/ProfessionalStitchV2';
 import CountdownTimer from '@/components/premium/CountdownTimer';
 import { Button } from "@/components/ui/button";
 import { EditableText } from '@/components/ui/editable-text';
@@ -48,6 +49,8 @@ interface WeddingTemplateProps {
     showSearchDialog?: boolean;
     setShowSearchDialog?: (show: boolean) => void;
     slug?: string;
+    onWishSubmit?: (name: string, message: string) => Promise<void>;
+    wishes?: any[];
 }
 
 export const WeddingTemplate = ({
@@ -67,7 +70,9 @@ export const WeddingTemplate = ({
     onSearchPhotos,
     showSearchDialog,
     setShowSearchDialog,
-    slug
+    slug,
+    onWishSubmit,
+    wishes = []
 }: WeddingTemplateProps) => {
 
     const themeClass = getThemeStyles(weddingData.theme);
@@ -151,6 +156,9 @@ export const WeddingTemplate = ({
                     >
                         <SectionControls sectionId="hero" />
                         {(() => {
+                            if (config?.layout === 'professional-stitch-v2') {
+                                return <ProfessionalStitchV2 weddingData={weddingData} timeline={timeline} photos={photos} />;
+                            }
                             switch (config?.layout) {
                                 case 'minimal-split':
                                     return (
@@ -191,7 +199,6 @@ export const WeddingTemplate = ({
                                                             <CountdownTimer
                                                                 targetDate={weddingData.weddingDate}
                                                                 targetTime={weddingData.weddingTime}
-                                                                theme={weddingData.theme}
                                                             />
                                                         </div>
                                                     </div>
@@ -346,8 +353,8 @@ export const WeddingTemplate = ({
                             }
                         })()}
 
-                        {/* Shared Countdown (if enabled) - Visible for all except split which has its own */}
-                        {weddingData.showCountdown && config?.layout !== 'minimal-split' && (
+                        {/* Shared Countdown (if enabled) - Visible for all except split and stitched which have their own (or will) */}
+                        {weddingData.showCountdown && config?.layout !== 'minimal-split' && config?.layout !== 'professional-stitch-v2' && (
                             <div className="pt-12 animate-fade-in-up pb-12 w-full z-20">
                                 <EditableText
                                     initialValue={customizations.countdownLabel || "Counting Down To Our Day"}
@@ -360,7 +367,6 @@ export const WeddingTemplate = ({
                                     <CountdownTimer
                                         targetDate={weddingData.weddingDate}
                                         targetTime={weddingData.weddingTime}
-                                        theme={weddingData.theme}
                                     />
                                 </div>
                             </div>
@@ -596,7 +602,10 @@ export const WeddingTemplate = ({
 
             {/* Dynamic Sections */}
             <AnimatePresence mode="popLayout">
-                {sectionOrder.map((sectionId: string) => renderSection(sectionId))}
+                {config?.layout === 'professional-stitch-v2'
+                    ? renderSection('hero')
+                    : sectionOrder.map((sectionId: string) => renderSection(sectionId))
+                }
             </AnimatePresence>
 
             {/* Upload Dialog */}
@@ -639,22 +648,25 @@ export const WeddingTemplate = ({
                     )}
                 </DialogContent>
             </Dialog>
-            {/* Footer */}
-            <footer className="py-12 bg-slate-900 text-slate-400 text-center">
-                <div className="max-w-4xl mx-auto px-8">
-                    <Heart className="w-8 h-8 text-rose-500 mx-auto mb-4" />
-                    <p className="text-xl font-serif text-white mb-2">
-                        {weddingData.groomName} & {weddingData.brideName}
-                    </p>
-                    <EditableText
-                        initialValue={customizations.footerMessage || "Thank you for being part of our story."}
-                        onSave={(val) => onUpdateCustomization('footerMessage', val)}
-                        isEditing={isEditing}
-                        className="mb-6 block"
-                        tag="p"
-                    />
-                </div>
-            </footer>
+
+            {/* Footer - Only show if not using a stitched template (which has its own footer) */}
+            {config?.layout !== 'professional-stitch-v2' && (
+                <footer className="py-12 bg-slate-900 text-slate-400 text-center">
+                    <div className="max-w-4xl mx-auto px-8">
+                        <Heart className="w-8 h-8 text-rose-500 mx-auto mb-4" />
+                        <p className="text-xl font-serif text-white mb-2">
+                            {weddingData.groomName} & {weddingData.brideName}
+                        </p>
+                        <EditableText
+                            initialValue={customizations.footerMessage || "Thank you for being part of our story."}
+                            onSave={(val) => onUpdateCustomization('footerMessage', val)}
+                            isEditing={isEditing}
+                            className="mb-6 block"
+                            tag="p"
+                        />
+                    </div>
+                </footer>
+            )}
         </div>
     );
 };

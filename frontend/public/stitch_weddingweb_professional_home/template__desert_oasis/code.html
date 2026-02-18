@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Desert Oasis | WeddingWeb</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "terracotta": "#C06C4D",
+                        "sand": "#F5E6CA",
+                        "sunset": "#FF9E64",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>body {
+    font-family: "Manrope", sans-serif
+    }
+.material-symbols-outlined {
+    vertical-align: middle
+    }
+.bg-grain {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDXpuo43a7wGQqv46X06HU5XVdCmCyimTeQw81hdH_KMeYbzGHa3U9Rw-vSNQoujzDUAmN8tWuwIvu8Ae3LtAK1bM93idPJIGVJ6RYprZiE_2OGYZRDs3TcbhJ_3zUAfkKsNZU6qZTHpXo7-gu_wu1wfmWD4F3RZ2J_sX6ygH1E_us9SDoggDPwpZ9m07FfnomYMInLxsxa4_wk_PrDCejfTxSaGaRJlvpMpSWkhMnWJc42ah1ZukGkJSIYMocrN-vC1IvwSxF_-KKe)
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] selection:bg-primary/30">
+<div class="relative flex h-auto min-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-white/80 backdrop-blur-md px-6 md:px-20 py-3">
+<div class="flex items-center gap-3 text-[#111318]">
+<div class="size-6 text-terracotta">
+<span class="material-symbols-outlined text-3xl">wb_sunny</span>
+</div>
+<h2 class="text-[#111318] text-xl font-extrabold leading-tight tracking-[-0.015em]">WeddingWeb</h2>
+</div>
+<div class="hidden lg:flex flex-1 justify-center gap-10">
+<a class="text-[#111318] text-sm font-semibold hover:text-terracotta transition-colors" href="#journey">Our Journey</a>
+<a class="text-[#111318] text-sm font-semibold hover:text-terracotta transition-colors" href="#gallery">Sunset Gallery</a>
+<a class="text-[#111318] text-sm font-semibold hover:text-terracotta transition-colors" href="#wishes">Wishes Wall</a>
+<a class="text-[#111318] text-sm font-semibold hover:text-terracotta transition-colors" href="#rsvp">RSVP</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span>Join Our Adventure</span>
+</button>
+</div>
+</header>
+<main class="flex flex-col pt-16">
+<!-- Hero Section -->
+<section class="relative h-[90vh] w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Breathtaking golden hour desert landscape with rolling dunes" style='background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(192, 108, 77, 0.4)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAROkacQ33easUUhXBYjqgLA7qAyml4D4nurZvzC-Bf_60pJbOhuhvZNlUluil-e12-vbrIZkZm-aOjmxibN202MvDtL-zsttq6kyyzJes8vbFnPFQFRB3fXEDsMTyd8rnn2SKNXtGw-E1Ouc0mIyCv7IWSIAYba4H_VL0auZXSDFigTqyqApUEWHSxH_SNnOJPACC8q7Ncehot5ZjGceUX7YhihkxBMzaY5DWVCDqwzOVr-nPMXKh1sNWOrMwv8ArpY_ElvfS1e9CH");'></div>
+<div class="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
+<span class="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-sand/90">The Union of Sarah &amp; Julian</span>
+<h1 class="max-w-4xl text-5xl font-black leading-tight tracking-tight md:text-7xl lg:text-8xl">
+                        A Desert Oasis <br/> <span class="text-sunset">Love Story</span>
+</h1>
+<p class="mt-6 max-w-2xl text-lg font-medium text-white/90 md:text-xl">
+                        In the heart of the dunes, our forever begins. Join us under the terracotta sunset in Joshua Tree.
+                    </p>
+<div class="mt-10 flex flex-col gap-4 sm:flex-row">
+<button class="rounded-lg bg-terracotta px-8 py-4 text-lg font-bold text-white shadow-xl hover:bg-terracotta/90 transition-all">Save the Date: 12.04.24</button>
+<button class="rounded-lg bg-white/20 px-8 py-4 text-lg font-bold text-white backdrop-blur-sm hover:bg-white/30 transition-all border border-white/30">View Registry</button>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+<span class="material-symbols-outlined text-white text-3xl">keyboard_double_arrow_down</span>
+</div>
+</section>
+<!-- Narrative Timeline Section -->
+<section class="bg-sand/30 py-24 px-6 md:px-20 lg:px-40 bg-grain" id="journey">
+<div class="mx-auto max-w-5xl">
+<div class="mb-16 text-center">
+<h2 class="text-4xl font-black tracking-tight text-[#111318] md:text-5xl">Our Journey Through The Dunes</h2>
+<div class="mx-auto mt-4 h-1.5 w-24 rounded-full bg-terracotta"></div>
+</div>
+<div class="relative grid grid-cols-1 gap-12 md:grid-cols-2">
+<!-- Path Line (Desktop) -->
+<div class="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-terracotta/20 md:block"></div>
+<!-- Milestone 1 -->
+<div class="relative flex flex-col gap-4 md:text-right">
+<div class="flex items-center gap-4 md:flex-row-reverse">
+<div class="flex size-12 items-center justify-center rounded-full bg-terracotta text-white shadow-lg">
+<span class="material-symbols-outlined">cannabis</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-terracotta">The First Horizon</h3>
+<p class="text-sm font-bold text-[#636f88]">SPRING 2021</p>
+</div>
+</div>
+<p class="text-base leading-relaxed text-[#111318]/80">Our paths first crossed in the arid beauty of Arizona. A chance meeting at a desert photography workshop turned into a three-hour conversation under the stars.</p>
+</div>
+<div class="hidden md:block"></div>
+<!-- Milestone 2 -->
+<div class="hidden md:block"></div>
+<div class="relative flex flex-col gap-4">
+<div class="flex items-center gap-4">
+<div class="flex size-12 items-center justify-center rounded-full bg-sunset text-white shadow-lg">
+<span class="material-symbols-outlined">explore</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-terracotta">Wandering Together</h3>
+<p class="text-sm font-bold text-[#636f88]">SUMMER 2022</p>
+</div>
+</div>
+<p class="text-base leading-relaxed text-[#111318]/80">From road trips across Utah's salt flats to hiking the canyons, every mile brought us closer. We learned that home isn't a place, but a person.</p>
+</div>
+<!-- Milestone 3 -->
+<div class="relative flex flex-col gap-4 md:text-right">
+<div class="flex items-center gap-4 md:flex-row-reverse">
+<div class="flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg">
+<span class="material-symbols-outlined">diamond</span>
+</div>
+<div>
+<h3 class="text-xl font-bold text-terracotta">The Oasis Proposal</h3>
+<p class="text-sm font-bold text-[#636f88]">AUTUMN 2023</p>
+</div>
+</div>
+<p class="text-base leading-relaxed text-[#111318]/80">Julian popped the question at a hidden palm oasis in the Mojave. With sand in our shoes and joy in our hearts, Sarah said yes as the sun dipped below the peaks.</p>
+</div>
+<div class="hidden md:block"></div>
+</div>
+</div>
+</section>
+<!-- Gallery Section -->
+<section class="py-24 px-6 md:px-20" id="gallery">
+<div class="mb-16 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
+<div class="text-center md:text-left">
+<h2 class="text-4xl font-black text-[#111318] md:text-5xl">Sunset Moments</h2>
+<p class="mt-2 text-[#636f88]">Captured memories from our engagement in the wild.</p>
+</div>
+<button class="flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 text-primary font-bold hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">photo_library</span>
+                        View Full Gallery
+                    </button>
+</div>
+<div id="wedding-gallery" class="grid grid-cols-2 gap-4 md:grid-cols-4 md:grid-rows-2 h-[800px]>
+<div id="wedding-gallery" class="col-span-2 row-span-2 overflow-hidden rounded-xl" data-gallery-item="true">
+<img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" data-alt="Couple walking hand in hand over sand dunes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUd1d3DiBhJEespWBFMP8DJ8QTuTPAsrokIKAfwG_slnglb1X4ndzfq4L5L_rDj-cTNlRYJ90Vy6_574KUYGxmT-E43XXXQiqaXZkhZ255Z_IVCnGu7S3FomXVdVUEW2lGiIKUMoHyRjU_lR_mS9BGiH-Sw_I9PSVD2V3uq57pNstTklxemtuRqFzjavx12RCjDLpFe0AcXv2_dh4esYxTuMit3AQuLB2hT1JFuYC84hP9TbeqZt2u-z5R3XFRxqiFBcaAJ658qcPV"/>
+</div>
+<div class="overflow-hidden rounded-xl">
+<img class="h-full w-full object-cover transition-transform duration-500 hover:scale-110" data-alt="Close up of engagement ring against desert sand" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLQSvq7PtGc1X3a1Hd0Q1oCB-iX-_DR7O7clWXfSh4p_Pmn_fdZDMsn-ZklI1oWe92kv6A04vYyN2X7U_mvpo5k96AizjPQG25fPaqPPEyXqED7pB8c5jXb0A0QAH5XK2WAsercI0iuT1mT55-VlAvdEDBmdgx9CJni3NgZF1b8r4YDH_REVA1fajxrShc4DByv3KJmOuXO-7jp6SXUK7RYpha-0qvf2MjtC6dPnbUtB137OWcMacZSECThk5Ox4AhDqwcYgl3T_q7"/>
+</div>
+<div class="overflow-hidden rounded-xl">
+<img class="h-full w-full object-cover transition-transform duration-500 hover:scale-110" data-alt="A lone palm tree in the desert at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7SKx7ER3dLkrpHRRPN04oSu-jqpjs1kyqnIqK8rUd2C6NAcSol3-Ddu7sN9GDS5d4DVmcnAUslr21qoyLyd9WFS9_TAX1PaeO0CXJuHTGMj30H-l7_5nA3iSUH8yZnxBQrC78GXGaivR70xUJ6UkCBxvfMI2lZk_PxVya8Vf4H1-CNN6LOifbRu7CyGRW7FJu4NBm32MM-N75Jp4R9dNRyvAufUjQ7ND24T7GFpTDFqvCNpJ16IfkdvpdQjgkkM5X-mtiPqATuW5c"/>
+</div>
+<div class="col-span-2 overflow-hidden rounded-xl">
+<img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" data-alt="Couple sitting on the edge of a canyon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl98EsmSdvB9eDyr8rEbTAH47BdXhHrfHGBXZoAT4LOFoYvcAro1WSFY918cCic7gt5q_E4JV7pY1aIiYibqb2uxbNF5qjbgMh0RitV2TTaoF_gNBlR9DFHj_p60b9x7zOYLPbYYJfT65C0yM-7NZLLdJPwijwMchkZajYx45-U3nK9BJQtrrcvR0fP3p4PDDkYYI8usRrnUp_-nWaqvgCNlnZnwo55Yf3lHUOeNjMdyDtHslfSkgc6WWueUiyUuujTgvRyah2AkbG"/>
+</div>
+</div>
+</section>
+<!-- Wishes Wall Section -->
+<section class="bg-terracotta py-24 px-6 md:px-20 lg:px-40 text-white" id="wishes">
+<div class="mx-auto max-w-6xl">
+<div class="mb-16 grid grid-cols-1 gap-12 lg:grid-cols-3">
+<div class="lg:col-span-1">
+<h2 class="text-4xl font-black tracking-tight md:text-5xl">Wishes Wall</h2>
+<p class="mt-6 text-lg text-white/80">
+                                Your presence is our greatest gift, but your words are what we'll cherish forever. Leave a note for the happy couple.
+                            </p>
+<form class="mt-10 space-y-4">
+<div>
+<label class="block text-sm font-bold uppercase tracking-wider text-sand">Your Name</label>
+<input class="mt-2 w-full rounded-lg border-none bg-white/10 p-3 text-white placeholder-white/50 focus:ring-2 focus:ring-sunset" placeholder="{{GroomName}} Rivera" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-bold uppercase tracking-wider text-sand">Your Message</label>
+<textarea class="mt-2 w-full rounded-lg border-none bg-white/10 p-3 text-white placeholder-white/50 focus:ring-2 focus:ring-sunset" placeholder="May your love be as vast as the desert sky..." rows="4"></textarea>
+</div>
+<button class="w-full rounded-lg bg-sunset py-3 font-bold text-white shadow-lg hover:bg-sunset/90 transition-all" type="button">Post My Wish</button>
+</form>
+</div>
+<div class="lg:col-span-2">
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+<!-- Wish Card 1 -->
+<div class="rounded-xl bg-white p-6 shadow-xl">
+<span class="material-symbols-outlined text-terracotta mb-4">format_quote</span>
+<p class="text-base italic text-[#111318]">"So incredibly happy for you both! Can't wait to celebrate under the desert stars. You two are the perfect match."</p>
+<div class="mt-6 flex items-center gap-3">
+<div class="size-10 rounded-full bg-sand/50" data-alt="Guest profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC1vYRHHWhW4mpYfaU54RJN-GITcbjrpgTpmZWigJyWU6dy31wazZrpnKi6DvFFuAHxVCJFADwIFqnXfOYsAkhIYN9e0LyLWOilZMM4lpi1GDoXIxYfRRPxoA_dCPVo6sI6WKZHUh8h2Ca6ZQXlEIJAudTPmLXekdDqHD7m8Wapxvltp1AUREMOEFW9BR1sFYrGDetg9gLQIN_M5zFJoeB3ZIfi3sDAbARJT9S1NzhDkXO5xZ_TBsECkaob_m7TXRllir9qubybQAJt'); background-size: cover;"></div>
+<div class="text-sm">
+<p class="font-bold text-[#111318]">The Miller Family</p>
+<p class="text-[#636f88]">2 days ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 2 -->
+<div class="rounded-xl bg-white p-6 shadow-xl">
+<span class="material-symbols-outlined text-terracotta mb-4">format_quote</span>
+<p class="text-base italic text-[#111318]">"Wishing you a lifetime of adventures. May your love grow deeper with every sunrise."</p>
+<div class="mt-6 flex items-center gap-3">
+<div class="size-10 rounded-full bg-sand/50" data-alt="Guest profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLcQxhPT3EzUQG_iLDwsr2TS_2YIb6ITF_v4z14zb6-dvOpPLTeCWyYdHg-wr6u1a_R46kRICMW2BVC5KAcvJxASPK3g3g2FpDORLfbvKpNGJFR7YvFedBTZetzJKqQkpNwqbbw06DbHl5wOMutT63HQQoxNdZuaTTevBhnSK2nGHhbtogW7onB8Ez91hCC__gxyzpGTlfqS6XhHHj9dKVWUNsHhjdbdEPtRusulxbsljP9ARzmZO9g6H4M5ZPA95AQC6cZQwpTYpt'); background-size: cover;"></div>
+<div class="text-sm">
+<p class="font-bold text-[#111318]">Sarah Johnson</p>
+<p class="text-[#636f88]">5 hours ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 3 -->
+<div class="rounded-xl bg-white p-6 shadow-xl sm:col-span-2">
+<span class="material-symbols-outlined text-terracotta mb-4">format_quote</span>
+<p class="text-base italic text-[#111318]">"To the most beautiful couple. This desert theme is SO you. Julian, thanks for making our Sarah so happy. We love you guys!"</p>
+<div class="mt-6 flex items-center gap-3">
+<div class="size-10 rounded-full bg-sand/50" data-alt="Guest profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCoMl5-jURWiRn9UJq9TG8jN9UqZhQBWJcl3sj4zb2Jdfx6tTB0Y50nCk7wlWsWIt7Kb0UPbuX3ERtN2Y2cb14pepB_4IYb1Ef6neWKyqmh6UcWoPkIXUhxsmW8pmYgpYMc5XcX243IZV-rsWbD9bnmiHS9u1HBDMhBk2W5Cyr5JvfaUYvzArjwzdB6B-HHYdZeOBX5L9aE_fHA2-lR7s1kmqnsssNaBoVaGFjMJOzwHAcOB6ZC4KE3o02GJ7Le8z1F9lU-1zppgFkf'); background-size: cover;"></div>
+<div class="text-sm">
+<p class="font-bold text-[#111318]">The Henderson Siblings</p>
+<p class="text-[#636f88]">Yesterday</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Location Section -->
+<section class="py-24 px-6 md:px-20 bg-background-light" id="rsvp">
+<div class="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col md:flex-row">
+<div class="p-10 md:w-1/2 flex flex-col justify-center">
+<h2 class="text-3xl font-black text-[#111318]">The Oasis Celebration</h2>
+<div class="mt-8 space-y-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-terracotta">calendar_today</span>
+<div>
+<p class="font-bold">{{WeddingDate}}</p>
+<p class="text-[#636f88]">Ceremony starts at 4:30 PM</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-terracotta">location_on</span>
+<div>
+<p class="font-bold">Mirage Estate, Joshua Tree</p>
+<p class="text-[#636f88]">54800 Desert View Dr, California</p>
+</div>
+</div>
+</div>
+<button class="mt-10 w-fit rounded-lg bg-primary px-10 py-4 text-lg font-bold text-white shadow-lg hover:shadow-primary/40 transition-all">
+                            RSVP Online Now
+                        </button>
+</div>
+<div class="h-80 md:h-auto md:w-1/2 bg-gray-200">
+<div class="h-full w-full bg-cover bg-center grayscale contrast-125" data-alt="Map area of desert location" data-location="Joshua Tree, California" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDuRTkPlwbm-XI64Tn8QYzvQS4fWdp7BTB-57RnXJCWnlF0wN1uL92UcUVNgaJ59WIF7UzLPXIpyyzmKxjQw7Cw8zpsaL8ot0JrjWSGxZcc7nzRvcTWdKqxfbtJoWj8-dH7XyvWi4SDbq1w--2nyrt6sBKDhRtv5DLK7THBogLG9NcAn5W2DKff5TNrjMJ0LPuA_RxfUETOo8DmsAaLKl_HtgP_ZvkcKMFkJAsvrnXHZSqzdKFQVaBCTJCABfmgbyGveWtuoeo2upBM');"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#111318] py-16 px-6 text-center text-white/50">
+<div class="mx-auto max-w-xl">
+<div class="flex items-center justify-center gap-3 text-white mb-6">
+<span class="material-symbols-outlined text-2xl text-terracotta">wb_sunny</span>
+<h2 class="text-2xl font-extrabold tracking-tight">WeddingWeb</h2>
+</div>
+<p class="text-sm">#SarahAndJulian2024 • Our Forever Oasis</p>
+<div class="mt-8 flex justify-center gap-6">
+<a class="hover:text-sunset transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="hover:text-sunset transition-colors" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="hover:text-sunset transition-colors" href="#"><span class="material-symbols-outlined">camera_enhance</span></a>
+</div>
+<div class="mt-12 text-xs border-t border-white/5 pt-8">
+                    © 2024 WeddingWeb Premium Templates. All rights reserved.
+                </div>
+</div>
+</footer>
+</div>
+
+    <!-- WeddingWeb Watermark -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
+        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            WeddingWeb AI
+        </div>
+    </div>
+    
+</body></html>

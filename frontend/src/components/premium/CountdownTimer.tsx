@@ -1,26 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { themeConfigs } from '@/lib/themeConfig';
 
 interface CountdownTimerProps {
     targetDate: string; // YYYY-MM-DD
     targetTime?: string; // HH:mm
-    theme?: string;
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, targetTime = '10:00', theme = 'Minimalist' }) => {
+const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, targetTime = '10:00' }) => {
     const [timeLeft, setTimeLeft] = useState<{ days: number, hours: number, minutes: number, seconds: number } | null>(null);
 
-    // Get theme-specific colors from shared config
-    const getThemeColors = () => {
-        const config = themeConfigs[theme];
-        if (config?.timer) {
-            return config.timer;
-        }
-        // Fallback default
-        return { container: 'bg-gray-100 border-gray-200', text: 'text-gray-900', subtext: 'text-gray-500' };
-    };
-
-    const colors = getThemeColors();
+    // Default colors now that themes are removed
+    const colors = { container: 'bg-gray-100 border-gray-200', text: 'text-gray-900', subtext: 'text-gray-500' };
 
     useEffect(() => {
         const calculateTimeLeft = () => {

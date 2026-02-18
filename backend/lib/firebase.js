@@ -9,7 +9,7 @@ const admin = require('firebase-admin');
 
 // Firebase configuration - Use environment variables or fallback to defaults
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJO3Bvdevh792Gh8A9Uj8",
+  apiKey: process.env.FIREBASE_API_KEY || "AIzaSyB8BGBnEsJhDRhJ03Bvdevh792Gh8A9Uj8",
   authDomain: process.env.FIREBASE_AUTH_DOMAIN || "kishore-75492.firebaseapp.com",
   projectId: process.env.FIREBASE_PROJECT_ID || "kishore-75492",
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "kishore-75492.firebasestorage.app",
@@ -33,11 +33,21 @@ try {
     const fs = require('fs');
 
     // Try to find the service account key file
+    const envPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
     const possiblePaths = [
+      path.join(__dirname, '..', 'service-account.json'),
       path.join(__dirname, '..', 'weddingweb-9421e-firebase-adminsdk-fbsvc-184b677d23 (2).json'),
       path.join(__dirname, '..', 'firebase-service-account.json'),
       path.join(__dirname, '..', 'serviceAccountKey.json')
     ];
+
+    if (envPath) {
+      if (path.isAbsolute(envPath)) {
+        possiblePaths.unshift(envPath);
+      } else {
+        possiblePaths.unshift(path.join(__dirname, '..', envPath));
+      }
+    }
 
     let credential;
     let foundServiceAccount = false;

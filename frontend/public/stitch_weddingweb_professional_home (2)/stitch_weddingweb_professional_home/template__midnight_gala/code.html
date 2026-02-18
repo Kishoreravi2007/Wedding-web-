@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Midnight Gala | Julian &amp; Elena</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "gold": "#D4AF37",
+                        "midnight": "#0a1128",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .gold-accent {
+            color: #D4AF37;
+        }
+        .border-gold {
+            border-color: #D4AF37;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-midnight dark:text-white">
+<!-- Sticky Navigation -->
+<header class="fixed top-0 w-full z-50 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-primary/10 px-6 lg:px-20 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">flare</span>
+<h2 class="text-xl font-extrabold tracking-tighter uppercase italic">Midnight Gala</h2>
+</div>
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#venue">The Venue</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#schedule">Schedule</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#gallery">Gallery</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
+</nav>
+<button class="bg-primary hover:bg-midnight text-white px-6 py-2.5 rounded-lg text-sm font-bold tracking-wider transition-all shadow-lg shadow-primary/20 uppercase">
+                RSVP
+            </button>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden pt-20">
+<div class="absolute inset-0 bg-cover bg-center z-0" data-alt="A glittering city skyline at night from a high-rise balcony" style="background-image: linear-gradient(rgba(10, 17, 40, 0.7), rgba(10, 17, 40, 0.5)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmImbXsouFM1Go7FboFIY_fDmG4xW2-HfAN2Wy17zzK18nYapq3svYZjCLW88tGTRmSScu2t1YrNNsXfa3MA84rEyVQWjEmRm7AFOoUT97Z9HhRLDv1PXgHXfgF0uuBIVktm9AEcNctJYklIrHiswvEApL1DB9y-JHQs0O8Dy6sv7CeTcmzQOWFrf1Wx5x-WG_OIOfCNVBFgqvpnOKZlwi1ZQbNh9eD_xH-VQe7wVXqb1_cSYkZdnw__j9FR1kkDwcfE5TAjyCsap8');"></div>
+<div class="relative z-10 text-center px-4">
+<p class="text-gold uppercase tracking-[0.5em] font-light mb-6 text-sm lg:text-base">We Request the Honor of Your Presence</p>
+<h1 class="text-white text-6xl md:text-8xl font-extrabold mb-8 tracking-tighter italic">Julian &amp; Elena</h1>
+<div class="h-px w-24 bg-gold mx-auto mb-8"></div>
+<p class="text-white/90 text-lg md:text-xl font-medium tracking-wide mb-10 max-w-2xl mx-auto uppercase">
+                October 12th, 2024 • The Grand Plaza Ballroom • Black Tie
+            </p>
+<button class="bg-white text-midnight hover:bg-gold hover:text-white px-10 py-4 rounded-lg font-bold transition-all transform hover:scale-105 shadow-2xl">
+                SAVE THE DATE
+            </button>
+</div>
+</section>
+<!-- The Venue -->
+<section class="py-24 px-6 lg:px-20 bg-white dark:bg-background-dark" id="venue">
+<div class="max-w-7xl mx-auto">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="order-2 lg:order-1">
+<div class="aspect-[4/5] bg-cover bg-center rounded-xl shadow-2xl border-8 border-background-light" data-alt="Grand luxury ballroom with gold chandeliers and white flowers" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA9bbIoAFVDs3LcOz3kStviZfwY_TspYt2PCoqHW1fHiZX3gNWpFESvd7JHajtbGq9J7kJrce5pMxpMwOmynsIqoN3NBxTD9NtZTRfPVgiWjGA9gOF4CIdXYNRu8D_Ycrqtob8ivyPzT9MdoFGGyVAPQ1EQ2dY2oV0CW_YhYdUMnQcG6DGKZMch6I-HaVfEbHgOe3XeDiiHGJqu5YtyO3mEqM8oLYaE3PU9YbftNd2tjZurwvtkqY0-O_ixZUr8-aI9F2I-idwN_F80');"></div>
+</div>
+<div class="order-1 lg:order-2 space-y-8">
+<span class="text-primary font-bold tracking-widest uppercase text-sm">The Experience</span>
+<h2 class="text-5xl font-black text-midnight dark:text-white leading-tight">A Venue Steeped in Elegance</h2>
+<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                        Join us at the historic Plaza Heights, where the city skyline meets the grandeur of a bygone era. Our celebration takes place in the Grand Ballroom, featuring soaring ceilings and panoramic views of the midnight harbor.
+                    </p>
+<div class="grid grid-cols-2 gap-6 pt-4">
+<div class="p-6 bg-background-light dark:bg-midnight/30 rounded-xl border-l-4 border-gold">
+<span class="material-symbols-outlined text-gold mb-2">directions_car</span>
+<h4 class="font-bold text-midnight dark:text-white">Valet Parking</h4>
+<p class="text-sm text-slate-500">Complimentary at main entrance</p>
+</div>
+<div class="p-6 bg-background-light dark:bg-midnight/30 rounded-xl border-l-4 border-gold">
+<span class="material-symbols-outlined text-gold mb-2">hotel</span>
+<h4 class="font-bold text-midnight dark:text-white">Stay Over</h4>
+<p class="text-sm text-slate-500">Reserved room blocks available</p>
+</div>
+</div>
+<button class="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all uppercase tracking-widest text-sm">
+                        View Map Location <span class="material-symbols-outlined">arrow_right_alt</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Schedule -->
+<section class="py-24 bg-midnight text-white relative overflow-hidden" id="schedule">
+<div class="absolute top-0 right-0 w-1/3 h-full bg-primary/10 blur-3xl rounded-full translate-x-1/2"></div>
+<div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+<h2 class="text-4xl font-black mb-16 uppercase italic tracking-tighter">The Evening's Progression</h2>
+<div class="space-y-12 text-left">
+<div class="flex gap-8 items-start group">
+<div class="text-right min-w-[100px] pt-1">
+<span class="text-gold font-bold text-xl block">19:00</span>
+<span class="text-xs text-white/40 uppercase tracking-widest">Arrival</span>
+</div>
+<div class="relative pt-1 flex flex-col items-center">
+<div class="size-4 rounded-full bg-gold border-4 border-white group-hover:scale-125 transition-transform"></div>
+<div class="w-0.5 h-24 bg-white/10 mt-2"></div>
+</div>
+<div>
+<h3 class="text-2xl font-bold mb-2">Champagne Welcome</h3>
+<p class="text-white/60">Reception at the Sky Terrace featuring chilled vintage reserves and live harpist accompaniment.</p>
+</div>
+</div>
+<div class="flex gap-8 items-start group">
+<div class="text-right min-w-[100px] pt-1">
+<span class="text-gold font-bold text-xl block">20:00</span>
+<span class="text-xs text-white/40 uppercase tracking-widest">Entry</span>
+</div>
+<div class="relative pt-1 flex flex-col items-center">
+<div class="size-4 rounded-full bg-white border-4 border-gold group-hover:scale-125 transition-transform"></div>
+<div class="w-0.5 h-24 bg-white/10 mt-2"></div>
+</div>
+<div>
+<h3 class="text-2xl font-bold mb-2">The Grand Entrance</h3>
+<p class="text-white/60">Procession into the Grand Ballroom for the exchange of vows under the midnight dome.</p>
+</div>
+</div>
+<div class="flex gap-8 items-start group">
+<div class="text-right min-w-[100px] pt-1">
+<span class="text-gold font-bold text-xl block">21:00</span>
+<span class="text-xs text-white/40 uppercase tracking-widest">Dining</span>
+</div>
+<div class="relative pt-1 flex flex-col items-center">
+<div class="size-4 rounded-full bg-gold border-4 border-white group-hover:scale-125 transition-transform"></div>
+<div class="w-0.5 h-24 bg-white/10 mt-2"></div>
+</div>
+<div>
+<h3 class="text-2xl font-bold mb-2">Midnight Banquet</h3>
+<p class="text-white/60">A curated five-course seasonal experience paired with world-class sommelier selections.</p>
+</div>
+</div>
+<div class="flex gap-8 items-start group">
+<div class="text-right min-w-[100px] pt-1">
+<span class="text-gold font-bold text-xl block">23:00</span>
+<span class="text-xs text-white/40 uppercase tracking-widest">Party</span>
+</div>
+<div class="relative pt-1 flex flex-col items-center">
+<div class="size-4 rounded-full bg-white border-4 border-gold group-hover:scale-125 transition-transform"></div>
+</div>
+<div>
+<h3 class="text-2xl font-bold mb-2">Dancing Under the Moon</h3>
+<p class="text-white/60">Late night jazz ensemble followed by a contemporary set until the early hours.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery -->
+<section class="py-24 px-6 lg:px-20 bg-background-light dark:bg-background-dark" id="gallery">
+<div class="max-w-7xl mx-auto text-center mb-16">
+<h2 class="text-4xl font-black text-midnight dark:text-white uppercase tracking-tighter">Capturing The Magic</h2>
+<p class="text-slate-500 mt-4">A look into our journey leading to this midnight celebration</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-7xl mx-auto h-[600px]">
+<div class="col-span-2 row-span-2 bg-cover bg-center rounded-xl shadow-lg border-2 border-white dark:border-midnight overflow-hidden group" data-alt="Couple in formal evening attire dancing on a city roof" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBO4k1vtErtqGqtvSpJQZxecYfT2WG3bNVp50O_P7_zkGlXgGOaQaUICMFLByJRSBhGtj1MuRtmLPsJ6X7jCvslxgtaQ-M-sSAzm50frWBiSoAGK8fq2llqZNg7uEi1Ii_YH8l0jeMahRv94eExTx5-lFqEhN84sZLwcRQXjXk1f1oStkTXoU5ck4asvvNTGSb_XWNmlqJTwXjPgqFw-L6JcyufkzFO6dzyuuUzxTzHJyGHq-tBRrFuWvUJ9MxwF4RTrkBUboHNV7Qd');">
+<div class="inset-0 bg-primary/20 group-hover:bg-primary/0 transition-all"></div>
+</div>
+<div class="bg-cover bg-center rounded-xl shadow-lg border-2 border-white dark:border-midnight overflow-hidden" data-alt="Elegant dining table setting with gold cutlery and navy napkins" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBHWu-Z7zcDY-gZUuKstDkeO8iry8DuOGgWMgQQpSXs0ivlQjNIHja_PRtoFEadkwQp9I57Q95SgUMIYAvWfO3RjbbKeS26AIA4aeXdPPr_hPy5zhok4BZfWOb8ERfDY_vAHITTUE1jvKKo999-j9R3ZdvAqnctrU-oOhC0UReHLiibq54VSGN8kKC6oj07M3I5tvJseZNzMYjIYJ1W8l5h_6VGlGyokl4JSIBkLXao9W58LLn-CiZcWpY5cEwLoNsG_qWc3lrmxjbJ');"></div>
+<div class="bg-cover bg-center rounded-xl shadow-lg border-2 border-white dark:border-midnight overflow-hidden" data-alt="Close up of black tie invitations with gold wax seal" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBPM2HKdZbNYA7QeWturaPjtITdx8C7Bd4jWBemqsQBqV3jy9EzuA-TL0bEiQYHhMWk1Bmt6eUbPl3TiD4jm0_wChSB6fbnXkranSzHfIluo-qjlAT5riOGcVCj8JjM_kD6qheLXb1nbZWSQOEWpX0mjHH1pValfG8PjgzbwHFtC5rQwqo7USL7Puv9GExCdteHqXGiCHss6EKscC1ru3UsMiMi5QAQgHempiS946xbbBc9FEnjpQiKf1HZdc4s_JTKtpKv2069NwmT');"></div>
+<div class="col-span-2 bg-cover bg-center rounded-xl shadow-lg border-2 border-white dark:border-midnight overflow-hidden" data-alt="A jazz band playing instruments in a dimly lit ballroom" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAXsz_Vmwm-B89pPUoVwGSHFVkJfZMgqa9u5VGl1c20sJWeeOBSmnAvWD-rgjrkHSQuK6VqUrkT2SJwPlcOm7NLTUQNYiJ2fLITPwAX5USddWJGUhpxW9017jsCQIZdBtEVjSgvNUUcw8am5uEzp3X7nIdhCKGDWUozvqMQp3Ryn2fMC05WJCf5kdkL49v4VzwaHXDw7lxUeV71v8-kPeKUA4YoHIX_0uqrU-GXYLnwVSE2AtkUd8J4zqm09JleWDUiBoCrGsQ2BlTp');"></div>
+</div>
+</section>
+<!-- Wishes Wall -->
+<section class="py-24 px-6 lg:px-20 bg-white dark:bg-background-dark" id="wishes">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+<div>
+<h2 class="text-4xl font-black text-midnight dark:text-white uppercase tracking-tighter">Wishes Wall</h2>
+<p class="text-slate-500 mt-2">Leave a digital note for the couple to cherish</p>
+</div>
+<button class="bg-midnight dark:bg-primary text-white px-8 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-gold transition-all">
+<span class="material-symbols-outlined">edit_note</span> Post a Wish
+                </button>
+</div>
+<div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+<div class="break-inside-avoid p-8 bg-background-light dark:bg-midnight/20 rounded-xl border border-gold/30 hover:shadow-xl transition-all group">
+<p class="text-lg italic text-midnight dark:text-white/90 mb-4 font-light">"Julian and Elena, may your marriage be as beautiful and enduring as the stars tonight. Wishing you a lifetime of happiness."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">MW</div>
+<div>
+<p class="font-bold text-sm">Marcus &amp; Wendy</p>
+<p class="text-xs text-slate-400">June 12, 2024</p>
+</div>
+</div>
+</div>
+<div class="break-inside-avoid p-8 bg-midnight text-white rounded-xl border-l-4 border-gold shadow-lg hover:shadow-primary/20 transition-all">
+<p class="text-lg italic mb-4 font-light">"The perfect couple in the perfect setting. We are so honored to share this midnight gala with you both!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-gold/30 flex items-center justify-center text-gold font-bold">S</div>
+<div>
+<p class="font-bold text-sm">Sophia Chen</p>
+<p class="text-xs text-white/40">June 14, 2024</p>
+</div>
+</div>
+</div>
+<div class="break-inside-avoid p-8 bg-background-light dark:bg-midnight/20 rounded-xl border border-gold/30 hover:shadow-xl transition-all">
+<p class="text-lg italic text-midnight dark:text-white/90 mb-4 font-light">"To Julian &amp; Elena, may the love you share today grow stronger with every passing year. Beautiful evening!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">JD</div>
+<div>
+<p class="font-bold text-sm">James Davenport</p>
+<p class="text-xs text-slate-400">June 15, 2024</p>
+</div>
+</div>
+</div>
+<div class="break-inside-avoid p-8 bg-background-light dark:bg-midnight/20 rounded-xl border border-gold/30 hover:shadow-xl transition-all">
+<p class="text-lg italic text-midnight dark:text-white/90 mb-4 font-light">"The gala is absolutely stunning. Julian, you're a lucky man! Elena, you look ethereal."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">AL</div>
+<div>
+<p class="font-bold text-sm">Arthur &amp; Lillian</p>
+<p class="text-xs text-slate-400">June 15, 2024</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Registry & RSVP Prompt -->
+<section class="py-24 bg-primary text-white text-center">
+<div class="max-w-3xl mx-auto px-6">
+<h2 class="text-4xl font-black mb-6 uppercase tracking-tighter">Will You Join Us?</h2>
+<p class="text-lg text-white/80 mb-10 leading-relaxed">
+                We hope to see you there under the city lights. Please let us know of your attendance by July 31st. 
+                Formal invitations to follow via post.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<button class="w-full sm:w-auto bg-midnight text-white px-10 py-4 rounded-lg font-bold hover:bg-white hover:text-midnight transition-all shadow-xl">
+                    SUBMIT RSVP
+                </button>
+<button class="w-full sm:w-auto bg-transparent border-2 border-white text-white px-10 py-4 rounded-lg font-bold hover:bg-white/10 transition-all">
+                    WEDDING REGISTRY
+                </button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="py-12 bg-background-light dark:bg-background-dark border-t border-primary/10">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">flare</span>
+<p class="font-extrabold uppercase tracking-tighter italic">Julian &amp; Elena</p>
+</div>
+<p class="text-sm text-slate-400">© 2024 Julian &amp; Elena. Made for the Midnight Gala.</p>
+<div class="flex gap-6">
+<a class="text-midnight dark:text-white hover:text-gold" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="text-midnight dark:text-white hover:text-gold" href="#"><span class="material-symbols-outlined">mail</span></a>
+</div>
+</div>
+</footer>
+</body></html>

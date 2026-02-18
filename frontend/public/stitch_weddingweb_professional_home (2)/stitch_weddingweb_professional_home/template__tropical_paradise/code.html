@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tropical Paradise | Our Wedding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                        "accent-teal": "#2dd4bf",
+                        "accent-green": "#22c55e",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .wishes-grid {
+            column-count: 1;
+        }
+        @media (min-width: 768px) { .wishes-grid { column-count: 2; } }
+        @media (min-width: 1024px) { .wishes-grid { column-count: 3; } }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318]">
+<!-- Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-primary/10">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">palm_logo</span>
+<h1 class="text-xl font-extrabold tracking-tight text-primary uppercase">ALOHA LOVE</h1>
+</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#ceremony">CEREMONY</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#logistics">LOGISTICS</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#gallery">GALLERY</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">WISHES WALL</a>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-primary/20">
+                RSVP
+            </button>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background-light"></div>
+<img alt="Wedding hero" class="w-full h-full object-cover" data-alt="Dreamy beach wedding ceremony with floral arch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBno76siXPi_k2Wcly1LFWiKGu23_67p2bWtbSBqv8WpmBDeKs-h2Bn4D9UAlWdAgxy_4dKD5L5J56t2LR7aXcI8ci3W3fWrtrEc1ONPsUf08Bah032yS6_EBPrpq36RMCUJfEUrE0Wv1G9czMcwBHygVEs0DTlEaS_5Z-UNI-_HkBu5ZR923lFwWl5XACZDFpAo3aOF0sstp4ZBy1HptXeX1qwkwPRQxKxdTXapl65OUBhDXpnsGFJ4qWIhMY7emVjwjnnX__YHnb"/>
+</div>
+<div class="relative z-10 text-center text-white px-4 max-w-4xl">
+<span class="inline-block px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-sm font-bold tracking-widest uppercase mb-6">Save the Date</span>
+<h1 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter">Our Tropical Paradise</h1>
+<p class="text-lg md:text-2xl font-light mb-10 opacity-90 leading-relaxed">Join us for a celebration of love under the palm trees <br class="hidden md:block"/> and turquoise waters of Maui.</p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-4">
+<button class="w-full md:w-auto bg-white text-primary px-10 py-4 rounded-xl font-black text-lg hover:scale-105 transition-transform">
+                    See the Details
+                </button>
+<button class="w-full md:w-auto bg-transparent border-2 border-white text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-white/10 transition-colors">
+                    Add to Calendar
+                </button>
+</div>
+</div>
+</header>
+<!-- Countdown Timer -->
+<section class="max-w-4xl mx-auto -mt-16 relative z-20 px-4">
+<div class="bg-white rounded-2xl shadow-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-4 border border-primary/5">
+<div class="flex flex-col items-center p-4 rounded-xl bg-primary/5">
+<span class="text-4xl font-black text-primary">124</span>
+<span class="text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">Days</span>
+</div>
+<div class="flex flex-col items-center p-4 rounded-xl bg-primary/5">
+<span class="text-4xl font-black text-primary">08</span>
+<span class="text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">Hours</span>
+</div>
+<div class="flex flex-col items-center p-4 rounded-xl bg-primary/5">
+<span class="text-4xl font-black text-primary">45</span>
+<span class="text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">Minutes</span>
+</div>
+<div class="flex flex-col items-center p-4 rounded-xl bg-primary/5">
+<span class="text-4xl font-black text-primary">12</span>
+<span class="text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">Seconds</span>
+</div>
+</div>
+</section>
+<!-- Journey Timeline -->
+<section class="max-w-5xl mx-auto py-24 px-6" id="ceremony">
+<div class="text-center mb-16">
+<span class="text-accent-teal font-black tracking-widest uppercase text-sm">Schedule</span>
+<h2 class="text-4xl font-black text-[#111318] mt-2">The Wedding Journey</h2>
+</div>
+<div class="space-y-12">
+<!-- Item 1 -->
+<div class="flex gap-8 group">
+<div class="flex flex-col items-center">
+<div class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">local_bar</span>
+</div>
+<div class="w-px h-full bg-primary/20 mt-4"></div>
+</div>
+<div class="pb-12 border-b border-primary/10 flex-1">
+<span class="text-primary font-bold text-sm">Friday, 6:00 PM</span>
+<h3 class="text-2xl font-extrabold mt-1">Welcome Cocktails</h3>
+<p class="text-[#636f88] mt-2 leading-relaxed">Meet us at the Sunset Deck for island-inspired drinks and light bites to kick off the weekend.</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex gap-8 group">
+<div class="flex flex-col items-center">
+<div class="size-14 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal group-hover:bg-accent-teal group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">beach_access</span>
+</div>
+<div class="w-px h-full bg-primary/20 mt-4"></div>
+</div>
+<div class="pb-12 border-b border-primary/10 flex-1">
+<span class="text-accent-teal font-bold text-sm">Saturday, 4:30 PM</span>
+<h3 class="text-2xl font-extrabold mt-1">The Beach Ceremony</h3>
+<p class="text-[#636f88] mt-2 leading-relaxed">Exchange of vows at North Shore beach. Please note: we'll be in the sand!</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex gap-8 group">
+<div class="flex flex-col items-center">
+<div class="size-14 rounded-full bg-accent-green/10 flex items-center justify-center text-accent-green group-hover:bg-accent-green group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">celebration</span>
+</div>
+</div>
+<div class="flex-1">
+<span class="text-accent-green font-bold text-sm">Saturday, 6:00 PM</span>
+<h3 class="text-2xl font-extrabold mt-1">Reception &amp; Dancing</h3>
+<p class="text-[#636f88] mt-2 leading-relaxed">Dinner followed by dancing under the stars in the Palm Ballroom.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Logistics -->
+<section class="bg-primary/5 py-24" id="logistics">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid lg:grid-cols-2 gap-12 items-center">
+<div class="rounded-3xl overflow-hidden shadow-2xl aspect-video lg:aspect-square relative">
+<div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
+<img alt="Tropical Map" class="w-full h-full object-cover" data-alt="Aerial view of a luxury tropical resort on Maui coast" data-location="Maui, Hawaii" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-3tZxPcDwUyrzkcSxVi5tnLzORZz__B-YF8ZFaCUwDaLpgv0x4XAMnoofjCbsj4fo3JtSty7XdEFelj8yiR-_a87byEu7Zob074As_pY18XV9EsH5j74PuD5s5Pblc78MwWCUP_1OSz_RGwRLo7XnPIDunuP7risAOJduWV3J4aE06CovdvOkfN7CWZaM7kBXQiuDN5SCWSMXbdhw63RsSbwdSlfKXIOdWlgX1Xr9LPjQC7J2OwyT8823HVJMVBCEYBMVInNdz4VV"/>
+</div>
+<div class="space-y-8">
+<div>
+<span class="text-primary font-black uppercase tracking-widest text-sm">Travel Info</span>
+<h2 class="text-4xl font-black mt-2">Where to Stay &amp; How to Get Here</h2>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">hotel</span>
+<div>
+<h4 class="font-bold text-lg">The Azure Resort</h4>
+<p class="text-[#636f88] text-sm">Primary wedding hotel with group rates available. Mention "Tropical Paradise Wedding" when booking.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">flight_takeoff</span>
+<div>
+<h4 class="font-bold text-lg">Arrival Terminal</h4>
+<p class="text-[#636f88] text-sm">Kahului Airport (OGG) is the main hub. Complimentary shuttle service provided for Azure guests.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">checkroom</span>
+<div>
+<h4 class="font-bold text-lg">Dress Code: Island Chic</h4>
+<p class="text-[#636f88] text-sm">Think linen suits, floral midi dresses, and comfortable footwear suitable for beach terrain.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Photo Gallery -->
+<section class="py-24 px-6" id="gallery">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-12">
+<div>
+<span class="text-primary font-black uppercase tracking-widest text-sm">Gallery</span>
+<h2 class="text-4xl font-black mt-2">Venue Preview</h2>
+</div>
+<button class="hidden md:block text-primary font-bold hover:underline">View All Photos →</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:h-[600px]">
+<div class="col-span-2 row-span-2 overflow-hidden rounded-2xl">
+<img alt="Beach" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Wide shot of a crystal clear turquoise ocean beach" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4AcbhaX7JtEvZSD1WbDLrFWXiZfmcWH84yBcWl4c26M5iCDuUvA0ZYDp1PMe06l9ymPDq-0gyM_TCKK_rZ7LvG39xhLUyN0zEu0N_1LZ45drHUVeO8S9F2RuBWqz3glEN3XmHX-lpQgVXukpr-SVAVtGMWe8K9OjbQAdTDgr3gFeYWw08F7iGcojct_Wsopp1DqmxHG1dJQMG47tYlBaU2Hl72q02iNb5OaiMNWyWzvcadFZh7ZNRAvc_c7Kqi6P1SnC7em7Eiazu"/>
+</div>
+<div class="overflow-hidden rounded-2xl">
+<img alt="Palm" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Lush green palm leaves against blue sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSRU2dpQLm5sGIKzwyJZLmgUDYDdf2q5M6IPLfGampiMy_aclXlwOQm7pkoRNYtf1S-CEXRkssH47zdEFaWkzBISxNuF7dgiuEVD1Ohtdbn4h0aG0Cti1v8xVneKrfG81ihJNqKyO4ESPePf7slz3aWcrywI5ugbU8tMEJw8MDDvQ462CvSY-oefuSLR6sUr4IJv7StAJ1e2xEI5Bf0Lp0OvoXk-B6-B6rjZSp3cfVfFev__zpCA04k83AxmA-wnXu7Xf3wXiDLRYE"/>
+</div>
+<div class="overflow-hidden rounded-2xl">
+<img alt="Floral" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Exotic tropical pink and orange hibiscus flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpWPOC6eyTOWcjCHNKUgixd0aTtfwCOSujXP3g6MOMxJpEYxD8WAp0Vgi688qGaht7d9Io9V7Bz5K4u2nBlCc2V7mJrbenNPH34P2lDTcdeEZ4vINYM08NENhaQUk44VC90hyZg-FJ_8NwUCw8T7ZWe3sK7Z72-1I3mXbCrEoSi3s1m_ZAQxYYKTpUolc4WDf41NNRveKB6zB4rSPKtkGWSWzsOIxGQW4sv3SeO5NUd3aYxdLF0Ad5AYPlpqmKldBFNiSCzESvgaeC"/>
+</div>
+<div class="col-span-2 overflow-hidden rounded-2xl">
+<img alt="Resort" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Luxury resort infinity pool overlooking the ocean" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD37vcjSFY_o0SXYESRVTNDeyFjkuKZNAjFANPwBxX0iRscmbC84-D5CWdznUIW9UM5yaKvHdmizj4iX9JNSvTfGxb6VS_hRhEWb-MVbyIca8LYk0flXJa_m-lXJB2q2XbmpXekn0rGxbyuKrL8k_4esfCaSOoapWYfW24Zeuee2NWdjieHDvymXT5t0JQ5bWNIYVF2RUM6oNp02WbFAQ1vyZwEGzypOuZg_yaKK7aZxXiUUMs_jFwZ543G-HyYOsuqYTWa5KypuXuP"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall Section -->
+<section class="bg-background-light py-24 px-6" id="wishes">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16">
+<span class="text-accent-teal font-black tracking-widest uppercase text-sm">Guestbook</span>
+<h2 class="text-4xl font-black mt-2">Wishes Wall</h2>
+<p class="text-[#636f88] mt-4 max-w-xl mx-auto">Leave a digital note for the couple before the big day! Your messages will be displayed at the reception.</p>
+<button class="mt-8 bg-primary text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+                    Post a Message
+                </button>
+</div>
+<div class="wishes-grid gap-6 space-y-6">
+<!-- Wish Card 1 -->
+<div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-sm border-t-4 border-accent-teal hover:shadow-md transition-shadow">
+<p class="text-lg italic text-[#111318] mb-6 font-medium">"So excited to celebrate with you both in paradise! Can't wait for the beach ceremony. See you soon!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-accent-teal/10 flex items-center justify-center font-bold text-accent-teal">JS</div>
+<div>
+<p class="font-bold text-sm">Jessica &amp; Sam</p>
+<p class="text-xs text-[#636f88]">Sent 2 hours ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 2 -->
+<div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-sm border-t-4 border-primary hover:shadow-md transition-shadow">
+<p class="text-lg italic text-[#111318] mb-6 font-medium">"Wishing you a lifetime of love and island breeze. Pack the sunscreen!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">U.M</div>
+<div>
+<p class="font-bold text-sm">Uncle Michael</p>
+<p class="text-xs text-[#636f88]">Sent Yesterday</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 3 -->
+<div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-sm border-t-4 border-accent-green hover:shadow-md transition-shadow">
+<p class="text-lg italic text-[#111318] mb-6 font-medium">"MAHALO for inviting us to this epic celebration. We've already started the countdown!"</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-accent-green/10 flex items-center justify-center font-bold text-accent-green">TB</div>
+<div>
+<p class="font-bold text-sm">The Bennetts</p>
+<p class="text-xs text-[#636f88]">Sent 3 days ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 4 -->
+<div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-sm border-t-4 border-accent-teal hover:shadow-md transition-shadow">
+<p class="text-lg italic text-[#111318] mb-6 font-medium">"Love you guys so much! To the most beautiful couple in the most beautiful place."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-accent-teal/10 flex items-center justify-center font-bold text-accent-teal">LW</div>
+<div>
+<p class="font-bold text-sm">Lauren W.</p>
+<p class="text-xs text-[#636f88]">Sent 4 days ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 5 -->
+<div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-sm border-t-4 border-primary hover:shadow-md transition-shadow">
+<p class="text-lg italic text-[#111318] mb-6 font-medium">"Island vibe is calling! We're coming for the cocktails but staying for the love."</p>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">DR</div>
+<div>
+<p class="font-bold text-sm">Dan &amp; Rosa</p>
+<p class="text-xs text-[#636f88]">Sent 1 week ago</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-white border-t border-primary/10 py-20 px-6">
+<div class="max-w-7xl mx-auto text-center">
+<div class="flex items-center justify-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary text-4xl">palm_logo</span>
+<h1 class="text-3xl font-extrabold tracking-tight text-primary uppercase">ALOHA LOVE</h1>
+</div>
+<p class="text-lg font-medium text-[#636f88] mb-12 italic">"Two souls, one island heart."</p>
+<div class="flex flex-wrap justify-center gap-8 mb-16">
+<a class="text-sm font-bold text-[#111318] hover:text-primary" href="#">Registry</a>
+<a class="text-sm font-bold text-[#111318] hover:text-primary" href="#">Our Story</a>
+<a class="text-sm font-bold text-[#111318] hover:text-primary" href="#">FAQ</a>
+<a class="text-sm font-bold text-[#111318] hover:text-primary" href="#">Contact</a>
+</div>
+<div class="pt-12 border-t border-primary/5 text-[#636f88] text-xs">
+                © 2024 Destination Wedding. Handcrafted for a Tropical Paradise.
+            </div>
+</div>
+</footer>
+</body></html>

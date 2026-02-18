@@ -14,12 +14,17 @@ try {
   firebaseApp = admin.app();
 } catch (error) {
   // Initialize if not already initialized
+  const path = require('path');
   const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH;
   if (!serviceAccountPath) {
     throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable not set');
   }
-  
-  const serviceAccount = require(serviceAccountPath);
+
+  const absolutePath = path.isAbsolute(serviceAccountPath)
+    ? serviceAccountPath
+    : path.join(__dirname, '..', serviceAccountPath);
+
+  const serviceAccount = require(absolutePath);
   firebaseApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     projectId: serviceAccount.project_id
@@ -36,7 +41,7 @@ const FirebaseAuth = {
   async createUser(userData) {
     try {
       const { email, password, displayName, role = 'user' } = userData;
-      
+
       // Create user in Firebase Auth
       const userRecord = await admin.auth().createUser({
         email,
@@ -44,16 +49,16 @@ const FirebaseAuth = {
         displayName,
         emailVerified: true // Auto-verify for wedding website
       });
-      
+
       // Set custom claims for role-based access
       await admin.auth().setCustomUserClaims(userRecord.uid, {
         role: role,
         created_at: new Date().toISOString()
       });
-      
+
       // Log user creation
       console.log(`✅ User created: ${email} with role: ${role}`);
-      
+
       return {
         uid: userRecord.uid,
         email: userRecord.email,
@@ -61,7 +66,7 @@ const FirebaseAuth = {
         role: role,
         emailVerified: userRecord.emailVerified
       };
-      
+
     } catch (error) {
       console.error('Error creating Firebase user:', error);
       throw error;
@@ -75,14 +80,14 @@ const FirebaseAuth = {
     try {
       // Verify the Firebase ID token
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      
+
       // Get user record to check if user is still active
       const userRecord = await admin.auth().getUser(decodedToken.uid);
-      
+
       if (userRecord.disabled) {
         throw new Error('User account is disabled');
       }
-      
+
       return {
         uid: decodedToken.uid,
         email: decodedToken.email,
@@ -90,7 +95,7 @@ const FirebaseAuth = {
         role: decodedToken.role || 'user',
         emailVerified: decodedToken.email_verified
       };
-      
+
     } catch (error) {
       console.error('Token verification error:', error);
       throw new Error('Invalid or expired token');
@@ -107,7 +112,7 @@ const FirebaseAuth = {
       role: user.role,
       iat: Math.floor(Date.now() / 1000)
     };
-    
+
     return jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d'
     });
@@ -122,7 +127,7 @@ const FirebaseAuth = {
         role: newRole,
         updated_at: new Date().toISOString()
       });
-      
+
       console.log(`✅ User role updated: ${uid} -> ${newRole}`);
       return true;
     } catch (error) {
@@ -230,11 +235,11 @@ const authMiddleware = {
     try {
       const authHeader = req.headers['authorization'];
       const idToken = authHeader && authHeader.split(' ')[1];
-      
+
       if (!idToken) {
         return res.status(401).json({ message: 'Firebase ID token required' });
       }
-      
+
       const user = await FirebaseAuth.verifyToken(idToken);
       req.user = user;
       next();
@@ -251,11 +256,11 @@ const authMiddleware = {
       if (!req.user) {
         return res.status(401).json({ message: 'Authentication required' });
       }
-      
+
       if (!roles.includes(req.user.role)) {
         return res.status(403).json({ message: 'Insufficient permissions' });
       }
-      
+
       next();
     };
   },

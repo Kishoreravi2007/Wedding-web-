@@ -42,6 +42,26 @@ CREATE TABLE IF NOT EXISTS weddings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure weddings columns exist
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='weddings' AND column_name='status') THEN
+        ALTER TABLE weddings ADD COLUMN status TEXT DEFAULT 'active' CHECK (status IN ('active', 'upcoming', 'completed', 'archived'));
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='weddings' AND column_name='package_type') THEN
+        ALTER TABLE weddings ADD COLUMN package_type TEXT DEFAULT 'basic' CHECK (package_type IN ('basic', 'premium', 'luxury'));
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='weddings' AND column_name='venue_address') THEN
+        ALTER TABLE weddings ADD COLUMN venue_address TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='weddings' AND column_name='theme_color') THEN
+        ALTER TABLE weddings ADD COLUMN theme_color TEXT DEFAULT '#ff6b9d';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='weddings' AND column_name='wedding_month') THEN
+        ALTER TABLE weddings ADD COLUMN wedding_month TEXT;
+    END IF;
+END $$;
+
 -- 4. Photos Table (Integrated with Wedding)
 CREATE TABLE IF NOT EXISTS photos (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

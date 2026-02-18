@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WeddingTemplate } from '@/components/WeddingTemplate';
 import { PremiumWeddingTemplate } from '@/components/PremiumWeddingTemplate';
+
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Save, Loader2, Eye, EyeOff, MonitorPlay, ExternalLink, GripVertical, RefreshCw, Sun, ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -380,6 +381,10 @@ const VisualEditor = () => {
                             // If preview mode is ON, isEditing is FALSE (hides pencils)
                             isEditing={!previewMode}
                             onUpdateCustomization={handleUpdateCustomization}
+                            onWishSubmit={async (name, message) => {
+                                alert(`Wish submitted in preview mode:\nName: ${name}\nMessage: ${message}`);
+                            }}
+                            wishes={[]} // Editor doesn't need real wishes data currently
                         />
                     )}
                 </div>

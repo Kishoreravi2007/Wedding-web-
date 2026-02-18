@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { WeddingTemplate } from '@/components/WeddingTemplate';
-import { PremiumWeddingTemplate } from '@/components/PremiumWeddingTemplate';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart, Search as SearchIcon } from 'lucide-react';
+import { WeddingTemplate } from '@/components/WeddingTemplate';
 import FaceSearch from '@/components/FaceSearch';
 import { API_BASE_URL } from '@/lib/api';
 import {
@@ -15,6 +13,7 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 
+import { saveWish, getWishes } from '@/services/wishService';
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 
 const WeddingPage = () => {
@@ -34,6 +33,7 @@ const WeddingPage = () => {
     const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
+    const [wishes, setWishes] = useState<any[]>([]);
 
     const fetchPhotos = async (weddingId?: string) => {
         try {
@@ -108,6 +108,19 @@ const WeddingPage = () => {
         }
     };
 
+    const handleWishSubmit = async (name: string, message: string) => {
+        if (!weddingData?.id) return;
+        try {
+            await saveWish(weddingData.id, name, message);
+            // Refresh wishes
+            const wishesData = await getWishes(weddingData.id);
+            setWishes(wishesData);
+        } catch (err) {
+            console.error("Failed to save wish", err);
+            throw err;
+        }
+    };
+
     useEffect(() => {
         const fetchWeddingData = async () => {
             try {
@@ -142,6 +155,16 @@ const WeddingPage = () => {
                     const tData = await tRes.json();
                     if (tData.success) {
                         setTimeline(tData.timeline);
+                    }
+                }
+
+                // Fetch wishes
+                if (data.id) {
+                    try {
+                        const wishesData = await getWishes(data.id);
+                        setWishes(wishesData);
+                    } catch (err) {
+                        console.error("Failed to fetch wishes", err);
                     }
                 }
             } catch (err) {
@@ -179,211 +202,28 @@ const WeddingPage = () => {
         );
     }
 
-    if (weddingData.theme === 'premium-masonry') {
-        return (
-            <div className="min-h-screen bg-background font-sans text-foreground">
-                <PremiumWeddingTemplate
-                    weddingData={weddingData}
-                    timeline={timeline}
-                    photos={photos}
-                    isEditing={false}
-                    slug={slug}
-                    onUploadPhoto={handlePhotoUpload} // Changed from handleUploadPhoto to handlePhotoUpload
-                    uploadFile={uploadFile}
-                    setUploadFile={setUploadFile}
-                    isUploading={isUploading}
-                    showUploadDialog={showUploadDialog}
-                    setShowUploadDialog={setShowUploadDialog}
-                    setSelectedPhoto={setSelectedPhoto}
-                    selectedPhoto={selectedPhoto}
-                    onSearchPhotos={() => setShowSearchDialog(true)}
-                />
-                {/* Shared Music Player */}
-                <AnimatePresence>
-                    {weddingData.musicEnabled && (
-                        <motion.div
-                            initial={{ y: 100, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 100, opacity: 0 }}
-                            className="fixed bottom-6 left-6 z-40"
-                        >
-                            {/* Upload Mode */}
-                            {musicSource === 'upload' && weddingData.musicUrl && (
-                                <div className={`p-4 rounded-2xl shadow-xl backdrop-blur-md border border-white/20 transition-colors duration-300 ${isPlaying ? 'bg-white/90 text-slate-900' : 'bg-black/60 text-white'}`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className={`p-3 rounded-full transition-colors ${isPlaying ? 'bg-rose-100 text-rose-500' : 'bg-white/10 text-white'}`}>
-                                            <Music className={`w-5 h-5 ${isPlaying ? 'animate-pulse' : ''}`} />
-                                        </div>
-                                        <div className="hidden md:block">
-                                            <p className="text-sm font-bold">Wedding Playlist</p>
-                                            <p className="text-xs opacity-70">Playing your favorites</p>
-                                        </div>
-                                        <button
-                                            onClick={togglePlay}
-                                            className={`p-3 rounded-full hover:scale-105 active:scale-95 transition-all ${isPlaying ? 'bg-rose-500 text-white shadow-rose-500/30' : 'bg-white text-black'}`}
-                                        >
-                                            {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Playlist Mode */}
-                            {musicSource === 'playlist' && playlistUrl && (
-                                <div className="shadow-2xl rounded-xl overflow-hidden border border-white/20">
-                                    {/* Reusing the iframe logic from below or simplifying for now. 
-                                      For brevity, I will just render the container and iframes can be added if needed, 
-                                      but let's try to include the iframes to be complete since I have the code. */}
-                                    {playlistUrl.includes('spotify.com') && (
-                                        <iframe
-                                            style={{ borderRadius: '12px' }}
-                                            src={playlistUrl.replace('open.spotify.com', 'open.spotify.com/embed')}
-                                            width="300"
-                                            height="80"
-                                            frameBorder="0"
-                                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                            loading="lazy"
-                                        ></iframe>
-                                    )}
-                                    {/* Apple Music Embed */}
-                                    {playlistUrl.includes('music.apple.com') && (
-                                        <iframe
-                                            allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
-                                            frameBorder="0"
-                                            height="175"
-                                            style={{ width: '100%', maxWidth: '300px', overflow: 'hidden', background: 'transparent' }}
-                                            sandbox="allow-forms allow-popups allow-same-origin allow-scripts storage-access-api-by-user-activation"
-                                            src={playlistUrl.replace('music.apple.com', 'embed.music.apple.com')}
-                                        ></iframe>
-                                    )}
-                                    {/* YouTube Embed */}
-                                    {(playlistUrl.includes('youtube.com') || playlistUrl.includes('youtu.be')) && (
-                                        <iframe
-                                            width="300"
-                                            height="170"
-                                            src={`https://www.youtube.com/embed/?listType=playlist&list=${new URL(playlistUrl).searchParams.get('list') || 'PL'}`}
-                                            title="YouTube video player"
-                                            frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            allowFullScreen
-                                        ></iframe>
-                                    )}
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Face Search Dialog - Reused */}
-                <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Find Your Photos</DialogTitle>
-                            <DialogDescription>
-                                Upload a selfie to instantly find photos of you from the wedding.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-rose-500/50 hover:bg-rose-50/50 transition-colors cursor-pointer">
-                                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500">
-                                    <SearchIcon className="w-8 h-8" />
-                                </div>
-                                <p className="text-sm font-medium text-gray-900">Click to upload selfie</p>
-                                <p className="text-xs text-gray-500 mt-1">or drag and drop here</p>
-                            </div>
-                            <Button className="w-full bg-rose-500 hover:bg-rose-600">
-                                Search Gallery
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        );
-    }
-
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen bg-white">
             <WeddingTemplate
                 weddingData={weddingData}
                 timeline={timeline}
                 photos={photos}
                 isEditing={false}
                 slug={slug}
-                // Gallery props
-                onUploadPhoto={handlePhotoUpload}
-                uploadFile={uploadFile}
-                setUploadFile={setUploadFile}
-                isUploading={isUploading}
-                showUploadDialog={showUploadDialog}
-                setShowUploadDialog={setShowUploadDialog}
-                selectedPhoto={selectedPhoto}
-                setSelectedPhoto={setSelectedPhoto}
-                // Photobooth props
                 onSearchPhotos={() => setShowSearchDialog(true)}
                 showSearchDialog={showSearchDialog}
                 setShowSearchDialog={setShowSearchDialog}
+                setSelectedPhoto={setSelectedPhoto}
+                selectedPhoto={selectedPhoto}
+                showUploadDialog={showUploadDialog}
+                setShowUploadDialog={setShowUploadDialog}
+                uploadFile={uploadFile}
+                setUploadFile={setUploadFile}
+                onUploadPhoto={handlePhotoUpload}
+                isUploading={isUploading}
+                onWishSubmit={handleWishSubmit}
+                wishes={wishes}
             />
-
-            {/* Event Details Modal (Public Only) */}
-            <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                    {selectedEvent && (
-                        <>
-                            <DialogHeader>
-                                <div className="flex items-center gap-2 mb-2 text-rose-500 font-bold uppercase tracking-wider text-sm">
-                                    {selectedEvent.event_date && (
-                                        <span>{new Date(selectedEvent.event_date).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}</span>
-                                    )}
-                                    <span>•</span>
-                                    <span>{selectedEvent.event_time}</span>
-                                </div>
-                                <DialogTitle className="text-3xl font-serif text-slate-900">{selectedEvent.title}</DialogTitle>
-                            </DialogHeader>
-
-                            <div className="space-y-6 mt-4">
-                                {selectedEvent.photo_url && (
-                                    <div className="rounded-xl overflow-hidden aspect-video relative">
-                                        <img
-                                            src={selectedEvent.photo_url}
-                                            alt={selectedEvent.title}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).style.display = 'none';
-                                            }}
-                                        />
-                                    </div>
-                                )}
-
-                                <DialogDescription className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap">
-                                    {selectedEvent.description || "Join us for this special moment."}
-                                </DialogDescription>
-
-                                {selectedEvent.location && (
-                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
-                                                <MapPin className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Location</p>
-                                                <p className="font-medium text-slate-900">{selectedEvent.location}</p>
-                                            </div>
-                                        </div>
-                                        <a
-                                            href={selectedEvent.location_map_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedEvent.location)}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:text-rose-600 hover:border-rose-200 transition-colors shadow-sm"
-                                        >
-                                            View Map
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
 
             {/* Face Search (Photobooth) Dialog */}
             <Dialog open={showSearchDialog} onOpenChange={setShowSearchDialog}>
@@ -402,89 +242,45 @@ const WeddingPage = () => {
             </Dialog>
 
             {/* Floating Music Controls */}
-            {
-                weddingData.musicEnabled && (
-                    <div className="fixed bottom-4 left-4 z-50 animate-in slide-in-from-bottom-4 duration-500">
-                        {/* Upload Mode: Custom Controls */}
-                        {musicSource === 'upload' && weddingData.musicUrl && (
-                            <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-full p-2 pr-4 flex items-center gap-3 border border-rose-100 ring-1 ring-rose-500/10">
-                                <Button
-                                    onClick={togglePlay}
-                                    size="icon"
-                                    className={`rounded-full shadow-md transition-all ${isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-slate-900 hover:bg-slate-800'} text-white w-10 h-10`}
-                                >
-                                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-                                </Button>
+            {weddingData.musicEnabled && (
+                <div className="fixed bottom-4 left-4 z-50 animate-in slide-in-from-bottom-4 duration-500">
+                    {musicSource === 'upload' && weddingData.musicUrl && (
+                        <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-full p-2 pr-4 flex items-center gap-3 border border-rose-100 ring-1 ring-rose-500/10">
+                            <Button
+                                onClick={togglePlay}
+                                size="icon"
+                                className={`rounded-full shadow-md transition-all ${isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-slate-900 hover:bg-slate-800'} text-white w-10 h-10`}
+                            >
+                                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                            </Button>
 
-                                <div className="flex flex-col min-w-[100px]">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Music className={`w-3 h-3 ${isPlaying ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`} />
-                                        <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">Our Song</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 group relative">
-                                        <Volume2 className="w-3 h-3 text-slate-400" />
-                                        <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden cursor-pointer">
-                                            <div
-                                                className="h-full bg-rose-500 rounded-full relative"
-                                                style={{ width: `${volume * 100}%` }}
-                                            />
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="100"
-                                                value={volume * 100}
-                                                onChange={(e) => setVolume(parseInt(e.target.value) / 100)}
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            />
-                                        </div>
+                            <div className="flex flex-col min-w-[100px]">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Music className={`w-3 h-3 ${isPlaying ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`} />
+                                    <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">Our Song</span>
+                                </div>
+                                <div className="flex items-center gap-2 group relative">
+                                    <Volume2 className="w-3 h-3 text-slate-400" />
+                                    <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden cursor-pointer">
+                                        <div
+                                            className="h-full bg-rose-500 rounded-full relative"
+                                            style={{ width: `${volume * 100}%` }}
+                                        />
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={volume * 100}
+                                            onChange={(e) => setVolume(parseInt(e.target.value) / 100)}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        />
                                     </div>
                                 </div>
                             </div>
-                        )}
-
-                        {/* Playlist Mode: Embed Widgets */}
-                        {musicSource === 'playlist' && playlistUrl && (
-                            <div className="shadow-2xl rounded-xl overflow-hidden border border-white/20">
-                                {/* Spotify Embed */}
-                                {playlistUrl.includes('spotify.com') && (
-                                    <iframe
-                                        style={{ borderRadius: '12px' }}
-                                        src={playlistUrl.replace('open.spotify.com', 'open.spotify.com/embed')}
-                                        width="300"
-                                        height="80"
-                                        frameBorder="0"
-                                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                        loading="lazy"
-                                    ></iframe>
-                                )}
-                                {/* Apple Music Embed */}
-                                {playlistUrl.includes('music.apple.com') && (
-                                    <iframe
-                                        allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
-                                        frameBorder="0"
-                                        height="175"
-                                        style={{ width: '100%', maxWidth: '300px', overflow: 'hidden', background: 'transparent' }}
-                                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts storage-access-api-by-user-activation"
-                                        src={playlistUrl.replace('music.apple.com', 'embed.music.apple.com')}
-                                    ></iframe>
-                                )}
-                                {/* YouTube Embed */}
-                                {(playlistUrl.includes('youtube.com') || playlistUrl.includes('youtu.be')) && (
-                                    <iframe
-                                        width="300"
-                                        height="170"
-                                        src={`https://www.youtube.com/embed/?listType=playlist&list=${new URL(playlistUrl).searchParams.get('list') || 'PL'}`}
-                                        title="YouTube video player"
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        allowFullScreen
-                                    ></iframe>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )
-            }
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

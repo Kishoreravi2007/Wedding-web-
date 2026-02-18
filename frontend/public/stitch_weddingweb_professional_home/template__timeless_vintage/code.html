@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf", // Royal Navy accent
+                        "background-light": "#fdfaf3", // Cream Parchment
+                        "background-dark": "#111621",
+                        "sepia-muted": "#705c4e",
+                        "sepia-light": "#efe4d1",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .vintage-border {
+            border: 1px solid #705c4e33;
+            position: relative;
+        }
+        .vintage-border::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid #705c4e1a;
+            pointer-events: none;
+        }
+        .paper-texture {
+            background-color: #fdfaf3;
+            background-image: radial-gradient(#705c4e11 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .sepia-filter {
+            filter: sepia(0.6) contrast(1.1) brightness(0.9);
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-sepia-muted selection:bg-primary/20">
+<div class="relative flex h-auto min-screen w-full flex-col paper-texture group/design-root overflow-x-hidden">
+<!-- Navigation -->
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-double border-sepia-muted/20 px-6 md:px-20 py-6 bg-background-light/80 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">rotate_auto</span>
+</div>
+<h2 class="text-sepia-muted text-xl font-extrabold leading-tight tracking-[0.15em] uppercase">E &amp; S</h2>
+</div>
+<nav class="hidden md:flex flex-1 justify-center gap-10">
+<a class="text-sepia-muted hover:text-primary text-xs font-bold uppercase tracking-widest transition-colors" href="#story">Our Story</a>
+<a class="text-sepia-muted hover:text-primary text-xs font-bold uppercase tracking-widest transition-colors" href="#gallery">Gallery</a>
+<a class="text-sepia-muted hover:text-primary text-xs font-bold uppercase tracking-widest transition-colors" href="#venue">Venue</a>
+<a class="text-sepia-muted hover:text-primary text-xs font-bold uppercase tracking-widest transition-colors" href="#wishes">Wishes</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-none border border-primary text-primary hover:bg-primary hover:text-white transition-all h-10 px-6 text-xs font-black tracking-widest uppercase">
+                    RSVP
+                </button>
+</div>
+</header>
+<main class="flex flex-col flex-1">
+<!-- Hero Section -->
+<section class="relative px-4 py-10 md:px-20 md:py-16">
+<div class="@container">
+<div class="relative flex min-h-[600px] flex-col items-center justify-center text-center gap-8 overflow-hidden rounded-xl bg-sepia-light">
+<div class="absolute inset-0 z-0 opacity-80">
+<img class="w-full h-full object-cover sepia-filter" data-alt="Vintage sepia-toned couple walking in a classic garden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS49lL8pRyCSgGeVbSXfYGZZy5JTmVSbb0mQ8dKynoKQc2Jag86yVeQkdU9EKcP4tB-zjXbVCxm8jzYg-8XdNfWwk_7A25NoTDVKugKmTobKIySaysnhN4_PR2XW0w5YLt5UedVyFvPMdXYi48OK1BHmfCf8a0xN5BowxsETpKtNpaOz5reTVCjT9sZj36Op10FgxHmb6iDAbcXns8NFbWIx8s4lOemAnk7XWGuvfZ3I3riqDJeodkt4mVGClemveL2P_p3BnqxnjL"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/20 to-background-light"></div>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-4 px-4">
+<span class="text-primary text-sm font-bold tracking-[0.4em] uppercase">You are cordially invited to the wedding of</span>
+<h1 class="text-sepia-muted text-6xl md:text-8xl font-black leading-tight tracking-[-0.04em] drop-shadow-sm">
+                                Elias <span class="text-primary font-light italic">&amp;</span> Sarah
+                            </h1>
+<div class="h-[1px] w-24 bg-sepia-muted/30 my-2"></div>
+<h2 class="text-sepia-muted text-base md:text-xl font-medium tracking-[0.2em] uppercase">
+                                {{WeddingDate}} — The Grand Plaza
+                            </h2>
+<button class="mt-8 flex min-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-8 bg-primary text-white text-sm font-black uppercase tracking-[0.2em] hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+                                Save the Date
+                            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Our Story Section -->
+<section class="px-6 md:px-40 py-20 bg-white/50 border-y border-sepia-muted/10" id="story">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-16">
+<span class="text-primary material-symbols-outlined text-4xl mb-4">history_edu</span>
+<h2 class="text-sepia-muted text-4xl font-black tracking-tight mb-2">The Journey</h2>
+<p class="text-sepia-muted/60 italic font-medium">A chronicle of our classic romance</p>
+</div>
+<div class="grid grid-cols-[48px_1fr] gap-x-8">
+<!-- Step 1 -->
+<div class="flex flex-col items-center">
+<div class="bg-primary/10 rounded-full p-2 text-primary">
+<span class="material-symbols-outlined text-2xl">favorite</span>
+</div>
+<div class="w-[2px] bg-primary/20 h-full grow my-2"></div>
+</div>
+<div class="pb-12">
+<h3 class="text-xl font-bold text-sepia-muted uppercase tracking-wider">The First Encounter</h3>
+<p class="text-primary text-sm font-bold mb-2">Spring 1938</p>
+<p class="text-sepia-muted/80 leading-relaxed text-lg italic">
+                                A chance meeting at the corner bookstore. He noticed her ribbon; she noticed his earnest eyes.
+                            </p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center">
+<div class="bg-primary/10 rounded-full p-2 text-primary">
+<span class="material-symbols-outlined text-2xl">mail</span>
+</div>
+<div class="w-[2px] bg-primary/20 h-full grow my-2"></div>
+</div>
+<div class="pb-12">
+<h3 class="text-xl font-bold text-sepia-muted uppercase tracking-wider">A Letter from Afar</h3>
+<p class="text-primary text-sm font-bold mb-2">Winter 1939</p>
+<p class="text-sepia-muted/80 leading-relaxed text-lg italic">
+                                Ink stains on parchment, words of longing sent across the coast. 321 letters in a single year.
+                            </p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center">
+<div class="bg-primary/10 rounded-full p-2 text-primary">
+<span class="material-symbols-outlined text-2xl">celebration</span>
+</div>
+</div>
+<div class="pb-4">
+<h3 class="text-xl font-bold text-sepia-muted uppercase tracking-wider">The Proposal at The Grand</h3>
+<p class="text-primary text-sm font-bold mb-2">Autumn 1941</p>
+<p class="text-sepia-muted/80 leading-relaxed text-lg italic">
+                                Beneath the crystal chandeliers of the Grand Ballroom, one knee hit the floor and a lifetime began.
+                            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Captured Moments (Gallery) -->
+<section class="px-6 md:px-20 py-20" id="gallery">
+<div class="text-center mb-12">
+<h2 class="text-sepia-muted text-4xl font-black tracking-tight mb-2">Captured Moments</h2>
+<div class="h-1 w-12 bg-primary mx-auto"></div>
+</div>
+<div id="wedding-gallery" class="grid grid-cols-1 md:grid-cols-3 gap-6>
+<div id="wedding-gallery" class="aspect-square bg-sepia-light rounded-lg overflow-hidden vintage-border">
+<img class="w-full h-full object-cover sepia-filter hover:scale-105 transition-transform duration-700" data-alt="Sepia wedding portrait of a vintage couple" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNYyrgeU7ALilUZ9xl7Ee8abSdiiYkG41txmI6bjefLOyQ7TBWvaBNArQagc9_C6U9JyucJa7jxipTaGqAI3cLyuD4pS0GcsNXrdJQXMVJTA2kS3syLjeIjDHfi9ZYOu3iXF-SGT6N0iecoAEdEBAiReUVodMcp6h3_B6BjCQciN_I8lZPHo6m9kZG409UKyJRqyhblnxZ1yVhQB_Td362X8H3VfoVS9TxM3kFKu236dBKngwrVQqRX0ARKFXtc0wAvBYImXSpNB31"/>
+</div>
+<div class="aspect-[3/4] bg-sepia-light rounded-lg overflow-hidden md:row-span-2 vintage-border">
+<img class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Black and white photo of wedding rings on an old letter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZl-RPE6wf121637RGwY49No9jEXDWtys-gcfMLrMXhNd8OFmnsRtBEyhIbTZRIKw_jcI-KonCN0X0cEa9efUUUrS8s2gmWvk6PYONE6J9yxaIXgVXHjJDlp_V1I4vlnKVrKX9knHA3Kvk2jCUTOu5XsapiEn6lrHHXaZI_4p43COo_yiFqJhyZ0F46KyhS_iKi73S0n7VqIRohA-8xkHiGojsUXE6eYQXZOMjewQF3fGnv6oB31VLsNXfZvUpTeN6s4yV5r-rxgkH"/>
+</div>
+<div class="aspect-square bg-sepia-light rounded-lg overflow-hidden vintage-border">
+<img class="w-full h-full object-cover sepia-filter hover:scale-105 transition-transform duration-700" data-alt="Vintage ballroom dancing floor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxsdIbbyMKa3yAj68rOTt3q-BTEET5_EYTrtN2MRj4MdcKHtEKthDGscspE-s2aRaeZHomzSuDAgiDoDIhoX6UaZrjBLpgBRDKlyZdCRrYckxe0AUwC-8Ie39CKndpGzWbkKkhAsMKLsrdaE9sMeN4ZucykqGEy4ZXNNA5YFZ_clO4KWfIRWzXFGHbaM0NoEi9HfrduDpSr5C7S_U3mkuBQNdjLfHQ5JL-zYFdyX7u44Tpte27eNFiTxeTN9xyUe-S150a1W-7n6tE"/>
+</div>
+<div class="aspect-square bg-sepia-light rounded-lg overflow-hidden vintage-border">
+<img class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Old champagne glasses on a tray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQllcdGGHEGqKpUWnBpOosbt16FkE15McVo_tz-E7ebDLg2NSdMTvSWhBF73V3OKCd4SIYkAGDHWq99vA39I3thJnGkIbS6jMu56whmYUqCjazOXGaD_qT72PtLKsZfWIId977UotBPrTWd_0xG4eD4VYijvCKXITs1pb1fpRQ1AkVkiCm0yIz0MrNv90iaiE7NuA7pXnd7Qxpx-QguTSClKjJnhORpX6ezjACOY0L2w6Eep3N6bFoR4zvkGLKt984nBLFSGzTO8EZ"/>
+</div>
+<div class="aspect-square bg-sepia-light rounded-lg overflow-hidden vintage-border">
+<img class="w-full h-full object-cover sepia-filter hover:scale-105 transition-transform duration-700" data-alt="Retro wedding cake display" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIRJoBkAYCu2Dlt79mqmn3HsnukMq6Gwlip1FkNRnaBn4QiaEwZ0tmLFTI1aOU651t6YN9yOQkDOnhwX4MIBOVDM4Ujgy6lqwoiXSG56-d-Zv-tI5NtXdmR56Q62b24U0qmX_0FXjZ9gUuhrLZmrNKm2kLGQr5VPaA1Z6em4lCXqRQtU9NvdqRlUVtRYetauEneogiy2tsYVFGVOcA7Huq2xDbov3SN1TgIVA9IeWEk2pZxvHfJxHNGUfJ-ieDy5JJUcwAcBuJKNoO"/>
+</div>
+</div>
+</section>
+<!-- Venue Details -->
+<section class="px-6 md:px-20 py-20 bg-background-dark text-white" id="venue">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-16 items-center">
+<div class="flex-1 space-y-6">
+<span class="text-primary font-bold tracking-widest uppercase text-sm">Location &amp; Details</span>
+<h2 class="text-4xl font-black tracking-tight">The Grand Ballroom</h2>
+<p class="text-gray-400 text-lg leading-relaxed">
+                            A masterpiece of 1920s architecture, the Grand Ballroom features hand-painted ceilings and the original mahogany dance floor where jazz legends once played.
+                        </p>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<div>
+<p class="font-bold">Ceremony: {{EventTime}}</p>
+<p class="text-sm text-gray-400">Main Chapel</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">local_bar</span>
+<div>
+<p class="font-bold">Reception: {{EventTime}}</p>
+<p class="text-sm text-gray-400">The Terrace</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">checkroom</span>
+<div>
+<p class="font-bold">Dress Code: Black Tie Vintage</p>
+<p class="text-sm text-gray-400">Think Gatsby, Classic Hollywood, or Tails.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/2 aspect-video rounded-xl overflow-hidden bg-gray-800 grayscale">
+<div class="w-full h-full bg-sepia-muted/20 flex items-center justify-center relative overflow-hidden" data-gallery-item="true">
+<img class="w-full h-full object-cover opacity-60" data-alt="Interior of a luxury 1940s ballroom" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpbvZ0uhxxjg_JzienzrvTmsAiGERyzHTF1_iFtyRxL_qfEl5__3T08z6R3pgjy4eDBAX8UuJwTsXXa8nnkJsU-EqvKA6h9L2wlox8FA27skuF1eQp2lEbiC5xZKqVIQQKsnlDkhbBzt7JIRjESNXHoj1_Oboa_7sM_PHu3p0iO10Fe18qvLzj1zmhj9ZgArF1gW7NzXu8BQbVgOj4Uu_WDickCDkvtqAT8PUHabw9laG3ti1ph7wgrlS_fRR2eMYOeYZKIyA8daI0"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-white/10 backdrop-blur-md p-6 rounded-lg border border-white/20 text-center">
+<span class="material-symbols-outlined text-4xl mb-2">map</span>
+<p class="font-bold tracking-widest uppercase text-xs">View Location</p>
+<p class="text-sm opacity-70">123 Promenade Ave, San Francisco</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall (Guestbook) -->
+<section class="px-6 md:px-20 py-20" id="wishes">
+<div class="text-center mb-16">
+<h2 class="text-sepia-muted text-4xl font-black tracking-tight mb-2">Telegrams of Love</h2>
+<p class="text-primary font-bold uppercase tracking-widest text-xs">The Wishes Wall</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Telegram Card 1 -->
+<div class="bg-white p-8 rounded shadow-sm border border-sepia-muted/10 flex flex-col gap-4 relative">
+<div class="absolute top-2 right-2 opacity-10">
+<span class="material-symbols-outlined text-4xl">sticker</span>
+</div>
+<p class="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-2">Western Union - 1942</p>
+<p class="italic text-sepia-muted leading-relaxed">
+                            "May your love be as timeless as the stars. Congratulations to the most beautiful couple."
+                        </p>
+<p class="text-sm font-black text-sepia-muted uppercase text-right mt-auto">— The Abbotts</p>
+</div>
+<!-- Telegram Card 2 -->
+<div class="bg-sepia-light/30 p-8 rounded shadow-sm border border-sepia-muted/10 flex flex-col gap-4 relative">
+<div class="absolute top-2 right-2 opacity-10">
+<span class="material-symbols-outlined text-4xl">mail</span>
+</div>
+<p class="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-2">Urgent Correspondence</p>
+<p class="italic text-sepia-muted leading-relaxed">
+                            "So thrilled for this union. Elias, you're a lucky man! Sarah, you're stunning as always."
+                        </p>
+<p class="text-sm font-black text-sepia-muted uppercase text-right mt-auto">— Arthur P.</p>
+</div>
+<!-- Telegram Card 3 -->
+<div class="bg-white p-8 rounded shadow-sm border border-sepia-muted/10 flex flex-col gap-4 relative">
+<p class="text-xs font-bold text-primary uppercase tracking-widest border-b border-primary/20 pb-2">Air Mail</p>
+<p class="italic text-sepia-muted leading-relaxed">
+                            "Cheers to a life of adventure, jazz, and midnight strolls. We can't wait to celebrate!"
+                        </p>
+<p class="text-sm font-black text-sepia-muted uppercase text-right mt-auto">— Margaret &amp; James</p>
+</div>
+<!-- Add Your Own -->
+<div class="border-2 border-dashed border-sepia-muted/20 p-8 rounded flex flex-col items-center justify-center text-center gap-4 hover:bg-sepia-light/10 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-4xl text-primary">edit_note</span>
+<p class="text-sepia-muted font-bold uppercase tracking-widest text-xs">Leave a Telegram</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-background-light py-12 border-t border-double border-sepia-muted/20 text-center px-6">
+<div class="max-w-md mx-auto space-y-4">
+<div class="text-primary">
+<span class="material-symbols-outlined text-4xl">ring_volume</span>
+</div>
+<h2 class="text-sepia-muted text-2xl font-black uppercase tracking-[0.2em]">Elias &amp; Sarah</h2>
+<p class="text-sepia-muted/60 text-sm italic">Designed with love for the Golden Age. All rights reserved © 1942-2024</p>
+<div class="flex justify-center gap-6 pt-4">
+<a class="text-sepia-muted/40 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="text-sepia-muted/40 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">print</span></a>
+<a class="text-sepia-muted/40 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">favorite</span></a>
+</div>
+</div>
+</footer>
+</div>
+</div>
+
+    <!-- WeddingWeb Watermark -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
+        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            WeddingWeb AI
+        </div>
+    </div>
+    
+</body></html>

@@ -4,10 +4,9 @@ const http = require('http');
 const cors = require('cors');
 const path = require('path');
 
-// Initialize Supabase (switched back from Firebase)
-const { supabase } = require('./lib/supabase');
-// Firebase (commented out - keeping for future migration)
-// const { db, storage, checkFirebaseConnection } = require('./lib/firebase');
+// Firebase (Replaced Supabase with Firebase for database and storage)
+const { db, storage, checkFirebaseConnection } = require('./lib/firebase');
+// const { supabase } = require('./lib/supabase');
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Use 5001 to avoid macOS AirPlay conflict on port 5000
@@ -111,47 +110,21 @@ app.use('/backend', express.static(path.join(__dirname)));
 console.log('📁 Serving backend files from:', path.join(__dirname));
 
 // Use wishes endpoint
-const wishesRouter = require('./wishes');
-app.use('/api/wishes', wishesRouter);
+// const wishesRouter = require('./wishes');
+// app.use('/api/wishes', wishesRouter);
 
-// Contact messages endpoint
-const contactMessagesRouter = require('./routes/contact-messages');
-app.use('/api/contact-messages', contactMessagesRouter);
+// Firebase wishes endpoint
+const wishesFirebaseRouter = require('./wishes');
+app.use('/api/wishes', wishesFirebaseRouter);
 
-// Call schedules endpoint
-const callSchedulesRouter = require('./routes/call-schedules');
-app.use('/api/call-schedules', callSchedulesRouter);
+// Secure SQL authentication (Replaced Firebase)
+const { router: authRouter } = require('./auth-new');
+const { authMiddleware } = require('./lib/secure-auth');
 
-// Feedback endpoint
-const feedbackRouter = require('./routes/feedback');
-app.use('/api/feedback', feedbackRouter);
-
-// N8N Integration endpoint
-const n8nRouter = require('./routes/n8n-integration');
-app.use('/api/n8n', n8nRouter);
-
-// Email Webhook endpoint
-const emailWebhookRouter = require('./routes/email-webhook');
-app.use('/api/email', emailWebhookRouter);
-
-// Firebase wishes endpoint (commented out - keeping for future migration)
-// const wishesFirebaseRouter = require('./wishes');
-// app.use('/api/wishes', wishesFirebaseRouter);
-
-// Use simple authentication (works with basic users table)
-const { router: authRouter, authenticateToken } = require('./auth-simple');
 app.use('/api/auth', authRouter);
 
-// Secure auth with RLS (commented out - needs RPC functions)
-// const { router: authSecureRouter, authenticateToken: authSecureToken } = require('./auth-secure');
-// app.use('/api/auth', authSecureRouter);
-
-// Firebase authentication (commented out - keeping for future migration)
-// const { router: authFirebaseRouter, authenticateToken: authFirebaseToken } = require('./auth');
-// app.use('/api/auth', authFirebaseRouter);
-
 const usersRouter = require('./users');
-app.use('/api/users', authenticateToken, usersRouter);
+app.use('/api/users', authMiddleware.verifyToken, usersRouter);
 
 const settingsRouter = require('./settings');
 app.use('/api/settings', settingsRouter); // Public read, admin write
@@ -163,13 +136,9 @@ app.use('/api/analytics', analyticsRouter); // Public track, admin read
 const weddingsRouter = require('./routes/weddings');
 app.use('/api/weddings', weddingsRouter); // Wedding customer management
 
-// Use photos endpoint
-const photosRouter = require('./photos-new');
-app.use('/api/photos', photosRouter); // Authentication handled per-route in photos-supabase.js
-
-// Firebase photos endpoint (commented out - keeping for future migration)
-// const photosFirebaseRouter = require('./photos');
-// app.use('/api/photos', photosFirebaseRouter);
+// Firebase photos endpoint
+const photosFirebaseRouter = require('./photos');
+app.use('/api/photos', photosFirebaseRouter);
 
 // Local filesystem photo uploads (primary upload endpoint)
 // Note: GET requests are public (for gallery), POST/DELETE require authentication
@@ -455,18 +424,31 @@ app.get('/', (req, res) => {
   });
 });
 
+// FRONTEND SERVING (Production Only)
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = path.join(__dirname, 'build');
+  app.use(express.static(buildPath));
+
+  // All other requests should serve index.html for SPA routing
+  app.use((req, res, next) => {
+    // API and uploads are already handled or should fall through to 404
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
+
 // Catch-all handler: return 404 for non-API routes
-// Frontend should be served separately (e.g., Vite dev server or separate hosting)
 app.use((req, res) => {
   // Skip API routes - they should have been handled above
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
 
-  // For non-API routes, return 404
+  // If we reached here in production, index.html should have been served already
+  // but if buildPath is missing or file not found, we fall through to here
   res.status(404).json({
     error: 'Route not found',
-    message: 'This is an API-only server. Frontend should be accessed separately.',
+    message: 'This is an API-only server. Frontend should be accessed separately or build/index.html is missing.',
     availableEndpoints: '/api'
   });
 });
@@ -489,22 +471,15 @@ httpServer.listen(PORT, async () => {
   console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/login`);
   console.log(`📡 Live sync endpoint: http://localhost:${PORT}/api/live/uploadPhoto`);
   console.log(`🔌 WebSocket server: ws://localhost:${PORT}`);
-  console.log(`💾 Using Supabase for photo storage`);
+  console.log(`💾 Using Firebase for photo storage and database`);
   console.log(`🌐 CORS enabled for frontend support`);
   console.log(`   Allowed origins: ${allowedOrigins.length > 0 ? allowedOrigins.join(', ') : 'All (development mode)'}`);
 
-  // Check Supabase connection
-  if (supabase) {
-    console.log('✅ Supabase client initialized');
+  // Firebase connection check
+  const isConnected = await checkFirebaseConnection();
+  if (isConnected) {
+    console.log('✅ Firebase connection successful');
   } else {
-    console.warn('⚠️  Supabase client not initialized. Check environment variables.');
+    console.warn('⚠️  Firebase connection check failed');
   }
-
-  // Firebase connection check (commented out)
-  // const isConnected = await checkFirebaseConnection();
-  // if (isConnected) {
-  //   console.log('✅ Firebase connection successful');
-  // } else {
-  //   console.warn('⚠️  Firebase connection check failed');
-  // }
 });

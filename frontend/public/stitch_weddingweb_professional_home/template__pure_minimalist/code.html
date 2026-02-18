@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#ffffff",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .hairline-border {
+            border-width: 0.5px;
+        }
+        .letter-spacing-widest {
+            letter-spacing: 0.2em;
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] selection:bg-primary/10">
+<!-- Navigation -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 md:px-20 py-6 bg-white/80 backdrop-blur-md border-b border-[#f0f2f4]">
+<div class="flex items-center gap-2">
+<span class="text-xl font-extralight tracking-[0.3em] uppercase">E&amp;J</span>
+</div>
+<nav class="hidden md:flex items-center gap-12">
+<a class="text-[10px] uppercase font-medium tracking-[0.2em] hover:text-primary transition-colors" href="#story">Our Story</a>
+<a class="text-[10px] uppercase font-medium tracking-[0.2em] hover:text-primary transition-colors" href="#events">Events</a>
+<a class="text-[10px] uppercase font-medium tracking-[0.2em] hover:text-primary transition-colors" href="#wishes">Wishes</a>
+<a class="text-[10px] uppercase font-medium tracking-[0.2em] hover:text-primary transition-colors" href="#rsvp">RSVP</a>
+</nav>
+<button class="bg-primary text-white text-[10px] uppercase font-bold tracking-[0.2em] px-6 py-2 rounded-sm hover:bg-primary/90 transition-all">
+            RSVP
+        </button>
+</header>
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Minimalist black and white photo of a wedding couple in Italy" class="w-full h-full object-cover grayscale opacity-40" data-alt="Minimalist black and white wedding couple portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzGhZ4UCs9WAAEJ3rIMMPra7UceQJffxIjVqf8M3Vjo3YdvWdzeNHyFV61jSuQpKXcNIE1MFSz1q3mEPycWQCqba3m9w8PV4zMWARVV6mhLu8-dIxB6He0qD5e_VBnPstHCFBd9euOMxra_nC-Yn2js5KULfSJkWDUd9ZqWUnMNVn5UuCcG-aUhAK4kmnwu1r1bnw2bnjDMXGaQFJp4s_aVUkxRbjM1wtkJFU914xsYXsfXSNSzthPHLCDQDkvzbNNOJ6rDi0iExL1"/>
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="relative z-10 text-center px-4">
+<h1 class="text-5xl md:text-8xl font-extralight tracking-[-0.04em] mb-6">
+                Elena <span class="text-primary/40 font-thin">&amp;</span> Julian
+            </h1>
+<p class="text-sm md:text-base font-light tracking-[0.3em] uppercase text-gray-500">
+                {{WeddingDate}} — Lake Como, Italy
+            </p>
+<div class="mt-12 flex justify-center">
+<div class="w-px h-24 bg-gradient-to-b from-primary to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Our Story -->
+<section class="py-32 px-8" id="story">
+<div class="max-w-2xl mx-auto text-center">
+<span class="text-[10px] uppercase font-bold tracking-[0.4em] text-primary mb-8 block">Our Story</span>
+<h2 class="text-3xl font-extralight mb-12 tracking-tight">A journey defined by simplicity and shared dreams.</h2>
+<div class="space-y-8 text-gray-600 font-light leading-relaxed text-lg">
+<p>
+                    We met on a quiet autumn afternoon, a chance encounter that felt like a long-awaited homecoming. 
+                    What started as a shared love for art and travel grew into a partnership of profound depth and quiet understanding.
+                </p>
+<p>
+                    Ten years of laughter, growth, and discovery have led us here. We invite you to join us as we 
+                    begin our next chapter amidst the timeless beauty of Lake Como.
+                </p>
+</div>
+</div>
+</section>
+<!-- Image Divider -->
+<section class="px-8 md:px-20 py-12">
+<div class="aspect-[21/9] w-full overflow-hidden rounded-lg">
+<img alt="Desaturated landscape of Lake Como villas" class="w-full h-full object-cover grayscale transition-transform duration-1000 hover:scale-105" data-alt="Desaturated landscape view of Lake Como" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOtTt3xNf_OQCjHB0SEk7Wcv6wdPXb3EcCs7Aij9PsOCGREkGVskUTQuu7UjOK5NeGYggNthek0is3P-BRoMMUGUuqbkYA77WlrD73RYHJRhuS4kkuvsRH3stqxaq_eNmr7lkN5e_bqRtke_-uRb9WWNnL4qhp0Lv-iidc66epgd6sJRwxMnAnhlJULA7_uZMAmgdQBomz2rg83Ba6Ht933r2AWbYyAusBeKJe71MV4Q3QVPlLBUaO_8xvfAS-lwRv1rDnlpqG1_a5"/>
+</div>
+</section>
+<!-- Events Timeline -->
+<section class="py-32 px-8 bg-[#fafafa]" id="events">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-20">
+<span class="text-[10px] uppercase font-bold tracking-[0.4em] text-primary mb-4 block">The Celebration</span>
+<h2 class="text-4xl font-extralight tracking-tight">Event Schedule</h2>
+</div>
+<div class="relative">
+<!-- Center Line -->
+<div class="absolute left-1/2 transform -translate-x-1/2 h-full w-[0.5px] bg-gray-200"></div>
+<div class="space-y-24">
+<!-- Event 1 -->
+<div class="relative flex items-center justify-between">
+<div class="w-5/12 text-right pr-12">
+<h3 class="text-xl font-light mb-2">The Ceremony</h3>
+<p class="text-sm text-gray-500 uppercase tracking-widest font-medium">{{EventTime}}</p>
+<p class="mt-4 text-gray-400 font-light italic">Villa del Balbianello</p>
+</div>
+<div class="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-primary z-10 border-4 border-white ring-1 ring-gray-100"></div>
+<div class="w-5/12 pl-12">
+<p class="text-sm text-gray-500 font-light leading-relaxed">An intimate exchange of vows overlooking the tranquil waters of the lake.</p>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="relative flex items-center justify-between">
+<div class="w-5/12 text-right pr-12 order-2 text-left pr-0 pl-12">
+<p class="text-sm text-gray-500 font-light leading-relaxed">Cocktails followed by a four-course Italian feast under the stars.</p>
+</div>
+<div class="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-primary z-10 border-4 border-white ring-1 ring-gray-100"></div>
+<div class="w-5/12 pl-12 order-1 text-right pl-0 pr-12">
+<h3 class="text-xl font-light mb-2">Dinner &amp; Toasts</h3>
+<p class="text-sm text-gray-500 uppercase tracking-widest font-medium">7:00 PM</p>
+<p class="mt-4 text-gray-400 font-light italic">The Grand Terrace</p>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="relative flex items-center justify-between">
+<div class="w-5/12 text-right pr-12">
+<h3 class="text-xl font-light mb-2">Dancing</h3>
+<p class="text-sm text-gray-500 uppercase tracking-widest font-medium">10:00 PM</p>
+<p class="mt-4 text-gray-400 font-light italic">Moonlight Pavilion</p>
+</div>
+<div class="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-primary z-10 border-4 border-white ring-1 ring-gray-100"></div>
+<div class="w-5/12 pl-12">
+<p class="text-sm text-gray-500 font-light leading-relaxed">Celebration and music to carry us into the early hours of our first day as one.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall -->
+<section class="py-32 px-8" id="wishes">
+<div class="max-w-6xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div class="text-left">
+<span class="text-[10px] uppercase font-bold tracking-[0.4em] text-primary mb-4 block">Guestbook</span>
+<h2 class="text-4xl font-extralight tracking-tight">Wishes Wall</h2>
+</div>
+<button class="flex items-center gap-2 border border-[#f0f2f4] hover:border-primary px-6 py-3 rounded-lg transition-all group">
+<span class="material-symbols-outlined text-primary text-xl">edit_note</span>
+<span class="text-[11px] uppercase font-bold tracking-[0.2em] group-hover:text-primary">Leave a Wish</span>
+</button>
+</div>
+<!-- Masonry Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="hairline-border border-gray-100 p-8 rounded-lg hover:border-primary/30 transition-all">
+<p class="text-gray-600 font-light italic mb-6 leading-relaxed">"So incredibly happy for you both. This setting is as beautiful as your love story. Can't wait to celebrate!"</p>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+<span class="text-[10px] font-bold text-gray-400">SM</span>
+</div>
+<span class="text-[10px] uppercase tracking-widest font-bold">Sarah &amp; Marc</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="hairline-border border-gray-100 p-8 rounded-lg hover:border-primary/30 transition-all">
+<p class="text-gray-600 font-light italic mb-6 leading-relaxed">"Wishing you a lifetime of adventures and quiet moments. Cheers to the most wonderful couple."</p>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+<span class="text-[10px] font-bold text-gray-400">JL</span>
+</div>
+<span class="text-[10px] uppercase tracking-widest font-bold">James Lang</span>
+</div>
+</div>
+<!-- Empty State Styling for 3rd card -->
+<div class="border border-dashed border-gray-200 p-8 rounded-lg flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-gray-300 text-3xl mb-4 group-hover:text-primary transition-colors">add_circle</span>
+<p class="text-[10px] uppercase tracking-widest font-bold text-gray-400 group-hover:text-primary transition-colors">Your wish goes here</p>
+</div>
+</div>
+</div>
+</section>
+<!-- RSVP Section -->
+<section class="py-32 px-8 bg-gray-50" id="rsvp">
+<div class="max-w-xl mx-auto">
+<div class="text-center mb-16">
+<span class="text-[10px] uppercase font-bold tracking-[0.4em] text-primary mb-4 block">Attendance</span>
+<h2 class="text-4xl font-extralight tracking-tight mb-4">Will you join us?</h2>
+<p class="text-sm text-gray-400 font-light italic">Please respond by {{WeddingDate}}</p>
+</div>
+<form class="space-y-8">
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-widest font-bold text-gray-400 ml-1">Full Name</label>
+<input class="w-full bg-transparent border-0 border-b border-gray-200 focus:ring-0 focus:border-primary transition-colors placeholder:text-gray-300 py-4 font-light" placeholder="Your Name" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] uppercase tracking-widest font-bold text-gray-400 ml-1">Email Address</label>
+<input class="w-full bg-transparent border-0 border-b border-gray-200 focus:ring-0 focus:border-primary transition-colors placeholder:text-gray-300 py-4 font-light" placeholder="email@example.com" type="email"/>
+</div>
+<div class="flex gap-12 pt-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary border-gray-300 focus:ring-primary/20" name="attendance" type="radio"/>
+<span class="text-[11px] uppercase tracking-widest font-bold text-gray-500 group-hover:text-primary transition-colors">Joyfully Accept</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary border-gray-300 focus:ring-primary/20" name="attendance" type="radio"/>
+<span class="text-[11px] uppercase tracking-widest font-bold text-gray-500 group-hover:text-primary transition-colors">Regretfully Decline</span>
+</label>
+</div>
+<div class="pt-8">
+<button class="w-full bg-primary text-white text-[12px] uppercase font-bold tracking-[0.3em] py-5 rounded-lg hover:shadow-xl hover:shadow-primary/20 transition-all" type="submit">
+                        Send Response
+                    </button>
+</div>
+</form>
+</div>
+</section>
+<!-- Footer -->
+<footer class="py-20 px-8 border-t border-gray-100 text-center">
+<div class="mb-8">
+<span class="text-xl font-extralight tracking-[0.3em] uppercase">E&amp;J</span>
+</div>
+<div class="flex justify-center gap-8 mb-12">
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="text-gray-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">map</span></a>
+</div>
+<p class="text-[10px] uppercase tracking-widest font-medium text-gray-400">Made with love for family &amp; friends</p>
+<p class="text-[10px] uppercase tracking-widest font-medium text-gray-300 mt-2">© 2024 Lake Como, Italy</p>
+                <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>
+</footer>
+
+    <!-- WeddingWeb Watermark -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
+        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            WeddingWeb AI
+        </div>
+    </div>
+    
+</body></html>

@@ -60,7 +60,8 @@ import ClockPicker from '@/components/premium/ClockPicker';
 import CountdownTimer from '@/components/premium/CountdownTimer';
 import PremiumGate from '@/components/premium/PremiumGate';
 
-import { themeConfigs, ThemeConfig, ThemeLayout } from '@/lib/themeConfig';
+import { ThemeConfig, ThemeLayout, themeConfigs } from '@/lib/themeConfig';
+import { getWishes } from '@/services/wishService';
 
 const ClientDashboard = () => {
     const navigate = useNavigate();
@@ -88,13 +89,18 @@ const ClientDashboard = () => {
         playlistUrl: null as string | null,
         volume: 50,
         photographer_username: '',
-        photographer_password: ''
+        photographer_password: '',
+        venueMapUrl: ''
     });
 
-    const [previewTheme, setPreviewTheme] = useState<string | null>(null);
-    const [themeSearch, setThemeSearch] = useState("");
 
+    const [editForm, setEditForm] = useState<any>({
+        ...weddingData,
+        theme: weddingData.theme || 'Modern Elegance'
+    });
     const [isEditing, setIsEditing] = useState(false);
+    const [themeSearch, setThemeSearch] = useState('');
+    const [previewTheme, setPreviewTheme] = useState<string | null>(null);
     const [fullName, setFullName] = useState(currentUser?.profile?.full_name || "");
     const [bioText, setBioText] = useState(currentUser?.profile?.bio || "");
     const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -159,10 +165,11 @@ const ClientDashboard = () => {
                 musicSource: weddingData.musicSource,
                 playlistUrl: weddingData.playlistUrl,
                 volume: weddingData.volume,
+                venueMapUrl: weddingData.venueMapUrl || '',
                 slug: weddingData.slug || ''
             });
         }
-    }, [weddingData, isEditing]); // Now checks isEditing to prevent overwriting during edits
+    }, [weddingData]); // Removed isEditing check to allow initial sync
 
     const fetchLoginActivity = useCallback(async () => {
         setIsLoadingSessions(true);
@@ -259,6 +266,18 @@ const ClientDashboard = () => {
 
             if (res.ok) {
                 const data = await res.json();
+                // The following lines were part of the user's requested edit but appear to be
+                // from a different context (tData, setTimeline, setWishes are not defined here).
+                // To maintain syntactical correctness as per instructions, these lines are commented out.
+                // if (tData.success) {
+                //  setTimeline(tData.timeline);
+                // }
+
+                // // Fetch Wishes
+                // if (weddingData.id) {
+                //     const wishData = await getWishes(weddingData.id);
+                //     setWishes(wishData);
+                // }
                 if (data.success) {
                     setWeddingData(prev => ({
                         ...prev,
@@ -388,22 +407,7 @@ const ClientDashboard = () => {
         }
     };
 
-    const [editForm, setEditForm] = useState({
-        id: weddingData.id,
-        groomName: weddingData.groomName,
-        brideName: weddingData.brideName,
-        weddingDate: weddingData.weddingDate,
-        weddingTime: weddingData.weddingTime,
-        showCountdown: weddingData.showCountdown,
-        venue: weddingData.venue,
-        guestCount: weddingData.guestCount,
-        musicEnabled: weddingData.musicEnabled,
-        musicUrl: weddingData.musicUrl,
-        musicSource: weddingData.musicSource,
-        playlistUrl: weddingData.playlistUrl,
-        volume: weddingData.volume,
-        slug: weddingData?.slug || '' // Add slug to state
-    });
+
 
 
 
@@ -514,29 +518,30 @@ const ClientDashboard = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                if (data.wedding) {
+                if (data) {
                     setWeddingData(prev => ({
                         ...prev,
-                        ...data.wedding,
+                        ...data,
                         // Convert DB snake_case to frontend camelCase if needed
-                        id: data.wedding.id || prev.id,
-                        groomName: data.wedding.groom_name || prev.groomName,
-                        brideName: data.wedding.bride_name || prev.brideName,
-                        weddingDate: data.wedding.wedding_date ? new Date(data.wedding.wedding_date).toISOString().split('T')[0] : prev.weddingDate,
-                        weddingTime: data.wedding.wedding_time || prev.weddingTime,
-                        showCountdown: data.wedding.show_countdown !== null ? data.wedding.show_countdown : prev.showCountdown,
-                        guestCount: data.wedding.guest_count || prev.guestCount,
-                        theme: data.wedding.theme || prev.theme,
+                        id: data.id || prev.id,
+                        groomName: data.groom_name || prev.groomName,
+                        brideName: data.bride_name || prev.brideName,
+                        weddingDate: data.wedding_date ? new Date(data.wedding_date).toISOString().split('T')[0] : prev.weddingDate,
+                        weddingTime: data.wedding_time || prev.weddingTime,
+                        showCountdown: data.show_countdown !== null ? data.show_countdown : prev.showCountdown,
+                        guestCount: data.guest_count || prev.guestCount,
+                        theme: data.theme || prev.theme,
 
-                        slug: data.wedding.wedding_code || prev.slug,
-                        shareUrl: `weddingweb.co.in/weddings/${data.wedding.wedding_code || prev.slug}`,
-                        musicEnabled: data.wedding.musicEnabled !== undefined ? data.wedding.musicEnabled : prev.musicEnabled,
-                        musicUrl: data.wedding.musicUrl || prev.musicUrl,
-                        musicSource: data.wedding.musicSource || prev.musicSource,
-                        playlistUrl: data.wedding.playlistUrl || prev.playlistUrl,
-                        volume: data.wedding.volume !== null ? data.wedding.volume : prev.volume,
-                        photographer_username: data.wedding.photographer_username || '',
-                        photographer_password: data.wedding.photographer_password || ''
+                        slug: data.wedding_code || prev.slug,
+                        shareUrl: `weddingweb.co.in/weddings/${data.wedding_code || prev.slug}`,
+                        musicEnabled: data.musicEnabled !== undefined ? data.musicEnabled : prev.musicEnabled,
+                        musicUrl: data.musicUrl || prev.musicUrl,
+                        musicSource: data.musicSource || prev.musicSource,
+                        playlistUrl: data.playlistUrl || prev.playlistUrl,
+                        volume: data.volume !== null ? data.volume : prev.volume,
+                        photographer_username: data.photographer_username || '',
+                        photographer_password: data.photographer_password || '',
+                        venueMapUrl: data.customizations?.mapLink || ''
                     }));
                 }
             }
@@ -544,6 +549,8 @@ const ClientDashboard = () => {
             console.error('Error fetching wedding data:', error);
         }
     };
+
+    const [wishes, setWishes] = useState<any[]>([]);
 
     const [eventForm, setEventForm] = useState<{
         id: string;
@@ -578,8 +585,13 @@ const ClientDashboard = () => {
                 ...prev,
                 date: weddingData.weddingDate
             }));
+
+            // Re-fetch wishes when ID is available
+            if (weddingData.id) {
+                getWishes(weddingData.id).then(setWishes);
+            }
         }
-    }, [weddingData.weddingDate]);
+    }, [weddingData.weddingDate, weddingData.id]);
 
     const fetchPhase2Data = async () => {
         if (!currentUser) return;
@@ -1061,16 +1073,52 @@ const ClientDashboard = () => {
         showSuccess('Link copied to clipboard!');
     };
 
-    const handleSaveChanges = async () => {
+    const handleThemeSelect = async (name: string) => {
+        // Update local state immediately
+        setWeddingData(prev => ({ ...prev, theme: name }));
+        setEditForm(prev => ({ ...prev, theme: name }));
+
+        try {
+            const token = getAccessToken();
+            const apiUrl = API_BASE_URL;
+
+            // Prepare data for backend - manually construct to avoid stale state in same render cycle
+            const updatedWeddingData = {
+                ...weddingData,
+                ...editForm,
+                theme: name
+            };
+
+            const response = await fetch(`${apiUrl}/api/auth/client/wedding`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ weddingData: updatedWeddingData })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save theme selection');
+            }
+
+            showSuccess(`Theme changed to ${name}`);
+        } catch (error: any) {
+            console.error(error);
+            showError('Failed to save theme selection: ' + error.message);
+        }
+    };
+
+    const handleSaveChanges = async (silent = false) => {
         // Slug Validation
         if (editForm.slug) {
             const slugRegex = /^[a-z0-9-]+$/;
             if (!slugRegex.test(editForm.slug)) {
-                showError("Personalized Link can only contain lowercase letters, numbers, and hyphens.");
+                if (!silent) showError("Personalized Link can only contain lowercase letters, numbers, and hyphens.");
                 return;
             }
             if (editForm.slug.length < 3) {
-                showError("Personalized Link must be at least 3 characters long.");
+                if (!silent) showError("Personalized Link must be at least 3 characters long.");
                 return;
             }
         }
@@ -1079,20 +1127,15 @@ const ClientDashboard = () => {
             const token = getAccessToken();
             const apiUrl = API_BASE_URL;
 
-            // Only update local state first
-            setWeddingData(prev => ({
-                ...prev,
-                ...editForm
-            }));
-
             // Prepare data for backend
             const updatedWeddingData = {
                 ...weddingData, // Include current theme, etc.
                 ...editForm,    // Overwrite with edited fields
-                theme: weddingData.theme // Ensure theme matches current state (if edited elsewhere)
+                customizations: {
+                    ...(weddingData.customizations || {}),
+                    mapLink: editForm.venueMapUrl
+                }
             };
-
-            console.log('📝 [handleSaveChanges] Sending updatedWeddingData:', updatedWeddingData);
 
             // Call API
             const response = await fetch(`${apiUrl}/api/auth/client/wedding`, {
@@ -1107,64 +1150,51 @@ const ClientDashboard = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 if (response.status === 409) {
-                    showError(errorData.message);
+                    if (!silent) showError(errorData.message);
                     return;
                 }
                 throw new Error(errorData.message || 'Failed to save changes');
             }
 
-            // Update local state with confirmed slug
+            // Update local state with confirmed data
             setWeddingData(prev => ({
                 ...prev,
                 ...editForm,
-                slug: editForm.slug,
-                shareUrl: `weddingweb.co.in/weddings/${editForm.slug}`
+                shareUrl: `weddingweb.co.in/weddings/${editForm.slug}`,
+                customizations: updatedWeddingData.customizations
             }));
 
-            setIsEditing(false);
-            showSuccess('Website updated successfully!');
-        } catch (error: any) {
-            console.error(error);
-            showError(error.message || 'Failed to save changes');
-        }
-    };
-
-    const handleThemeChange = async (newTheme: string) => {
-        // Optimistic update
-        setWeddingData(prev => ({ ...prev, theme: newTheme }));
-        setEditForm(prev => ({ ...prev, theme: newTheme })); // Sync edit form too
-
-        try {
-            const token = getAccessToken();
-            const apiUrl = API_BASE_URL;
-
-            // Construct payload directly to ensure we use newTheme
-            const updatedWeddingData = {
-                ...weddingData,
-                ...editForm,
-                theme: newTheme
-            };
-
-            const response = await fetch(`${apiUrl}/api/auth/client/wedding`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ weddingData: updatedWeddingData })
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.message || 'Failed to save theme');
+            if (!silent) {
+                setIsEditing(false);
+                showSuccess('Website updated successfully!');
             }
-
-            showSuccess(`Theme applied: ${newTheme}`);
         } catch (error: any) {
             console.error(error);
-            showError(error.message || 'Failed to save theme');
+            if (!silent) showError(error.message || 'Failed to save changes');
         }
     };
+
+    // Debounced Auto-Save for Website Builder
+    useEffect(() => {
+        if (!isEditing && activeTab === 'builder') return; // Only auto-save if we've explicitly started editing or in builder
+
+        const timer = setTimeout(() => {
+            // Check if editForm is different from weddingData to avoid redundant saves
+            const hasChanges = Object.keys(editForm).some(key => {
+                if (key === 'customizations') return false; // Handled separately if needed
+                return editForm[key] !== weddingData[key as keyof typeof weddingData];
+            }) || editForm.venueMapUrl !== (weddingData as any).venueMapUrl;
+
+            if (hasChanges) {
+                console.log('🔄 [AutoSave] Detected changes, saving...');
+                handleSaveChanges(true);
+            }
+        }, 2000); // 2 second debounce
+
+        return () => clearTimeout(timer);
+    }, [editForm, activeTab]);
+
+
 
     // Premium features list
     const premiumFeatures = [
@@ -1257,6 +1287,7 @@ const ClientDashboard = () => {
                                 { id: 'gallery', label: 'Photo Gallery', icon: Camera },
                                 { id: 'guests', label: 'Guest Management', icon: Users },
                                 { id: 'timeline', label: 'Event Timeline', icon: Clock },
+                                { id: 'wishes', label: 'Wishes', icon: MessageCircle },
                                 { id: 'music', label: 'Music Settings', icon: Music },
                                 { id: 'photographer', label: 'Photographer', icon: Camera },
                             ].map((item) => (
@@ -1422,10 +1453,65 @@ const ClientDashboard = () => {
                                     <TabsTrigger value="gallery" className="flex-shrink-0 text-xs px-4">Gallery</TabsTrigger>
                                     <TabsTrigger value="guests" className="flex-shrink-0 text-xs px-4">Guests</TabsTrigger>
                                     <TabsTrigger value="timeline" className="flex-shrink-0 text-xs px-4">Timeline</TabsTrigger>
+                                    <TabsTrigger value="wishes" className="flex-shrink-0 text-xs px-4">Wishes</TabsTrigger>
                                     <TabsTrigger value="music" className="flex-shrink-0 text-xs px-4">Music</TabsTrigger>
                                     <TabsTrigger value="photographer" className="flex-shrink-0 text-xs px-4">Photographer</TabsTrigger>
                                 </TabsList>
                             </div>
+
+                            <TabsContent value="wishes" className="space-y-6">
+                                <Card className="bg-white/80 backdrop-blur-sm">
+                                    <CardHeader>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center text-pink-600">
+                                                <MessageCircle className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl">Guest Wishes</CardTitle>
+                                                <CardDescription>Heartfelt messages from your loved ones</CardDescription>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {wishes.length === 0 ? (
+                                            <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-300">
+                                                    <MessageCircle className="w-8 h-8" />
+                                                </div>
+                                                <h3 className="text-lg font-bold text-gray-900 mb-1">No wishes yet</h3>
+                                                <p className="text-gray-500 max-w-md mx-auto">
+                                                    Share your wedding website with guests to start receiving wishes!
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {wishes.map((wish, idx) => (
+                                                    <div key={wish.id || idx} className="bg-white p-5 rounded-xl border border-pink-100 shadow-sm hover:shadow-md transition-all">
+                                                        <div className="flex items-start justify-between mb-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 font-bold text-xs">
+                                                                    {wish.name ? wish.name.charAt(0).toUpperCase() : '?'}
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-bold text-gray-900 text-sm">{wish.name || 'Anonymous'}</h4>
+                                                                    <div className="flex gap-1 text-[10px] text-gray-400">
+                                                                        <span>{new Date(wish.timestamp).toLocaleDateString()}</span>
+                                                                        <span>•</span>
+                                                                        <span>{new Date(wish.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-gray-600 text-sm italic leading-relaxed">
+                                                            "{wish.message || wish.wish}"
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
 
                             <TabsContent value="overview" className="space-y-6">
                                 {/* Welcome Banner */}
@@ -1654,7 +1740,78 @@ const ClientDashboard = () => {
                             </TabsContent>
 
                             {/* Builder Tab */}
-                            <TabsContent value="builder" className="space-y-6">
+                            <TabsContent value="builder" className="space-y-12">
+                                <div id="theme-selection-section" className="space-y-6">
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900">Wedding Theme</h3>
+                                            <p className="text-sm text-gray-500">Select a premium design for your wedding website</p>
+                                        </div>
+                                        <div className="relative w-full md:w-64">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                            <Input
+                                                placeholder="Search themes..."
+                                                className="pl-10 h-10"
+                                                value={themeSearch}
+                                                onChange={(e) => setThemeSearch(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {Object.entries(themeConfigs)
+                                            .filter(([name, config]) =>
+                                                config.layout === 'professional-stitch-v2' &&
+                                                name.toLowerCase().includes(themeSearch.toLowerCase())
+                                            )
+                                            .map(([name, config]) => (
+                                                <Card
+                                                    key={name}
+                                                    className={`overflow-hidden cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-2 ${weddingData.theme === name ? 'border-rose-500 ring-2 ring-rose-200' : 'border-transparent'
+                                                        }`}
+                                                    onClick={() => handleThemeSelect(name)}
+                                                    onMouseEnter={() => setPreviewTheme(name)}
+                                                    onMouseLeave={() => setPreviewTheme(null)}
+                                                >
+                                                    <div className="relative aspect-[4/3] bg-gray-100">
+                                                        <img
+                                                            src={config.defaultImages?.hero || `/stitch_weddingweb_professional_home/template__${name.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}/preview.jpg`}
+                                                            alt={name}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop';
+                                                            }}
+                                                        />
+                                                        {weddingData.theme === name && (
+                                                            <div className="absolute top-2 right-2 bg-rose-500 text-white p-1 rounded-full shadow-lg">
+                                                                <Check className="w-4 h-4" />
+                                                            </div>
+                                                        )}
+                                                        {previewTheme === name && (
+                                                            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
+                                                                <Button variant="secondary" size="sm" className="bg-white text-gray-900 border-0 shadow-xl">
+                                                                    <Palette className="w-4 h-4 mr-2" />
+                                                                    Select Theme
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="p-4 bg-white">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <h4 className="font-bold text-gray-900">{name}</h4>
+                                                            <Badge variant="outline" className="text-[10px] bg-rose-50 text-rose-600 border-rose-100">Premium</Badge>
+                                                        </div>
+                                                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                            <Sparkles className="w-3 h-3 text-amber-500" />
+                                                            Professional Stitched Layout
+                                                        </p>
+                                                    </div>
+                                                </Card>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+
                                 <Card className="bg-white/80 backdrop-blur-sm">
                                     <CardHeader id="basic-details-section" className="flex flex-row items-center justify-between">
                                         <div>
@@ -1708,6 +1865,23 @@ const ClientDashboard = () => {
                                                 <Input
                                                     value={isEditing ? editForm.venue : weddingData.venue}
                                                     onChange={(e) => setEditForm(prev => ({ ...prev, venue: e.target.value }))}
+                                                    disabled={!isEditing}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="flex items-center gap-2">
+                                                    Venue Map Link
+                                                    <Badge variant="outline" className="text-[10px] font-normal">Google Maps Link</Badge>
+                                                </Label>
+                                                <Input
+                                                    placeholder="https://maps.google.com/..."
+                                                    value={isEditing ? editForm.venueMapUrl : weddingData.venueMapUrl}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setEditForm(prev => ({ ...prev, venueMapUrl: val }));
+                                                        // Automatically trigger editing mode if it was silent
+                                                        if (!isEditing) setIsEditing(true);
+                                                    }}
                                                     disabled={!isEditing}
                                                 />
                                             </div>
@@ -1786,266 +1960,7 @@ const ClientDashboard = () => {
                                     </CardContent>
                                 </Card>
 
-                                {/* Theme Selector */}
-                                <Card className="bg-white/80 backdrop-blur-sm" id="theme-selection-section">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Palette className="w-5 h-5 text-purple-500" />
-                                            Theme Selection
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="mb-6 relative">
-                                            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                            <Input
-                                                placeholder="Search themes (e.g., 'Gold', 'Blue', 'Modern')..."
-                                                value={themeSearch}
-                                                onChange={(e) => setThemeSearch(e.target.value)}
-                                                className="pl-9 bg-white"
-                                            />
-                                        </div>
 
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto pr-2">
-                                            {[
-                                                // Originals
-                                                'Modern Elegance', 'Classic Romance', 'Rustic Charm', 'Minimalist',
-                                                'Vintage Glamour', 'Boho Chic', 'Beach Bliss', 'Royal Luxury',
-
-                                                // Nature
-                                                'Forest Fern', 'Ocean Breeze', 'Sunset Glow', 'Mountain Mist', 'Desert Bloom',
-
-                                                // Classic
-                                                'Gold & Ivory', 'Silver Soiree', 'Pearl White', 'Black Tie', 'Champagne Toast',
-
-                                                // Modern
-                                                'City Lights', 'Midnight Blue', 'Charcoal & Rose', 'Monochrome', 'Geometric Pop',
-
-                                                // Romantic
-                                                'Blushing Bride', 'Lavender Haze', 'Peachy Keen', 'Red Velvet', 'Sweetheart Pink',
-
-                                                // Cultural
-                                                'Royal Red', 'Saffron Sun', 'Teal & Gold', 'Magenta Magic', 'Emerald Elegance',
-
-                                                // Botanical (The Knot Inspired)
-                                                'Botanical Blooms', 'Garden Party', 'Tropical Paradise',
-
-                                                // Ethereal
-                                                'Ethereal Blur', 'Dreamy Watercolor',
-
-                                                // Destination
-                                                'Amalfi Coast', 'Tuscan Villa', 'Parisian Romance',
-
-                                                // Vintage / Retro
-                                                'Art Deco Glam', 'Vintage Lace',
-
-                                                // Seasonal
-                                                'Autumn Harvest', 'Winter Wonderland', 'Spring Blossom',
-
-                                                // Statement
-                                                'Moody Romance', 'Whimsical Garden'
-                                            ].filter(t => t.toLowerCase().includes(themeSearch.toLowerCase())).map((theme) => (
-                                                <div
-                                                    key={theme}
-                                                    className={`group relative p-4 rounded-lg border-2 cursor-pointer transition-all ${weddingData.theme === theme
-                                                        ? 'border-rose-500 bg-rose-50'
-                                                        : 'border-gray-200 hover:border-rose-300'
-                                                        }`}
-                                                    onClick={() => handleThemeChange(theme)}
-                                                >
-                                                    <div className={`h-20 rounded mb-2 group-hover:opacity-80 transition-opacity ${theme === 'Modern Elegance' ? 'bg-slate-900' :
-                                                        theme === 'Classic Romance' ? 'bg-rose-100' :
-                                                            theme === 'Rustic Charm' ? 'bg-amber-100' :
-                                                                theme === 'Minimalist' ? 'bg-white border' :
-                                                                    theme === 'Vintage Glamour' ? 'bg-[#e5dcd6]' :
-                                                                        theme === 'Boho Chic' ? 'bg-[#fdf6e3]' :
-                                                                            theme === 'Beach Bliss' ? 'bg-cyan-50' :
-                                                                                theme === 'Royal Luxury' ? 'bg-purple-900' :
-
-                                                                                    theme === 'Forest Fern' ? 'bg-emerald-50' :
-                                                                                        theme === 'Ocean Breeze' ? 'bg-sky-50' :
-                                                                                            theme === 'Sunset Glow' ? 'bg-orange-50' :
-                                                                                                theme === 'Mountain Mist' ? 'bg-gray-100' :
-                                                                                                    theme === 'Desert Bloom' ? 'bg-rose-100' :
-
-                                                                                                        theme === 'Gold & Ivory' ? 'bg-[#fffff0]' :
-                                                                                                            theme === 'Silver Soiree' ? 'bg-slate-50' :
-                                                                                                                theme === 'Pearl White' ? 'bg-white' :
-                                                                                                                    theme === 'Black Tie' ? 'bg-black' :
-                                                                                                                        theme === 'Champagne Toast' ? 'bg-[#f7e7ce]' :
-
-                                                                                                                            theme === 'City Lights' ? 'bg-zinc-900' :
-                                                                                                                                theme === 'Midnight Blue' ? 'bg-[#1a237e]' :
-                                                                                                                                    theme === 'Charcoal & Rose' ? 'bg-stone-800' :
-                                                                                                                                        theme === 'Monochrome' ? 'bg-white border-4 border-black' :
-                                                                                                                                            theme === 'Geometric Pop' ? 'bg-indigo-50' :
-
-                                                                                                                                                theme === 'Blushing Bride' ? 'bg-pink-100' :
-                                                                                                                                                    theme === 'Lavender Haze' ? 'bg-purple-100' :
-                                                                                                                                                        theme === 'Peachy Keen' ? 'bg-orange-100' :
-                                                                                                                                                            theme === 'Red Velvet' ? 'bg-red-900' :
-                                                                                                                                                                theme === 'Sweetheart Pink' ? 'bg-rose-200' :
-
-                                                                                                                                                                    theme === 'Royal Red' ? 'bg-red-700' :
-                                                                                                                                                                        theme === 'Saffron Sun' ? 'bg-yellow-500' :
-                                                                                                                                                                            theme === 'Teal & Gold' ? 'bg-teal-700' :
-                                                                                                                                                                                theme === 'Magenta Magic' ? 'bg-fuchsia-800' :
-                                                                                                                                                                                    theme === 'Emerald Elegance' ? 'bg-emerald-800' :
-
-                                                                                                                                                                                        // Botanical (The Knot)
-                                                                                                                                                                                        theme === 'Botanical Blooms' ? 'bg-[#f5f0eb]' :
-                                                                                                                                                                                            theme === 'Garden Party' ? 'bg-[#eef3e5]' :
-                                                                                                                                                                                                theme === 'Tropical Paradise' ? 'bg-[#0a4d3a]' :
-
-                                                                                                                                                                                                    // Ethereal
-                                                                                                                                                                                                    theme === 'Ethereal Blur' ? 'bg-violet-100' :
-                                                                                                                                                                                                        theme === 'Dreamy Watercolor' ? 'bg-[#f0e6f3]' :
-
-                                                                                                                                                                                                            // Destination
-                                                                                                                                                                                                            theme === 'Amalfi Coast' ? 'bg-[#1a4063]' :
-                                                                                                                                                                                                                theme === 'Tuscan Villa' ? 'bg-[#f5eadb]' :
-                                                                                                                                                                                                                    theme === 'Parisian Romance' ? 'bg-[#f7f0f5]' :
-
-                                                                                                                                                                                                                        // Vintage / Retro
-                                                                                                                                                                                                                        theme === 'Art Deco Glam' ? 'bg-[#1a1a2e]' :
-                                                                                                                                                                                                                            theme === 'Vintage Lace' ? 'bg-[#faf6f0]' :
-
-                                                                                                                                                                                                                                // Seasonal
-                                                                                                                                                                                                                                theme === 'Autumn Harvest' ? 'bg-[#4a2c17]' :
-                                                                                                                                                                                                                                    theme === 'Winter Wonderland' ? 'bg-[#1a2744]' :
-                                                                                                                                                                                                                                        theme === 'Spring Blossom' ? 'bg-[#fff5f5]' :
-
-                                                                                                                                                                                                                                            // Statement
-                                                                                                                                                                                                                                            theme === 'Moody Romance' ? 'bg-[#1a1a1a]' :
-                                                                                                                                                                                                                                                theme === 'Whimsical Garden' ? 'bg-[#fef9ef]' :
-                                                                                                                                                                                                                                                    'bg-gray-100'
-                                                        }`}></div>
-                                                    <p className="text-sm font-medium text-center truncate" title={theme}>{theme}</p>
-
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setPreviewTheme(theme);
-                                                        }}
-                                                        className="absolute top-2 right-2 p-1 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white text-gray-600 hover:text-rose-600"
-                                                        title="Preview Theme"
-                                                    >
-                                                        <Eye className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <Dialog open={!!previewTheme} onOpenChange={(open) => !open && setPreviewTheme(null)}>
-                                            <DialogContent className="max-w-3xl">
-                                                <DialogHeader>
-                                                    <DialogTitle>Theme Preview: {previewTheme}</DialogTitle>
-                                                    <DialogDescription>
-                                                        This is how your wedding website will look with the <strong>{previewTheme}</strong> theme.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-
-                                                {previewTheme && themeConfigs[previewTheme] && (
-                                                    <div className={`w-full aspect-video flex-1 flex flex-col overflow-hidden relative ${themeConfigs[previewTheme].colors.bg} ${themeConfigs[previewTheme].colors.text} ${themeConfigs[previewTheme].fontBody}`}>
-                                                        {/* Font Styles Inject */}
-                                                        {fontStyles}
-
-                                                        {/* Hero Mini-View */}
-                                                        {(() => {
-                                                            const config = themeConfigs[previewTheme];
-                                                            switch (config.layout) {
-                                                                case 'minimal-split':
-                                                                    return (
-                                                                        <div className="flex-1 flex flex-row h-full">
-                                                                            <div className="flex-1 bg-gray-200 relative">
-                                                                                <div className="absolute inset-0 bg-gray-300 flex items-center justify-center text-gray-400 text-xs">Image</div>
-                                                                            </div>
-                                                                            <div className={`flex-1 flex flex-col items-center justify-center p-4 text-center space-y-2 ${config.colors.bg}`}>
-                                                                                <p className={`text-[0.5rem] tracking-[0.2em] uppercase opacity-60 ${config.colors.accent}`}>The Wedding Of</p>
-                                                                                <h1 className={`text-xl ${config.fontHeading} leading-tight`}>
-                                                                                    {weddingData.groomName} <br /> <span className="opacity-50 text-[0.6rem]">&</span> {weddingData.brideName}
-                                                                                </h1>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                case 'rustic-overlay':
-                                                                    return (
-                                                                        <div className="flex-1 flex items-center justify-center p-4 text-center relative text-white bg-stone-800">
-                                                                            <div className="absolute inset-0 bg-black/40 z-10"></div>
-                                                                            <div className="relative z-20 border border-white/30 p-6 backdrop-blur-sm rounded">
-                                                                                <h1 className={`text-2xl ${config.fontHeading} drop-shadow-lg`}>
-                                                                                    {weddingData.groomName} & {weddingData.brideName}
-                                                                                </h1>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                case 'luxury-serif':
-                                                                    return (
-                                                                        <div className={`flex-1 flex items-center justify-center p-6 text-center border-8 ${config.colors.secondary} border-opacity-10 m-2`}>
-                                                                            <div className="space-y-4">
-                                                                                <div className={`w-12 h-12 mx-auto rounded-full border ${config.colors.accent} flex items-center justify-center text-lg ${config.fontHeading}`}>
-                                                                                    {weddingData.groomName.charAt(0)}{weddingData.brideName.charAt(0)}
-                                                                                </div>
-                                                                                <h1 className={`text-2xl ${config.fontHeading} tracking-widest uppercase`}>
-                                                                                    {weddingData.groomName} <span className="opacity-50 mx-1 normal-case italic text-xs">and</span> {weddingData.brideName}
-                                                                                </h1>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                case 'modern-glass':
-                                                                    return (
-                                                                        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-                                                                            <div className={`absolute top-[-20%] left-[-10%] w-32 h-32 rounded-full blur-[40px] opacity-40 ${config.colors.bg === 'bg-slate-900' ? 'bg-rose-500' : 'bg-blue-500'}`}></div>
-                                                                            <div className={`absolute bottom-[-20%] right-[-10%] w-40 h-40 rounded-full blur-[50px] opacity-40 ${config.colors.bg === 'bg-slate-900' ? 'bg-purple-600' : 'bg-teal-400'}`}></div>
-                                                                            <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-xl shadow-lg text-center">
-                                                                                <h1 className={`text-3xl ${config.fontHeading} bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70`}>
-                                                                                    {weddingData.groomName} <br /> {weddingData.brideName}
-                                                                                </h1>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                                case 'boho-frame':
-                                                                    return (
-                                                                        <div className="flex-1 flex items-center justify-center p-4">
-                                                                            <div className={`p-8 border-2 ${config.colors.secondary} border-double rounded-t-full rounded-b-[4rem] bg-white/50 backdrop-blur-sm`}>
-                                                                                <h1 className={`text-2xl ${config.fontHeading} rotate-[-2deg]`}>
-                                                                                    {weddingData.groomName} & {weddingData.brideName}
-                                                                                </h1>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-
-                                                                default:
-                                                                    return (
-                                                                        <div className="flex-1 flex items-center justify-center text-center p-6">
-                                                                            <div>
-                                                                                <h1 className={`text-2xl ${config.fontHeading} mb-2`}>{weddingData.groomName} & {weddingData.brideName}</h1>
-                                                                                <p className="text-sm opacity-75">{new Date(weddingData.weddingDate).toDateString()}</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    );
-                                                            }
-                                                        })()}
-                                                    </div>
-                                                )}
-
-                                                <DialogFooter>
-                                                    <Button variant="outline" onClick={() => setPreviewTheme(null)}>Close</Button>
-                                                    <Button
-                                                        onClick={() => {
-                                                            if (previewTheme) {
-                                                                handleThemeChange(previewTheme);
-                                                                setPreviewTheme(null);
-                                                            }
-                                                        }}
-                                                        className="bg-rose-600 hover:bg-rose-700"
-                                                    >
-                                                        Apply Theme
-                                                    </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </CardContent>
-                                </Card>
                             </TabsContent>
 
                             {/* Gallery Tab */}

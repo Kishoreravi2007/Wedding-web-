@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sarah &amp; James | A Retro Wedding Celebration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "retro-mint": "#d1f2eb",
+                        "retro-coral": "#ff8b94",
+                        "retro-cream": "#fff9f0",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .retro-pattern {
+            background-color: #fff9f0;
+            background-image: radial-gradient(#1754cf 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+        }
+        .polaroid {
+            background: white;
+            padding: 1rem 1rem 3rem 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: scale(1.02) rotate(0deg) !important;
+        }
+        .starburst {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+    </style>
+</head>
+<body class="font-display bg-retro-cream text-[#111318]">
+<!-- Navigation -->
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-dashed border-primary/20 px-6 md:px-20 py-6 bg-retro-mint/30 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary text-white flex items-center justify-center rounded-lg rotate-3 shadow-lg">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</div>
+<h2 class="text-primary text-xl font-black leading-tight tracking-tighter uppercase italic">S &amp; J</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-8">
+<a class="text-primary hover:text-retro-coral text-sm font-bold uppercase tracking-widest transition-colors" href="#story">Our Story</a>
+<a class="text-primary hover:text-retro-coral text-sm font-bold uppercase tracking-widest transition-colors" href="#timeline">Timeline</a>
+<a class="text-primary hover:text-retro-coral text-sm font-bold uppercase tracking-widest transition-colors" href="#gallery">Gallery</a>
+<a class="text-primary hover:text-retro-coral text-sm font-bold uppercase tracking-widest transition-colors" href="#wishes">Wishes</a>
+</nav>
+<a class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-full h-10 px-6 bg-primary text-white text-xs font-black uppercase tracking-widest hover:bg-retro-coral transition-all shadow-md" href="#rsvp">
+                        RSVP Now
+                    </a>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary text-3xl">menu</span>
+</div>
+</header>
+<!-- Hero Section -->
+<main class="flex-1">
+<div class="relative overflow-hidden bg-retro-mint/20 py-12 md:py-24 px-6 md:px-20">
+<!-- Decorative Elements -->
+<div class="absolute top-10 right-10 w-32 h-32 bg-retro-coral/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-10 left-10 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 z-10 text-center md:text-left">
+<div class="inline-block px-4 py-1 bg-retro-coral text-white font-black text-xs uppercase tracking-[0.2em] rounded-full mb-6 shadow-sm rotate-[-2deg]">
+                                Save the Date
+                            </div>
+<h1 class="text-[#111318] text-5xl md:text-8xl font-black leading-[0.9] tracking-tighter mb-6 uppercase">
+                                Sarah <span class="text-primary italic">&amp;</span> James <br/>
+<span class="text-primary">Tying the Knot</span>
+</h1>
+<p class="text-lg md:text-xl text-[#636f88] mb-10 max-w-lg font-medium leading-relaxed">
+                                Join us for an atomic-age celebration of love, laughter, and endless dancing in the garden.
+                            </p>
+<div class="flex flex-wrap gap-4 justify-center md:justify-start">
+<a class="flex min-w-[180px] items-center justify-center rounded-xl h-14 px-8 bg-primary text-white text-base font-black uppercase tracking-widest hover:bg-retro-coral transition-all shadow-xl hover:-translate-y-1" href="#rsvp">
+                                    RSVP Now
+                                </a>
+<div class="flex items-center gap-3 px-6 py-4 bg-white rounded-xl shadow-sm border border-primary/10">
+<span class="material-symbols-outlined text-retro-coral">calendar_today</span>
+<span class="font-bold text-primary">JUNE 15, 2024</span>
+</div>
+</div>
+</div>
+<div class="flex-1 relative">
+<div class="polaroid rotate-3 z-20">
+<img alt="The Happy Couple" class="w-full h-[400px] object-cover grayscale-[20%]" data-alt="Vintage style couple laughing together outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5b9JYu2kEPILPRn2UH_jxA8oBME3k-UGOHbflfzfw8nkaNNvFjJwguOMOE9U6gkgfAzy5aom0CMVqcoBuzUxoQVuvjmbclHTsuRH5Y1bfMz0GsJTi7Trv4EmQTocG6-8bbw8kLqNowRQaoWcOxCgq6f6lfkbXqGAyQ0tXItOUhuO0kq6i0VETZTwJ8Je095fWdHAqDR5OL2v-8PyAHxzwqRF8yisufKLBjyTmTxWMSO-Uky-GLf82WzkWc-Qjbkubyg2oPO2A9HfV"/>
+<p class="text-center font-bold text-xl mt-6 text-[#111318] italic" style="font-family: 'Brush Script MT', cursive, sans-serif;">Summer of '24</p>
+</div>
+<div class="absolute -top-6 -right-6 w-24 h-24 bg-retro-coral starburst opacity-80 animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- Timeline Section -->
+<section class="py-24 px-6 md:px-20 bg-white retro-pattern" id="timeline">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-primary mb-4">The Big Day Timeline</h2>
+<div class="h-1 w-24 bg-retro-coral mx-auto rounded-full"></div>
+</div>
+<div class="space-y-0">
+<!-- Timeline Item 1 -->
+<div class="grid grid-cols-[80px_1fr] md:grid-cols-[1fr_120px_1fr] items-center">
+<div class="hidden md:block text-right pr-8">
+<h3 class="text-xl font-black text-[#111318]">St. Jude's Chapel</h3>
+<p class="text-[#636f88]">The I-Dos and rings</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg border-4 border-white z-10">
+<span class="material-symbols-outlined text-3xl">church</span>
+</div>
+<div class="w-1 bg-primary/20 h-24 dashed"></div>
+</div>
+<div class="pl-8 pb-12">
+<p class="text-retro-coral font-black text-sm uppercase tracking-widest mb-1">4:00 PM</p>
+<h3 class="text-xl font-black text-[#111318] md:hidden">St. Jude's Chapel</h3>
+<p class="text-lg font-bold text-primary italic">The Wedding Ceremony</p>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="grid grid-cols-[80px_1fr] md:grid-cols-[1fr_120px_1fr] items-center">
+<div class="pl-8 pb-12 md:pl-0 md:pr-8 md:text-right order-2 md:order-1">
+<p class="text-retro-coral font-black text-sm uppercase tracking-widest mb-1">5:30 PM</p>
+<h3 class="text-xl font-black text-[#111318] md:hidden">The Secret Garden</h3>
+<p class="text-lg font-bold text-primary italic">Cocktail Hour</p>
+</div>
+<div class="flex flex-col items-center gap-2 order-1 md:order-2">
+<div class="size-16 rounded-full bg-retro-mint flex items-center justify-center text-primary shadow-lg border-4 border-white z-10">
+<span class="material-symbols-outlined text-3xl">local_bar</span>
+</div>
+<div class="w-1 bg-primary/20 h-24 dashed"></div>
+</div>
+<div class="hidden md:block pl-8 order-3">
+<h3 class="text-xl font-black text-[#111318]">The Secret Garden</h3>
+<p class="text-[#636f88]">Signature drinks &amp; jazz</p>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="grid grid-cols-[80px_1fr] md:grid-cols-[1fr_120px_1fr] items-center">
+<div class="hidden md:block text-right pr-8">
+<h3 class="text-xl font-black text-[#111318]">Main Ballroom</h3>
+<p class="text-[#636f88]">Three-course feast</p>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-16 rounded-full bg-retro-coral flex items-center justify-center text-white shadow-lg border-4 border-white z-10">
+<span class="material-symbols-outlined text-3xl">restaurant</span>
+</div>
+<div class="w-1 bg-primary/20 h-24 dashed"></div>
+</div>
+<div class="pl-8 pb-12">
+<p class="text-retro-coral font-black text-sm uppercase tracking-widest mb-1">7:00 PM</p>
+<h3 class="text-xl font-black text-[#111318] md:hidden">Main Ballroom</h3>
+<p class="text-lg font-bold text-primary italic">Dinner &amp; Toasts</p>
+</div>
+</div>
+<!-- Timeline Item 4 -->
+<div class="grid grid-cols-[80px_1fr] md:grid-cols-[1fr_120px_1fr] items-center">
+<div class="pl-8 md:pl-0 md:pr-8 md:text-right order-2 md:order-1">
+<p class="text-retro-coral font-black text-sm uppercase tracking-widest mb-1">9:00 PM</p>
+<h3 class="text-xl font-black text-[#111318] md:hidden">The Disco Floor</h3>
+<p class="text-lg font-bold text-primary italic">Dancing 'til Dawn</p>
+</div>
+<div class="flex flex-col items-center gap-2 order-1 md:order-2">
+<div class="size-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg border-4 border-white z-10">
+<span class="material-symbols-outlined text-3xl">celebration</span>
+</div>
+</div>
+<div class="hidden md:block pl-8 order-3">
+<h3 class="text-xl font-black text-[#111318]">The Disco Floor</h3>
+<p class="text-[#636f88]">Live band &amp; fun</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Photo Gallery Section -->
+<section class="py-24 px-6 md:px-20 bg-retro-mint/30 overflow-hidden" id="gallery">
+<div class="max-w-6xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div>
+<h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-primary">Our Story in Polaroids</h2>
+<p class="text-lg text-[#636f88] mt-4 max-w-md">Snapshots of our favorite moments from the last five years together.</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-black uppercase tracking-widest hover:text-retro-coral transition-colors">
+<span>View Full Album</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="polaroid -rotate-3">
+<img alt="First Date" class="w-full aspect-square object-cover" data-alt="Couple at the beach during sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQhIGgK009c-UVumtcUaMzDXIFWHfRzafzkE8-9Tt39Dfp3NGdaMaVQ0mgzUZOy927ReJNeLwi6LP7xu9r5SLU4v-HMv8cDJgVBvNZfzxJgIXV3dannLSj3pWEQAj-Ts_YyCu8ul78wlZRM5YjZZ_88jiisHcpedc57FcCLsHxSCz7GnwhlJNfvv28_5CJ3VA4ZrtHehIt0Cud9iuW5VQcmQynq-2gDYzBYoNpJ9J2JT_YFGU1m7Yhl64ojcOZi1xKU2v8CppV7XHO"/>
+<p class="mt-4 font-bold italic text-center text-gray-500">First Trip to the Coast</p>
+</div>
+<div class="polaroid rotate-6 mt-6">
+<img alt="The Proposal" class="w-full aspect-square object-cover" data-alt="Couple drinking coffee in a vintage cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9RWWMxei3xrXn0GcFqDcauB2eipsvUIgNw36irthyKLTAr1IOLpaiLmSx1n3RNGD2_P6qQ64BdXtFcfpzOIrD9EXdGNO7iZzIysF1Tfr80gmZYHQHUf-jIBvLtsO99ZzOjPXvtdGSd9r46-oPhmK1PHmCUC8IhdcRA_CZ0CpBcx7WPtWGlz6Y1QuBW_nB8_P3A14mpklQJjBORnGkMp4XpY0I7G2IkKo-hNoXi044q6CsFNKxPf-rqBFCvx3uwZjdz-eDUpTz4cOP"/>
+<p class="mt-4 font-bold italic text-center text-gray-500">Sunday Mornings</p>
+</div>
+<div class="polaroid -rotate-6">
+<img alt="Adventures" class="w-full aspect-square object-cover" data-alt="Couple dancing at a small party" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8Ea7oouZXJCZRfRcPs9p6j1UopsbZefveRWyVdY8vs9K8VR22kQYPfnxI2SA4ekZOg487IXhj8cbl_6ii5uqNQxaQq0Hik598Q90evrUZahnH-HgG1MuazlPEKvVPHvsf71ZDhuKPlTyMPWNwF4ZHB74zOT8wLwiJO9WwcEUmvfAhSBxVjZA0gOrnb6oRAczPzYhVe_Bp7CiA2tUg9MT0jUGIAIvjLh2H3Wn11Jb_8KCxtAqdnEwO6UugQrx9rEgyH_7TMCNl357K"/>
+<p class="mt-4 font-bold italic text-center text-gray-500">Our First House</p>
+</div>
+<div class="polaroid rotate-2 mt-4">
+<img alt="Engagement" class="w-full aspect-square object-cover" data-alt="Couple walking through a field of flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBglIBFgqvN9cHj3yaxEqgWsjPPE6uqrEmqeFMivBc1T1XBk46_UYMbbS94-J0pK6KRLYtOUKzSixJmCcwZPd0LJPOCQTyGdIZq2bagBa9u71VvHzBZaBN289xUZUscPbai4WX3oDDX9aMZ0CtJJfAee-U7-1pa2MYwHR_Ydzo7Y1Up5qI03UrOJUf-KgCWLyE77Fz_nTFIyPb0NG5guj8-7WHe_N9auAweCMWf1EVnGDmKG5-23Z7qHoQzaoyTN_jMdUPhzL9-nvMG"/>
+<p class="mt-4 font-bold italic text-center text-gray-500">She said YES!</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall -->
+<section class="py-24 px-6 md:px-20 bg-white relative" id="wishes">
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATpM0fTL0LxbYTKnKizvMc8PcBkaf5DXfA1APynCqFb4MBLKqdh-gRYxxi8-AbaQLzOrHgr0JDx5swfaSgrakVxinJI3QGUBM01iyvFaTmP7zR31-6tRWZ8C3qxOtZqnIR0mTdnrIV4oDr0X7iPkGOv0d6em01B2RQpvECsqH0N00xxOhTycYnRFURsioNw8XmJxzNr9xRuEmAJJt8PIQskc2yQHvtLOEjN6fYOLEAztsiTFUyxLwLhl8TRtKtnSxMRBm_nj7_KOi_');"></div>
+<div class="max-w-6xl mx-auto relative">
+<div class="text-center mb-16">
+<h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-primary">The Wishes Wall</h2>
+<p class="text-lg text-[#636f88] mt-4">Leave a note for the happy couple</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Wish Card 1 -->
+<div class="bg-retro-mint/40 p-8 rounded-lg shadow-sm border-t-8 border-primary rotate-1 transform hover:rotate-0 transition-all">
+<span class="material-symbols-outlined text-primary text-4xl mb-4">format_quote</span>
+<p class="text-lg font-medium italic text-[#111318] mb-6">"So happy for both of you! Can't wait to dance the night away. Love you guys!"</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">A</div>
+<div>
+<p class="font-bold text-primary uppercase text-xs tracking-widest">Aunt Martha</p>
+<p class="text-[10px] text-gray-500">2 days ago</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 2 -->
+<div class="bg-retro-coral/20 p-8 rounded-lg shadow-sm border-t-8 border-retro-coral -rotate-2 transform hover:rotate-0 transition-all">
+<span class="material-symbols-outlined text-retro-coral text-4xl mb-4">format_quote</span>
+<p class="text-lg font-medium italic text-[#111318] mb-6">"To a lifetime of adventure and endless laughter. Cheers to Sarah and James!"</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-retro-coral/20 flex items-center justify-center font-bold text-retro-coral">M</div>
+<div>
+<p class="font-bold text-retro-coral uppercase text-xs tracking-widest">Michael &amp; Jen</p>
+<p class="text-[10px] text-gray-500">Yesterday</p>
+</div>
+</div>
+</div>
+<!-- Wish Card 3 -->
+<div class="bg-retro-mint/40 p-8 rounded-lg shadow-sm border-t-8 border-primary rotate-2 transform hover:rotate-0 transition-all">
+<span class="material-symbols-outlined text-primary text-4xl mb-4">format_quote</span>
+<p class="text-lg font-medium italic text-[#111318] mb-6">"Wishing you both all the happiness in the world. See you in June!"</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">D</div>
+<div>
+<p class="font-bold text-primary uppercase text-xs tracking-widest">David Smith</p>
+<p class="text-[10px] text-gray-500">Today</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 text-center">
+<button class="px-8 py-4 border-2 border-primary text-primary font-black uppercase tracking-widest rounded-xl hover:bg-primary hover:text-white transition-all">
+                                Add Your Wish
+                            </button>
+</div>
+</div>
+</section>
+<!-- RSVP Section -->
+<section class="py-24 px-6 md:px-20 bg-primary" id="rsvp">
+<div class="max-w-4xl mx-auto bg-retro-cream p-8 md:p-16 rounded-2xl shadow-2xl relative overflow-hidden">
+<!-- Decorative Banners -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-retro-coral rotate-45 translate-x-16 -translate-y-16"></div>
+<div class="relative z-10">
+<h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-primary mb-2 text-center">RSVP</h2>
+<p class="text-center text-[#636f88] mb-12 font-bold italic">Kindly respond by May 15th, 2024</p>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-2">
+<label class="font-black text-xs uppercase tracking-widest text-primary">Full Name</label>
+<input class="rounded-lg border-2 border-primary/10 p-4 focus:ring-primary focus:border-primary bg-white shadow-inner" placeholder="Your name" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-black text-xs uppercase tracking-widest text-primary">Email Address</label>
+<input class="rounded-lg border-2 border-primary/10 p-4 focus:ring-primary focus:border-primary bg-white shadow-inner" placeholder="hello@example.com" type="email"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-black text-xs uppercase tracking-widest text-primary">Attendance</label>
+<select class="rounded-lg border-2 border-primary/10 p-4 focus:ring-primary focus:border-primary bg-white shadow-inner">
+<option>Joyfully Accept</option>
+<option>Regretfully Decline</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-black text-xs uppercase tracking-widest text-primary">Meal Preference</label>
+<select class="rounded-lg border-2 border-primary/10 p-4 focus:ring-primary focus:border-primary bg-white shadow-inner">
+<option>Prime Rib</option>
+<option>Atlantic Salmon</option>
+<option>Vegetarian Risotto</option>
+</select>
+</div>
+<div class="md:col-span-2 flex flex-col gap-2">
+<label class="font-black text-xs uppercase tracking-widest text-primary">Song Request</label>
+<input class="rounded-lg border-2 border-primary/10 p-4 focus:ring-primary focus:border-primary bg-white shadow-inner" placeholder="What will get you on the dance floor?" type="text"/>
+</div>
+<button class="md:col-span-2 w-full py-5 bg-primary text-white font-black uppercase tracking-[0.2em] rounded-xl shadow-lg hover:bg-retro-coral transition-all transform hover:scale-[1.01] active:scale-[0.98]" type="submit">
+                                    Send My Response
+                                </button>
+</form>
+</div>
+</div>
+</section>
+<!-- Location Section -->
+<section class="py-24 px-6 md:px-20 bg-white">
+<div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
+<div class="flex-1 w-full h-[400px] bg-retro-mint rounded-2xl overflow-hidden shadow-xl border-8 border-white">
+<img alt="Map Location" class="w-full h-full object-cover grayscale opacity-80" data-alt="Stylized map showing event locations" data-location="Los Angeles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4s4GPQY0VwIcQwplTcnPrWJ-4JKccKr1U_xvKqY8HMMGv4A_jIsIiuXMD-siFtrgTPk0ZZnsd7GJb90TKF8wwUFKl1FvDBNvlUwcIt1Fla_b4jBsxSYgkz2vM4LFt0YaiD9BL_8LN_j4hB4b8ATumsa0FOjx_6wM06vDOJocLd-ycCBUk1FVwuBPdmz_2VxsRuAOx8fxgM8nPNiJunElRxTX6rgUved7qjSTYd0g8MFn8SICvedkYchsGM6XuY52txk_cheyJwTk7"/>
+</div>
+<div class="flex-1">
+<h2 class="text-4xl font-black uppercase tracking-tighter text-primary mb-6">Location &amp; Details</h2>
+<div class="space-y-8">
+<div class="flex gap-4">
+<div class="size-12 rounded-lg bg-retro-mint flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<h4 class="font-black uppercase tracking-widest text-sm text-retro-coral">The Venue</h4>
+<p class="text-lg font-bold">St. Jude’s Chapel &amp; Grand Ballroom</p>
+<p class="text-[#636f88]">123 Wedding Lane, Los Angeles, CA 90210</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="size-12 rounded-lg bg-retro-mint flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined">hotel</span>
+</div>
+<div>
+<h4 class="font-black uppercase tracking-widest text-sm text-retro-coral">Accommodations</h4>
+<p class="text-lg font-bold">The Beverly Retro Hotel</p>
+<p class="text-[#636f88]">Room block code: SJWED24</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="size-12 rounded-lg bg-retro-mint flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<h4 class="font-black uppercase tracking-widest text-sm text-retro-coral">Parking</h4>
+<p class="text-lg font-bold">Valet Available</p>
+<p class="text-[#636f88]">Complimentary valet parking for all guests.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-retro-mint py-16 px-6 md:px-20 text-center border-t border-dashed border-primary/20">
+<div class="size-16 bg-white text-primary flex items-center justify-center rounded-2xl rotate-12 shadow-md mx-auto mb-8 border-2 border-primary">
+<span class="material-symbols-outlined text-4xl">favorite</span>
+</div>
+<h3 class="text-3xl font-black uppercase tracking-widest text-primary mb-4 italic">Sarah &amp; James</h3>
+<p class="text-[#636f88] max-w-sm mx-auto mb-8 font-medium">Thank you for being part of our special day. We can't wait to see you there!</p>
+<div class="flex justify-center gap-6 text-primary mb-12">
+<a class="hover:text-retro-coral" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="hover:text-retro-coral" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="hover:text-retro-coral" href="#"><span class="material-symbols-outlined">camera_enhance</span></a>
+</div>
+<div class="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40">
+                    Est. 2024 • Handcrafted for Love
+                </div>
+</footer>
+</div>
+</div>
+</body></html>

@@ -472,6 +472,11 @@ const WishesDB = {
     const params = [];
     const conditions = [];
 
+    if (filters.weddingId) {
+      conditions.push(`wedding_id = $${params.length + 1}`);
+      params.push(filters.weddingId);
+    }
+
     if (filters.recipient && filters.recipient !== 'both') {
       conditions.push(`(recipient = $${params.length + 1} OR recipient = 'both')`);
       params.push(filters.recipient);

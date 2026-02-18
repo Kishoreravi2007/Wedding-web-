@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "lake-blue": "#0f3d82",
+                        "soft-sand": "#F5F2ED",
+                        "driftwood": "#5D574F",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .water-gradient {
+            background: linear-gradient(180deg, rgba(23, 84, 207, 0.05) 0%, rgba(245, 242, 237, 1) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-driftwood">
+<!-- Header / Nav -->
+<header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-driftwood/10">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">waves</span>
+<h1 class="text-xl font-extrabold tracking-tight text-lake-blue">{{GroomName}} & {{BrideName}}</h1>
+<p class="text-white/90 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto italic">
+                "Join us at the shore for a celebration of love, light, and a lifetime of adventures."
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary hover:bg-lake-blue text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                    Join us at the Shore
+                    <span class="material-symbols-outlined text-sm">arrow_downward</span>
+</button>
+<button class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-xl font-bold transition-all">
+                    View Schedule
+                </button>
+</div>
+</div>
+</section>
+<!-- Reflections of Us (Story) -->
+<section class="py-24 bg-soft-sand relative overflow-hidden" id="story">
+<div class="max-w-4xl mx-auto px-6">
+<div class="text-center mb-16">
+<span class="material-symbols-outlined text-primary text-4xl mb-4">favorite</span>
+<h2 class="text-4xl font-extrabold text-lake-blue tracking-tight">Reflections of Us</h2>
+<div class="w-12 h-1 bg-primary/30 mx-auto mt-4 rounded-full"></div>
+</div>
+<div class="space-y-12">
+<!-- Event 1 -->
+<div class="flex gap-6 md:gap-10">
+<div class="flex flex-col items-center">
+<div class="size-12 rounded-full bg-white border-2 border-primary flex items-center justify-center text-primary shadow-sm z-10">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div class="w-0.5 grow bg-primary/20 my-2"></div>
+</div>
+<div class="pb-8">
+<h3 class="text-xl font-bold text-lake-blue">The First Encounter</h3>
+<p class="text-primary/60 font-semibold mb-3">Summer 2020 • Lake Tahoe</p>
+<p class="text-driftwood leading-relaxed bg-white/50 p-6 rounded-2xl border border-driftwood/5">
+                            We met during a morning kayak excursion. {{BrideName}} was struggling with a jammed rudder, and {{GroomName}} paddled over to help. What started as a 5-minute fix turned into a three-hour conversation about books, travel, and the perfect espresso.
+                        </p>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="flex gap-6 md:gap-10">
+<div class="flex flex-col items-center">
+<div class="size-12 rounded-full bg-white border-2 border-primary flex items-center justify-center text-primary shadow-sm z-10">
+<span class="material-symbols-outlined">sailing</span>
+</div>
+<div class="w-0.5 grow bg-primary/20 my-2"></div>
+</div>
+<div class="pb-8">
+<h3 class="text-xl font-bold text-lake-blue">First Date by the Pier</h3>
+<p class="text-primary/60 font-semibold mb-3">Autumn 2021 • Navy Pier</p>
+<p class="text-driftwood leading-relaxed bg-white/50 p-6 rounded-2xl border border-driftwood/5">
+                            Our first official date was under the autumn stars. We shared fish tacos and watched the reflection of the city lights dancing on the water's surface. That was the night we knew this was something special.
+                        </p>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="flex gap-6 md:gap-10">
+<div class="flex flex-col items-center">
+<div class="size-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg z-10">
+<span class="material-symbols-outlined">diamond</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-lake-blue">The Proposal by the Lake</h3>
+<p class="text-primary/60 font-semibold mb-3">Winter 2024 • Lake Como</p>
+<p class="text-driftwood leading-relaxed bg-white/50 p-6 rounded-2xl border border-driftwood/5">
+                            Against the backdrop of the snow-capped Alps, {{BrideName}} asked the big question on a private wooden boat. The lake was perfectly still, like a mirror, reflecting a new beginning for us both.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Waterfront Wonders (Gallery) -->
+<section class="py-24 bg-white" id="gallery">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<h2 class="text-4xl font-extrabold text-lake-blue tracking-tight">Waterfront Wonders</h2>
+<p class="text-driftwood/70 mt-2">Moments captured through the lens of our journey.</p>
+</div>
+<div class="flex gap-2">
+<span class="px-4 py-2 rounded-full bg-primary text-white text-xs font-bold cursor-pointer">All</span>
+<span class="px-4 py-2 rounded-full bg-soft-sand text-driftwood text-xs font-bold cursor-pointer hover:bg-driftwood/10 transition-colors">Engagement</span>
+<span class="px-4 py-2 rounded-full bg-soft-sand text-driftwood text-xs font-bold cursor-pointer hover:bg-driftwood/10 transition-colors">Travels</span>
+</div>
+</div>
+<div id="wedding-gallery" class="grid grid-cols-1 md:grid-cols-3 gap-6>
+<div id="wedding-gallery" class="space-y-6">
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]" data-gallery-item="true">
+<img alt="Gallery Image 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Couple sitting on a wooden dock by a misty lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1EY9OuIaFv6fV9UNgoPyeDyYoQJRQ7yB93iee69ZjXaXqb0oZjezTUBbSXOi9SnivItpDTFZgc2RobhT6rrHdX4fpZHEU-16sAtzKdjzvFnUB91VLWjWY8y0O5VyRn7dBMOFcE2uLsS8dptQBV550pmRTBxdo2akE-9TAsh4yKyPmqbOz4fghZf7F-rTzt8_s6pQXyY061kcKcie0JAvCJRsiZt0cLWZu3_KayQEUepV-eMWVy2J5aFLQdgpVNgzUApZv0VEaoIK4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-lake-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-sm font-medium">Misty Mornings</p>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl aspect-square">
+<img alt="Gallery Image 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close up of two people holding hands by blue water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEGCBKlit2CpEFCt7a3EfZ7f-zUJbwENJUQz6yVxwAWbBbmcP_pX092kZcxaWtUAJnSKpgIj0AYCpqL81NSsj8MP_vRiVJQ6i1-wlZKPhwZEB7m0rZiegcyfLdJBVEvzoreO6N9-h3maxfPMPAR49LyX6DA0XijoNCKMFIrnPlRJB040AJhzBEM10tT-f0neHSPSCdtnAsG_iYYsmX9tyC_P3mYjq0ATg3YDxZPSEzDDSHy3Kn3IKKh62-Lk7sy6i_bftLAzejW8FS"/>
+<div class="absolute inset-0 bg-gradient-to-t from-lake-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-sm font-medium">Holding On</p>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="group relative overflow-hidden rounded-2xl aspect-square">
+<img alt="Gallery Image 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Breathtaking scenery of a mountain lake reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw5C_laL8vGnYicIPmSY8vyd7fHFbIeIXRSRzREitZgSgE_HWJvOqmQhoXSuUHUzVel3_RvdqPH6ZlRUhnma9BlZF6YvgN-Wc17_rzNXsGiRH_QCJOKrSG98iWteqY4MdJIBkeHB-S7kSmzpj2TkDuVNoEdkI_gkyCw9aKkyXYqM2aY8IeP_pYaEE3omzzqY08SHLWOgCDtgAzFEoQXzxusKSOYjnQmOAVrRle8_m0R7R7MSMf0M8zCuBCvQoOtA-7jr3cC6rXOkXb"/>
+</div>
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]">
+<img alt="Gallery Image 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Couple laughing together on a boat in the middle of a lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX8R-9jpx67mg95ehKxtAwmXtZrfsQyG1TQ4225S8y4x_00Z12IjpMmjYffKvhTUEoP32iQnUsHo1Iue11efpwVBYtEXGEkenjkJzZrur2HPy5w58bIVFPviuJ3KjiS1ra55tc56nqrbiMxoyyYci3KuUslslVuNtWIX_PhajO4e_6GYoMANGf3oB70WduNJl0eHMLB4n4yNyQAwm0VbroDxx__5WxWxpUtPvWhMxpnIXvVt89uK4Tu2M8a6TOOVkHPCtTTrV32D8D"/>
+<div class="absolute inset-0 bg-gradient-to-t from-lake-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-sm font-medium">Laughter on the Water</p>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="group relative overflow-hidden rounded-2xl aspect-[4/5]">
+<img alt="Gallery Image 5" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Couple walking along a sandy shoreline at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX-r0Bb2KaUQaIQ5AWhdodXZuQv6kP4FkQhjzKRkVKsQrmW7F6pHTEot7HothjazuNsG6DwhqtlUjEnllliQ0HxjLTgJqMJkcR-LdVQ-Zkbs9uXz2qwhFRcUfpgcDd4EQCY8rupsUJXb069Vmb--0JkjMv04Qyjfc1JBYU6K-hJF3vKhHwD1ZcDAgqmroa4-YZi_BwZb4rk9aFE_YUxl2F1WP3tRt0-CNAVzV7oZ0aJVQF0vQ7IHuzMWXQaCBLKdjtuedhVdsVe0v3"/>
+</div>
+<div class="group relative overflow-hidden rounded-2xl aspect-square">
+<img alt="Gallery Image 6" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A small campfire by the edge of a lake at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAni6Lh-k_0r7hpqKSHUWZL0gpct41CWVwklIdWPj_VcyFijhxUXVJYgOIlhiYXnwmelvtJYdIu9eJvSSbori3vsDPJI7QmMX_tbE3UeQ93Txv7ABtALwgjFdNTSXbJ4DKQZdOUsYd9FmlER0oKC7Q3O8PY8PBlIi6Ak_D7PS9UUwquq3CY0iKaKl1hgtVWvzwfz1eD5tIk3AIySsQy2hNeJA8f-aqWanlwvl0H603zJkH6HYSYafT6PaOwo72PeJkOk6R7sTs00gBn"/>
+<div class="absolute inset-0 bg-gradient-to-t from-lake-blue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-sm font-medium">Sunset Bonfire</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Event Details / Map -->
+<section class="py-24 water-gradient" id="details">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<div>
+<h2 class="text-4xl font-extrabold text-lake-blue tracking-tight">The Big Day</h2>
+<p class="text-driftwood mt-4 text-lg">We can't wait to share our special moment with you in the place where we feel most at home.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">location_on</span>
+<div>
+<h4 class="font-bold text-lake-blue">The Venue</h4>
+<p class="text-sm text-driftwood">Blue Heron Estate<br/>123 Lakeshore Dr, Aspen CO</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">schedule</span>
+<div>
+<h4 class="font-bold text-lake-blue">The Schedule</h4>
+<p class="text-sm text-driftwood">Ceremony: 4:30 PM<br/>Reception: {{EventTime}}</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">checkroom</span>
+<div>
+<h4 class="font-bold text-lake-blue">Dress Code</h4>
+<p class="text-sm text-driftwood">Lakeside Chic<br/>Light colors, breathable fabrics</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">directions_bus</span>
+<div>
+<h4 class="font-bold text-lake-blue">Shuttle</h4>
+<p class="text-sm text-driftwood">Departing from Hyatt Regency<br/>Starting at 3:30 PM</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative bg-white p-3 rounded-2xl shadow-xl border border-driftwood/5">
+<div class="w-full aspect-[4/3] rounded-xl overflow-hidden grayscale contrast-125">
+<img alt="Venue Map" class="w-full h-full object-cover" data-alt="Top down aerial view of a lakeside road" data-location="Aspen, Colorado" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq9OLVWdOLNT3iHJwEBwEbdZ5HJB1ggxeA3EgRd4Y_qQTguWiNV39JLyqnExi-jDmIpUtvKpGhcpvVe3F3qVBtjgCf6Xn-ZNF0DxtM-HlDE55Er49wSdJY1zSpnW3uKl98zHN9KUhZk0Tv-SLH38pJ66BdbngIMxB3unBbZS5nwCWeZ2rWTDdxxqYN4FR9cZ03eEFSeN7V9HmsBGbJ89IyL59AP_L8XW6c-br20M0ykis39lq72HcvHALSG0mejXF_24c-XVnYbC1j"/>
+</div>
+<div class="absolute bottom-10 left-10 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border border-primary/20">
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Our Venue</p>
+<p class="text-lake-blue font-extrabold">Blue Heron Lakeside</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Wishes Wall (Guestbook) -->
+<section class="py-24 bg-white" id="wishes">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-extrabold text-lake-blue tracking-tight">Wishes Wall</h2>
+<p class="text-driftwood/70 mt-2">Leave a message for the happy couple</p>
+<button class="mt-8 bg-soft-sand text-lake-blue border border-lake-blue/20 px-8 py-3 rounded-xl font-bold hover:bg-primary hover:text-white transition-all">
+                    Leave a Wish
+                </button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Wish Card 1 -->
+<div class="bg-soft-sand/50 p-8 rounded-2xl border border-driftwood/10 shadow-sm flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary/40 text-4xl mb-4">format_quote</span>
+<p class="text-driftwood italic text-lg leading-relaxed">
+                            "Wishing you both a lifetime of calm waters and beautiful sunsets. You're the perfect match!"
+                        </p>
+</div>
+<div class="mt-6 pt-6 border-t border-driftwood/10">
+<p class="font-bold text-lake-blue">Sarah &amp; Michael</p>
+<p class="text-xs text-driftwood/50">{{WeddingDate}}</p>
+</div>
+</div>
+<!-- Wish Card 2 -->
+<div class="bg-primary/5 p-8 rounded-2xl border border-primary/10 shadow-sm flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary/40 text-4xl mb-4">format_quote</span>
+<p class="text-driftwood italic text-lg leading-relaxed">
+                            "To the best explorers I know. May your marriage be your greatest adventure yet. Love you guys!"
+                        </p>
+</div>
+<div class="mt-6 pt-6 border-t border-driftwood/10">
+<p class="font-bold text-lake-blue">Uncle Dave</p>
+<p class="text-xs text-driftwood/50">{{WeddingDate}}</p>
+</div>
+</div>
+<!-- Wish Card 3 -->
+<div class="bg-soft-sand/50 p-8 rounded-2xl border border-driftwood/10 shadow-sm flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary/40 text-4xl mb-4">format_quote</span>
+<p class="text-driftwood italic text-lg leading-relaxed">
+                            "So happy for you both! Can't wait to dance the night away by the lake. Cheers to {{GroomName}} & {{BrideName}}!"
+                        </p>
+</div>
+<div class="mt-6 pt-6 border-t border-driftwood/10">
+<p class="font-bold text-lake-blue">The Henderson Family</p>
+<p class="text-xs text-driftwood/50">{{WeddingDate}}</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-background-dark py-16 text-white/80">
+<div class="max-w-7xl mx-auto px-6 text-center">
+<div class="flex items-center justify-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl">waves</span>
+<span class="text-xl font-bold tracking-tight text-white">WeddingWeb</span>
+</div>
+<nav class="flex flex-wrap justify-center gap-x-12 gap-y-4 mb-12">
+<a class="text-sm hover:text-white transition-colors" href="#">Our Story</a>
+<a class="text-sm hover:text-white transition-colors" href="#">RSVP Now</a>
+<a class="text-sm hover:text-white transition-colors" href="#">Registry</a>
+<a class="text-sm hover:text-white transition-colors" href="#">Travel Info</a>
+<a class="text-sm hover:text-white transition-colors" href="#">Privacy</a>
+</nav>
+<div class="pt-8 border-t border-white/10 text-xs tracking-widest uppercase">
+                © 2025 {{GroomName}} & {{BrideName}} • Made with Serenity
+            </div>
+</div>
+</footer>
+
+    <!-- WeddingWeb Watermark -->
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
+        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            WeddingWeb AI
+        </div>
+    </div>
+    
+</body></html>
