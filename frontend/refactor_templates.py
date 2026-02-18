@@ -73,21 +73,20 @@ def refactor_template(file_path):
     # 8. BRANDING INJECTION
     # Footer Branding
     branding_footer = '<p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>'
-    if 'WeddingWeb AI' not in content:
+    if 'WeddingWeb AI Inc.' not in content:
         # Try to find the copyright notice in footer
         content = re.sub(r'(©\s*202\d[^<]+)(</p>)', rf'\1\2\n                {branding_footer}', content)
 
-    # Watermark Badge
-    watermark_html = '''
-    <!-- WeddingWeb Watermark -->
-    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; pointer-events: none; opacity: 0.3; transform: rotate(-15deg); font-family: sans-serif;">
-        <div style="background: #000; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-            WeddingWeb AI
-        </div>
-    </div>
-    '''
-    if 'WeddingWeb Watermark' not in content:
-        content = content.replace('</body>', f'{watermark_html}\n</body>')
+    # 9. WATERMARK REMOVAL (User request: remove watermark)
+    watermark_pattern = r'<!-- WeddingWeb Watermark -->.*?<!-- End WeddingWeb Watermark -->'
+    # Re-inject with markers first if they were missing, then remove
+    # Actually, simpler to just find the div structure I added
+    watermark_div_pattern = r'<!-- WeddingWeb Watermark -->.*?</div>\s*</div>'
+    content = re.sub(watermark_div_pattern, '', content, flags=re.DOTALL)
+    
+    # Also handle the one without comments if it exists
+    simple_watermark_pattern = r'<div style="position: fixed; bottom: 20px; left: 20px; z-index: 9999;.*?WeddingWeb AI.*?</div>\s*</div>'
+    content = re.sub(simple_watermark_pattern, '', content, flags=re.DOTALL)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content)
