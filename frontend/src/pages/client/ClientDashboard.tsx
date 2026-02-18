@@ -68,7 +68,7 @@ const ClientDashboard = () => {
     const { currentUser, logout, refreshProfile, enable2FA } = useAuth();
     const [activeTab, setActiveTab] = useState('overview');
 
-    const [weddingData, setWeddingData] = useState({
+    const [weddingData, setWeddingData] = useState<any>({
         id: '',
         groomName: currentUser?.profile?.full_name?.split('&')[0]?.trim() || currentUser?.username?.split('@')[0] || 'Groom',
         brideName: currentUser?.profile?.full_name?.split('&')[1]?.trim() || 'Bride',
@@ -90,7 +90,8 @@ const ClientDashboard = () => {
         volume: 50,
         photographer_username: '',
         photographer_password: '',
-        venueMapUrl: ''
+        venueMapUrl: '',
+        customizations: {}
     });
 
 
@@ -1538,7 +1539,7 @@ const ClientDashboard = () => {
                                             {weddingData.showCountdown && (
                                                 <div className="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20">
                                                     <p className="text-[10px] text-pink-100 uppercase tracking-widest font-bold mb-2 text-center md:text-left">The Big Day In</p>
-                                                    <CountdownTimer targetDate={weddingData.weddingDate} targetTime={weddingData.weddingTime} theme={weddingData.theme} />
+                                                    <CountdownTimer targetDate={weddingData.weddingDate} targetTime={weddingData.weddingTime} />
                                                 </div>
                                             )}
 
@@ -1775,7 +1776,7 @@ const ClientDashboard = () => {
                                                 >
                                                     <div className="relative aspect-[4/3] bg-gray-100">
                                                         <img
-                                                            src={config.defaultImages?.hero || `/stitch_weddingweb_professional_home/template__${name.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}/preview.jpg`}
+                                                            src={config.defaultHeroImage || `/stitch_weddingweb_professional_home/template__${name.toLowerCase().replace(/ /g, '_').replace(/&/g, 'and')}/preview.jpg`}
                                                             alt={name}
                                                             className="w-full h-full object-cover"
                                                             onError={(e) => {
@@ -1826,7 +1827,7 @@ const ClientDashboard = () => {
                                         ) : (
                                             <div className="flex gap-2">
                                                 <Button onClick={() => setIsEditing(false)} variant="ghost" size="sm">Cancel</Button>
-                                                <Button onClick={handleSaveChanges} size="sm">
+                                                <Button onClick={() => handleSaveChanges()} size="sm">
                                                     <Check className="w-4 h-4 mr-1" />
                                                     Save
                                                 </Button>
@@ -2689,7 +2690,7 @@ const ClientDashboard = () => {
 
                                             {(isEditing) && (
                                                 <div className="flex justify-end sticky bottom-4">
-                                                    <Button onClick={handleSaveChanges} className="shadow-lg">
+                                                    <Button onClick={() => handleSaveChanges()} className="shadow-lg">
                                                         <Check className="w-4 h-4 mr-2" />
                                                         Save Changes
                                                     </Button>

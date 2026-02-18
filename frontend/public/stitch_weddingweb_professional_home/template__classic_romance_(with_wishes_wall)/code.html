@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -32,325 +39,402 @@
             },
         }
     </script>
-<style>
-        .font-serif { font-family: 'Playfair Display', serif; }
-        .font-display { font-family: 'Manrope', sans-serif; }
+    <style>
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-display {
+            font-family: 'Manrope', sans-serif;
+        }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark font-display text-[#111318]">
-<!-- Navigation -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-primary/10 px-6 lg:px-20 py-4">
-<div class="max-w-7xl mx-auto flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-3xl">favorite</span>
-<h2 class="text-xl font-bold tracking-tight text-primary">{{GroomInitial}}&{{BrideInitial}}</h2>
-</div>
-<nav class="hidden md:flex items-center gap-10">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#gallery">Gallery</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#schedule">Schedule</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#registry">Registry</a>
-</nav>
-<div class="flex items-center gap-4">
-<button class="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+    <!-- Navigation -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-primary/10 px-6 lg:px-20 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+                <h2 class="text-xl font-bold tracking-tight text-primary">{{GroomInitial}}&{{BrideInitial}}</h2>
+            </div>
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#gallery">Gallery</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#schedule">Schedule</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#registry">Registry</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button
+                    class="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
                     RSVP
                 </button>
-</div>
-</div>
-</header>
-<!-- Grand Hero Section -->
-<section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-<div class="absolute inset-0 z-0">
-<div class="absolute inset-0 bg-black/30 z-10"></div>
-<img alt="Wedding Hero" class="w-full h-full object-cover" data-alt="Elegant wedding venue with floral decorations and warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7vnG9bH68I7qQyiiTUQJPJ1e2RLW7NEiQCt4TJFqqAdPzFizl3bs12R_8NImVKHr4SgaGem4xxf_6z3DTSZ53lgP_dFsYDQSZcn7piO8idv2bMs2Noi3BoPOYh6IwlQrnHGHHWeS2Y1RTkaEOgvGJVvVRw2_TnDmQh_3giBI3-B_OpH5EfgrrsYWJFAz59tto8Apb7qousBqT3bR3RVAcLAuntQqh9B0-HRggvIy7tr1sUMpWPdzj01BLiDFe9uwPqRfM7oUUzW6N"/>
-</div>
-<div class="relative z-20 text-center text-white px-4">
-<p class="uppercase tracking-[0.3em] text-sm mb-6 font-medium">Join us for the wedding of</p>
-<h1 class="font-serif text-6xl md:text-8xl lg:text-9xl mb-8 italic">
-                Kishore Ravi <span class="text-4xl md:text-6xl font-display font-light mx-4 not-italic">&amp;</span> Bride
+            </div>
+        </div>
+    </header>
+    <!-- Grand Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-black/30 z-10"></div>
+            <img alt="Wedding Hero" class="w-full h-full object-cover hero-bg" data-hero-bg="true"
+                data-alt="Elegant wedding venue with floral decorations and warm lighting"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7vnG9bH68I7qQyiiTUQJPJ1e2RLW7NEiQCt4TJFqqAdPzFizl3bs12R_8NImVKHr4SgaGem4xxf_6z3DTSZ53lgP_dFsYDQSZcn7piO8idv2bMs2Noi3BoPOYh6IwlQrnHGHHWeS2Y1RTkaEOgvGJVvVRw2_TnDmQh_3giBI3-B_OpH5EfgrrsYWJFAz59tto8Apb7qousBqT3bR3RVAcLAuntQqh9B0-HRggvIy7tr1sUMpWPdzj01BLiDFe9uwPqRfM7oUUzW6N" />
+        </div>
+        <div class="relative z-20 text-center text-white px-4">
+            <p class="uppercase tracking-[0.3em] text-sm mb-6 font-medium">Join us for the wedding of</p>
+            <h1 class="font-serif text-6xl md:text-8xl lg:text-9xl mb-8 italic">
+                {{GroomName}} <span class="text-4xl md:text-6xl font-display font-light mx-4 not-italic">&amp;</span>
+                {{BrideName}}
             </h1>
-<div class="flex flex-col items-center gap-6">
-<div class="h-[1px] w-24 bg-white/60"></div>
-<h2 class="text-xl md:text-2xl font-light tracking-widest">DECEMBER 12, 2024 • NEW YORK CITY</h2>
-<div class="flex gap-4 md:gap-8 mt-4">
-<div class="flex flex-col items-center">
-<span class="text-3xl font-bold">124</span>
-<span class="text-[10px] uppercase tracking-widest opacity-80">Days</span>
-</div>
-<div class="flex flex-col items-center">
-<span class="text-3xl font-bold">08</span>
-<span class="text-[10px] uppercase tracking-widest opacity-80">Hours</span>
-</div>
-<div class="flex flex-col items-center">
-<span class="text-3xl font-bold">45</span>
-<span class="text-[10px] uppercase tracking-widest opacity-80">Mins</span>
-</div>
-</div>
-<button class="mt-8 bg-white text-primary hover:bg-primary hover:text-white px-10 py-4 rounded-full font-bold transition-all transform hover:scale-105">
+            <div class="flex flex-col items-center gap-6">
+                <div class="h-[1px] w-24 bg-white/60"></div>
+                <h2 class="text-xl md:text-2xl font-light tracking-widest">{{WeddingDate}} • {{Location}}</h2>
+                <div class="flex gap-4 md:gap-8 mt-4">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold">124</span>
+                        <span class="text-[10px] uppercase tracking-widest opacity-80">Days</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold">08</span>
+                        <span class="text-[10px] uppercase tracking-widest opacity-80">Hours</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold">45</span>
+                        <span class="text-[10px] uppercase tracking-widest opacity-80">Mins</span>
+                    </div>
+                </div>
+                <button
+                    class="mt-8 bg-white text-primary hover:bg-primary hover:text-white px-10 py-4 rounded-full font-bold transition-all transform hover:scale-105">
                     JOIN OUR CELEBRATION
                 </button>
-</div>
-</div>
-</section>
-<!-- Our Story Section -->
-<section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="story">
-<div class="grid md:grid-cols-2 gap-16 items-center">
-<div class="relative group">
-<div class="absolute -inset-4 bg-primary/5 rounded-xl transition-all group-hover:bg-primary/10"></div>
-<img alt="The Couple" class="relative z-10 rounded-lg shadow-2xl w-full aspect-[4/5] object-cover" data-alt="Happy couple walking together in a garden setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNCBsOca15qcPy18BvFtPJsunoatnIVBP2o_x8F4jIDxrZbKfonf-wsgLbDK7fJFDQQb2noatbYbJNnKY_py05JT0S5DDGTGfYfJVHPs0HCsNOlu_7llx7m_e4yFKwaXCbJINyL8OauAoQ51LHIaDf6WxWaAo7sZ0WwPp5x-rW4t4DiqJ8M_5Y3mJiFA7Gh2Z1gNF0gIQZbq4GIkNynfTw7VGN2x86qe3u3Gh9VK3gyQh5b3LoZw3xuEBcEgbv0gOt0Nu-kpdgQK3e"/>
-</div>
-<div class="space-y-8">
-<h3 class="font-serif text-4xl text-primary italic">Our Story</h3>
-<p class="text-lg leading-relaxed text-gray-600">
-                    From our first meeting at a quiet coffee shop in Brooklyn to traveling across continents together, our journey has been filled with laughter, adventure, and an ever-growing love. We can't wait to start this next chapter of our lives surrounded by our closest family and friends.
+            </div>
+        </div>
+    </section>
+    <!-- Our Story Section -->
+    <section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="story">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div class="relative group">
+                <div class="absolute -inset-4 bg-primary/5 rounded-xl transition-all group-hover:bg-primary/10"></div>
+                <img alt="The Couple" class="relative z-10 rounded-lg shadow-2xl w-full aspect-[4/5] object-cover"
+                    data-alt="Happy couple walking together in a garden setting"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNCBsOca15qcPy18BvFtPJsunoatnIVBP2o_x8F4jIDxrZbKfonf-wsgLbDK7fJFDQQb2noatbYbJNnKY_py05JT0S5DDGTGfYfJVHPs0HCsNOlu_7llx7m_e4yFKwaXCbJINyL8OauAoQ51LHIaDf6WxWaAo7sZ0WwPp5x-rW4t4DiqJ8M_5Y3mJiFA7Gh2Z1gNF0gIQZbq4GIkNynfTw7VGN2x86qe3u3Gh9VK3gyQh5b3LoZw3xuEBcEgbv0gOt0Nu-kpdgQK3e" />
+            </div>
+            <div class="space-y-8">
+                <h3 class="font-serif text-4xl text-primary italic">{{Story_Title}}</h3>
+                <p class="text-lg leading-relaxed text-gray-600">
+                    {{Story_Body}}
                 </p>
-<div class="grid grid-cols-2 gap-4">
-<div class="p-6 bg-white rounded-xl border border-primary/10">
-<span class="material-symbols-outlined text-primary mb-2">calendar_today</span>
-<h4 class="font-bold">First Date</h4>
-<p class="text-sm text-gray-500">Sept 14, 2021</p>
-</div>
-<div class="p-6 bg-white rounded-xl border border-primary/10">
-<span class="material-symbols-outlined text-primary mb-2">diamond</span>
-<h4 class="font-bold">Proposed</h4>
-<p class="text-sm text-gray-500">Jan 20, 2024</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Captured Moments Gallery -->
-<section class="bg-white py-24 px-6 lg:px-20" id="gallery">
-<div class="max-w-7xl mx-auto">
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-<div>
-<h2 class="font-serif text-5xl mb-4 italic">Captured Moments</h2>
-<p class="text-gray-500">A collection of memories through the lens of our loved ones.</p>
-</div>
-<div class="flex gap-4">
-<div class="relative min-w-[300px]">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-<input class="w-full pl-12 pr-4 py-3 bg-background-light border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-sm" placeholder="Search by name or event..." type="text"/>
-</div>
-<button class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm hover:opacity-90">
-<span class="material-symbols-outlined text-xl">add_a_photo</span>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-6 bg-white rounded-xl border border-primary/10">
+                        <span class="material-symbols-outlined text-primary mb-2">calendar_today</span>
+                        <h4 class="font-bold">First Date</h4>
+                        <p class="text-sm text-gray-500">Sept 14, 2021</p>
+                    </div>
+                    <div class="p-6 bg-white rounded-xl border border-primary/10">
+                        <span class="material-symbols-outlined text-primary mb-2">diamond</span>
+                        <h4 class="font-bold">Proposed</h4>
+                        <p class="text-sm text-gray-500">Jan 20, {{Year}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Captured Moments Gallery -->
+    <section class="bg-white py-24 px-6 lg:px-20" id="gallery">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div>
+                    <h2 class="font-serif text-5xl mb-4 italic">Captured Moments</h2>
+                    <p class="text-gray-500">A collection of memories through the lens of our loved ones.</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="relative min-w-[300px]">
+                        <span
+                            class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <input
+                            class="w-full pl-12 pr-4 py-3 bg-background-light border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-sm"
+                            placeholder="Search by name or event..." type="text" />
+                    </div>
+                    <button
+                        class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm hover:opacity-90">
+                        <span class="material-symbols-outlined text-xl">add_a_photo</span>
                         Add Your Photo
                     </button>
-</div>
-</div>
-<!-- Gallery Grid -->
-<div id="wedding-gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4>
-<div id="wedding-gallery" class="relative group aspect-square overflow-hidden rounded-xl" data-gallery-item="true">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Candid wedding guest laughing at the reception" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp-by8V5vwQaCGAwiPJUJde96qP11Ud2rHOz74NnJD5nKnK79U71gMg6E78oaTxZ0tlcRPygsNyK2PlZEavAUPLmx0quDrHfHlqVAbeN-BQjTL7ZsMoHpp7jbMPWJyYyVdZM2MARVeEKRqtSdmvgdNfzWoVaoDCJq3IAGi_uTOiUYocRugNg4W0oLMRow8AKrxgtWDGg50hnnTxXU5DD0offTk8FzhohJZElhlTPfZvDlzxV3laoRSYZMF76FiR50B3Xpvb4np7NCP"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">The Engagement</p>
-<p class="text-white/80 text-xs">by Sarah J.</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Beautifully decorated wedding cake with flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDACJJC-WUtelD7mR7WGFnjM2i1mRnw0FS-CmUtFbJCT6rPy4XxrhuVvFAUCw5O5rZS7osxhJ4L8cDQNTMAO37ccDtH9BAgSCSGimF87x4XWrUo27-hgC-UYP86RvuzRAu_0JZfFr0egW6lONvkg98Poy9ldnpES7KkDwrIdJmuXepuVyGi959fi8hean_dD-XSPHZjBWeTxi_Ka-ag9Nkie87ZcyTSAueCEkqm2xKQL4rR1PvXExteeWA7ug-msoNid0kP_zB5N6Eq"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">Cake Tasting</p>
-<p class="text-white/80 text-xs">by Michael R.</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Bride and groom sharing a quiet moment outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCua9a8Dg-1D5DZYzhcYqhIdgSjBu3_R_c7b4pGaQYc0-hvl_fzsuPbGpHytHfnGo-CY320qNDU3KGNCQLsocuJMpWIQ7JsB61IkVC0uHJoGe1xP9yQY6oIB68mwDJLpxZ_aSpFGDZO9Qbb5PNEOgfOsdggJhcDgs6s-gVstYOLMSfSQKvsiXuByjaIWaH51fD47SiamOngsGxbheJATb3wCfOWfmT9vfFrFn8ph7yD1dM_dNooiPfmpvAmJIMPqsOT2KxGZ8tLQFr"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">Sunset Walk</p>
-<p class="text-white/80 text-xs">by David K.</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Sparkling cocktail glasses on a wedding table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwdhV-K6k0SxEP1S6XKmEVIUXGQMDYaG9m5rCdTndkUsxB8X_6-9idYRpAxBvHfcKXuPgolfzt3gdBAWHM7PcGqU0zhKpFJLjW2ScT5j4rzc1hOser6-vqPo0PllWV06IFzsnrRxB0wVWZrBmQgoTDzxxMswC_1Wg8NYd3417ZaTrB1Ua23pRww47sV8nvxl5MKoEn8dzb0NWrGqTntFP-e0evTybMy2NE9zIaBn7G8mtpW4FrVUn51yio2UJ-9dfLpSXmhbos9IEH"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">Cocktail Hour</p>
-<p class="text-white/80 text-xs">by Emily W.</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Floral centerpieces on a long reception table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgtUkCumn5_7PGitgZBkWwL_Z9ZyaGe2Q6yn1wmbfE9iUW2tBYuCYLA7ZKwgJA4HLgdfqM0XN3Wpwuc9ljEHgT9JtmHUGqrk_JsKROAua7E1Wv5XcgOlTspR-M1hc9r0qAcQj2imo3I2F3g9G13fwbNYNLLGlnWr542FCW7rlnsSVjihPSgIMhrjaR4CCfin1fTX0fY_cJ3BbrHFvGSUBQxgfoNV1nUf9ie9t7a59JzdLlGM4D3BAX1HHL0-NFrp5tlEXWsUFN5Tl3"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">Decor Details</p>
-<p class="text-white/80 text-xs">by Admin</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Aerial view of a garden wedding ceremony" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0qNRa8wY6zX5twkN0BdAV02qzQvLTd26EjxUN6B85J5rArBn8lDboPYQHJxPU8POufHn-xzbO2HGC1H_-6MNGWGWVdVqLTAI0KPBLcajWDy4wOB1_Lznn4OPfml8cWyJXz45VnPYJGQ3tjWCqJbOkUc0N5_FHS0DvSSQgfxzdB-yGDYaQPjsggH_kVpWq9wYukTV6tBvwfzsMuJjf3ORH9txr4Hr5JtMg9WkI9DP1cxMo6V-QnmX_KuwSfs7xU9sZa1N907EkqUOd"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">Venue View</p>
-<p class="text-white/80 text-xs">by Mark T.</p>
-</div>
-</div>
-<div class="relative group aspect-square overflow-hidden rounded-xl">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Group of friends celebrating at a wedding" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd5Q7HoYDF4QUVG88H1w80zg-4xOgrR-RCM8K2llwBe8o6YE6XMdNid7vk06D2ZYjuTm-SMo74TgsSApW2u5QI3EPpNSiiJuAVonR7JFP6guTLsEQhAzUZm5uL92OP0SiqXhyykhZBnrMnTKqSONLeAaBFezeqHJpucEYmmrWYQ4ONCbmF5C7htURMfpEiShGqkmyTUy-LMImWjska5chN2JCszw0S6cEME1p753SB-7bMsKTp5w32ZlJpqvi5R5iG-fYcjgrf3idg"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-<p class="text-white text-sm font-bold">The Crew</p>
-<p class="text-white/80 text-xs">by Jessica L.</p>
-</div>
-</div>
-<div class="bg-primary/5 border-2 border-dashed border-primary/20 rounded-xl flex flex-col items-center justify-center p-6 text-center group cursor-pointer hover:border-primary transition-colors">
-<span class="material-symbols-outlined text-4xl text-primary mb-2 group-hover:scale-110 transition-transform">upload</span>
-<p class="font-bold text-primary">View More</p>
-<p class="text-xs text-primary/60 mt-1">128+ Photos Shared</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Schedule Section -->
-<section class="py-24 px-6 lg:px-20 max-w-5xl mx-auto" id="schedule">
-<div class="text-center mb-16">
-<h2 class="font-serif text-5xl mb-4 italic">The Celebration</h2>
-<p class="text-gray-500">The detailed timeline for our special day.</p>
-</div>
-<div id="wedding-timeline" class="space-y-12">
-<!-- Event 1 -->
-<div class="flex gap-8 items-start group" data-timeline-item="true">
-<div class="flex flex-col items-center pt-1">
-<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-<span class="material-symbols-outlined">church</span>
-</div>
-<div class="w-0.5 h-24 bg-primary/10 mt-4"></div>
-</div>
-<div class="flex-1 pb-8 border-b border-primary/10">
-<div class="flex justify-between items-center mb-2">
-<h4 class="text-2xl font-bold">The Ceremony</h4>
-<span class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">{{EventTime}}</span>
-</div>
-<p class="text-gray-600 mb-4">St. Patrick's Cathedral, Midtown Manhattan. Please arrive 15 minutes early for seating.</p>
-<a class="inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline" href="#">
-<span class="material-symbols-outlined text-base">location_on</span> View Map
+                </div>
+            </div>
+            <!-- Gallery Grid -->
+            <div id="wedding-gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Candid wedding guest laughing at the reception"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp-by8V5vwQaCGAwiPJUJde96qP11Ud2rHOz74NnJD5nKnK79U71gMg6E78oaTxZ0tlcRPygsNyK2PlZEavAUPLmx0quDrHfHlqVAbeN-BQjTL7ZsMoHpp7jbMPWJyYyVdZM2MARVeEKRqtSdmvgdNfzWoVaoDCJq3IAGi_uTOiUYocRugNg4W0oLMRow8AKrxgtWDGg50hnnTxXU5DD0offTk8FzhohJZElhlTPfZvDlzxV3laoRSYZMF76FiR50B3Xpvb4np7NCP" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">The Engagement</p>
+                        <p class="text-white/80 text-xs">by {{BrideName}} J.</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Beautifully decorated wedding cake with flowers"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDACJJC-WUtelD7mR7WGFnjM2i1mRnw0FS-CmUtFbJCT6rPy4XxrhuVvFAUCw5O5rZS7osxhJ4L8cDQNTMAO37ccDtH9BAgSCSGimF87x4XWrUo27-hgC-UYP86RvuzRAu_0JZfFr0egW6lONvkg98Poy9ldnpES7KkDwrIdJmuXepuVyGi959fi8hean_dD-XSPHZjBWeTxi_Ka-ag9Nkie87ZcyTSAueCEkqm2xKQL4rR1PvXExteeWA7ug-msoNid0kP_zB5N6Eq" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">Cake Tasting</p>
+                        <p class="text-white/80 text-xs">by Michael R.</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Bride and groom sharing a quiet moment outdoors"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCua9a8Dg-1D5DZYzhcYqhIdgSjBu3_R_c7b4pGaQYc0-hvl_fzsuPbGpHytHfnGo-CY320qNDU3KGNCQLsocuJMpWIQ7JsB61IkVC0uHJoGe1xP9yQY6oIB68mwDJLpxZ_aSpFGDZO9Qbb5PNEOgfOsdggJhcDgs6s-gVstYOLMSfSQKvsiXuByjaIWaH51fD47SiamOngsGxbheJATb3wCfOWfmT9vfFrFn8ph7yD1dM_dNooiPfmpvAmJIMPqsOT2KxGZ8tLQFr" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">Sunset Walk</p>
+                        <p class="text-white/80 text-xs">by David K.</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Sparkling cocktail glasses on a wedding table"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwdhV-K6k0SxEP1S6XKmEVIUXGQMDYaG9m5rCdTndkUsxB8X_6-9idYRpAxBvHfcKXuPgolfzt3gdBAWHM7PcGqU0zhKpFJLjW2ScT5j4rzc1hOser6-vqPo0PllWV06IFzsnrRxB0wVWZrBmQgoTDzxxMswC_1Wg8NYd3417ZaTrB1Ua23pRww47sV8nvxl5MKoEn8dzb0NWrGqTntFP-e0evTybMy2NE9zIaBn7G8mtpW4FrVUn51yio2UJ-9dfLpSXmhbos9IEH" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">Cocktail Hour</p>
+                        <p class="text-white/80 text-xs">by {{BrideName}} W.</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Floral centerpieces on a long reception table"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgtUkCumn5_7PGitgZBkWwL_Z9ZyaGe2Q6yn1wmbfE9iUW2tBYuCYLA7ZKwgJA4HLgdfqM0XN3Wpwuc9ljEHgT9JtmHUGqrk_JsKROAua7E1Wv5XcgOlTspR-M1hc9r0qAcQj2imo3I2F3g9G13fwbNYNLLGlnWr542FCW7rlnsSVjihPSgIMhrjaR4CCfin1fTX0fY_cJ3BbrHFvGSUBQxgfoNV1nUf9ie9t7a59JzdLlGM4D3BAX1HHL0-NFrp5tlEXWsUFN5Tl3" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">Decor Details</p>
+                        <p class="text-white/80 text-xs">by Admin</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Aerial view of a garden wedding ceremony"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0qNRa8wY6zX5twkN0BdAV02qzQvLTd26EjxUN6B85J5rArBn8lDboPYQHJxPU8POufHn-xzbO2HGC1H_-6MNGWGWVdVqLTAI0KPBLcajWDy4wOB1_Lznn4OPfml8cWyJXz45VnPYJGQ3tjWCqJbOkUc0N5_FHS0DvSSQgfxzdB-yGDYaQPjsggH_kVpWq9wYukTV6tBvwfzsMuJjf3ORH9txr4Hr5JtMg9WkI9DP1cxMo6V-QnmX_KuwSfs7xU9sZa1N907EkqUOd" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">Venue View</p>
+                        <p class="text-white/80 text-xs">by {{GroomName}}.</p>
+                    </div>
+                </div>
+                <div data-gallery-item="true" class="relative group aspect-square overflow-hidden rounded-xl">
+                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        data-alt="Group of friends celebrating at a wedding"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd5Q7HoYDF4QUVG88H1w80zg-4xOgrR-RCM8K2llwBe8o6YE6XMdNid7vk06D2ZYjuTm-SMo74TgsSApW2u5QI3EPpNSiiJuAVonR7JFP6guTLsEQhAzUZm5uL92OP0SiqXhyykhZBnrMnTKqSONLeAaBFezeqHJpucEYmmrWYQ4ONCbmF5C7htURMfpEiShGqkmyTUy-LMImWjska5chN2JCszw0S6cEME1p753SB-7bMsKTp5w32ZlJpqvi5R5iG-fYcjgrf3idg" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <p class="text-white text-sm font-bold">The Crew</p>
+                        <p class="text-white/80 text-xs">by Jessica L.</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-primary/5 border-2 border-dashed border-primary/20 rounded-xl flex flex-col items-center justify-center p-6 text-center group cursor-pointer hover:border-primary transition-colors">
+                    <span
+                        class="material-symbols-outlined text-4xl text-primary mb-2 group-hover:scale-110 transition-transform">upload</span>
+                    <p class="font-bold text-primary">View More</p>
+                    <p class="text-xs text-primary/60 mt-1">128+ Photos Shared</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Schedule Section -->
+    <section class="py-24 px-6 lg:px-20 max-w-5xl mx-auto" id="schedule">
+        <div class="text-center mb-16">
+            <h2 class="font-serif text-5xl mb-4 italic">The Celebration</h2>
+            <p class="text-gray-500">The detailed timeline for our special day.</p>
+        </div>
+        <div id="wedding-timeline" class="space-y-12">
+            <!-- Event 1 -->
+            <div data-timeline-item="true" class="flex gap-8 items-start group">
+                <div class="flex flex-col items-center pt-1">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                        <span class="material-symbols-outlined">church</span>
+                    </div>
+                    <div class="w-0.5 h-24 bg-primary/10 mt-4"></div>
+                </div>
+                <div class="flex-1 pb-8 border-b border-primary/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-2xl font-bold">The Ceremony</h4>
+                        <span
+                            class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">{{EventTime}}</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">St. Patrick's Cathedral, Midtown Manhattan. Please arrive 15 minutes
+                        early for seating.</p>
+                    <a class="inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline" href="#">
+                        <span class="material-symbols-outlined text-base">location_on</span> View Map
                     </a>
-</div>
-</div>
-<!-- Event 2 -->
-<div class="flex gap-8 items-start group">
-<div class="flex flex-col items-center pt-1">
-<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-<span class="material-symbols-outlined">liquor</span>
-</div>
-<div class="w-0.5 h-24 bg-primary/10 mt-4"></div>
-</div>
-<div class="flex-1 pb-8 border-b border-primary/10">
-<div class="flex justify-between items-center mb-2">
-<h4 class="text-2xl font-bold">Cocktail Hour</h4>
-<span class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">5:30 PM</span>
-</div>
-<p class="text-gray-600 mb-4">The Plaza Hotel Penthouse. Enjoy artisanal appetizers and our signature cocktails overlooking Central Park.</p>
-</div>
-</div>
-<!-- Event 3 -->
-<div class="flex gap-8 items-start group">
-<div class="flex flex-col items-center pt-1">
-<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-<span class="material-symbols-outlined">restaurant</span>
-</div>
-</div>
-<div class="flex-1">
-<div class="flex justify-between items-center mb-2">
-<h4 class="text-2xl font-bold">Dinner &amp; Dancing</h4>
-<span class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">7:00 PM</span>
-</div>
-<p class="text-gray-600 mb-4">Grand Ballroom. Formal dinner followed by a night of celebration, speeches, and lots of dancing!</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Join Us Section (RSVP) -->
-<section class="py-24 px-6 lg:px-20 bg-primary/5">
-<div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-<div class="md:w-1/3 bg-primary p-12 text-white flex flex-col justify-center">
-<h3 class="font-serif text-3xl mb-6 italic">Join Us in Celebration</h3>
-<p class="text-white/80 text-sm leading-relaxed mb-8">Kindly respond by {{WeddingDate}} to help us finalize the details for our special day.</p>
-<div class="space-y-4">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-xl">mail</span>
-<span class="text-xs">rsvp@kishoreandbride.com</span>
-</div>
-</div>
-</div>
-<div class="md:w-2/3 p-12"><div class="space-y-8">
-<div>
-<h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Wishes Wall</h4>
-<form class="space-y-6">
-<div class="space-y-4">
-<div>
-<label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Your Name</label>
-<input class="w-full bg-background-light border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20" placeholder="Enter your name" type="text"/>
-</div>
-<div>
-<label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Leave a Wish for the Couple</label>
-<textarea class="w-full bg-background-light border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20" placeholder="Write your message here..." rows="4"></textarea>
-</div>
-</div>
-<button class="w-full bg-primary text-white py-4 rounded-xl font-bold hover:shadow-xl transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-xl">send</span>
-                SEND WISH
-            </button>
-</form>
-</div>
-<div class="pt-8 border-t border-gray-100">
-<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Recent Wishes</p>
-<div class="space-y-4">
-<div class="bg-background-light/50 p-4 rounded-xl border border-primary/5">
-<p class="text-gray-600 italic mb-2 font-serif text-lg">"So happy for you both! Can't wait to celebrate!"</p>
-<p class="text-xs font-bold text-primary uppercase tracking-wider">— The Millers</p>
-</div>
-<div class="bg-background-light/50 p-4 rounded-xl border border-primary/5">
-<p class="text-gray-600 italic mb-2 font-serif text-lg">"Wishing you a lifetime of love and happiness together."</p>
-<p class="text-xs font-bold text-primary uppercase tracking-wider">— Sarah &amp; Tom</p>
-</div>
-</div>
-</div>
-</div></div>
-</div>
-</section>
-<!-- Registry Section -->
-<section class="py-24 px-6 lg:px-20 text-center max-w-5xl mx-auto" id="registry">
-<h2 class="font-serif text-5xl mb-4 italic">Gift Registry</h2>
-<p class="text-gray-500 mb-12">Your presence at our wedding is the greatest gift of all. However, if you wish to honor us with a gift, we have curated a few registries.</p>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl" href="#">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">shopping_bag</span>
-</div>
-<h4 class="font-bold text-lg mb-2">Crate &amp; Barrel</h4>
-<p class="text-sm text-gray-400">Home Essentials &amp; Decor</p>
-</a>
-<a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl" href="#">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">flight_takeoff</span>
-</div>
-<h4 class="font-bold text-lg mb-2">Honeymoon Fund</h4>
-<p class="text-sm text-gray-400">Contribute to our Amalfi trip</p>
-</a>
-<a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl" href="#">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">volunteer_activism</span>
-</div>
-<h4 class="font-bold text-lg mb-2">Charity Donation</h4>
-<p class="text-sm text-gray-400">Support Global Education</p>
-</a>
-</div>
-</section>
-<!-- Footer -->
-<footer class="bg-background-dark py-16 px-6 lg:px-20 text-white/60 text-center">
-<div class="max-w-7xl mx-auto">
-<div class="font-serif text-4xl text-white italic mb-6">Kishore &amp; Bride</div>
-<p class="text-sm tracking-widest uppercase mb-12">See you on {{WeddingDate}}</p>
-<div class="h-[1px] w-full bg-white/10 mb-12"></div>
-<div class="flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-medium">
-<p>© 2024 Kishore &amp; Bride's Wedding Site. Made with love.</p>
+                </div>
+            </div>
+            <!-- Event 2 -->
+            <div data-timeline-item="true" class="flex gap-8 items-start group">
+                <div class="flex flex-col items-center pt-1">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                        <span class="material-symbols-outlined">liquor</span>
+                    </div>
+                    <div class="w-0.5 h-24 bg-primary/10 mt-4"></div>
+                </div>
+                <div class="flex-1 pb-8 border-b border-primary/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-2xl font-bold">Cocktail Hour</h4>
+                        <span class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">5:30 PM</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">The Plaza Hotel Penthouse. Enjoy artisanal appetizers and our
+                        signature cocktails overlooking {{Location}}.</p>
+                </div>
+            </div>
+            <!-- Event 3 -->
+            <div data-timeline-item="true" class="flex gap-8 items-start group">
+                <div class="flex flex-col items-center pt-1">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                        <span class="material-symbols-outlined">restaurant</span>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-2xl font-bold">Dinner &amp; Dancing</h4>
+                        <span class="px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">7:00 PM</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Grand Ballroom. Formal dinner followed by a night of celebration,
+                        speeches, and lots of dancing!</p>
+                </div>
+            </div>
+        </div>
+        <!-- Interactive Map -->
+        <div class="mt-20 max-w-5xl mx-auto px-6">
+            <div class="rounded-3xl overflow-hidden shadow-2xl h-[450px] relative border-8 border-white">
+                <div id="wedding-map" class="w-full h-full bg-slate-50"></div>
+            </div>
+        </div>
+    </section>
+    <!-- Join Us Section (RSVP) -->
+    <section class="py-24 px-6 lg:px-20 bg-primary/5">
+        <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            <div class="md:w-1/3 bg-primary p-12 text-white flex flex-col justify-center">
+                <h3 class="font-serif text-3xl mb-6 italic">Join Us in Celebration</h3>
+                <p class="text-white/80 text-sm leading-relaxed mb-8">Kindly respond by {{WeddingDate}} to help us
+                    finalize the details for our special day.</p>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-xl">mail</span>
+                        <span class="text-xs">rsvp@kishoreandbride.com</span>
+                    </div>
+                </div>
+            </div>
+            <div class="md:w-2/3 p-12">
+                <div class="space-y-8">
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Wishes Wall</h4>
+                        <form class="space-y-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Your
+                                        Name</label>
+                                    <input
+                                        class="w-full bg-background-light border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20"
+                                        placeholder="Enter your name" type="text" />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Leave
+                                        a Wish for the Couple</label>
+                                    <textarea
+                                        class="w-full bg-background-light border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20"
+                                        placeholder="Write your message here..." rows="4"></textarea>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full bg-primary text-white py-4 rounded-xl font-bold hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-xl">send</span>
+                                SEND WISH
+                            </button>
+                        </form>
+                    </div>
+                    <div class="pt-8 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Recent Wishes</p>
+                        <div class="space-y-4">
+                            <div class="bg-background-light/50 p-4 rounded-xl border border-primary/5">
+                                <p class="text-gray-600 italic mb-2 font-serif text-lg">"So happy for you both! Can't
+                                    wait to celebrate!"</p>
+                                <p class="text-xs font-bold text-primary uppercase tracking-wider">— The Millers</p>
+                            </div>
+                            <div class="bg-background-light/50 p-4 rounded-xl border border-primary/5">
+                                <p class="text-gray-600 italic mb-2 font-serif text-lg">"Wishing you a lifetime of love
+                                    and happiness together."</p>
+                                <p class="text-xs font-bold text-primary uppercase tracking-wider">— {{BrideName}} &amp;
+                                    Tom</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Registry Section -->
+    <section class="py-24 px-6 lg:px-20 text-center max-w-5xl mx-auto" id="registry">
+        <h2 class="font-serif text-5xl mb-4 italic">{{Registry_Title}}</h2>
+        <p class="text-gray-500 mb-12">{{Registry_Body}}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl"
+                href="#">
+                <div
+                    class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Crate &amp; Barrel</h4>
+                <p class="text-sm text-gray-400">Home Essentials &amp; Decor</p>
+            </a>
+            <a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl"
+                href="#">
+                <div
+                    class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-3xl">flight_takeoff</span>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Honeymoon Fund</h4>
+                <p class="text-sm text-gray-400">Contribute to our trip</p>
+            </a>
+            <a class="group p-8 bg-white rounded-2xl border border-primary/5 hover:border-primary/20 transition-all flex flex-col items-center shadow-sm hover:shadow-xl"
+                href="#">
+                <div
+                    class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-3xl">volunteer_activism</span>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Charity Donation</h4>
+                <p class="text-sm text-gray-400">Support Global Education</p>
+            </a>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-background-dark py-16 px-6 lg:px-20 text-white/60 text-center">
+        <div class="max-w-7xl mx-auto">
+            <div class="font-serif text-4xl text-white italic mb-6">{{GroomName}} &amp; {{BrideName}}</div>
+            <p class="text-sm tracking-widest uppercase mb-12">See you on {{WeddingDate}}</p>
+            <div class="h-[1px] w-full bg-white/10 mb-12"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-medium">
+                <p>© {{Year}} {{GroomName}} &amp; {{BrideName}}'s Wedding Site. Made with love.</p>
                 <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>
-<div class="flex gap-8">
-<a class="hover:text-white transition-colors" href="#">Instagram</a>
-<a class="hover:text-white transition-colors" href="#">Contact</a>
-<a class="hover:text-white transition-colors" href="#">Travel Info</a>
-</div>
-</div>
-</div>
-</footer>
+                <div class="flex gap-8">
+                    <a class="hover:text-white transition-colors" href="#">Instagram</a>
+                    <a class="hover:text-white transition-colors" href="#">Contact</a>
+                    <a class="hover:text-white transition-colors" href="#">Travel Info</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

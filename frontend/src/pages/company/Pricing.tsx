@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
-import { LandingToolbar } from "@/components/LandingToolbar";
+import { WeddingWebHeader } from "@/components/WeddingWebHeader";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -504,8 +504,7 @@ const Pricing = () => {
   if (currentUser?.has_premium_access) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        <CompanyNavbar />
-        <LandingToolbar />
+        <WeddingWebHeader />
         <section className="relative pt-32 pb-20 px-4 flex flex-col items-center justify-center min-h-[80vh] text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -555,10 +554,9 @@ const Pricing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
-      <CompanyNavbar />
+      <WeddingWebHeader />
 
-      {/* Sidebar Toolbar */}
-      <LandingToolbar />
+
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">

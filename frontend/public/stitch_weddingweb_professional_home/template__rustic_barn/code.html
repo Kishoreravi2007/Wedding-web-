@@ -1,299 +1,373 @@
 <!DOCTYPE html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#1754cf",
-                "background-light": "#fdfbf7", // Warm Parchment
-                "background-dark": "#111621",
-                "rustic-taupe": "#8d7e71",
-                "rustic-cream": "#faf7f2",
-                "rustic-slate": "#4a5568"
-              },
-              fontFamily: {
-                "display": ["Manrope", "sans-serif"]
-              },
-              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-            },
-          },
-        }
-      </script>
-<style>body {
-    font-family: "Manrope", sans-serif
-    }
-.cursive-style {
-    font-style: italic;
-    letter-spacing: -0.02em
-    }
-.wood-texture {
-    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCfSzlT39QhNGOV_B7vtbzbW36sK-fCWwrknrT2y6JknlYX7onntymLednCw8vC8eFsjXNTmLXQqgqEBbnHquzuyt99qzH4SXMzuwQftbPDFZiMXJHiWqwUUx6yuE3_X5TCogKczys-rL8_Q3GlToBbdKDjORcqBBIgBgLO7048IxmtMAH-QbyowVydxuuBHZL1FvkOQJDTi1bAms-8GnAZlItRuw86hRypBEDfz-kgTvOSn_Co6SSldhwAkfOrTTSOrdQzxL9O-lr-)
-    }</style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
-<!-- Sticky Navigation -->
-<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-rustic-taupe/10">
-<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-3xl">favorite</span>
-<span class="text-xl font-extrabold tracking-tight text-rustic-slate dark:text-white uppercase">E <span class="text-primary">&amp;</span> S</span>
-</div>
-<nav class="hidden md:flex items-center gap-8">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#details">Details</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#schedule">Schedule</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
-</nav>
-<button class="bg-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-                Leave a Wish
-            </button>
-</div>
-</header>
-<main>
-<!-- Hero Section -->
-<section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="A happy couple walking through a golden meadow at sunset" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBRG3bQm6q13-AGSI_s3qO6COyc8Ei3IaZwWunIZiskwZDaZGFYrQM8YwC_Fmx9qobW0nCNjOhHRfXvDIgy_GJoqC_ucqwBLZqy-ODvalGdTGgvX8uTQOzmUSdb-C_mZam0KOdDGVKX0gp9W2pQSu_ZyrOmMVfAoES4F7cmynlXP2g8Jv6U4AcK9-0829pTN7vSIeF0NFUzDshNQsCLT237zoFpZBMJI-N7stGmXYXeedSoR6IAndnvnkPoE4bsLXp70-faZ8_eMJ9g');"></div>
-<div class="relative text-center text-white px-4">
-<p class="text-lg md:text-xl font-medium tracking-widest uppercase mb-4 opacity-90">We are getting married</p>
-<h1 class="text-6xl md:text-9xl font-extrabold mb-6 tracking-tighter cursive-style">{{GroomName}} & {{BrideName}}</h1>
-<div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-lg font-light">
-<span class="flex items-center gap-2"><span class="material-symbols-outlined">calendar_today</span> {{WeddingDate}}</span>
-<span class="hidden md:block w-1 h-1 bg-white rounded-full"></span>
-<span class="flex items-center gap-2"><span class="material-symbols-outlined">location_on</span> The Rustic Barn, Vermont</span>
-</div>
-<div class="mt-12">
-<a class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-8 py-4 rounded-full font-bold hover:bg-white hover:text-primary transition-all" href="#schedule">
-                        View Wedding Schedule <span class="material-symbols-outlined">arrow_downward</span>
-</a>
-</div>
-</div>
-</section>
-<!-- Our Story -->
-<section class="py-24 px-6 bg-rustic-cream dark:bg-background-dark/50" id="story">
-<div class="max-w-4xl mx-auto">
-<div class="text-center mb-16">
-<span class="text-primary font-bold tracking-widest uppercase text-sm">The Journey</span>
-<h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">Our Love Story</h2>
-</div>
-<div class="relative">
-<!-- Vertical Line -->
-<div class="absolute left-1/2 -translate-x-1/2 h-full w-px bg-rustic-taupe/30"></div>
-<!-- Story Item 1 -->
-<div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
-<div class="md:text-right">
-<h3 class="text-2xl font-bold text-rustic-slate dark:text-white">How We Met</h3>
-<p class="text-primary font-bold mb-2">Summer 2018</p>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">It started with a shared umbrella during a sudden downpour in downtown Burlington. A simple "thank you" turned into a three-hour conversation over coffee.</p>
-</div>
-<div class="rounded-xl overflow-hidden shadow-2xl h-64 order-first md:order-last">
-<img class="w-full h-full object-cover" data-alt="A couple laughing together in a cozy cafe setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeMpHo8kswSrWuG8s4FT_orrE7dZZgQKeXfidYKS9nylXG_Xos_OM8wVdDupWnzscCfhsNehhqoD9OFJTdFF9QvEPDuLfUWsGOFLvUjAo-7paUJ6UfeRYI1VS3jwdePqYg08qiI8xvNhcYc1OWqaP1NVbvujswkL_Z4Kr6LgNbsPzzx0pmwlwECQxfSghzebgwBeRvqeGelqHzvwe2iE1BBY1CQt2l7i9mr9Alwie-2Mkwu9prw4wP9F82jqJOgN9Q7qqp7JbNgGTm"/>
-</div>
-<div class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm"></div>
-</div>
-<!-- Story Item 2 -->
-<div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
-<div class="rounded-xl overflow-hidden shadow-2xl h-64">
-<img class="w-full h-full object-cover" data-alt="A couple having a picnic in an autumn forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYNKBfHbxi0sIzpLmrctpMNLIBDfFnjPFsIj5_l5OP2he13MQsbJH8AbQpyT4R3gdGfCWU2tJ2S2A20MKu1NHjS6eahy9-Z8-EN3mFxOmkrzukCJoXJRpMj61LrrYka_kHeJHzcJfU3ql1YlkdL-zSrqwoMjtJ2iTqySI9fGTbK4r1wwloU2vEMd-RXx8RK64Tl-cOfITnD3Y944CEd1bHJCHuvzPY0VwJCzU49wCSdVIhVPaiG3go4-QAlh4pmgPNMIYNyaN825JP"/>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-rustic-slate dark:text-white">The First Date</h3>
-<p class="text-primary font-bold mb-2">Autumn 2018</p>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Our first official date was at the Apple Orchard. We spent more time laughing at our poor picking skills than actually gathering fruit. It was then we knew this was special.</p>
-</div>
-<div class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm"></div>
-</div>
-<!-- Story Item 3 -->
-<div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-<div class="md:text-right">
-<h3 class="text-2xl font-bold text-rustic-slate dark:text-white">The Proposal</h3>
-<p class="text-primary font-bold mb-2">Winter 2023</p>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Under the twinkling lights of the winter festival, Elias got down on one knee. Through happy tears and the freezing cold, Sarah said the easiest "Yes" of her life.</p>
-</div>
-<div class="rounded-xl overflow-hidden shadow-2xl h-64 order-first md:order-last">
-<img class="w-full h-full object-cover" data-alt="Close up of an engagement ring in a romantic winter setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdYDRnoT3Yo0OlYhuMx2Ijct4MXpK7YzUSSR2ZvPVVQhq2Satcp5Mir0_DxE7AadfdDyzZkwYbaArZDRmGEjwsC_54ehCmRMukpj11cpvDhXe5OybqM3mzGiJGfDgtWxTe-KeEj8ZxPEDasQuLJ5YWeJ25kb-0UqZGc5wCSzxoFAkBnTCN5gjcNfjk_xyIAj1GtGcxsm0JSdUYGrxvX2tq3VviTqnKaPuvV0lgQiYKLpVHFf9Q88jck7dH517Dx_WWP2mod7vmrlRk"/>
-</div>
-<div class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm"></div>
-</div>
-</div>
-</div>
-</section>
-<!-- Wedding Schedule -->
-<section class="py-24 px-6 bg-white dark:bg-background-dark wood-texture bg-opacity-5" id="schedule">
-<div class="max-w-6xl mx-auto">
-<div class="text-center mb-16">
-<span class="text-primary font-bold tracking-widest uppercase text-sm">Plan for the Day</span>
-<h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">Wedding Schedule</h2>
-</div>
-<div id="wedding-timeline" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-<!-- Schedule Card 1 -->
-<div class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">church</span>
-</div>
-<p class="text-primary font-bold text-lg">3:30 PM</p>
-<h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">The Ceremony</h4>
-<p class="text-slate-500 text-sm">The North Meadow</p>
-</div>
-<!-- Schedule Card 2 -->
-<div class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">local_bar</span>
-</div>
-<p class="text-primary font-bold text-lg">4:30 PM</p>
-<h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Cocktails</h4>
-<p class="text-slate-500 text-sm">The Barn Terrace</p>
-</div>
-<!-- Schedule Card 3 -->
-<div class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">restaurant</span>
-</div>
-<p class="text-primary font-bold text-lg">{{EventTime}}</p>
-<h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Dinner &amp; Toasts</h4>
-<p class="text-slate-500 text-sm">The Main Loft</p>
-</div>
-<!-- Schedule Card 4 -->
-<div class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
-<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-3xl">nightlife</span>
-</div>
-<p class="text-primary font-bold text-lg">8:30 PM</p>
-<h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Dancing</h4>
-<p class="text-slate-500 text-sm">Under the Stars</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Wedding Details & Map -->
-<section class="py-24 px-6 bg-rustic-slate text-white" id="details">
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-<div>
-<h2 class="text-4xl md:text-5xl font-black mb-8 cursive-style">Wedding Details</h2>
-<div class="space-y-8>
-<div class="flex gap-4" data-timeline-item="true">
-<span class="material-symbols-outlined text-primary text-3xl">checkroom</span>
-<div>
-<h4 class="text-xl font-bold mb-1">Attire: Rustic Chic</h4>
-<p class="text-slate-300">Semi-formal attire. We recommend comfortable shoes for the meadow ceremony and a light wrap for the evening mountain breeze.</p>
-</div>
-</div>
-<div class="flex gap-4">
-<span class="material-symbols-outlined text-primary text-3xl">hotel</span>
-<div>
-<h4 class="text-xl font-bold mb-1">Accommodations</h4>
-<p class="text-slate-300">Room blocks are available at The Vermont Inn and Green Mountain Suites. Mention the "Elias &amp; Sarah" wedding for a special rate.</p>
-</div>
-</div>
-<div class="flex gap-4">
-<span class="material-symbols-outlined text-primary text-3xl">card_giftcard</span>
-<div>
-<h4 class="text-xl font-bold mb-1">Registry</h4>
-<p class="text-slate-300">Your presence is our greatest gift. Should you wish to honor us with a contribution, we have a honeymoon fund set up.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="rounded-2xl overflow-hidden shadow-2xl h-[450px] relative border-8 border-white/10">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="A stylized map showing the wedding location in Vermont" data-location="Burlington, Vermont" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCAjPB9FjaSe8vDadjPLaHTClDNBaflBQBSQUVF2vHNLjLc5TPFHWXMm4zex0ssf9COKJ7mGEfbwpPCMOyyDsiwTvkoGnUxOaxhu5-RltD4ldH8wHMfGDaZoDSnGV5WQ0JnPeq80LK7_151yuLsFh98WgSYMivzFUY2YGAWgozYHfzHkRui7Qqz-p8hmKW2O5hfa5zSZgZPY487fmqp2K8kPX0_fwrMWdr8ZxzmRBTvd6SBrKXpbzMNJzQQnDa3ZmvgL0J0L-0Riufg');"></div>
-<div class="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-xl text-rustic-slate shadow-xl flex items-center justify-between">
-<div>
-<p class="font-bold text-lg">The Rustic Barn</p>
-<p class="text-sm opacity-70">123 Meadow Lane, Stowe, VT</p>
-</div>
-<button class="bg-primary text-white p-3 rounded-full hover:scale-105 transition-transform">
-<span class="material-symbols-outlined">directions</span>
-</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Wishes Wall -->
-<section class="py-24 px-6 bg-background-light dark:bg-background-dark" id="wishes">
-<div class="max-w-6xl mx-auto">
-<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-<div>
-<span class="text-primary font-bold tracking-widest uppercase text-sm">Guestbook</span>
-<h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">Wishes Wall</h2>
-<p class="text-slate-500 mt-4 max-w-md">Instead of a traditional RSVP, please leave us a message, a memory, or a blessing for our new journey together.</p>
-</div>
-<button class="bg-primary text-white px-10 py-4 rounded-full font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform flex items-center gap-2">
-<span class="material-symbols-outlined">edit_note</span> Leave a Wish
-                    </button>
-</div>
-<div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-<!-- Wish Card 1 -->
-<div class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
-<span class="material-symbols-outlined text-primary/20 absolute top-4 right-4 text-4xl">format_quote</span>
-<p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"To a beautiful couple! May your life together be as wonderful as the day we first saw you two holding that umbrella. We can't wait to celebrate with you in October!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-rustic-taupe/20 flex items-center justify-center font-bold text-rustic-taupe">AM</div>
-<div>
-<p class="font-bold text-rustic-slate dark:text-white text-sm">Aunt Martha &amp; Uncle Jim</p>
-<p class="text-xs text-slate-400">{{WeddingDate}}</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 2 -->
-<div class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
-<p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"So excited for you guys! Here's to many more adventures, campfire stories, and Vermont sunsets. Love you both!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">K</div>
-<div>
-<p class="font-bold text-rustic-slate dark:text-white text-sm">Kevin &amp; Chloe</p>
-<p class="text-xs text-slate-400">{{WeddingDate}}</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 3 -->
-<div class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
-<p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"Elias, you finally found someone who laughs at your jokes as much as we do. Sarah, welcome to the family properly! See you at the barn!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-rustic-taupe/20 flex items-center justify-center font-bold text-rustic-taupe">TS</div>
-<div>
-<p class="font-bold text-rustic-slate dark:text-white text-sm">The Stevensons</p>
-<p class="text-xs text-slate-400">{{WeddingDate}}</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 4 -->
-<div class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
-<p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"Wishing you both a lifetime of happiness. May your love grow deeper with every passing year. Can't wait for the dancing!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">LR</div>
-<div>
-<p class="font-bold text-rustic-slate dark:text-white text-sm">Linda &amp; Robert</p>
-<p class="text-xs text-slate-400">{{WeddingDate}}</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="py-12 px-6 bg-rustic-cream dark:bg-background-dark border-t border-rustic-taupe/10">
-<div class="max-w-7xl mx-auto flex flex-col items-center">
-<div class="text-3xl font-extrabold tracking-tight text-rustic-slate dark:text-white uppercase mb-4 cursive-style">E <span class="text-primary">&amp;</span> S</div>
-<p class="text-slate-500 text-sm mb-8">{{WeddingDate}} • Stowe, Vermont</p>
-<div class="flex gap-6 mb-8">
-<a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
-<a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">mail</span></a>
-<a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">favorite</span></a>
-</div>
-<p class="text-xs text-slate-400">Built with love by Elias &amp; Sarah. All photography by Vermont Sunsets.</p>
-</div>
-</footer>
+<html lang="en">
 
-    
-    
-</body></html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1754cf",
+            "background-light": "#fdfbf7", // Warm Parchment
+            "background-dark": "#111621",
+            "rustic-taupe": "#8d7e71",
+            "rustic-cream": "#faf7f2",
+            "rustic-slate": "#4a5568"
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: "Manrope", sans-serif
+    }
+
+    .cursive-style {
+      font-style: italic;
+      letter-spacing: -0.02em
+    }
+
+    .wood-texture {
+      background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCfSzlT39QhNGOV_B7vtbzbW36sK-fCWwrknrT2y6JknlYX7onntymLednCw8vC8eFsjXNTmLXQqgqEBbnHquzuyt99qzH4SXMzuwQftbPDFZiMXJHiWqwUUx6yuE3_X5TCogKczys-rL8_Q3GlToBbdKDjORcqBBIgBgLO7048IxmtMAH-QbyowVydxuuBHZL1FvkOQJDTi1bAms-8GnAZlItRuw86hRypBEDfz-kgTvOSn_Co6SSldhwAkfOrTTSOrdQzxL9O-lr-)
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+  <!-- Sticky Navigation -->
+  <header
+    class="fixed top-0 w-full z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-rustic-taupe/10">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+        <span class="text-xl font-extrabold tracking-tight text-rustic-slate dark:text-white uppercase">{{GroomInitial}}
+          <span class="text-primary">&amp;</span> {{BrideInitial}}</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
+        <a class="text-sm font-semibold hover:text-primary transition-colors" href="#details">Details</a>
+        <a class="text-sm font-semibold hover:text-primary transition-colors" href="#schedule">Schedule</a>
+        <a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
+      </nav>
+      <button
+        class="bg-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+        Leave a Wish
+      </button>
+    </div>
+  </header>
+  <main>
+    <!-- Hero Section -->
+    <section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 bg-cover bg-center hero-bg" data-hero-bg="true"
+        data-alt="A happy couple walking through a golden meadow at sunset"
+        style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBRG3bQm6q13-AGSI_s3qO6COyc8Ei3IaZwWunIZiskwZDaZGFYrQM8YwC_Fmx9qobW0nCNjOhHRfXvDIgy_GJoqC_ucqwBLZqy-ODvalGdTGgvX8uTQOzmUSdb-C_mZam0KOdDGVKX0gp9W2pQSu_ZyrOmMVfAoES4F7cmynlXP2g8Jv6U4AcK9-0829pTN7vSIeF0NFUzDshNQsCLT237zoFpZBMJI-N7stGmXYXeedSoR6IAndnvnkPoE4bsLXp70-faZ8_eMJ9g');">
+      </div>
+      <div class="relative text-center text-white px-4">
+        <p class="text-lg md:text-xl font-medium tracking-widest uppercase mb-4 opacity-90">We are getting married</p>
+        <h1 class="text-6xl md:text-9xl font-extrabold mb-6 tracking-tighter cursive-style">{{GroomName}} &
+          {{BrideName}}</h1>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-lg font-light">
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined">calendar_today</span>
+            {{WeddingDate}}</span>
+          <span class="hidden md:block w-1 h-1 bg-white rounded-full"></span>
+          <span class="flex items-center gap-2"><span class="material-symbols-outlined">location_on</span> {{Venue}},
+            {{Location}}</span>
+        </div>
+        <div class="mt-12">
+          <a class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 px-8 py-4 rounded-full font-bold hover:bg-white hover:text-primary transition-all"
+            href="#schedule">
+            View Wedding Schedule <span class="material-symbols-outlined">arrow_downward</span>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- Our Story -->
+    <section class="py-24 px-6 bg-rustic-cream dark:bg-background-dark/50" id="story">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-16">
+          <span class="text-primary font-bold tracking-widest uppercase text-sm">The Journey</span>
+          <h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">
+            {{Story_Title}}</h2>
+        </div>
+        <div class="relative">
+          <!-- Vertical Line -->
+          <div class="absolute left-1/2 -translate-x-1/2 h-full w-px bg-rustic-taupe/30"></div>
+          <!-- Story Item 1 -->
+          <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
+            <div class="md:text-right">
+              <h3 class="text-2xl font-bold text-rustic-slate dark:text-white">{{Story_Event1_Title}}</h3>
+              <p class="text-primary font-bold mb-2">{{Story_Event1_Date}}</p>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{Story_Event1_Desc}}</p>
+            </div>
+            <div class="rounded-xl overflow-hidden shadow-2xl h-64 order-first md:order-last">
+              <img class="w-full h-full object-cover" data-alt="A couple laughing together in a cozy cafe setting"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeMpHo8kswSrWuG8s4FT_orrE7dZZgQKeXfidYKS9nylXG_Xos_OM8wVdDupWnzscCfhsNehhqoD9OFJTdFF9QvEPDuLfUWsGOFLvUjAo-7paUJ6UfeRYI1VS3jwdePqYg08qiI8xvNhcYc1OWqaP1NVbvujswkL_Z4Kr6LgNbsPzzx0pmwlwECQxfSghzebgwBeRvqeGelqHzvwe2iE1BBY1CQt2l7i9mr9Alwie-2Mkwu9prw4wP9F82jqJOgN9Q7qqp7JbNgGTm" />
+            </div>
+            <div
+              class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm">
+            </div>
+          </div>
+          <!-- Story Item 2 -->
+          <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 items-center">
+            <div class="rounded-xl overflow-hidden shadow-2xl h-64">
+              <img class="w-full h-full object-cover" data-alt="A couple having a picnic in an autumn forest"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYNKBfHbxi0sIzpLmrctpMNLIBDfFnjPFsIj5_l5OP2he13MQsbJH8AbQpyT4R3gdGfCWU2tJ2S2A20MKu1NHjS6eahy9-Z8-EN3mFxOmkrzukCJoXJRpMj61LrrYka_kHeJHzcJfU3ql1YlkdL-zSrqwoMjtJ2iTqySI9fGTbK4r1wwloU2vEMd-RXx8RK64Tl-cOfITnD3Y944CEd1bHJCHuvzPY0VwJCzU49wCSdVIhVPaiG3go4-QAlh4pmgPNMIYNyaN825JP" />
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-rustic-slate dark:text-white">{{Story_Event2_Title}}</h3>
+              <p class="text-primary font-bold mb-2">{{Story_Event2_Date}}</p>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{Story_Event2_Desc}}</p>
+            </div>
+            <div
+              class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm">
+            </div>
+          </div>
+          <!-- Story Item 3 -->
+          <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="md:text-right">
+              <h3 class="text-2xl font-bold text-rustic-slate dark:text-white">{{Story_Event3_Title}}</h3>
+              <p class="text-primary font-bold mb-2">{{Story_Event3_Date}}</p>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{Story_Event3_Desc}}</p>
+            </div>
+            <div class="rounded-xl overflow-hidden shadow-2xl h-64 order-first md:order-last">
+              <img class="w-full h-full object-cover"
+                data-alt="Close up of an engagement ring in a romantic winter setting"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdYDRnoT3Yo0OlYhuMx2Ijct4MXpK7YzUSSR2ZvPVVQhq2Satcp5Mir0_DxE7AadfdDyzZkwYbaArZDRmGEjwsC_54ehCmRMukpj11cpvDhXe5OybqM3mzGiJGfDgtWxTe-KeEj8ZxPEDasQuLJ5YWeJ25kb-0UqZGc5wCSzxoFAkBnTCN5gjcNfjk_xyIAj1GtGcxsm0JSdUYGrxvX2tq3VviTqnKaPuvV0lgQiYKLpVHFf9Q88jck7dH517Dx_WWP2mod7vmrlRk" />
+            </div>
+            <div
+              class="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-background-dark shadow-sm">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Wedding Schedule -->
+    <section class="py-24 px-6 bg-white dark:bg-background-dark wood-texture bg-opacity-5" id="schedule">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <span class="text-primary font-bold tracking-widest uppercase text-sm">Plan for the Day</span>
+          <h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">Wedding
+            Schedule</h2>
+        </div>
+        <div id="wedding-timeline" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+          <!-- Schedule Card 1 -->
+          <div data-timeline-item="true"
+            class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
+            <div
+              class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-3xl">church</span>
+            </div>
+            <p class="text-primary font-bold text-lg">3:30 PM</p>
+            <h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">The Ceremony</h4>
+            <p class="text-slate-500 text-sm">The North Meadow</p>
+          </div>
+          <!-- Schedule Card 2 -->
+          <div data-timeline-item="true"
+            class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
+            <div
+              class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-3xl">local_bar</span>
+            </div>
+            <p class="text-primary font-bold text-lg">4:30 PM</p>
+            <h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Cocktails</h4>
+            <p class="text-slate-500 text-sm">The Barn Terrace</p>
+          </div>
+          <!-- Schedule Card 3 -->
+          <div data-timeline-item="true"
+            class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
+            <div
+              class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-3xl">restaurant</span>
+            </div>
+            <p class="text-primary font-bold text-lg">{{EventTime}}</p>
+            <h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Dinner &amp; Toasts</h4>
+            <p class="text-slate-500 text-sm">The Main Loft</p>
+          </div>
+          <!-- Schedule Card 4 -->
+          <div data-timeline-item="true"
+            class="bg-background-light dark:bg-slate-800/50 p-8 rounded-xl border border-rustic-taupe/10 text-center hover:shadow-xl transition-all group">
+            <div
+              class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-3xl">nightlife</span>
+            </div>
+            <p class="text-primary font-bold text-lg">8:30 PM</p>
+            <h4 class="text-xl font-extrabold text-rustic-slate dark:text-white mb-2">Dancing</h4>
+            <p class="text-slate-500 text-sm">Under the Stars</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Wedding Details & Map -->
+    <section class="py-24 px-6 bg-rustic-slate text-white" id="details">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-4xl md:text-5xl font-black mb-8 cursive-style">{{Venue}}</h2>
+          <div class="space-y-8>
+<div class=" flex gap-4" data-timeline-item="true">
+            <span class="material-symbols-outlined text-primary text-3xl">checkroom</span>
+            <div>
+              <h4 class="text-xl font-bold mb-1">Attire: Rustic Chic</h4>
+              <p class="text-slate-300">Semi-formal attire. We recommend comfortable shoes for the meadow ceremony and a
+                light wrap for the evening mountain breeze.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <span class="material-symbols-outlined text-primary text-3xl">hotel</span>
+            <div>
+              <h4 class="text-xl font-bold mb-1">{{Lodging_Title}}</h4>
+              <p class="text-slate-300">{{Lodging_Body}}</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <span class="material-symbols-outlined text-primary text-3xl">card_giftcard</span>
+            <div>
+              <h4 class="text-xl font-bold mb-1">{{Registry_Title}}</h4>
+              <p class="text-slate-300">{{Registry_Body}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="wedding-map" class="rounded-2xl overflow-hidden shadow-2xl h-[450px] relative border-8 border-white/10">
+        <div class="absolute inset-0 bg-cover bg-center"
+          data-alt="A stylized map showing the wedding location in Vermont" data-location="Burlington, Vermont"
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCAjPB9FjaSe8vDadjPLaHTClDNBaflBQBSQUVF2vHNLjLc5TPFHWXMm4zex0ssf9COKJ7mGEfbwpPCMOyyDsiwTvkoGnUxOaxhu5-RltD4ldH8wHMfGDaZoDSnGV5WQ0JnPeq80LK7_151yuLsFh98WgSYMivzFUY2YGAWgozYHfzHkRui7Qqz-p8hmKW2O5hfa5zSZgZPY487fmqp2K8kPX0_fwrMWdr8ZxzmRBTvd6SBrKXpbzMNJzQQnDa3ZmvgL0J0L-0Riufg');">
+        </div>
+        <div
+          class="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-xl text-rustic-slate shadow-xl flex items-center justify-between">
+          <div>
+            <p class="font-bold text-lg">{{Venue}}</p>
+            <p class="text-sm opacity-70">{{Location}}</p>
+          </div>
+          <button class="bg-primary text-white p-3 rounded-full hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined">directions</span>
+          </button>
+        </div>
+      </div>
+      </div>
+    </section>
+    <!-- Wishes Wall -->
+    <section class="py-24 px-6 bg-background-light dark:bg-background-dark" id="wishes">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div>
+            <span class="text-primary font-bold tracking-widest uppercase text-sm">Guestbook</span>
+            <h2 class="text-4xl md:text-5xl font-black text-rustic-slate dark:text-white mt-2 cursive-style">Wishes Wall
+            </h2>
+            <p class="text-slate-500 mt-4 max-w-md">Instead of a traditional RSVP, please leave us a message, a memory,
+              or a blessing for our new journey together.</p>
+          </div>
+          <button
+            class="bg-primary text-white px-10 py-4 rounded-full font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform flex items-center gap-2">
+            <span class="material-symbols-outlined">edit_note</span> Leave a Wish
+          </button>
+        </div>
+        <div id="wedding-gallery" class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          <!-- Wish Card 1 -->
+          <div data-gallery-item="true"
+            class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
+            <span class="material-symbols-outlined text-primary/20 absolute top-4 right-4 text-4xl">format_quote</span>
+            <p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"To a beautiful couple! May your
+              life together be as wonderful as the day we first saw you two holding that umbrella. We can't wait to
+              celebrate with you in October!"</p>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-full bg-rustic-taupe/20 flex items-center justify-center font-bold text-rustic-taupe">
+                AM</div>
+              <div>
+                <p class="font-bold text-rustic-slate dark:text-white text-sm">Aunt Martha &amp; Uncle Jim</p>
+                <p class="text-xs text-slate-400">{{WeddingDate}}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Wish Card 2 -->
+          <div data-gallery-item="true"
+            class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
+            <p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"So excited for you guys! Here's
+              to many more adventures, campfire stories, and Vermont sunsets. Love you both!"</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                K</div>
+              <div>
+                <p class="font-bold text-rustic-slate dark:text-white text-sm">Kevin &amp; Chloe</p>
+                <p class="text-xs text-slate-400">{{WeddingDate}}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Wish Card 3 -->
+          <div data-gallery-item="true"
+            class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
+            <p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"Elias, you finally found someone
+              who laughs at your jokes as much as we do. {{BrideName}}, welcome to the family properly! See you at the
+              barn!"</p>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-full bg-rustic-taupe/20 flex items-center justify-center font-bold text-rustic-taupe">
+                TS</div>
+              <div>
+                <p class="font-bold text-rustic-slate dark:text-white text-sm">The Stevensons</p>
+                <p class="text-xs text-slate-400">{{WeddingDate}}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Wish Card 4 -->
+          <div data-gallery-item="true"
+            class="break-inside-avoid bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-rustic-taupe/10 relative">
+            <p class="text-slate-700 dark:text-slate-300 italic mb-6 leading-relaxed">"Wishing you both a lifetime of
+              happiness. May your love grow deeper with every passing year. Can't wait for the dancing!"</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                LR</div>
+              <div>
+                <p class="font-bold text-rustic-slate dark:text-white text-sm">Linda &amp; Robert</p>
+                <p class="text-xs text-slate-400">{{WeddingDate}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- Footer -->
+  <footer class="py-12 px-6 bg-rustic-cream dark:bg-background-dark border-t border-rustic-taupe/10">
+    <div class="max-w-7xl mx-auto flex flex-col items-center">
+      <div
+        class="text-3xl font-extrabold tracking-tight text-rustic-slate dark:text-white uppercase mb-4 cursive-style">
+        {{GroomInitial}} <span class="text-primary">&amp;</span> {{BrideInitial}}</div>
+      <p class="text-slate-500 text-sm mb-8">{{WeddingDate}} • {{Location}}</p>
+      <div class="flex gap-6 mb-8">
+        <a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span
+            class="material-symbols-outlined">share</span></a>
+        <a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span
+            class="material-symbols-outlined">mail</span></a>
+        <a class="text-rustic-slate/60 hover:text-primary transition-colors" href="#"><span
+            class="material-symbols-outlined">favorite</span></a>
+      </div>
+      <p class="text-xs text-slate-400">Built with love by {{GroomName}} &amp; {{BrideName}}. All photography by Vermont
+        Sunsets.</p>
+    </div>
+  </footer>
+
+
+
+</body>
+
+</html>

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
+import { WeddingWebHeader } from "@/components/WeddingWebHeader";
 import {
   Heart,
   Target,
@@ -14,7 +14,7 @@ import {
   Shield,
   FileText
 } from "lucide-react";
-import { LandingToolbar } from "@/components/LandingToolbar";
+
 
 const About = () => {
   const values = [
@@ -59,10 +59,9 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Navigation */}
-      <CompanyNavbar />
+      <WeddingWebHeader />
 
-      {/* Sidebar Toolbar */}
-      <LandingToolbar />
+
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">

@@ -63,7 +63,42 @@ def refactor_template(file_path):
     if 'id="wedding-gallery"' in content and 'data-gallery-item' not in content:
         content = re.sub(r'(id="wedding-gallery"[^>]*>.*?)(<div[^>]*class="[^"]*(?:relative|col-span)[^"]*")', r'\1\2 data-gallery-item="true"', content, flags=re.DOTALL)
 
-    # 7. Placeholder content
+    # 7. Aggressive Fake Data Cleanup
+    names_to_replace = [
+        ('Evelyn & Julian', '{{GroomName}} & {{BrideName}}'),
+        ('Sarah & James', '{{GroomName}} & {{BrideName}}'),
+        ('Emily & Mark', '{{GroomName}} & {{BrideName}}'),
+        ('Olivia & Ethan', '{{GroomName}} & {{BrideName}}'),
+        ('Sophia & Liam', '{{GroomName}} & {{BrideName}}'),
+        ('Julian', '{{GroomName}}'),
+        ('Evelyn', '{{BrideName}}'),
+        ('James', '{{GroomName}}'),
+        ('Sarah', '{{BrideName}}'),
+        ('Mark', '{{GroomName}}'),
+        ('Emily', '{{BrideName}}')
+    ]
+    for old, new in names_to_replace:
+        content = content.replace(old, new)
+
+    # Standardize Years/Dates
+    content = re.sub(r'(Fall|Spring|Summer|Winter|Autumn)\s+20\d\d', r'{{WeddingDate}}', content)
+    content = re.sub(r'October 15th', '{{WeddingDate}}', content)
+    content = re.sub(r'2024', '{{Year}}', content)
+
+    # Standardize Venues
+    venues_to_replace = [
+        ('The Rustic Maple Estate', '{{Venue}}'),
+        ('Timberline Lodge', '{{Venue}}'),
+        ('The Grand Lodge', '{{Venue}}'),
+        ('Hudson Valley, NY', '{{Location}}'),
+        ('Hudson Valley, New York', '{{Location}}'),
+        ('Aspen, Colorado', '{{Location}}'),
+        ('Central Park', '{{Location}}')
+    ]
+    for old, new in venues_to_replace:
+        content = content.replace(old, new)
+
+    # Placeholder content for schedule
     content = content.replace('03:00 PM', '{{EventTime}}')
     content = content.replace('05:00 PM', '{{EventTime}}')
     content = content.replace('06:30 PM', '{{EventTime}}')

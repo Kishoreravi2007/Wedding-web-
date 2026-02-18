@@ -70,7 +70,8 @@
             <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-12">
                 <div class="flex items-center gap-3 text-primary">
                     <span class="material-symbols-outlined text-3xl font-bold">landscape</span>
-                    <h2 class="text-xl font-extrabold tracking-tight text-slate-900">WeddingWeb</h2>
+                    <h2 class="text-xl font-extrabold tracking-tight text-slate-900">{{GroomInitial}} &amp;
+                        {{BrideInitial}}</h2>
                 </div>
                 <nav class="hidden items-center gap-8 lg:flex">
                     <a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
@@ -94,20 +95,21 @@
         <main class="flex-1">
             <!-- Hero Section -->
             <section class="relative h-[90vh] w-full overflow-hidden">
-                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000"
-                    data-alt="Majestic snow-capped mountain range at sunrise"
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hero-bg"
+                    data-hero-bg="true" data-alt="Majestic snow-capped mountain range at sunrise"
                     style="background-image: linear-gradient(rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.6)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCpiGSc1v43dRC2lCkrGa5o6sk7GDbGnn6Ex-SsKywSTlwPordIiS1YhRh1USH6OnbnT66oC8p6OWDGuR6GeNnfiQ-ElrsYCr-KQ8T2y0t3kS_ZsPc8E8a3Pm5a7S9UJyJBlHx3yDELJgra3AovS6AUQMDEUZQnot9xUhuHuZf01X8GtV7eITaXIu8urwkb0WyWaNJo4CRkQzfPMypqMcQM35zHo7CVOt6Q9Ew8EfxnAUOhfQRJozgc2Fd5TbVlXZJMYMN-Ct4y0r92');">
                 </div>
                 <div class="relative flex h-full flex-col items-center justify-center px-4 text-center">
                     <div
                         class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 backdrop-blur-md border border-white/20">
-                        <span class="text-xs font-bold uppercase tracking-widest text-white">Aspen, Colorado</span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-white">{{Location}}</span>
                     </div>
                     <h1 class="max-w-4xl text-5xl font-extrabold leading-tight tracking-tight text-white lg:text-7xl">
                         Adventure Awaits: <br />The Summit of Our Love
                     </h1>
                     <p class="mt-6 text-lg font-medium text-slate-100 lg:text-xl max-w-2xl">
-                        Join Sarah &amp; James for a mountain retreat wedding. <br />{{WeddingDate}} • The Grand Lodge
+                        Join {{BrideName}} &amp; {{GroomName}} for a mountain retreat wedding. <br />{{WeddingDate}} •
+                        {{Venue}}
                     </p>
                     <div class="mt-10 flex flex-col gap-4 sm:flex-row">
                         <button
@@ -129,7 +131,7 @@
                         <h2 class="mt-2 text-4xl font-extrabold text-slate-900 tracking-tight">Adventure Timeline</h2>
                         <div class="mt-4 h-1 w-20 bg-primary/20 mx-auto rounded-full"></div>
                     </div>
-                    <div class="space-y-0">
+                    <div id="wedding-timeline" class="space-y-0">
                         <!-- Timeline Item 1 -->
                         <div class="flex gap-8 group">
                             <div class="flex flex-col items-center">
@@ -140,16 +142,15 @@
                                 <div class="w-0.5 grow bg-slate-100"></div>
                             </div>
                             <div class="pb-12 pt-1">
-                                <h3 class="text-xl font-bold text-slate-900">Basecamp Welcome</h3>
-                                <p class="mt-1 text-sm font-semibold text-primary">Friday, Dec 11 • {{EventTime}}</p>
+                                <h3 class="text-xl font-bold text-slate-900">{{Story_Event1_Title}}</h3>
+                                <p class="mt-1 text-sm font-semibold text-primary">{{Story_Event1_Date}}</p>
                                 <p class="mt-3 text-slate-600 leading-relaxed max-w-lg">
-                                    Join us in the Lodge Lobby for craft cocktails and a cozy fireside dinner as we
-                                    welcome everyone to the summit.
+                                    {{Story_Event1_Desc}}
                                 </p>
                             </div>
                         </div>
                         <!-- Timeline Item 2 -->
-                        <div class="flex gap-8 group">
+                        <div data-timeline-item="true" class="flex gap-8 group">
                             <div class="flex flex-col items-center">
                                 <div
                                     class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-8 ring-background-light group-hover:bg-primary group-hover:text-white transition-all">
@@ -158,16 +159,15 @@
                                 <div class="w-0.5 grow bg-slate-100"></div>
                             </div>
                             <div class="pb-12 pt-1">
-                                <h3 class="text-xl font-bold text-slate-900">The Ascent: Ceremony</h3>
-                                <p class="mt-1 text-sm font-semibold text-primary">Saturday, Dec 12 • 2:00 PM</p>
+                                <h3 class="text-xl font-bold text-slate-900">{{Story_Event2_Title}}</h3>
+                                <p class="mt-1 text-sm font-semibold text-primary">{{Story_Event2_Date}}</p>
                                 <p class="mt-3 text-slate-600 leading-relaxed max-w-lg">
-                                    A brief gondola ride takes us to the Pine Grove. Please dress warmly for an outdoor
-                                    ceremony with mountain vistas.
+                                    {{Story_Event2_Desc}}
                                 </p>
                             </div>
                         </div>
                         <!-- Timeline Item 3 -->
-                        <div class="flex gap-8 group">
+                        <div data-timeline-item="true" class="flex gap-8 group">
                             <div class="flex flex-col items-center">
                                 <div
                                     class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-8 ring-background-light group-hover:bg-primary group-hover:text-white transition-all">
@@ -176,16 +176,15 @@
                                 <div class="w-0.5 grow bg-slate-100"></div>
                             </div>
                             <div class="pb-12 pt-1">
-                                <h3 class="text-xl font-bold text-slate-900">Summit Vows &amp; Toasts</h3>
-                                <p class="mt-1 text-sm font-semibold text-primary">Saturday, Dec 12 • {{EventTime}}</p>
+                                <h3 class="text-xl font-bold text-slate-900">{{Story_Event3_Title}}</h3>
+                                <p class="mt-1 text-sm font-semibold text-primary">{{Story_Event3_Date}}</p>
                                 <p class="mt-3 text-slate-600 leading-relaxed max-w-lg">
-                                    Exchanging vows at the Peak Pavilion. Cocktails and appetizers will be served on the
-                                    heated observation deck.
+                                    {{Story_Event3_Desc}}
                                 </p>
                             </div>
                         </div>
                         <!-- Timeline Item 4 -->
-                        <div class="flex gap-8 group">
+                        <div data-timeline-item="true" class="flex gap-8 group">
                             <div class="flex flex-col items-center">
                                 <div
                                     class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-8 ring-background-light group-hover:bg-primary group-hover:text-white transition-all">
@@ -193,11 +192,10 @@
                                 </div>
                             </div>
                             <div class="pt-1">
-                                <h3 class="text-xl font-bold text-slate-900">Après-Ski Celebration</h3>
-                                <p class="mt-1 text-sm font-semibold text-primary">Saturday, Dec 12 • 7:00 PM</p>
+                                <h3 class="text-xl font-bold text-slate-900">{{Story_Event4_Title}}</h3>
+                                <p class="mt-1 text-sm font-semibold text-primary">{{Story_Event4_Date}}</p>
                                 <p class="mt-3 text-slate-600 leading-relaxed max-w-lg">
-                                    Dinner, dancing, and late-night snacks in the Grand Ballroom. Let's celebrate our
-                                    new journey together!
+                                    {{Story_Event4_Desc}}
                                 </p>
                             </div>
                         </div>
@@ -217,184 +215,203 @@
                             View All Photos <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
                     </div>
-                    <div id="wedding-gallery" class="masonry-grid>
-<div id=" wedding-gallery" class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="Couple standing on a cliff edge"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs8tY2lfjWLBfEjl5iF07_kfpNgrVFB4t9hw75qH0P6pSCGiMhDlKgkrbaJRAILbE0wt-C1EyFeCv5XSzxVl4Pl19y8rL5J600dgIvNjKy_AfrNVGkq_vH5hUSj_Y-ujErA-L9poZa9rwBT5S9wMDPt5ouWxdgNteGWcO7WTqxU2VTPw8v0hda5Dkj-80hoi6ytJnsZ7bL9AlcVOiMF2V9VmNlMkWybRh_rVjVUIFh4hCtjrlTUdJpNfXkBmO7kzhAYqNN9F4EHsT3" />
-                    </div>
-                    <div class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="Wedding rings on a pine branch"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPmE8-cBviRqEXTNyZ_N76Uu48AXzJo8bdT7RA27IVadRzKqyTDPFMOzd8Lo2OoimB7upRvxkiJbC7PTMqkFMPxQVprSanzEFqJwer9dEdapF6oZTxjY4GEr0uqOQv6XIwb0GViUtFFfnpcQ2SdGjkVv9QmS-MC_wHPpMIpIf40aoSTmEgVfyWITuGdCIWllQP_Nx1WREAH8Ji5x3fH5-yC38DxKC10ZYTXcPN7tI3e-tjTWVUiYveQDAa4ZTOJD7q_lRQPbDphWYY" />
-                    </div>
-                    <div class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="Scenic lake with mountain reflection"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyZy041oYFMzNMj1csqwWrKv_xt7y8AVR2rfWbS6xg1T_2gm3C_axELeWE4awT5da9Lhb42O5AIis7Jpt-9ENHKpClu6uDlG5ESg55xVdJpH6RxLxF9Em5-XeIxtNsc6oxSZkGE28ix2EN-dv3KyUsu56GbQWp-kDyAGTg_1ZV0XtrFALeK1w33HGooXP2VH5Nea2QxyRErU-w_3G7v4Nqo19M8rA5I0FE0-iDKXd6Pzhqh2u6wRHbKmtK-jLXAhWb709Q2ZwGiSKw" />
-                    </div>
-                    <div class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="Engagement photo in the snow"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJv1EPvDvYJWgYrkA_Wym6b8U_GGQ24v35pbSxwuG-H955qJN6fW-PNlnj9FoI6Jst3W_VQLFwYoX3H_QVFmcYWGmZIYb3pMra74r_sAYK7pyCVJLEf8LtSY-9VA6uLRcq8iyn788wWa-e7tyqo_xMr5o4HNd1mukI8GLyHe9LDb9MOvYbOAMR79btiBr70TWZvlly2t69F6g331Pv7OCoG7eSt6MZjJRKM8-XLbWcgloBYlpQc2h0fEYPHF4uMTmPASP6fwdvC4--" />
-                    </div>
-                    <div class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="Wedding invitation with mountain motif"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvDdR_OX-Bg6CHFSqbpf9f47ZAn6Juel0rgW6zOnDbBw48FOqwraNYABtqH-vTgbsZKBU8mA-ge31ArjsdjLxGTcrGAzD3b-HPp7xKw3Y0l5tq44vgXV4Z7o7tOlfKfaBgfgeooWsXSWalekYqRBN6ZUenHAQaitcOub1MB0HOYySAQ8USpldkfZSteB5VDlNQiKjSfHJ9wvUh-jRRI80qKajlZhoUPsjhNRHBVlKf34L3uKIajbOjgeVkXwS2NOwSwJG2CbXLpxcY" />
-                    </div>
-                    <div class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
-                        <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
-                            data-alt="A frame cabin in the woods"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS-v2gBlGW6kiUNxcYmhrJO5miQNJOfGlLuhYBNa9sCpXYLJkZp9fshnO_CSaJ4_zFyIb5slVAWiIx7k7HNOTFZPn-VksCyaNKGecIuHqqxaUDL5ZCXQpXQPXvGcvFBOkpPHHR9nivU3hsGyROVrL2hmr29YW4ltaSEio1FkkLYmj6V3JwxZbj9iL2oVd_Hwa01mK_Ou8PdK6IBwRXiFrE87Cstd62fQz5Xiy7hJEQNNU1VDVquxTvgRIL279HIBu5thvAcUwW1G_E" />
+                    <div id="wedding-gallery" class="masonry-grid">
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="Couple standing on a cliff edge"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs8tY2lfjWLBfEjl5iF07_kfpNgrVFB4t9hw75qH0P6pSCGiMhDlKgkrbaJRAILbE0wt-C1EyFeCv5XSzxVl4Pl19y8rL5J600dgIvNjKy_AfrNVGkq_vH5hUSj_Y-ujErA-L9poZa9rwBT5S9wMDPt5ouWxdgNteGWcO7WTqxU2VTPw8v0hda5Dkj-80hoi6ytJnsZ7bL9AlcVOiMF2V9VmNlMkWybRh_rVjVUIFh4hCtjrlTUdJpNfXkBmO7kzhAYqNN9F4EHsT3" />
+                        </div>
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="Wedding rings on a pine branch"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPmE8-cBviRqEXTNyZ_N76Uu48AXzJo8bdT7RA27IVadRzKqyTDPFMOzd8Lo2OoimB7upRvxkiJbC7PTMqkFMPxQVprSanzEFqJwer9dEdapF6oZTxjY4GEr0uqOQv6XIwb0GViUtFFfnpcQ2SdGjkVv9QmS-MC_wHPpMIpIf40aoSTmEgVfyWITuGdCIWllQP_Nx1WREAH8Ji5x3fH5-yC38DxKC10ZYTXcPN7tI3e-tjTWVUiYveQDAa4ZTOJD7q_lRQPbDphWYY" />
+                        </div>
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="Scenic lake with mountain reflection"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyZy041oYFMzNMj1csqwWrKv_xt7y8AVR2rfWbS6xg1T_2gm3C_axELeWE4awT5da9Lhb42O5AIis7Jpt-9ENHKpClu6uDlG5ESg55xVdJpH6RxLxF9Em5-XeIxtNsc6oxSZkGE28ix2EN-dv3KyUsu56GbQWp-kDyAGTg_1ZV0XtrFALeK1w33HGooXP2VH5Nea2QxyRErU-w_3G7v4Nqo19M8rA5I0FE0-iDKXd6Pzhqh2u6wRHbKmtK-jLXAhWb709Q2ZwGiSKw" />
+                        </div>
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="Engagement photo in the snow"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJv1EPvDvYJWgYrkA_Wym6b8U_GGQ24v35pbSxwuG-H955qJN6fW-PNlnj9FoI6Jst3W_VQLFwYoX3H_QVFmcYWGzZIYb3pMra74r_sAYK7pyCVJLEf8LtSY-9VA6uLRcq8iyn788wWa-e7tyqo_xMr5o4HNd1mukI8GLyHe9LDb9MOvYbOAMR79btiBr70TWZvlly2t69F6g331Pv7OCoG7eSt6MZjJRKM8-XLWcgloBYlpQc2h0fEYPHF4uMTmPASP6fwdvC4--" />
+                        </div>
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="Wedding invitation with mountain motif"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvDdR_OX-Bg6CHFSqbpf9f47ZAn6Juel0rgW6zOnDbBw48FOqwraNYABtqH-vTgbsZKBU8mA-ge31ArjsdjLxGTcrGAzD3b-HPp7xKw3Y0l5tq44vgXV4Z7o7tOlfKfaBgfgeooWsXSWalekYqRBN6ZUenHAQaitcOub1MB0HOYySAQ8USpldkfZSteB5VDlNQiKjSfHJ9wvUh-jRRI80qKajlZhoUPpjhNRHBVlKf34L3uKIajbOjgeVkXwS2NOwSwJG2CbXLpxcY" />
+                        </div>
+                        <div data-gallery-item="true"
+                            class="mb-4 overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200 group">
+                            <img class="w-full grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105"
+                                data-alt="A frame cabin in the woods"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS-v2gBlGW6kiUNxcYmhrJO5miQNJOfGlLuhYBNa9sCpXYLJkZp9fshnO_CSaJ4_zFyIb5slVAWiIx7k7HNOTFZPn-VksCyaNKGecIuHqqxaUDL5ZCXQpXQPXvGcvFBOkpPHHR9nivU3hsGyROVrL2hmr29YW4ltaSEio1FkkLYmj6V3JwxZbj9iL2oVd_Hwa01mK_Ou8PdK6IBwRXiFrE87Cstd62fQz5Xiy7hJEQNNU1VDVquxTvgRIL279HIBu5thvAcUwW1G_E" />
+                        </div>
                     </div>
                 </div>
-    </div>
-    </section>
-    <!-- Wishes Wall Section -->
-    <section class="bg-white py-24 px-6 lg:px-12" id="wishes">
-        <div class="mx-auto max-w-7xl">
-            <div class="text-center mb-16">
-                <span class="text-primary font-bold text-sm uppercase tracking-[0.2em]">Guestbook</span>
-                <h2 class="mt-2 text-4xl font-extrabold text-slate-900 tracking-tight">The Wishes Wall</h2>
-                <p class="mt-4 text-slate-600 max-w-xl mx-auto">Leave a message for the happy couple as they begin their
-                    greatest adventure together.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Message Form Card -->
-                <div class="flex flex-col rounded-2xl bg-slate-50 p-8 border border-slate-200/60 shadow-sm">
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">Leave a Wish</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name</label>
-                            <input
-                                class="w-full rounded-lg border-slate-200 bg-white p-3 text-sm focus:border-primary focus:ring-primary"
-                                placeholder="Enter your name" type="text" />
+            </section>
+            <!-- Wishes Wall Section -->
+            <section class="bg-white py-24 px-6 lg:px-12" id="wishes">
+                <div class="mx-auto max-w-7xl">
+                    <div class="text-center mb-16">
+                        <span class="text-primary font-bold text-sm uppercase tracking-[0.2em]">Guestbook</span>
+                        <h2 class="mt-2 text-4xl font-extrabold text-slate-900 tracking-tight">The Wishes Wall</h2>
+                        <p class="mt-4 text-slate-600 max-w-xl mx-auto">Leave a message for the happy couple as they
+                            begin their
+                            greatest adventure together.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Message Form Card -->
+                        <div class="flex flex-col rounded-2xl bg-slate-50 p-8 border border-slate-200/60 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4">Leave a Wish</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your
+                                        Name</label>
+                                    <input
+                                        class="w-full rounded-lg border-slate-200 bg-white p-3 text-sm focus:border-primary focus:ring-primary"
+                                        placeholder="Enter your name" type="text" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your
+                                        Message</label>
+                                    <textarea
+                                        class="w-full rounded-lg border-slate-200 bg-white p-3 text-sm focus:border-primary focus:ring-primary"
+                                        placeholder="Write your heartfelt message here..." rows="4"></textarea>
+                                </div>
+                                <button
+                                    class="w-full rounded-lg bg-primary py-3 text-sm font-bold text-white hover:bg-primary/90 transition-all">Post
+                                    Wish</button>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Message</label>
-                            <textarea
-                                class="w-full rounded-lg border-slate-200 bg-white p-3 text-sm focus:border-primary focus:ring-primary"
-                                placeholder="Write your heartfelt message here..." rows="4"></textarea>
+                        <!-- Wish Card 1 -->
+                        <div class="flex flex-col rounded-2xl bg-white p-8 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group"
+                            data-gallery-item="true">
+                            <div class="absolute top-0 right-0 p-4 opacity-10">
+                                <span class="material-symbols-outlined text-6xl text-primary">format_quote</span>
+                            </div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <span class="text-primary font-bold">EM</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">{{BrideName}} &amp; {{GroomName}}</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Posted 2
+                                        hours ago
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 italic leading-relaxed">"May your love grow as high as the
+                                mountains you're
+                                getting married on! We are so thrilled to witness this beautiful union in such a
+                                stunning
+                                place."</p>
                         </div>
-                        <button
-                            class="w-full rounded-lg bg-primary py-3 text-sm font-bold text-white hover:bg-primary/90 transition-all">Post
-                            Wish</button>
+                        <!-- Wish Card 2 -->
+                        <div
+                            class="flex flex-col rounded-2xl bg-white p-8 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10">
+                                <span class="material-symbols-outlined text-6xl text-primary">format_quote</span>
+                            </div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <span class="text-primary font-bold">JS</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">John Stevens</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Posted
+                                        Yesterday
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 italic leading-relaxed">"To {{BrideName}} and {{GroomName}}, what a
+                                wonderful way to
+                                celebrate! Can't wait to see you both at the basecamp welcome dinner. Cheers to a
+                                lifetime of
+                                peaks!"</p>
+                        </div>
                     </div>
                 </div>
-                <!-- Wish Card 1 -->
-                <div class="flex flex-col rounded-2xl bg-white p-8 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group"
-                    data-gallery-item="true">
-                    <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <span class="material-symbols-outlined text-6xl text-primary">format_quote</span>
-                    </div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span class="text-primary font-bold">EM</span>
-                        </div>
+            </section>
+            <!-- Travel & Map Section -->
+            <section class="bg-slate-900 py-24 px-6 lg:px-12 text-white overflow-hidden">
+                <div class="mx-auto max-w-7xl">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>
-                            <h4 class="text-sm font-bold text-slate-900">Emily &amp; Mark</h4>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Posted 2 hours ago
+                            <h2 class="mt-2 text-4xl font-extrabold tracking-tight">{{Lodging_Title}}</h2>
+                            <p class="mt-6 text-slate-400 leading-relaxed text-lg">
+                                {{Lodging_Body}}
                             </p>
+                            <div class="mt-10 space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                                        <span class="material-symbols-outlined text-primary">location_on</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">{{Venue}}</h4>
+                                        <p class="text-sm text-slate-400">{{Location}}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                                        <span class="material-symbols-outlined text-primary">airport_shuttle</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">Shuttle Service</h4>
+                                        <p class="text-sm text-slate-400">Complimentary shuttles from Aspen/Pitkin
+                                            County
+                                            Airport (ASE)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                class="mt-12 rounded-lg bg-white px-8 py-3 text-sm font-bold text-slate-900 hover:bg-slate-200 transition-all">
+                                Book Your Stay
+                            </button>
+                        </div>
+                        <div id="wedding-map" class="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl">
+                            <div class="absolute inset-0 bg-slate-800" data-location="{{Location}}">
+                                <iframe frameborder="0" height="100%" marginheight="0" marginwidth="0" scrolling="no"
+                                    src="{{MapEmbedLink}}" width="100%"></iframe>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-slate-600 italic leading-relaxed">"May your love grow as high as the mountains you're
-                        getting married on! We are so thrilled to witness this beautiful union in such a stunning
-                        place."</p>
                 </div>
-                <!-- Wish Card 2 -->
-                <div
-                    class="flex flex-col rounded-2xl bg-white p-8 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <span class="material-symbols-outlined text-6xl text-primary">format_quote</span>
-                    </div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span class="text-primary font-bold">JS</span>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold text-slate-900">John Stevens</h4>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Posted Yesterday
-                            </p>
-                        </div>
-                    </div>
-                    <p class="text-slate-600 italic leading-relaxed">"To Sarah and James, what a wonderful way to
-                        celebrate! Can't wait to see you both at the basecamp welcome dinner. Cheers to a lifetime of
-                        peaks!"</p>
+            </section>
+        </main>
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 py-12 px-6 lg:px-12">
+            <div class="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-3 text-primary grayscale opacity-70">
+                    <span class="material-symbols-outlined text-3xl font-bold">landscape</span>
+                    <h2 class="text-xl font-extrabold tracking-tight text-slate-900">{{GroomInitial}} &amp;
+                        {{BrideInitial}}</h2>
                 </div>
-            </div>
-        </div>
-    </section>
-    <!-- Travel & Map Section -->
-    <section class="bg-slate-900 py-24 px-6 lg:px-12 text-white overflow-hidden">
-        <div class="mx-auto max-w-7xl">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div>
-                    <span class="text-primary font-bold text-sm uppercase tracking-[0.2em]">The Destination</span>
-                    <h2 class="mt-2 text-4xl font-extrabold tracking-tight">The Grand Lodge at Aspen</h2>
-                    <p class="mt-6 text-slate-400 leading-relaxed text-lg">
-                        Nestled in the heart of the Rocky Mountains, the Grand Lodge offers breathtaking views and
-                        world-class amenities. We have secured a block of rooms for our guests.
+                <div class="flex gap-8 text-sm font-bold text-slate-500">
+                    <a class="hover:text-primary" href="#">Registry</a>
+                    <a class="hover:text-primary" href="#">Attire Guide</a>
+                    <a class="hover:text-primary" href="#">FAQ</a>
+                    <a class="hover:text-primary" href="#">Contact</a>
+                </div>
+                <div class="flex flex-col items-center md:items-end">
+                    <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                        <span class="material-symbols-outlined text-blue-400">ac_unit</span>
+                        Current Temperature: 24°F (-4°C)
+                    </div>
+                    <p class="mt-1 text-xs text-slate-400">© {{Year}} {{BrideName}} &amp; {{GroomName}} Wedding. Built
+                        with WeddingWeb.</p>
+                    <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.
                     </p>
-                    <div class="mt-10 space-y-6">
-                        <div class="flex items-start gap-4">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                                <span class="material-symbols-outlined text-primary">location_on</span>
-                            </div>
-                            <div>
-                                <h4 class="font-bold">Address</h4>
-                                <p class="text-sm text-slate-400">123 Mountain View Way, Aspen, CO 81611</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-4">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                                <span class="material-symbols-outlined text-primary">airport_shuttle</span>
-                            </div>
-                            <div>
-                                <h4 class="font-bold">Shuttle Service</h4>
-                                <p class="text-sm text-slate-400">Complimentary shuttles from Aspen/Pitkin County
-                                    Airport (ASE)</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button
-                        class="mt-12 rounded-lg bg-white px-8 py-3 text-sm font-bold text-slate-900 hover:bg-slate-200 transition-all">
-                        Book Your Stay
-                    </button>
-                </div>
-                <div id="wedding-map" class="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl">
-                    <div class="absolute inset-0 bg-slate-800" data-location="Aspen, Colorado">
-                        <iframe frameborder="0" height="100%" marginheight="0" marginwidth="0" scrolling="no"
-                            src="{{MapEmbedLink}}" width="100%"></iframe>
-                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    </main>
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-12 px-6 lg:px-12">
-        <div class="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="flex items-center gap-3 text-primary grayscale opacity-70">
-                <span class="material-symbols-outlined text-3xl font-bold">landscape</span>
-                <h2 class="text-xl font-extrabold tracking-tight text-slate-900">WeddingWeb</h2>
-            </div>
-            <div class="flex gap-8 text-sm font-bold text-slate-500">
-                <a class="hover:text-primary" href="#">Registry</a>
-                <a class="hover:text-primary" href="#">Attire Guide</a>
-                <a class="hover:text-primary" href="#">FAQ</a>
-                <a class="hover:text-primary" href="#">Contact</a>
-            </div>
-            <div class="flex flex-col items-center md:items-end">
-                <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                    <span class="material-symbols-outlined text-blue-400">ac_unit</span>
-                    Current Temperature: 24°F (-4°C)
-                </div>
-                <p class="mt-1 text-xs text-slate-400">© 2024 Sarah &amp; James Wedding. Built with WeddingWeb.</p>
-                <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>
-            </div>
-        </div>
-    </footer>
+        </footer>
     </div>
 
 

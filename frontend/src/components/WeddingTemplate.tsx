@@ -114,7 +114,7 @@ export const WeddingTemplate = ({
         onUpdateCustomization('sectionOrder', JSON.stringify(newOrder));
     };
 
-    const SectionControls = ({ sectionId }: { sectionId: string }) => {
+    const SectionControls = ({ sectionId, onAction, actionIcon: ActionIcon, actionTitle }: { sectionId: string, onAction?: () => void, actionIcon?: any, actionTitle?: string }) => {
         const index = sectionOrder.indexOf(sectionId);
         const isFirst = index === 0;
         const isLast = index === sectionOrder.length - 1;
@@ -141,6 +141,23 @@ export const WeddingTemplate = ({
                 >
                     <ChevronDown className="w-4 h-4" />
                 </Button>
+                {onAction && ActionIcon && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    size="icon"
+                                    onClick={onAction}
+                                    className="w-8 h-8 rounded-full bg-white/90 shadow-md hover:bg-white text-slate-900 border border-slate-200"
+                                >
+                                    <ActionIcon className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{actionTitle || 'Action'}</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
             </div>
         );
     };
@@ -234,8 +251,22 @@ export const WeddingTemplate = ({
                                     return (
                                         <div className={`flex-1 flex items-center justify-center p-8 md:p-12 text-center min-h-[80vh] border-[16px] ${config.colors.secondary || 'border-rose-100'} border-opacity-30 m-4 md:m-8 bg-white/40`}>
                                             <div className="space-y-10 max-w-4xl">
-                                                <div className={`w-28 h-28 mx-auto rounded-full border-2 border-current flex items-center justify-center text-4xl ${headingFont} opacity-80 shadow-sm`}>
-                                                    {weddingData.groomName && weddingData.groomName.charAt(0)}{weddingData.brideName && weddingData.brideName.charAt(0)}
+                                                <div
+                                                    className={`w-28 h-28 mx-auto rounded-full border-2 border-current flex items-center justify-center text-4xl ${headingFont} opacity-80 shadow-sm relative group/logo`}
+                                                    onClick={() => isEditing && onUpdateCustomization('triggerLogoUpload', 'true')}
+                                                >
+                                                    {customizations.coupleLogo ? (
+                                                        <img src={customizations.coupleLogo} className="w-full h-full rounded-full object-cover" alt="Logo" />
+                                                    ) : (
+                                                        <div className="flex flex-col items-center">
+                                                            <img src="/logo.png" className="w-12 h-12 object-contain opacity-50" alt="WeddingWeb Logo" />
+                                                        </div>
+                                                    )}
+                                                    {isEditing && (
+                                                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/logo:opacity-100 transition-opacity cursor-pointer">
+                                                            <Upload className="w-6 h-6 text-white" />
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <h1 className={`text-5xl md:text-8xl ${headingFont} tracking-widest uppercase leading-tight`}>
                                                     <EditableText initialValue={weddingData.groomName} onSave={val => onUpdateCustomization('groomName', val)} isEditing={isEditing} tag="span" />

@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -31,322 +38,407 @@
             },
         }
     </script>
-<style>
-        body { font-family: 'Manrope', sans-serif; }
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
         .masonry-grid {
             column-count: 1;
             column-gap: 1.5rem;
         }
-        @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
-        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+
+        @media (min-width: 640px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+
         .masonry-item {
             break-inside: avoid;
             margin-bottom: 1.5rem;
         }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark text-[#111318] antialiased">
-<!-- Sticky Navigation -->
-<header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-20 py-4">
-<div class="max-w-7xl mx-auto flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-3xl">all_inclusive</span>
-<span class="text-xl font-extrabold tracking-tighter uppercase">{{GroomInitial}}&{{BrideInitial}}</span>
-</div>
-<nav class="hidden md:flex items-center gap-10">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">OUR STORY</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#event">THE EVENT</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">WISHES WALL</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#registry">REGISTRY</a>
-</nav>
-<button class="bg-primary text-white px-8 py-2.5 rounded-lg text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+    <!-- Sticky Navigation -->
+    <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-20 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">all_inclusive</span>
+                <span class="text-xl font-extrabold tracking-tighter uppercase">{{GroomInitial}}&{{BrideInitial}}</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#story">OUR STORY</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#event">THE EVENT</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#wishes">WISHES WALL</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors" href="#registry">REGISTRY</a>
+            </nav>
+            <button
+                class="bg-primary text-white px-8 py-2.5 rounded-lg text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
                 RSVP
             </button>
-</div>
-</header>
-<main>
-<!-- Hero Section: Asymmetric Split -->
-<section class="relative min-h-[90vh] flex flex-col lg:flex-row overflow-hidden">
-<div class="w-full lg:w-7/12 h-[50vh] lg:h-auto bg-cover bg-center" data-alt="High fashion wedding couple editorial portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCuGiVCa9ZQsvxKTrQZLX7JjOaxmDSgjXAAbwhY-Rt2LURHSEyPf0pT0DFs7T-N4XsO8mO--OGuYKY6Ulr0jG_leYHN_8tMreXJGrcopH6t2cVIgfIWBs7LXB0bFJ8R7Jn9UrZ0y8rf2XO7w52Oh84GznUXkjFvJN3dwupgnifY6vcDlXzYHEUaaHvL7X1dmF7dopxY6a-HNQXQuPF611B8u7bM7jRtpB_S-nFjzdzvquRjs4fCT6jiMaviuS3qpfen92CDZNUe6pRc')">
-</div>
-<div class="w-full lg:w-5/12 flex flex-col justify-center p-8 lg:p-20 bg-white">
-<p class="text-primary font-bold tracking-[0.2em] mb-4">SAVE THE DATE</p>
-<h1 class="text-6xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8">{{GroomName}} & {{BrideName}}</h1>
-<div class="flex flex-col gap-6">
-<div class="flex items-center gap-4">
-<span class="text-4xl font-light text-gray-300">09</span>
-<div class="h-px w-12 bg-primary"></div>
-<span class="text-4xl font-light text-gray-300">24</span>
-<div class="h-px w-12 bg-primary"></div>
-<span class="text-4xl font-light text-gray-300">2024</span>
-</div>
-<p class="text-gray-500 max-w-sm leading-relaxed text-lg">
+        </div>
+    </header>
+    <main>
+        <!-- Hero Section: Asymmetric Split -->
+        <section class="relative min-h-[90vh] flex flex-col lg:flex-row overflow-hidden">
+            <div class="w-full lg:w-7/12 h-[50vh] lg:h-auto bg-cover bg-center hero-bg" data-hero-bg="true"
+                data-alt="High fashion wedding couple editorial portrait"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCuGiVCa9ZQsvxKTrQZLX7JjOaxmDSgjXAAbwhY-Rt2LURHSEyPf0pT0DFs7T-N4XsO8mO--OGuYKY6Ulr0jG_leYHN_8tMreXJGrcopH6t2cVIgfIWBs7LXB0bFJ8R7Jn9UrZ0y8rf2XO7w52Oh84GznUXkjFvJN3dwupgnifY6vcDlXzYHEUaaHvL7X1dmF7dopxY6a-HNQXQuPF611B8u7bM7jRtpB_S-nFjzdzvquRjs4fCT6jiMaviuS3qpfen92CDZNUe6pRc')">
+            </div>
+            <div class="w-full lg:w-5/12 flex flex-col justify-center p-8 lg:p-20 bg-white">
+                <p class="text-primary font-bold tracking-[0.2em] mb-4">SAVE THE DATE</p>
+                <h1 class="text-6xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-8">{{GroomName}} &
+                    {{BrideName}}</h1>
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center gap-4">
+                        <span class="text-4xl font-light text-gray-300">09</span>
+                        <div class="h-px w-12 bg-primary"></div>
+                        <span class="text-4xl font-light text-gray-300">24</span>
+                        <div class="h-px w-12 bg-primary"></div>
+                        <span class="text-4xl font-light text-gray-300">{{Year}}</span>
+                    </div>
+                    <p class="text-gray-500 max-w-sm leading-relaxed text-lg">
                         Join us for an evening of modern elegance and celebration at the Glass House Conservatory.
                     </p>
-<div class="grid grid-cols-4 gap-4 mt-8">
-<div class="text-center">
-<p class="text-2xl font-bold">142</p>
-<p class="text-[10px] uppercase tracking-widest text-gray-400">Days</p>
-</div>
-<div class="text-center">
-<p class="text-2xl font-bold">08</p>
-<p class="text-[10px] uppercase tracking-widest text-gray-400">Hrs</p>
-</div>
-<div class="text-center">
-<p class="text-2xl font-bold">45</p>
-<p class="text-[10px] uppercase tracking-widest text-gray-400">Min</p>
-</div>
-<div class="text-center">
-<p class="text-2xl font-bold">12</p>
-<p class="text-[10px] uppercase tracking-widest text-gray-400">Sec</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Our Story: Asymmetric Grid -->
-<section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="story">
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-<div class="lg:col-span-5 order-2 lg:order-1">
-<h2 class="text-primary text-sm font-bold tracking-[0.3em] mb-6 uppercase">Our Journey</h2>
-<h3 class="text-4xl lg:text-5xl font-extrabold mb-8 leading-tight">From coffee dates to "I do".</h3>
-<p class="text-gray-600 text-lg leading-loose mb-8">
-                        It started with a shared love for brutalist architecture and third-wave coffee. Three years and five countries later, we're ready to start our biggest adventure yet. 
+                    <div class="grid grid-cols-4 gap-4 mt-8">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold">142</p>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Days</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold">08</p>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Hrs</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold">45</p>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Min</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold">12</p>
+                            <p class="text-[10px] uppercase tracking-widest text-gray-400">Sec</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Our Story: Asymmetric Grid -->
+        <section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="story">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-5 order-2 lg:order-1">
+                    <h2 class="text-primary text-sm font-bold tracking-[0.3em] mb-6 uppercase">{{Story_Title}}</h2>
+                    <h3 class="text-4xl lg:text-5xl font-extrabold mb-8 leading-tight">Our Journey.</h3>
+                    <p class="text-gray-600 text-lg leading-loose mb-8">
+                        {{Story_Body}}
                     </p>
-<div class="flex items-center gap-4 group cursor-pointer">
-<div class="w-12 h-12 rounded-full border border-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-<span class="material-symbols-outlined">play_arrow</span>
-</div>
-<span class="font-bold text-sm tracking-widest uppercase">Watch Our Film</span>
-</div>
-</div>
-<div class="lg:col-span-7 grid grid-cols-2 gap-4 order-1 lg:order-2">
-<div class="pt-12">
-<img class="rounded-xl shadow-2xl w-full h-80 object-cover" data-alt="Couple laughing in urban setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL2665FDiVC7DOl5Zmq1pOWVFtMcKLLBXShnUtvGB-JXLCI9cS4PIV2Unko6CZF6fs0dTnLxs_dBRnedHxwDrqI01LPVx8P-jPv4qes6RhbqgrXmdOwGTyB4UOpxtswL5WtCzXv-HBDFf0GbGeseoVMcviBM_6M6b0pezMJSRYVKMKwHjlGyPec9NCuVeL0rgBjEyhxOofYHGCrAYQma_Lqr1H8CBZwsujkUwMs0QUZdem4jqIo61vPcuNiJaIDK9EMJm5Y42TSsmM"/>
-</div>
-<div>
-<img class="rounded-xl shadow-2xl w-full h-[30rem] object-cover" data-alt="Candid moment of couple holding hands" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBMYI5Qi_XMYc9KPGQelh4PWIB2vVqCy9Z0rSLqNQrtAHqB4WOAypwXXQU5wYCWIcetYxDDo2E4Ud4nT9vYI6PGRwBhVzDzS_6uamSnFLBT1J9cm1GTBdHo5AXhlmeEOalBiPMQYB3CwbE0Iw59oPNTgMQr2FTFUcXAnIf5iLYKLt6K3zy6zDqRvX8j3ft-aLO3o3lDzujJfj8TuZblpw3RrEPX1UAuJNzUGyvdPlYuiIub3izC-qduU5mCKDw9KOkx5vnq331A7xg"/>
-</div>
-</div>
-</div>
-</section>
-<!-- The Event & Timeline -->
-<section class="bg-white py-24 px-6 lg:px-20" id="event">
-<div class="max-w-7xl mx-auto">
-<div class="text-center mb-20">
-<h2 class="text-5xl font-black tracking-tighter mb-4 uppercase italic">The Celebration</h2>
-<p class="text-gray-400 uppercase tracking-[0.4em] text-xs font-bold">{{WeddingDate}}</p>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
-<!-- Event Details -->
-<div class="space-y-12">
-<div class="flex gap-8 group">
-<div class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">01</div>
-<div>
-<h4 class="text-2xl font-bold mb-2">The Ceremony</h4>
-<p class="text-gray-500 mb-4">{{EventTime}} — The Glass House Conservatory</p>
-<p class="text-sm text-gray-400 leading-relaxed">A minimal, light-filled ceremony surrounded by lush botanical gardens and contemporary architecture.</p>
-</div>
-</div>
-<div class="flex gap-8 group">
-<div class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">02</div>
-<div>
-<h4 class="text-2xl font-bold mb-2">The Cocktail Hour</h4>
-<p class="text-gray-500 mb-4">5:30 PM — The Rooftop Terrace</p>
-<p class="text-sm text-gray-400 leading-relaxed">Signature drinks and jazz as the sun sets over the skyline.</p>
-</div>
-</div>
-<div class="flex gap-8 group">
-<div class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">03</div>
-<div>
-<h4 class="text-2xl font-bold mb-2">Dinner &amp; Dancing</h4>
-<p class="text-gray-500 mb-4">7:00 PM — Main Gallery Hall</p>
-<p class="text-sm text-gray-400 leading-relaxed">A curated culinary experience followed by an unforgettable night on the floor.</p>
-</div>
-</div>
-</div>
-<!-- Map Component -->
-<div class="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
-<div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
-<div class="w-full h-full bg-gray-200 flex items-center justify-center relative">
-<!-- Placeholder for Map -->
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Stylized city map with wedding location marker" data-location="Los Angeles, California" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA1ConLx-1MCgEa491RbCjPrdfiKQ0zQTdD3CbPkisnhiFoLEysKYw4tfm2O4V7EtoZZOqb9WPzP152gjLV2v_mANihrmmomKtyqPpuTausGzy68ytUvDUhzCwlaQjRxdOJd6YxzGyrrzSPMT462GT6IfoSiY3WRdAiMuIWTInaW99ooHf_JzGSveVE4v6BK6-bHumsgrKXsNyVaG9fXygwyg3CHv-tmCnVHIaHpeu7V4FpDHUegDqS-d1rtqDWaqQG6jhrKwP6TQgL')"></div>
-<div class="z-10 bg-white p-6 rounded-lg shadow-xl max-w-xs text-center border-t-4 border-primary">
-<span class="material-symbols-outlined text-primary mb-2">location_on</span>
-<p class="font-bold text-sm">Glass House Conservatory</p>
-<p class="text-xs text-gray-500 mt-1">123 Modernist Way, Downtown Arts District</p>
-<button class="mt-4 text-xs font-bold text-primary underline">GET DIRECTIONS</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Gallery Grid: Intentional Non-Uniform -->
-<section class="py-12 px-4 lg:px-8">
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 h-[600px] lg:h-[800px]">
-<div class="col-span-1 row-span-2">
-<img class="w-full h-full object-cover rounded-xl" data-alt="Wedding rings on marble surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY7h6ObyQ5FkwSM3CWnnVrieDDIsOXM93g7MUa_JiBl9sCpG9g78dbY9wiWTXE4UAl0we_VBlK6h5DClPyF58AQH32VEydzgL1oNP61_KQXP3Pjp3pRqnc_vhghZpMOikJHewCXhq9u5n8YmVZn9k4aL-tBBgWwQETp9ZkYJiPHoB0qjKq-AZaF6A3TkxB_c5tiIYptfu10vo-NkDrfDNFEGprkdgp-XrKOnJKjxrBUk4FAsQUEPz8cqKzmYac6GsHFWfHVAQ-K33k"/>
-</div>
-<div class="col-span-1 row-span-1">
-<img class="w-full h-full object-cover rounded-xl" data-alt="Bridal bouquet with white flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOILB86O48MLBlsI8DZUfVr98_K-CB1vyw1x0eskB1UGSm3CT4xmVD31CrvAPf6V7MjrqIfO44zX0_-P3SuOdtlKJuz4_oIrUA4H5jxr-0q5gnKXt5apD4Fv3IbYvRKtG4I_3XVrCNryimerZYCSusKxNNkBXZYkbybc6ZY97-CJiY5qhIrQ1ZcxgAn084Invgxh0ZeTiwbRGFlkXBisehF21JsSbXrBX5Sf9YOYCElOc7PwDYK4Mw9V49fA8EFHlfRzRrY6u0WN9K"/>
-</div>
-<div class="col-span-2 row-span-1">
-<img class="w-full h-full object-cover rounded-xl" data-alt="Wedding table setting detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1HBr8VXpNyhC0inmJutSrFTwc4e0bdmNS5VSxtLx_-6-8Ulu9c2CBwivgfqtZP1LbaW443r8K5TaLncSKuZhU1Br5NorP55NrCl6eSTq3o_lrmu1b5xnDd75RE4QLD-bN9ei-5v8W1QNOLXzKErneAFMDIa6CyODJp_JoWC2hk4rBWttDtl3jlHBQjtt4yMBKhda2A_ft1IxmCZcuJvQjY_Q1cPVGxCbvS_m_jUxR-tbvixjRVF4qHwI8FnOda5nb1JgmLs8maq4K"/>
-</div>
-<div class="col-span-1 row-span-1">
-<img class="w-full h-full object-cover rounded-xl" data-alt="Couple sharing a champagne toast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaPD69QzcMw3z9dsH_MB_IdEUBbuWG40QigIGYGkJPKP1YK6jOgnHKvUf9jJz6nYoe0svQ8fqleFHbaZ3iOd-WGOifk5VSApcL4u0YdLG4H0MwbEUkSa34wnw_-egtyJilvS9uVNfu7mc-zkaipBrRaVEZoYp_GoX_BnZF5MlZ4A1zZqeZ-xIznrsKEXLAE7ZS6O-lt8EN2vPQ5JBYjPuyrjSoVAxr6B9Lc9FHT304bkYfPKnmNsgj1B_FvwbD-_CWUF5LIG7cw_n6"/>
-</div>
-<div class="col-span-2 row-span-1">
-<img class="w-full h-full object-cover rounded-xl" data-alt="Aesthetic ceremony venue interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYH1zF96SiGYfzHz26BlsDnI-ZgvO6_fkoDw8hu2xh-QmPXrF3kOIULZ_U2X4sj0G-dlx1duKkFsb5uOjF4IDmKM2E2aEAC-f-teCl5pcvoJQAOKya5z3npP4PjUbwm5iD2A_-hV8TKW76SLcfngdweYEW3mF3kamf8J5yHzWKD2a_r-iRVdvzQl3L0VLl31neL_ym0SYr1_vaphy_IQ7OO0MkErQ5kloefrk9Mk7Jm2jH3uPnSLSaLRipn_cOSX4KvG8SFM1eNDwY"/>
-</div>
-</div>
-</section>
-<!-- Wishes Wall -->
-<section class="py-24 bg-background-light overflow-hidden" id="wishes">
-<div class="max-w-7xl mx-auto px-6 lg:px-20">
-<div class="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
-<div>
-<h2 class="text-6xl font-black tracking-tighter uppercase mb-4">Wishes Wall</h2>
-<p class="text-gray-500 max-w-md">Our favorite people, our favorite memories. Leave a note for the happy couple.</p>
-</div>
-<button class="flex items-center gap-3 bg-white border border-gray-200 px-6 py-4 rounded-xl font-bold shadow-sm hover:shadow-md hover:border-primary transition-all group">
-<span class="material-symbols-outlined text-primary group-hover:scale-125 transition-transform">add_a_photo</span>
-<span>POST A WISH</span>
-</button>
-</div>
-<!-- Masonry Layout -->
-<div class="masonry-grid">
-<!-- Wish Card 1 -->
-<div class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 rotate-1 hover:rotate-0 transition-transform duration-500">
-<div class="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Friends laughing at a party" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYy9_HNyr5hFCXRT03odCQmhw-TMx80y0dR_ZDxsrkNmoaymYwDspAjuv6kTl5ZE8tV_dwCr0AVPXf0mY9cx63Xq8HH8V-E0dmmpP8XU0zCbdxYPglgxnu5SpX0WSzltY3AROLixmcduLGJr1L0zdQr0TXx-UANu60JqzMsbmVVcwdnpkPZJ8gDA8R5os9VAa6oKrvDPlI7vn6X3yVF5Tsc1dOFu6zHXfh_GuOHQ6RZHeAQ9mCY31eldAV97rQohtQIHYVHJ6LNP_0"/>
-</div>
-<p class="text-gray-700 italic mb-4 leading-relaxed">"Can't wait to see you both finally tie the knot! You're perfect for each other. See you in Sept!"</p>
-<div class="flex items-center justify-between">
-<span class="font-bold text-sm">— Sarah &amp; Mike</span>
-<span class="material-symbols-outlined text-primary fill-1 text-xl">favorite</span>
-</div>
-</div>
-<!-- Wish Card 2 -->
-<div class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 -rotate-1 hover:rotate-0 transition-transform duration-500">
-<p class="text-xl font-medium text-gray-800 mb-4">"Wishing you a lifetime of love, laughter, and endless coffee adventures! Love you guys."</p>
-<div class="flex items-center justify-between border-t border-gray-50 pt-4">
-<span class="font-bold text-sm">— Grandma Jo</span>
-<span class="material-symbols-outlined text-gray-300 hover:text-primary transition-colors cursor-pointer">favorite</span>
-</div>
-</div>
-<!-- Wish Card 3 -->
-<div class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 rotate-2 hover:rotate-0 transition-transform duration-500">
-<div class="aspect-[4/3] bg-gray-100 rounded-lg mb-4 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Beach sunset photo from guests" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY34My2SjW23SfQMQiZQn8vSRcCPN1AFD5qOd2Ao41mAcpuP73ejTPypK18HWcSu0yafaQDahbarf162lShmUGNpxMw6r7WKpoWBazYty6Qq2hwiwlGmml_W8hS238EL1vgZtrWmdEDnc8zFTAeFcpeqbx6gV3bMykDqE7GkS-2pQuxyB1BbfkI1IBWjIlahYRVrfQUA4c67iewWsRJR0bCv_eZOo1Lo53YJpXT3WPp1aYmEkMfUKHzMRZegW3soO_aQ6CRbLYyZrQ"/>
-</div>
-<p class="text-gray-700 mb-4 leading-relaxed">"Remembering this sunset in Amalfi when you told us the news. So happy for you!"</p>
-<div class="flex items-center justify-between">
-<span class="font-bold text-sm">— The Millers</span>
-<span class="material-symbols-outlined text-primary fill-1 text-xl">favorite</span>
-</div>
-</div>
-<!-- Wish Card 4 -->
-<div class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 -rotate-2 hover:rotate-0 transition-transform duration-500">
-<p class="text-gray-700 italic mb-4 leading-relaxed">"Cheers to the most stylish couple we know! Get ready for the dance floor."</p>
-<div class="flex items-center justify-between">
-<span class="font-bold text-sm">— Leo &amp; Clara</span>
-<span class="material-symbols-outlined text-gray-300 hover:text-primary transition-colors cursor-pointer">favorite</span>
-</div>
-</div>
-<!-- Wish Card 5 -->
-<div class="masonry-item bg-primary p-6 rounded-xl shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
-<p class="text-white text-xl font-bold mb-6">"You guys are the definition of soulmates. Can't wait for the big day!"</p>
-<div class="flex items-center justify-between border-t border-white/20 pt-4">
-<span class="font-bold text-sm text-white/90">— Best Man Dave</span>
-<span class="material-symbols-outlined text-white fill-1 text-xl">favorite</span>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- RSVP Form Section -->
-<section class="py-24 px-6 lg:px-20 bg-white" id="rsvp">
-<div class="max-w-3xl mx-auto bg-background-light p-8 lg:p-16 rounded-3xl border border-gray-100 shadow-2xl relative">
-<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center shadow-xl">
-<span class="material-symbols-outlined text-4xl">mail</span>
-</div>
-<div class="text-center mb-12 mt-4">
-<h2 class="text-4xl font-black uppercase tracking-tighter">Will You Join Us?</h2>
-<p class="text-gray-500 mt-2">Please RSVP by {{WeddingDate}}</p>
-</div>
-<form class="space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-gray-400">First Name</label>
-<input class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all" placeholder="{{GroomName}}" type="text"/>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-gray-400">Last Name</label>
-<input class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all" placeholder="Smith" type="text"/>
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-gray-400">Attending?</label>
-<select class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all">
-<option>Joyfully Accept</option>
-<option>Regretfully Decline</option>
-</select>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-gray-400">Dietary Requirements</label>
-<textarea class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all" placeholder="Allergies, vegan, etc." rows="3"></textarea>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold uppercase tracking-widest text-gray-400">Song Request</label>
-<input class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all" placeholder="What will get you on the dance floor?" type="text"/>
-</div>
-<button class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl transition-all transform hover:-translate-y-1" type="submit">
+                    <div class="flex items-center gap-4 group cursor-pointer">
+                        <div
+                            class="w-12 h-12 rounded-full border border-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                        </div>
+                        <span class="font-bold text-sm tracking-widest uppercase">Watch Our Film</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-7 grid grid-cols-2 gap-4 order-1 lg:order-2">
+                    <div class="pt-12">
+                        <img class="rounded-xl shadow-2xl w-full h-80 object-cover"
+                            data-alt="Couple laughing in urban setting"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL2665FDiVC7DOl5Zmq1pOWVFtMcKLLBXShnUtvGB-JXLCI9cS4PIV2Unko6CZF6fs0dTnLxs_dBRnedHxwDrqI01LPVx8P-jPv4qes6RhbqgrXmdOwGTyB4UOpxtswL5WtCzXv-HBDFf0GbGeseoVMcviBM_6M6b0pezMJSRYVKMKwHjlGyPec9NCuVeL0rgBjEyhxOofYHGCrAYQma_Lqr1H8CBZwsujkUwMs0QUZdem4jqIo61vPcuNiJaIDK9EMJm5Y42TSsmM" />
+                    </div>
+                    <div>
+                        <img class="rounded-xl shadow-2xl w-full h-[30rem] object-cover"
+                            data-alt="Candid moment of couple holding hands"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBMYI5Qi_XMYc9KPGQelh4PWIB2vVqCy9Z0rSLqNQrtAHqB4WOAypwXXQU5wYCWIcetYxDDo2E4Ud4nT9vYI6PGRwBhVzDzS_6uamSnFLBT1J9cm1GTBdHo5AXhlmeEOalBiPMQYB3CwbE0Iw59oPNTgMQr2FTFUcXAnIf5iLYKLt6K3zy6zDqRvX8j3ft-aLO3o3lDzujJfj8TuZblpw3RrEPX1UAuJNzUGyvdPlYuiIub3izC-qduU5mCKDw9KOkx5vnq331A7xg" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- The Event & Timeline -->
+        <section class="bg-white py-24 px-6 lg:px-20" id="event">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="text-5xl font-black tracking-tighter mb-4 uppercase italic">The Celebration</h2>
+                    <p class="text-gray-400 uppercase tracking-[0.4em] text-xs font-bold">{{WeddingDate}}</p>
+                </div>
+                <div id="wedding-timeline" class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                    <!-- Event Details -->
+                    <div data-timeline-item="true" class="space-y-12">
+                        <div class="flex gap-8 group">
+                            <div
+                                class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">
+                                01</div>
+                            <div>
+                                <h4 class="text-2xl font-bold mb-2">The Ceremony</h4>
+                                <p class="text-gray-500 mb-4">{{EventTime}} — The Glass House Conservatory</p>
+                                <p class="text-sm text-gray-400 leading-relaxed">A minimal, light-filled ceremony
+                                    surrounded by lush botanical gardens and contemporary architecture.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-8 group">
+                            <div
+                                class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">
+                                02</div>
+                            <div>
+                                <h4 class="text-2xl font-bold mb-2">The Cocktail Hour</h4>
+                                <p class="text-gray-500 mb-4">5:30 PM — The Rooftop Terrace</p>
+                                <p class="text-sm text-gray-400 leading-relaxed">Signature drinks and jazz as the sun
+                                    sets over the skyline.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-8 group">
+                            <div
+                                class="text-primary text-5xl font-light opacity-30 group-hover:opacity-100 transition-opacity">
+                                03</div>
+                            <div>
+                                <h4 class="text-2xl font-bold mb-2">Dinner &amp; Dancing</h4>
+                                <p class="text-gray-500 mb-4">7:00 PM — Main Gallery Hall</p>
+                                <p class="text-sm text-gray-400 leading-relaxed">A curated culinary experience followed
+                                    by an unforgettable night on the floor.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Map Component -->
+                    <div id="wedding-map"
+                        class="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                        <div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
+                        <div class="w-full h-full bg-gray-200 flex items-center justify-center relative">
+                            <!-- Placeholder for Map -->
+                            <div class="absolute inset-0 bg-cover bg-center"
+                                data-alt="Stylized city map with wedding location marker"
+                                data-location="Los Angeles, California"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA1ConLx-1MCgEa491RbCjPrdfiKQ0zQTdD3CbPkisnhiFoLEysKYw4tfm2O4V7EtoZZOqb9WPzP152gjLV2v_mANihrmmomKtyqPpuTausGzy68ytUvDUhzCwlaQjRxdOJd6YxzGyrrzSPMT462GT6IfoSiY3WRdAiMuIWTInaW99ooHf_JzGSveVE4v6BK6-bHumsgrKXsNyVaG9fXygwyg3CHv-tmCnVHIaHpeu7V4FpDHUegDqS-d1rtqDWaqQG6jhrKwP6TQgL')">
+                            </div>
+                            <div
+                                class="z-10 bg-white p-6 rounded-lg shadow-xl max-w-xs text-center border-t-4 border-primary">
+                                <span class="material-symbols-outlined text-primary mb-2">location_on</span>
+                                <p class="font-bold text-sm">Glass House Conservatory</p>
+                                <p class="text-xs text-gray-500 mt-1">123 Modernist Way, Downtown Arts District</p>
+                                <button class="mt-4 text-xs font-bold text-primary underline">GET DIRECTIONS</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Gallery Grid: Intentional Non-Uniform -->
+        <section class="py-12 px-4 lg:px-8">
+            <div id="wedding-gallery" class="grid grid-cols-2 lg:grid-cols-4 gap-4 h-[600px] lg:h-[800px]">
+                <div class="col-span-1 row-span-2" data-gallery-item="true">
+                    <img class="w-full h-full object-cover rounded-xl" data-alt="Wedding rings on marble surface"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY7h6ObyQ5FkwSM3CWnnVrieDDIsOXM93g7MUa_JiBl9sCpG9g78dbY9wiWTXE4UAl0we_VBlK6h5DClPyF58AQH32VEydzgL1oNP61_KQXP3Pjp3pRqnc_vhghZpMOikJHewCXhq9u5n8YmVZn9k4aL-tBBgWwQETp9ZkYJiPHoB0qjKq-AZaF6A3TkxB_c5tiIYptfu10vo-NkDrfDNFEGprkdgp-XrKOnJKjxrBUk4FAsQUEPz8cqKzmYac6GsHFWfHVAQ-K33k" />
+                </div>
+                <div data-gallery-item="true" class="col-span-1 row-span-1">
+                    <img class="w-full h-full object-cover rounded-xl" data-alt="Bridal bouquet with white flowers"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOILB86O48MLBlsI8DZUfVr98_K-CB1vyw1x0eskB1UGSm3CT4xmVD31CrvAPf6V7MjrqIfO44zX0_-P3SuOdtlKJuz4_oIrUA4H5jxr-0q5gnKXt5apD4Fv3IbYvRKtG4I_3XVrCNryimerZYCSusKxNNkBXZYkbybc6ZY97-CJiY5qhIrQ1ZcxgAn084Invgxh0ZeTiwbRGFlkXBisehF21JsSbXrBX5Sf9YOYCElOc7PwDYK4Mw9V49fA8EFHlfRzRrY6u0WN9K" />
+                </div>
+                <div data-gallery-item="true" class="col-span-2 row-span-1">
+                    <img class="w-full h-full object-cover rounded-xl" data-alt="Wedding table setting detail"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1HBr8VXpNyhC0inmJutSrFTwc4e0bdmNS5VSxtLx_-6-8Ulu9c2CBwivgfqtZP1LbaW443r8K5TaLncSKuZhU1Br5NorP55NrCl6eSTq3o_lrmu1b5xnDd75RE4QLD-bN9ei-5v8W1QNOLXzKErneAFMDIa6CyODJp_JoWC2hk4rBWttDtl3jlHBQjtt4yMBKhda2A_ft1IxmCZcuJvQjY_Q1cPVGxCbvS_m_jUxR-tbvixjRVF4qHwI8FnOda5nb1JgmLs8maq4K" />
+                </div>
+                <div data-gallery-item="true" class="col-span-1 row-span-1">
+                    <img class="w-full h-full object-cover rounded-xl" data-alt="Couple sharing a champagne toast"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaPD69QzcMw3z9dsH_MB_IdEUBbuWG40QigIGYGkJPKP1YK6jOgnHKvUf9jJz6nYoe0svQ8fqleFHbaZ3iOd-WGOifk5VSApcL4u0YdLG4H0MwbEUkSa34wnw_-egtyJilvS9uVNfu7mc-zkaipBrRaVEZoYp_GoX_BnZF5MlZ4A1zZqeZ-xIznrsKEXLAE7ZS6O-lt8EN2vPQ5JBYjPuyrjSoVAxr6B9Lc9FHT304bkYfPKnmNsgj1B_FvwbD-_CWUF5LIG7cw_n6" />
+                </div>
+                <div data-gallery-item="true" class="col-span-2 row-span-1">
+                    <img class="w-full h-full object-cover rounded-xl" data-alt="Aesthetic ceremony venue interior"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYH1zF96SiGYfzHz26BlsDnI-ZgvO6_fkoDw8hu2xh-QmPXrF3kOIULZ_U2X4sj0G-dlx1duKkFsb5uOjF4IDmKM2E2aEAC-f-teCl5pcvoJQAOKya5z3npP4PjUbwm5iD2A_-hV8TKW76SLcfngdweYEW3mF3kamf8J5yHzWKD2a_r-iRVdvzQl3L0VLl31neL_ym0SYr1_vaphy_IQ7OO0MkErQ5kloefrk9Mk7Jm2jH3uPnSLSaLRipn_cOSX4KvG8SFM1eNDwY" />
+                </div>
+            </div>
+        </section>
+        <!-- Wishes Wall -->
+        <section class="py-24 bg-background-light overflow-hidden" id="wishes">
+            <div class="max-w-7xl mx-auto px-6 lg:px-20">
+                <div class="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
+                    <div>
+                        <h2 class="text-6xl font-black tracking-tighter uppercase mb-4">Wishes Wall</h2>
+                        <p class="text-gray-500 max-w-md">Our favorite people, our favorite memories. Leave a note for
+                            the happy couple.</p>
+                    </div>
+                    <button
+                        class="flex items-center gap-3 bg-white border border-gray-200 px-6 py-4 rounded-xl font-bold shadow-sm hover:shadow-md hover:border-primary transition-all group">
+                        <span
+                            class="material-symbols-outlined text-primary group-hover:scale-125 transition-transform">add_a_photo</span>
+                        <span>POST A WISH</span>
+                    </button>
+                </div>
+                <!-- Masonry Layout -->
+                <div class="masonry-grid">
+                    <!-- Wish Card 1 -->
+                    <div
+                        class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 rotate-1 hover:rotate-0 transition-transform duration-500">
+                        <div class="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                            <img class="w-full h-full object-cover" data-alt="Friends laughing at a party"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYy9_HNyr5hFCXRT03odCQmhw-TMx80y0dR_ZDxsrkNmoaymYwDspAjuv6kTl5ZE8tV_dwCr0AVPXf0mY9cx63Xq8HH8V-E0dmmpP8XU0zCbdxYPglgxnu5SpX0WSzltY3AROLixmcduLGJr1L0zdQr0TXx-UANu60JqzMsbmVVcwdnpkPZJ8gDA8R5os9VAa6oKrvDPlI7vn6X3yVF5Tsc1dOFu6zHXfh_GuOHQ6RZHeAQ9mCY31eldAV97rQohtQIHYVHJ6LNP_0" />
+                        </div>
+                        <p class="text-gray-700 italic mb-4 leading-relaxed">"Can't wait to see you both finally tie the
+                            knot! You're perfect for each other. See you in Sept!"</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm">— {{BrideName}} &amp; Mike</span>
+                            <span class="material-symbols-outlined text-primary fill-1 text-xl">favorite</span>
+                        </div>
+                    </div>
+                    <!-- Wish Card 2 -->
+                    <div
+                        class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 -rotate-1 hover:rotate-0 transition-transform duration-500">
+                        <p class="text-xl font-medium text-gray-800 mb-4">"Wishing you a lifetime of love, laughter, and
+                            endless coffee adventures! Love you guys."</p>
+                        <div class="flex items-center justify-between border-t border-gray-50 pt-4">
+                            <span class="font-bold text-sm">— Grandma Jo</span>
+                            <span
+                                class="material-symbols-outlined text-gray-300 hover:text-primary transition-colors cursor-pointer">favorite</span>
+                        </div>
+                    </div>
+                    <!-- Wish Card 3 -->
+                    <div
+                        class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 rotate-2 hover:rotate-0 transition-transform duration-500">
+                        <div class="aspect-[4/3] bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                            <img class="w-full h-full object-cover" data-alt="Beach sunset photo from guests"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY34My2SjW23SfQMQiZQn8vSRcCPN1AFD5qOd2Ao41mAcpuP73ejTPypK18HWcSu0yafaQDahbarf162lShmUGNpxMw6r7WKpoWBazYty6Qq2hwiwlGmml_W8hS238EL1vgZtrWmdEDnc8zFTAeFcpeqbx6gV3bMykDqE7GkS-2pQuxyB1BbfkI1IBWjIlahYRVrfQUA4c67iewWsRJR0bCv_eZOo1Lo53YJpXT3WPp1aYmEkMfUKHzMRZegW3soO_aQ6CRbLYyZrQ" />
+                        </div>
+                        <p class="text-gray-700 mb-4 leading-relaxed">"Remembering this sunset in Amalfi when you told
+                            us the news. So happy for you!"</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm">— The Millers</span>
+                            <span class="material-symbols-outlined text-primary fill-1 text-xl">favorite</span>
+                        </div>
+                    </div>
+                    <!-- Wish Card 4 -->
+                    <div
+                        class="masonry-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 -rotate-2 hover:rotate-0 transition-transform duration-500">
+                        <p class="text-gray-700 italic mb-4 leading-relaxed">"Cheers to the most stylish couple we know!
+                            Get ready for the dance floor."</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm">— Leo &amp; Clara</span>
+                            <span
+                                class="material-symbols-outlined text-gray-300 hover:text-primary transition-colors cursor-pointer">favorite</span>
+                        </div>
+                    </div>
+                    <!-- Wish Card 5 -->
+                    <div
+                        class="masonry-item bg-primary p-6 rounded-xl shadow-xl transform hover:scale-[1.02] transition-transform duration-500">
+                        <p class="text-white text-xl font-bold mb-6">"You guys are the definition of soulmates. Can't
+                            wait for the big day!"</p>
+                        <div class="flex items-center justify-between border-t border-white/20 pt-4">
+                            <span class="font-bold text-sm text-white/90">— Best Man Dave</span>
+                            <span class="material-symbols-outlined text-white fill-1 text-xl">favorite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- RSVP Form Section -->
+        <section class="py-24 px-6 lg:px-20 bg-white" id="rsvp">
+            <div
+                class="max-w-3xl mx-auto bg-background-light p-8 lg:p-16 rounded-3xl border border-gray-100 shadow-2xl relative">
+                <div
+                    class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center shadow-xl">
+                    <span class="material-symbols-outlined text-4xl">mail</span>
+                </div>
+                <div class="text-center mb-12 mt-4">
+                    <h2 class="text-4xl font-black uppercase tracking-tighter">Will You Join Us?</h2>
+                    <p class="text-gray-500 mt-2">Please RSVP by {{WeddingDate}}</p>
+                </div>
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-widest text-gray-400">First Name</label>
+                            <input
+                                class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all"
+                                placeholder="{{GroomName}}" type="text" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Last Name</label>
+                            <input
+                                class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all"
+                                placeholder="Smith" type="text" />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Attending?</label>
+                        <select
+                            class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all">
+                            <option>Joyfully Accept</option>
+                            <option>Regretfully Decline</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Dietary
+                            Requirements</label>
+                        <textarea
+                            class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all"
+                            placeholder="Allergies, vegan, etc." rows="3"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Song Request</label>
+                        <input
+                            class="w-full px-4 py-3 rounded-lg border-gray-200 focus:ring-primary focus:border-primary transition-all"
+                            placeholder="What will get you on the dance floor?" type="text" />
+                    </div>
+                    <button
+                        class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl transition-all transform hover:-translate-y-1"
+                        type="submit">
                         SUBMIT RSVP
                     </button>
-</form>
-</div>
-</section>
-<!-- Registry -->
-<section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto text-center" id="registry">
-<h2 class="text-primary text-sm font-bold tracking-[0.3em] mb-4 uppercase">Registry</h2>
-<h3 class="text-4xl font-extrabold mb-12">Gifts &amp; Contributions</h3>
-<p class="text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">
-                Your presence at our wedding is the greatest gift of all. However, if you wish to honor us with a gift, we have curated a selection of items and funds.
+                </form>
+            </div>
+        </section>
+        <!-- Registry -->
+        <section class="py-24 px-6 lg:px-20 max-w-7xl mx-auto text-center" id="registry">
+            <h2 class="text-primary text-sm font-bold tracking-[0.3em] mb-4 uppercase">{{Registry_Title}}</h2>
+            <h3 class="text-4xl font-extrabold mb-12">Gifts &amp; Contributions</h3>
+            <p class="text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">
+                {{Registry_Body}}
             </p>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<div class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
-<span class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">home</span>
-<h4 class="font-bold text-lg mb-2">New Home Fund</h4>
-<p class="text-gray-400 text-sm">Help us build our dream nest.</p>
-</div>
-<div class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
-<span class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">flight</span>
-<h4 class="font-bold text-lg mb-2">Honeymoon Fund</h4>
-<p class="text-gray-400 text-sm">Contribute to our Japan adventure.</p>
-</div>
-<div class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
-<span class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">volunteer_activism</span>
-<h4 class="font-bold text-lg mb-2">Charity Donation</h4>
-<p class="text-gray-400 text-sm">Support the Environmental Defense Fund.</p>
-</div>
-</div>
-</section>
-</main>
-<footer class="bg-white border-t border-gray-100 py-12 px-6 lg:px-20 text-center">
-<div class="max-w-7xl mx-auto">
-<h2 class="text-2xl font-black uppercase tracking-tighter mb-4">A <span class="text-primary">&amp;</span> J</h2>
-<p class="text-gray-400 text-xs tracking-[0.2em] uppercase font-bold mb-8">09.24.2024</p>
-<div class="flex justify-center gap-6 mb-8 text-gray-400">
-<a class="hover:text-primary" href="#"><span class="material-symbols-outlined">share</span></a>
-<a class="hover:text-primary" href="#"><span class="material-symbols-outlined">camera_alt</span></a>
-<a class="hover:text-primary" href="#"><span class="material-symbols-outlined">mail</span></a>
-</div>
-<p class="text-gray-300 text-[10px] uppercase tracking-widest">Designed with love for {{GroomName}} & {{BrideName}}</p>
-</div>
-</footer>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
+                    <span
+                        class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">home</span>
+                    <h4 class="font-bold text-lg mb-2">New Home Fund</h4>
+                    <p class="text-gray-400 text-sm">Help us build our dream nest.</p>
+                </div>
+                <div
+                    class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
+                    <span
+                        class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">flight</span>
+                    <h4 class="font-bold text-lg mb-2">Honeymoon Fund</h4>
+                    <p class="text-gray-400 text-sm">Contribute to our adventure.</p>
+                </div>
+                <div
+                    class="p-8 border border-gray-100 rounded-2xl hover:border-primary transition-colors cursor-pointer group">
+                    <span
+                        class="material-symbols-outlined text-4xl text-gray-300 group-hover:text-primary mb-4">volunteer_activism</span>
+                    <h4 class="font-bold text-lg mb-2">Charity Donation</h4>
+                    <p class="text-gray-400 text-sm">Support the Environmental Defense Fund.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-white border-t border-gray-100 py-12 px-6 lg:px-20 text-center">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-4">{{GroomInitial}} <span
+                    class="text-primary">&amp;</span> {{BrideInitial}}</h2>
+            <p class="text-gray-400 text-xs tracking-[0.2em] uppercase font-bold mb-8">09.24.{{Year}}</p>
+            <div class="flex justify-center gap-6 mb-8 text-gray-400">
+                <a class="hover:text-primary" href="#"><span class="material-symbols-outlined">share</span></a>
+                <a class="hover:text-primary" href="#"><span class="material-symbols-outlined">camera_alt</span></a>
+                <a class="hover:text-primary" href="#"><span class="material-symbols-outlined">mail</span></a>
+            </div>
+            <p class="text-gray-300 text-[10px] uppercase tracking-widest">Designed with love for {{GroomName}} &
+                {{BrideName}}</p>
+        </div>
+    </footer>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

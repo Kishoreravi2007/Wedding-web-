@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -24,290 +31,381 @@
                     fontFamily: {
                         "display": ["Manrope", "sans-serif"]
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
                 },
             },
         }
     </script>
-<style>
-        body { font-family: 'Manrope', sans-serif; }
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
         .glass-moss {
             background: rgba(74, 93, 74, 0.1);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .text-shadow {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark text-forest-earth font-display">
-<!-- Navigation -->
-<header class="fixed top-0 w-full z-50 glass-moss border-b border-white/10 px-6 py-4 lg:px-20">
-<div class="max-w-7xl mx-auto flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="text-primary">
-<span class="material-symbols-outlined text-3xl">forest</span>
-</div>
-<h2 class="text-forest-deep dark:text-white text-xl font-extrabold tracking-tight">WeddingWeb</h2>
-</div>
-<nav class="hidden md:flex items-center gap-10">
-<a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors" href="#story">Our Story</a>
-<a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors" href="#gallery">Gallery</a>
-<a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
-<a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors" href="#venue">Venue</a>
-</nav>
-<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
+    <!-- Navigation -->
+    <header class="fixed top-0 w-full z-50 glass-moss border-b border-white/10 px-6 py-4 lg:px-20">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-primary">
+                    <span class="material-symbols-outlined text-3xl">forest</span>
+                </div>
+                <h2 class="text-forest-deep dark:text-white text-xl font-extrabold tracking-tight">{{GroomInitial}}
+                    &amp; {{BrideInitial}}</h2>
+            </div>
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors"
+                    href="#story">Our Story</a>
+                <a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors"
+                    href="#gallery">Gallery</a>
+                <a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors"
+                    href="#wishes">Wishes Wall</a>
+                <a class="text-forest-deep dark:text-gray-200 text-sm font-semibold hover:text-primary transition-colors"
+                    href="#venue">Venue</a>
+            </nav>
+            <button
+                class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
                 Leave a Wish
             </button>
-</div>
-</header>
-<!-- Hero Section -->
-<section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105" data-alt="Misty redwood forest canopy with sunlight rays" style="background-image: linear-gradient(rgba(26, 46, 26, 0.5), rgba(26, 46, 26, 0.8)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDswSQGTs_WzpNZucjitSEefRlgypwuvDR7QYeheEmXb3oFj63r_kZUtBnWo4aQNAHlm2aFtT5QeXBMmvnVSB1Xo-WEv72Wpghc1ElJ_L4lApkOWbS4S_wk0B35ckcOP2YqlxbpbZXwrs9acak1GS84hQ4dio2mYYscmObFqhHwp_Vc6iirhPzXbWnYo0J3pdtov0kaTxfRKmGDJBuPSo6ZxEjrs9Esh7Agw7NE6AAJwgXqSPjk863qC0hoQ9u6pb2cLklA5GJsQ2Vg');">
-</div>
-<div class="relative z-10 text-center px-4 max-w-4xl">
-<span class="text-white/80 uppercase tracking-[0.3em] text-sm font-medium mb-4 block">We are getting married</span>
-<h1 class="text-white text-5xl md:text-8xl font-extrabold leading-tight mb-6 tracking-tighter text-shadow">{{GroomName}} & {{BrideName}}</h1>
-<div class="h-1 w-24 bg-primary mx-auto mb-8 rounded-full"></div>
-<p class="text-white text-lg md:text-2xl font-light mb-10 tracking-wide">
-                {{WeddingDate}} • Redwood National Park, CA
+        </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105 hero-bg"
+            data-hero-bg="true" data-alt="Misty redwood forest canopy with sunlight rays"
+            style="background-image: linear-gradient(rgba(26, 46, 26, 0.5), rgba(26, 46, 26, 0.8)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDswSQGTs_WzpNZucjitSEefRlgypwuvDR7QYeheEmXb3oFj63r_kZUtBnWo4aQNAHlm2aFtT5QeXBMmvnVSB1Xo-WEv72Wpghc1ElJ_L4lApkOWbS4S_wk0B35ckcOP2YqlxbpbZXwrs9acak1GS84hQ4dio2mYYscmObFqhHwp_Vc6iirhPzXbWnYo0J3pdtov0kaTxfRKmGDJBuPSo6ZxEjrs9Esh7Agw7NE6AAJwgXqSPjk863qC0hoQ9u6pb2cLklA5GJsQ2Vg');">
+        </div>
+        <div class="relative z-10 text-center px-4 max-w-4xl">
+            <span class="text-white/80 uppercase tracking-[0.3em] text-sm font-medium mb-4 block">We are getting
+                married</span>
+            <h1 class="text-white text-5xl md:text-8xl font-extrabold leading-tight mb-6 tracking-tighter text-shadow">
+                {{GroomName}} & {{BrideName}}</h1>
+            <div class="h-1 w-24 bg-primary mx-auto mb-8 rounded-full"></div>
+            <p class="text-white text-lg md:text-2xl font-light mb-10 tracking-wide">
+                {{WeddingDate}} • {{Venue}}, {{Location}}
             </p>
-<div class="flex flex-col sm:flex-row gap-4 justify-center">
-<a class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-xl font-bold transition-all" href="#story">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-xl font-bold transition-all"
+                    href="#story">
                     Enter Our Story
                 </a>
-<a class="bg-primary text-white px-8 py-4 rounded-xl font-bold transition-all shadow-xl shadow-primary/30" href="#wishes">
+                <a class="bg-primary text-white px-8 py-4 rounded-xl font-bold transition-all shadow-xl shadow-primary/30"
+                    href="#wishes">
                     Sign the Wishes Wall
                 </a>
-</div>
-</div>
-<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/50">
-<span class="material-symbols-outlined text-4xl font-thin">expand_more</span>
-</div>
-</section>
-<main class="relative">
-<!-- Story Section -->
-<section class="py-24 px-6 lg:px-20 bg-background-light dark:bg-background-dark" id="story">
-<div class="max-w-5xl mx-auto">
-<div class="text-center mb-20">
-<h2 class="text-4xl font-black text-forest-deep dark:text-white mb-4">Our Journey Together</h2>
-<p class="text-forest-moss dark:text-gray-400 max-w-xl mx-auto text-lg">From city lights to forest heights, here is how our paths became one.</p>
-</div>
-<div class="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-forest-moss/30 before:to-transparent">
-<!-- Item 1 -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-<span class="material-symbols-outlined text-xl">landscape</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
-<time class="font-bold text-primary text-sm uppercase tracking-wider">May 2019</time>
-<div class="text-xl font-bold text-forest-earth dark:text-white mt-1">The First Hike</div>
-<p class="text-forest-moss dark:text-gray-300 mt-2">Where it all began - under the vast blue sky of the Blue Ridge Mountains. We found more than just a trail; we found a companion for life.</p>
-</div>
-</div>
-<!-- Item 2 -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-<span class="material-symbols-outlined text-xl">favorite</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
-<time class="font-bold text-primary text-sm uppercase tracking-wider">December 2022</time>
-<div class="text-xl font-bold text-forest-earth dark:text-white mt-1">The Proposal Under the Pines</div>
-<p class="text-forest-moss dark:text-gray-300 mt-2">Surrounded by a snowy aspen grove, Elias asked the most important question of our lives. The silence of the winter forest was the perfect witness.</p>
-</div>
-</div>
-<!-- Item 3 -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-<span class="material-symbols-outlined text-xl">church</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
-<time class="font-bold text-primary text-sm uppercase tracking-wider">October 2024</time>
-<div class="text-xl font-bold text-forest-earth dark:text-white mt-1">Our Forever After</div>
-<p class="text-forest-moss dark:text-gray-300 mt-2">Returning to our roots in the Redwood Forest to pledge our lives to one another. We can't wait to share this magic with you.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Gallery Section -->
-<section class="py-24 px-6 lg:px-20 bg-forest-deep text-white" id="gallery">
-<div class="max-w-7xl mx-auto">
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-<div>
-<h2 class="text-4xl font-black mb-4">Captured Moments</h2>
-<p class="text-white/60 text-lg">A glimpse into our world through the lens.</p>
-</div>
-<div class="flex gap-4">
-<button class="px-6 py-2 rounded-full border border-white/20 hover:bg-white/10 transition-all text-sm font-bold">Engagement</button>
-<button class="px-6 py-2 rounded-full border border-white/20 hover:bg-white/10 transition-all text-sm font-bold">Travels</button>
-</div>
-</div>
-<div id="wedding-gallery" class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]>
-<div id="wedding-gallery" class="md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden group relative" data-gallery-item="true">
-<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Couple walking through redwood forest at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMtuPx6hXlc8KPG64GcfhG24e2pOrp_ZIW6qd8TSeBaI8cKfG8Juo4V3LWWuhTsMsGmxWWZuAMM8KBbd_Zd_m7_lbkev3cinS6hb_LgGBV9HLp8WgRG4twkWiYI1MXtbrYGXiceUcL8rqWFIGTMyp6zHeMsWVCqcnhthKvy4zI5kNuUzghZ-5Wc2y9rBSnAAtGZB2JTv9ib5K4uPYlwZXVKf_IDSEmpLDXIgdLLI7dN0-vKe5Hybtq3JevrVxanPhaSc4WvE65MjdS"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-<p class="font-bold">Golden Hour Stroll</p>
-</div>
-</div>
-<div class="md:col-span-1 rounded-2xl overflow-hidden group relative">
-<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close up of engagement ring on a mossy branch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYXaidpffiEA6vsei2SEoUHMrokFXIZE0vn64ieQV-fQVWG7WBYLVkAsbfDse65R0KkvgvF6jISzRbF4OYfpUKrGcTLtj0o_TnSJtdVwHcrsiBtK1WzhlYFAdHSn-gXL98hB_5AskodIo1zmp4hMKx39uT3OjOMdRqbcHbba26Ej8dw9sdLnRv77pNf1UU9JWK1Hthi7SayCZdtjoWQfR6khvPsgja-604Q4GLrLKsmuhUX78AdOPbt08oidMsz29bmPCzJjkuCZwZ"/>
-</div>
-<div class="md:col-span-1 md:row-span-2 rounded-2xl overflow-hidden group relative">
-<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Couple standing in a snowy aspen grove" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaQ1v5v4zV5dKECAh-TBmcSN7BRKLisrz-OmsDbaaZcnRaV8kVcizTpjLFW9tVWxDh0Y7NoSCyAJGWMiYigQvSn4JTYuBUlLDG62vkB4YbgENYguxGuxDqcGqJEJUPcm9E-KL6RHD5CeOV5FIj0gl5VrwY4KeDpQ-YL4caGI_950DR0LrKtYoDjq6MerJbqlTS-qnsRCz4tu-_mp9HLiEUfbED_oCd1T8bm6LZMbWRclAlUuvT5TInee9Z3bxQrfRJB-2euHLFN-Su"/>
-</div>
-<div class="md:col-span-1 rounded-2xl overflow-hidden group relative">
-<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Wedding table setting with forest greens" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbXoBEIvvEITMCnK433BGx4UXfmKmohpUl0PqrkYeUyWinSVREDJnKv9cwhvm1oGUYlruR67q0TYyu35h3XpOjoTqIhCVvtSe9VcShjgivuxBjgloY995NNIpMNWJmdzBHoAKwZe_v_E_yMukijMWfzYI3YNpg8TpcZq82raZQzUicJb9KUM373c6e2eViSTCC4_FZ852BNU0RI8sXLevmIcZCNqQae-y7rFOkCcSRTonHXgiPQlTXAvcesZ8dYy-XQJ7Pjkt6I8qr"/>
-</div>
-<div class="md:col-span-2 rounded-2xl overflow-hidden group relative">
-<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Mountain lake landscape reflecting forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQv0iOaubU8-kTqkc6kJknVoRXUGcI4GdWSM2xC9qWME-gYRbs-VCXv8eiESpMgzU9vTQe5U8pkn536UxgrggH154QsE-Rk536pxw6xI-SPECwXJALLZeca5-q5Yb9-0v9n2wzU2wBy6vOHIb_jccQNW0hGlp946fFVzqlltBgPi3mdi1fJfmj650u51BQn6ovNJ1Wl4P9OMFZW2IxjHyug7lHQ8H3DM-7xbht5385-DryWOBHuxI5bSyTxd63dY1erXe3TU0njGOu"/>
-</div>
-</div>
-</div>
-</section>
-<!-- Wishes Wall Section -->
-<section class="py-24 px-6 lg:px-20 bg-background-light dark:bg-background-dark relative" id="wishes">
-<div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16">
-<div class="lg:w-1/3">
-<div class="sticky top-32">
-<h2 class="text-4xl font-black text-forest-deep dark:text-white mb-6">Wishes Wall</h2>
-<p class="text-forest-moss dark:text-gray-400 mb-8 text-lg">Leave a digital leaf on our wall. Share your wisdom, love, or favorite memory with us.</p>
-<form class="space-y-4 bg-white dark:bg-forest-deep/10 p-8 rounded-2xl shadow-xl border border-forest-moss/10">
-<div>
-<label class="block text-sm font-bold text-forest-earth dark:text-gray-300 mb-2">Your Name</label>
-<input class="w-full rounded-lg border-gray-200 dark:border-forest-moss/20 dark:bg-forest-deep/20 dark:text-white focus:ring-primary focus:border-primary" placeholder="Enter your name" type="text"/>
-</div>
-<div>
-<label class="block text-sm font-bold text-forest-earth dark:text-gray-300 mb-2">Your Wish</label>
-<textarea class="w-full rounded-lg border-gray-200 dark:border-forest-moss/20 dark:bg-forest-deep/20 dark:text-white focus:ring-primary focus:border-primary" placeholder="Write something beautiful..." rows="4"></textarea>
-</div>
-<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20" type="submit">
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/50">
+            <span class="material-symbols-outlined text-4xl font-thin">expand_more</span>
+        </div>
+    </section>
+    <main class="relative">
+        <!-- Story Section -->
+        <section class="py-24 px-6 lg:px-20 bg-background-light dark:bg-background-dark" id="story">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl font-black text-forest-deep dark:text-white mb-4">{{Story_Title}}</h2>
+                    <p class="text-forest-moss dark:text-gray-400 max-w-xl mx-auto text-lg">{{Story_Body}}</p>
+                </div>
+                <div id="wedding-timeline"
+                    class="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-forest-moss/30 before:to-transparent">
+                    <!-- Item 1 -->
+                    <div data-timeline-item="true"
+                        class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div
+                            class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                            <span class="material-symbols-outlined text-xl">landscape</span>
+                        </div>
+                        <div
+                            class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
+                            <time
+                                class="font-bold text-primary text-sm uppercase tracking-wider">{{Story_Event1_Date}}</time>
+                            <div class="text-xl font-bold text-forest-earth dark:text-white mt-1">{{Story_Event1_Title}}
+                            </div>
+                            <p class="text-forest-moss dark:text-gray-300 mt-2">{{Story_Event1_Desc}}</p>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div data-timeline-item="true"
+                        class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div
+                            class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                            <span class="material-symbols-outlined text-xl">favorite</span>
+                        </div>
+                        <div
+                            class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
+                            <time
+                                class="font-bold text-primary text-sm uppercase tracking-wider">{{Story_Event2_Date}}</time>
+                            <div class="text-xl font-bold text-forest-earth dark:text-white mt-1">{{Story_Event2_Title}}
+                            </div>
+                            <p class="text-forest-moss dark:text-gray-300 mt-2">{{Story_Event2_Desc}}</p>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div data-timeline-item="true"
+                        class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div
+                            class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-forest-moss text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                            <span class="material-symbols-outlined text-xl">church</span>
+                        </div>
+                        <div
+                            class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-forest-deep/20 shadow-sm border border-forest-moss/10 transition-all hover:shadow-md">
+                            <time
+                                class="font-bold text-primary text-sm uppercase tracking-wider">{{Story_Event3_Date}}</time>
+                            <div class="text-xl font-bold text-forest-earth dark:text-white mt-1">{{Story_Event3_Title}}
+                            </div>
+                            <p class="text-forest-moss dark:text-gray-300 mt-2">{{Story_Event3_Desc}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Gallery Section -->
+        <section class="py-24 px-6 lg:px-20 bg-forest-deep text-white" id="gallery">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                    <div>
+                        <h2 class="text-4xl font-black mb-4">Captured Moments</h2>
+                        <p class="text-white/60 text-lg">A glimpse into our world through the lens.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button
+                            class="px-6 py-2 rounded-full border border-white/20 hover:bg-white/10 transition-all text-sm font-bold">Engagement</button>
+                        <button
+                            class="px-6 py-2 rounded-full border border-white/20 hover:bg-white/10 transition-all text-sm font-bold">Travels</button>
+                    </div>
+                </div>
+                <div id="wedding-gallery" class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]">
+                    <div data-gallery-item="true"
+                        class="md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden group relative">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            data-alt="Couple walking through redwood forest at sunset"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMtuPx6hXlc8KPG64GcfhG24e2pOrp_ZIW6qd8TSeBaI8cKfG8Juo4V3LWWuhTsMsGmxWWZuAMM8KBbd_Zd_m7_lbkev3cinS6hb_LgGBV9HLp8WgRG4twkWiYI1MXtbrYGXiceUcL8rqWFIGTMyp6zHeMsWVCqcnhthKvy4zI5kNuUzghZ-5Wc2y9rBSnAAtGZB2JTv9ib5K4uPYlwZXVKf_IDSEmpLDXIgdLLI7dN0-vKe5Hybtq3JevrVxanPhaSc4WvE65MjdS" />
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                            <p class="font-bold">Golden Hour Stroll</p>
+                        </div>
+                    </div>
+                    <div data-gallery-item="true" class="md:col-span-1 rounded-2xl overflow-hidden group relative">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            data-alt="Close up of engagement ring on a mossy branch"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYXaidpffiEA6vsei2SEoUHMrokFXIZE0vn64ieQV-fQVWG7WBYLVkAsbfDse65R0KkvgvF6jISzRbF4OYfpUKrGcTLtj0o_TnSJtdVwHcrsiBtK1WzhlYFAdHSn-gXL98hB_5AskodIo1zmp4hMKx39uT3OjOMdRqbcHbba26Ej8dw9sdLnRv77pNf1UU9JWK1Hthi7SayCZdtjoWQfR6khvPsgja-604Q4GLrLKsmuhUX78AdOPbt08oidMsz29bmPCzJjkuCZwZ" />
+                    </div>
+                    <div data-gallery-item="true"
+                        class="md:col-span-1 md:row-span-2 rounded-2xl overflow-hidden group relative">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            data-alt="Couple standing in a snowy aspen grove"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaQ1v5v4zV5dKECAh-TBmcSN7BRKLisrz-OmsDbaaZcnRaV8kVcizTpjLFW9tVWxDh0Y7NoSCyAJGWMiYigQvSn4JTYuBUlLDG62vkB4YbgENYguxGuxDqcGqJEJUPcm9E-KL6RHD5CeOV5FIj0gl5VrwY4KeDpQ-YL4caGI_950DR0LrKtYoDjq6MerJbqlTS-qnsRCz4tu-_mp9HLiEUfbED_oCd1T8bm6LZMbWRclAlUuvT5TInee9Z3bxQrfRJB-2euHLFN-Su" />
+                    </div>
+                    <div data-gallery-item="true" class="md:col-span-1 rounded-2xl overflow-hidden group relative">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            data-alt="Wedding table setting with forest greens"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbXoBEIvvEITMCnK433BGx4UXfmKmohpUl0PqrkYeUyWinSVREDJnKv9cwhvm1oGUYlruR67q0TYyu35h3XpOjoTqIhCVvtSe9VcShjgivuxBjgloY995NNIpMNWJmdzBHoAKwZe_v_E_yMukijMWfzYI3YNpg8TpcZq82raZQzUicJb9KUM373c6e2eViSTCC4_FZ852BNU0RI8sXLevmIcZCNqQae-y7rFOkCcSRTonHXgiPQlTXAvcesZ8dYy-XQJ7Pjkt6I8qr" />
+                    </div>
+                    <div data-gallery-item="true" class="md:col-span-2 rounded-2xl overflow-hidden group relative">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            data-alt="Mountain lake landscape reflecting forest"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQv0iOaubU8-kTqkc6kJknVoRXUGcI4GdWSM2xC9qWME-gYRbs-VCXv8eiESpMgzU9vTQe5U8pkn536UxgrggH154QsE-Rk536pxw6xI-SPECwXJALLZeca5-q5Yb9-0v9n2wzU2wBy6vOHIb_jccQNW0hGlp946fFVzqlltBgPi3mdi1fJfmj650u51BQn6ovNJ1Wl4P9OMFZW2IxjHyug7lHQ8H3DM-7xbht5385-DryWOBHuxI5bSyTxd63dY1erXe3TU0njGOu" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Wishes Wall Section -->
+        <section class="py-24 px-6 lg:px-20 bg-background-light dark:bg-background-dark relative" id="wishes">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16">
+                <div class="lg:w-1/3">
+                    <div class="sticky top-32">
+                        <h2 class="text-4xl font-black text-forest-deep dark:text-white mb-6">Wishes Wall</h2>
+                        <p class="text-forest-moss dark:text-gray-400 mb-8 text-lg">Leave a digital leaf on our wall.
+                            Share your wisdom, love, or favorite memory with us.</p>
+                        <form
+                            class="space-y-4 bg-white dark:bg-forest-deep/10 p-8 rounded-2xl shadow-xl border border-forest-moss/10">
+                            <div>
+                                <label class="block text-sm font-bold text-forest-earth dark:text-gray-300 mb-2">Your
+                                    Name</label>
+                                <input
+                                    class="w-full rounded-lg border-gray-200 dark:border-forest-moss/20 dark:bg-forest-deep/20 dark:text-white focus:ring-primary focus:border-primary"
+                                    placeholder="Enter your name" type="text" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-forest-earth dark:text-gray-300 mb-2">Your
+                                    Wish</label>
+                                <textarea
+                                    class="w-full rounded-lg border-gray-200 dark:border-forest-moss/20 dark:bg-forest-deep/20 dark:text-white focus:ring-primary focus:border-primary"
+                                    placeholder="Write something beautiful..." rows="4"></textarea>
+                            </div>
+                            <button
+                                class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20"
+                                type="submit">
                                 Post Your Wish
                             </button>
-</form>
-</div>
-</div>
-<div class="lg:w-2/3">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<!-- Wish Card 1 -->
-<div class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
-<span class="material-symbols-outlined text-primary mb-4">format_quote</span>
-<p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"May your love grow as strong and deep as the ancient redwoods. So happy for both of you!"</p>
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">JD</div>
-<div>
-<h4 class="font-bold text-forest-deep dark:text-white">Jane &amp; David</h4>
-<p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">Aunt &amp; Uncle</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 2 -->
-<div class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
-<span class="material-symbols-outlined text-primary mb-4">format_quote</span>
-<p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"To the most adventurous couple I know. Can't wait to celebrate in the woods with you guys!"</p>
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">MT</div>
-<div>
-<h4 class="font-bold text-forest-deep dark:text-white">Marcus T.</h4>
-<p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">Best Friend</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 3 -->
-<div class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
-<span class="material-symbols-outlined text-primary mb-4">format_quote</span>
-<p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"I still remember the day Sarah told me about 'the hiker guy' she met. Look at you now! Love you both."</p>
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">EL</div>
-<div>
-<h4 class="font-bold text-forest-deep dark:text-white">Elena Lewis</h4>
-<p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">Maid of Honor</p>
-</div>
-</div>
-</div>
-<!-- Wish Card 4 -->
-<div class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
-<span class="material-symbols-outlined text-primary mb-4">format_quote</span>
-<p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"Wishing you endless happiness and many more summits together."</p>
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">S</div>
-<div>
-<h4 class="font-bold text-forest-deep dark:text-white">The Smiths</h4>
-<p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">Neighbors</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Venue Section -->
-<section class="py-24 px-6 lg:px-20 bg-forest-earth text-white" id="venue">
-<div class="max-w-7xl mx-auto">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-<div>
-<h2 class="text-4xl font-black mb-8">The Venue</h2>
-<div class="space-y-8">
-<div class="flex gap-6">
-<div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary">location_on</span>
-</div>
-<div>
-<h4 class="text-xl font-bold mb-1">Redwood National Park</h4>
-<p class="text-white/60">Elk Meadow, Newton B. Drury Scenic Pkwy<br/>Orick, CA 95555</p>
-</div>
-</div>
-<div class="flex gap-6">
-<div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary">schedule</span>
-</div>
-<div>
-<h4 class="text-xl font-bold mb-1">The Ceremony</h4>
-<p class="text-white/60">{{WeddingDate}} at 4:30 PM<br/>Reception to follow at The Grove Lodge</p>
-</div>
-</div>
-<button class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-xl shadow-primary/30 flex items-center gap-3">
-<span class="material-symbols-outlined">directions</span>
+                        </form>
+                    </div>
+                </div>
+                <div class="lg:w-2/3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Wish Card 1 -->
+                        <div
+                            class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
+                            <span class="material-symbols-outlined text-primary mb-4">format_quote</span>
+                            <p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"May your love grow as
+                                strong and deep as the ancient redwoods. So happy for both of you!"</p>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">
+                                    JD</div>
+                                <div>
+                                    <h4 class="font-bold text-forest-deep dark:text-white">Jane &amp; David</h4>
+                                    <p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">
+                                        Aunt &amp; Uncle</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wish Card 2 -->
+                        <div
+                            class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
+                            <span class="material-symbols-outlined text-primary mb-4">format_quote</span>
+                            <p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"To the most adventurous
+                                couple I know. Can't wait to celebrate in the woods with you guys!"</p>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">
+                                    MT</div>
+                                <div>
+                                    <h4 class="font-bold text-forest-deep dark:text-white">Marcus T.</h4>
+                                    <p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">
+                                        Best Friend</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wish Card 3 -->
+                        <div
+                            class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
+                            <span class="material-symbols-outlined text-primary mb-4">format_quote</span>
+                            <p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"I still remember the
+                                day {{BrideName}} told me about 'the hiker guy' she met. Look at you now! Love you
+                                both."</p>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">
+                                    EL</div>
+                                <div>
+                                    <h4 class="font-bold text-forest-deep dark:text-white">Elena Lewis</h4>
+                                    <p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">
+                                        Maid of Honor</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wish Card 4 -->
+                        <div
+                            class="p-8 rounded-2xl glass-moss border border-forest-moss/20 bg-white/50 dark:bg-forest-deep/30">
+                            <span class="material-symbols-outlined text-primary mb-4">format_quote</span>
+                            <p class="text-forest-earth dark:text-gray-200 text-lg italic mb-6">"Wishing you endless
+                                happiness and many more summits together."</p>
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-forest-moss/20 flex items-center justify-center font-bold text-forest-deep dark:text-white">
+                                    S</div>
+                                <div>
+                                    <h4 class="font-bold text-forest-deep dark:text-white">The Smiths</h4>
+                                    <p class="text-xs text-forest-moss/60 dark:text-gray-400 uppercase tracking-widest">
+                                        Neighbors</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Venue Section -->
+        <section class="py-24 px-6 lg:px-20 bg-forest-earth text-white" id="venue">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-4xl font-black mb-8">The Venue</h2>
+                        <div class="space-y-8">
+                            <div class="flex gap-6">
+                                <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-primary">location_on</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold mb-1">{{Venue}}</h4>
+                                    <p class="text-white/60">{{Location}}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6">
+                                <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-primary">schedule</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold mb-1">The Ceremony</h4>
+                                    <p class="text-white/60">{{WeddingDate}} at 4:30 PM<br />Reception to follow at The
+                                        Grove Lodge</p>
+                                </div>
+                            </div>
+                            <button
+                                class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-xl shadow-primary/30 flex items-center gap-3">
+                                <span class="material-symbols-outlined">directions</span>
                                 Get Directions
                             </button>
-</div>
-</div>
-<div class="h-[400px] rounded-3xl overflow-hidden shadow-2xl relative border-4 border-white/5">
-<img class="w-full h-full object-cover grayscale-[20%] sepia-[10%] opacity-80" data-alt="Aerial view of redwood forest winding road" data-location="Redwood National Park, CA" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbo3Ya61FxRCFAO-doIIdrKZ1_1dx9WQ9kXDtndkZQzGAje8CXpfdlRhVD2zzTUWcBUsdAdZoneJKWI_F1rvASTMPcWSCcE9_QZkytMKm3NQ1CtweBbVMiamGflrhjsTZiAdWgjkiLcZbpwt7_POKxiaX9lfY0yytORbwSTp7Kml_0cMkbeOutmIZtOC8TGm8xnFBgtobiqExPEdSV_EQjoxzfkufwdjq2KSHuhVTGMBQggx807W_RfQgu1LFvXs055k7R8bPAMpSj"/>
-<div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-forest-deep py-20 px-6 lg:px-20 border-t border-white/5 text-center">
-<div class="max-w-7xl mx-auto">
-<div class="flex items-center justify-center gap-3 mb-8">
-<span class="material-symbols-outlined text-primary text-3xl">forest</span>
-<h2 class="text-white text-2xl font-black tracking-tight">WeddingWeb</h2>
-</div>
-<p class="text-white/40 max-w-lg mx-auto mb-10 text-sm leading-relaxed">
-                Thank you for being part of our story. We can't wait to welcome you to our enchanted forest wedding. Please remember to dress warmly for the mountain evening.
-            </p>
-<div class="flex justify-center gap-6 mb-12">
-<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white" href="#">
-<span class="material-symbols-outlined text-xl">share</span>
-</a>
-<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white" href="#">
-<span class="material-symbols-outlined text-xl">mail</span>
-</a>
-<a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white" href="#">
-<span class="material-symbols-outlined text-xl">map</span>
-</a>
-</div>
-<div class="text-white/20 text-xs font-bold uppercase tracking-[0.2em]">
-                © 2024 Elias &amp; Sarah • Designed with WeddingWeb
+                        </div>
+                    </div>
+                    <div id="wedding-map"
+                        class="h-[400px] rounded-3xl overflow-hidden shadow-2xl relative border-4 border-white/5">
+                        <img class="w-full h-full object-cover grayscale-[20%] sepia-[10%] opacity-80"
+                            data-alt="Aerial view of redwood forest winding road"
+                            data-location="Redwood National Park, CA"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbo3Ya61FxRCFAO-doIIdrKZ1_1dx9WQ9kXDtndkZQzGAje8CXpfdlRhVD2zzTUWcBUsdAdZoneJKWI_F1rvASTMPcWSCcE9_QZkytMKm3NQ1CtweBbVMiamGflrhjsTZiAdWgjkiLcZbpwt7_POKxiaX9lfY0yytORbwSTp7Kml_0cMkbeOutmIZtOC8TGm8xnFBgtobiqExPEdSV_EQjoxzfkufwdjq2KSHuhVTGMBQggx807W_RfQgu1LFvXs055k7R8bPAMpSj" />
+                        <div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
+                    </div>
+                </div>
             </div>
-</div>
-</footer>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-forest-deep py-20 px-6 lg:px-20 border-t border-white/5 text-center">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-center gap-3 mb-8">
+                <span class="material-symbols-outlined text-primary text-3xl">forest</span>
+                <h2 class="text-white text-2xl font-black tracking-tight">{{GroomInitial}} &amp; {{BrideInitial}}</h2>
+            </div>
+            <p class="text-white/40 max-w-lg mx-auto mb-10 text-sm leading-relaxed">
+                Thank you for being part of our story. We can't wait to welcome you to our enchanted forest wedding.
+                Please remember to dress warmly for the mountain evening.
+            </p>
+            <div class="flex justify-center gap-6 mb-12">
+                <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white"
+                    href="#">
+                    <span class="material-symbols-outlined text-xl">share</span>
+                </a>
+                <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white"
+                    href="#">
+                    <span class="material-symbols-outlined text-xl">mail</span>
+                </a>
+                <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-colors text-white"
+                    href="#">
+                    <span class="material-symbols-outlined text-xl">map</span>
+                </a>
+            </div>
+            <div class="text-white/20 text-xs font-bold uppercase tracking-[0.2em]">
+                © {{Year}} {{GroomFirst}} &amp; {{BrideFirst}} • Designed with WeddingWeb
+            </div>
+        </div>
+    </footer>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

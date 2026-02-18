@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
-import { LandingToolbar } from "@/components/LandingToolbar";
+import { WeddingWebHeader } from "@/components/WeddingWebHeader";
+
 import {
     BookOpen,
     MousePointer2,
@@ -81,8 +81,7 @@ const Guide = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50">
-            <CompanyNavbar />
-            <LandingToolbar />
+            <WeddingWebHeader />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden bg-white">

@@ -58,6 +58,11 @@ import CompanyContact from "./pages/company/Contact";
 import CompanyLegal from "./pages/company/Legal";
 import CompanyGuide from "./pages/company/Guide";
 import CompanyBookings from "./pages/company/Bookings";
+import CompanyBlog from "./pages/company/Blog";
+import CompanyCareers from "./pages/company/Careers";
+import CompanyPress from "./pages/company/Press";
+import CompanyHelpCenter from "./pages/company/HelpCenter";
+import CompanyCookieSettings from "./pages/company/CookieSettings";
 import CompanyPayments from "./pages/company/Payments";
 import CompanySettings from "./pages/company/Settings";
 import ClientGallery from "./pages/company/ClientGallery";
@@ -130,8 +135,7 @@ const App = () => {
 
   // Check if on company or photographer pages (hide music player)
   const isExcludedPage = useMemo(() => {
-    return location.pathname === '/' ||
-      location.pathname.startsWith('/company') ||
+    return location.pathname.startsWith('/company') ||
       location.pathname.startsWith('/client') ||
       location.pathname.startsWith('/photographer') ||
       location.pathname.startsWith('/admin') ||
@@ -245,6 +249,11 @@ const App = () => {
                 <Route path="/company/payments" element={<AuthGuard><CompanyPayments /></AuthGuard>} />
                 <Route path="/company/settings" element={<AuthGuard><CompanySettings /></AuthGuard>} />
                 <Route path="/company/guide" element={<CompanyGuide />} />
+                <Route path="/company/blog" element={<CompanyBlog />} />
+                <Route path="/company/careers" element={<CompanyCareers />} />
+                <Route path="/company/press" element={<CompanyPress />} />
+                <Route path="/company/help-center" element={<CompanyHelpCenter />} />
+                <Route path="/company/cookie-settings" element={<CompanyCookieSettings />} />
                 <Route path="/company/scroll" element={<CompanyScrollDemo />} />
 
                 {/* Company Route Redirects - Short URLs */}

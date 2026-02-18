@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>The Loft Wedding | Urban Minimalism</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Loft Wedding | Urban Minimalism</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -33,280 +40,346 @@
             },
         }
     </script>
-<style>
-        body { font-family: 'Manrope', sans-serif; }
-        .industrial-border { border-color: rgba(17, 19, 24, 0.1); }
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .industrial-border {
+            border-color: rgba(17, 19, 24, 0.1);
+        }
+
         .grain-bg {
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.03;
         }
     </style>
 </head>
+
 <body class="bg-background-light text-onyx font-display antialiased">
-<div class="fixed inset-0 pointer-events-none grain-bg z-50"></div>
-<!-- Navigation -->
-<nav class="sticky top-0 z-40 w-full bg-background-light/80 backdrop-blur-md border-b industrial-border px-6 md:px-20 py-4">
-<div class="max-w-7xl mx-auto flex items-center justify-between">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary scale-125">apartment</span>
-<span class="text-xl font-extrabold tracking-tighter uppercase">The Loft <span class="text-primary">.</span></span>
-</div>
-<div class="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[0.2em] font-bold">
-<a class="hover:text-primary transition-colors" href="#story">Our Story</a>
-<a class="hover:text-primary transition-colors" href="#details">Details</a>
-<a class="hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
-<a class="hover:text-primary transition-colors" href="#registry">Registry</a>
-</div>
-<button class="bg-onyx text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-primary transition-all">
+    <div class="fixed inset-0 pointer-events-none grain-bg z-50"></div>
+    <!-- Navigation -->
+    <nav
+        class="sticky top-0 z-40 w-full bg-background-light/80 backdrop-blur-md border-b industrial-border px-6 md:px-20 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary scale-125">apartment</span>
+                <span class="text-xl font-extrabold tracking-tighter uppercase">{{GroomInitial}}+{{BrideInitial}} <span
+                        class="text-primary">.</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[0.2em] font-bold">
+                <a class="hover:text-primary transition-colors" href="#story">Our Story</a>
+                <a class="hover:text-primary transition-colors" href="#details">Details</a>
+                <a class="hover:text-primary transition-colors" href="#wishes">Wishes Wall</a>
+                <a class="hover:text-primary transition-colors" href="#registry">Registry</a>
+            </div>
+            <button
+                class="bg-onyx text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-primary transition-all">
                 RSVP
             </button>
-</div>
-</nav>
-<!-- Hero Section -->
-<section class="relative h-[90vh] flex items-center justify-center overflow-hidden px-6">
-<div class="absolute inset-0 z-0">
-<div class="absolute inset-0 bg-gradient-to-b from-transparent to-background-light/90 z-10"></div>
-<img alt="Urban Loft Interior" class="w-full h-full object-cover grayscale brightness-75" data-alt="Monochrome urban loft wedding venue interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDZnh0Mqk6T46zM80I07u31DBFjFZAmTWP-6ILyJrmr1BgajYBjJwMYZHk3GnqLn6WG0fj1kwi5zUMxfrb1Md0wBAIBrN0SmiqD-qoZDThqwhPVeuqQEt_2AWJo0xYqEMRVV93YPuvjKCuSeVGh9qeR8epGEniDQzpWVOoX1qL-jrI7SFn-_KetbNR0bDWtNw_p2bno7mc3Yyg6u5bI5BrrpVW50XJj6O8ju5RwwYPKgQ8H9Cx5jsouNWf3YjKKB16yJwKF-iPMCyA"/>
-</div>
-<div class="relative z-20 text-center max-w-4xl">
-<p class="text-primary font-bold tracking-[0.4em] uppercase text-xs mb-6">Saturday • {{WeddingDate}}</p>
-<h1 class="text-6xl md:text-9xl font-extrabold tracking-tighter leading-none mb-8 uppercase italic">
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="relative h-[90vh] flex items-center justify-center overflow-hidden px-6">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-background-light/90 z-10"></div>
+            <img alt="Urban Loft Interior" class="w-full h-full object-cover grayscale brightness-75 hero-bg"
+                data-hero-bg="true" data-alt="Monochrome urban loft wedding venue interior"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDZnh0Mqk6T46zM80I07u31DBFjFZAmTWP-6ILyJrmr1BgajYBjJwMYZHk3GnqLn6WG0fj1kwi5zUMxfrb1Md0wBAIBrN0SmiqD-qoZDThqwhPVeuqQEt_2AWJo0xYqEMRVV93YPuvjKCuSeVGh9qeR8epGEniDQzpWVOoX1qL-jrI7SFn-_KetbNR0bDWtNw_p2bno7mc3Yyg6u5bI5BrrpVW50XJj6O8ju5RwwYPKgQ8H9Cx5jsouNWf3YjKKB16yJwKF-iPMCyA" />
+        </div>
+        <div class="relative z-20 text-center max-w-4xl">
+            <p class="text-primary font-bold tracking-[0.4em] uppercase text-xs mb-6">Saturday • {{WeddingDate}}</p>
+            <h1 class="text-6xl md:text-9xl font-extrabold tracking-tighter leading-none mb-8 uppercase italic">
                 {{GroomName}} <span class="not-italic text-primary">&amp;</span> {{BrideName}}
             </h1>
-<div class="flex flex-col md:flex-row items-center justify-center gap-4">
-<div class="h-[1px] w-12 bg-onyx hidden md:block"></div>
-<p class="text-sm font-medium tracking-[0.2em] uppercase">{{Venue}} • </p>
-<div class="h-[1px] w-12 bg-onyx hidden md:block"></div>
-</div>
-<div class="mt-12">
-<button class="bg-primary text-white px-10 py-5 rounded-none font-black text-sm uppercase tracking-[0.3em] hover:bg-onyx transition-all transform hover:-translate-y-1">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <div class="h-[1px] w-12 bg-onyx hidden md:block"></div>
+                <p class="text-sm font-medium tracking-[0.2em] uppercase">{{Venue}} • </p>
+                <div class="h-[1px] w-12 bg-onyx hidden md:block"></div>
+            </div>
+            <div class="mt-12">
+                <button
+                    class="bg-primary text-white px-10 py-5 rounded-none font-black text-sm uppercase tracking-[0.3em] hover:bg-onyx transition-all transform hover:-translate-y-1">
                     Join the celebration
                 </button>
-</div>
-</div>
-</section>
-<!-- Our Journey -->
-<section class="py-24 px-6 max-w-7xl mx-auto" id="story">
-<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-6">
-<div class="max-w-xl">
-<h2 class="text-5xl font-extrabold tracking-tighter uppercase leading-none mb-6">Our Journey <span class="text-primary">/</span></h2>
-<p class="text-onyx/60 text-lg leading-relaxed">From a chance meeting at a vinyl shop in Bushwick to building a life in the heart of the city. This is our industrial love story.</p>
-</div>
-<span class="text-primary font-black text-8xl opacity-10 leading-none select-none hidden md:block">2019-2024</span>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-<div class="absolute top-1/2 left-0 w-full h-[1px] bg-industrial-gray -z-10 hidden md:block"></div>
-<!-- Step 1 -->
-<div class="flex flex-col gap-6 group">
-<div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
-<img alt="The Encounter" class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Two people looking at vinyl records" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_tk4pRlIVtRcYmthWchpUNu1k1kUjOP9Vq1UN4CD6dF7NAJgfy9zJ20t7zw3-oYhgL4lGgttBvLTlCr0dYhnNdLc73xiBmSpP0rR20RQ92YoKFC568CUo085n7MmzAui9D3fNwO-rYUujVVqOCJHjstnH78acHBywU-SLC58oGSKhKlBBoUuq5VwsMLjROQxLii7dtqM0gwfivf9Wtu79YLqCt5hc9TfNAXAFJkQJO1BpLFklvPqLeXhY5yU74FfIESR2gf18eRNb"/>
-<div class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">2019</div>
-</div>
-<div>
-<h3 class="text-xl font-bold uppercase tracking-tight mb-2">The First Spin</h3>
-<p class="text-sm text-onyx/70 leading-relaxed">It started with a shared discovery of a rare Coltrane pressing. We haven't stopped listening since.</p>
-</div>
-</div>
-<!-- Step 2 -->
-<div class="flex flex-col gap-6 group md:translate-y-12">
-<div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
-<img alt="The Proposal" class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Rooftop skyline in Brooklyn at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp6feRF8MfsSbvjTfLIp4vqhr5AOLleFExBHZbaWdbG9ze20ES1eCOZgNL5PHFXz8zXExYdgMoBNgtvOapFbz5mL0hCMT8fFOY2rFvnjnzf5hRFTJwK_KZGWMuV466L-IYe0Z0ChpMul0AC4NRIutCUp2Yoo-dpiovkEK2wq5SHRZ5I_uYtt-vJDnBVKsEktgy8Ak-KAKIHUB4BK6vLYAl40JM7xMcNDyJ0U0BORvMYERgBmHy72CcustndIGe3WSQt2YfM53yhC-F"/>
-<div class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">2022</div>
-</div>
-<div>
-<h3 class="text-xl font-bold uppercase tracking-tight mb-2">Skyline Promise</h3>
-<p class="text-sm text-onyx/70 leading-relaxed">Against the iron-grid backdrop of the Brooklyn Bridge, we decided on forever under the city lights.</p>
-</div>
-</div>
-<!-- Step 3 -->
-<div class="flex flex-col gap-6 group">
-<div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
-<img alt="The Wedding" class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Architecture with stark shadows and light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRSytlVVNhzUIuzjqQML_iUwi-VpBA4QzmlwxW6xa0xY8DVpEokSCSBvkIVqX0pPkjyZzpfoXaBvAARuJUF1x2ZvKtDmdOmp4XTbJ9Fo63X9JWyVPMZ4_DA7Eg40h_9_EAzmgFtai_CF63RLfHVhEf8zqboBzromtbujRf624oJMPdPd7KZDjiZnA3OKBZtnzpvpWY9ldaflc_cnjIABO6Cw40-LrZx9yfk-zwEzB9oodzjurNWu3v2yrXx-VaV9p_fSR6cDEF0iVo"/>
-<div class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">2024</div>
-</div>
-<div>
-<h3 class="text-xl font-bold uppercase tracking-tight mb-2">Building Home</h3>
-<p class="text-sm text-onyx/70 leading-relaxed">Now we merge our lives in the space that reflects us most: raw, open, and filled with light.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Event Details -->
-<section class="bg-onyx text-white py-24 px-6" id="details">
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
-<div>
-<h2 class="text-5xl font-extrabold tracking-tighter uppercase mb-12">The Logistics <span class="text-primary">.</span></h2>
-<div class="space-y-12">
-<div class="flex gap-6 items-start border-l-2 border-primary pl-8 py-2">
-<span class="material-symbols-outlined text-primary text-3xl">schedule</span>
-<div>
-<h4 class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-2">When</h4>
-<p class="text-xl font-medium">Saturday, {{WeddingDate}}</p>
-<p class="text-sm text-white/50 mt-1">Ceremony at 5:30 PM • Cocktails &amp; Party to follow</p>
-</div>
-</div>
-<div class="flex gap-6 items-start border-l-2 border-white/10 pl-8 py-2">
-<span class="material-symbols-outlined text-white/50 text-3xl">location_on</span>
-<div>
-<h4 class="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mb-2">Where</h4>
-<p class="text-xl font-medium">{{Venue}}</p>
-<p class="text-sm text-white/50 mt-1">42 Industrial Ave,  11211</p>
-</div>
-</div>
-<div class="flex gap-6 items-start border-l-2 border-white/10 pl-8 py-2">
-<span class="material-symbols-outlined text-white/50 text-3xl">apparel</span>
-<div>
-<h4 class="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mb-2">Dress Code</h4>
-<p class="text-xl font-medium">Urban Black Tie</p>
-<p class="text-sm text-white/50 mt-1">Think sleek, monochromatic, and architectural.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="relative min-h-[400px] lg:min-h-full overflow-hidden rounded-xl">
-<div class="absolute inset-0 bg-primary/10 z-10 pointer-events-none"></div>
-<img alt="Map Location" class="w-full h-full object-cover grayscale brightness-50 contrast-125" data-alt="A monochromatic map of Brooklyn streets" data-location="Brooklyn, New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_l3BMr-HCctjA7499ZgKWbIqTwnan6nnB0wm8w5HjJppcFxaHJ14NtKkkh90cJQz3Ky6n5Xw2OCnsjeV10INcdk5-fB88gu9qkvsKdGc9kTcpmBvybWOVqcrCBZODktbr2JPdgUiUgt5nQUj4YwdCstRWuCwmcsGwOsfC3Q6ckd62e4wBljV_iIWf7mZXT6C5gyVVTHN6yUxvhxG11aTBIoaDe9UIXfAu0eYN0KWiybiKwjowARkBdTuVJsezmVl8yRzPLVuz251"/>
-<div class="absolute inset-0 flex items-center justify-center z-20">
-<div class="bg-primary w-4 h-4 rounded-full animate-ping absolute"></div>
-<div class="bg-primary w-4 h-4 rounded-full relative"></div>
-</div>
-<div class="absolute bottom-6 left-6 right-6 bg-onyx/80 backdrop-blur-md p-4 flex justify-between items-center z-20 border border-white/10">
-<span class="text-xs font-bold uppercase tracking-widest">Open in Maps</span>
-<span class="material-symbols-outlined text-primary">north_east</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Wishes Wall -->
-<section class="py-24 px-6 max-w-7xl mx-auto" id="wishes">
-<div class="text-center mb-16">
-<h2 class="text-5xl font-extrabold tracking-tighter uppercase mb-4">Wishes Wall <span class="text-primary">#</span></h2>
-<p class="text-onyx/50 text-sm font-medium uppercase tracking-widest">Leave a tribute for the couple</p>
-</div>
-<div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-<!-- Wish 1 -->
-<div class="break-inside-avoid bg-white border industrial-border p-8 rounded-none group hover:border-primary transition-colors cursor-default">
-<span class="material-symbols-outlined text-primary/30 mb-4">format_quote</span>
-<p class="text-lg font-medium leading-relaxed mb-6 italic">"So excited for you both! Can't wait to see this beautiful industrial masterpiece of a wedding."</p>
-<div class="flex items-center gap-3">
-<div class="size-8 bg-industrial-gray rounded-full overflow-hidden">
-<img alt="Sarah" class="grayscale" data-alt="Guest portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJBkeU5jebhNiaLOOD-8BPWp4JE-LEx0KUXaZqcA8iyk9VQMSTzJoZJd4NJV8_wP9hTcYK8TSAEomQeIjUw8aVGDgnPPvPvDvzw1ZEzvUNkM9n3MQ-bJzAZq5nNM1YT-ERqLzsbXmVt7hX-mrxB4dlgX3rSy7RXaqA1bA-HKxbOcyXQL-z04trzG7dm_WVPMoJnTfeItaxEJAuIPMhMdVP2KSacwChZHslnFTPj7YOAYE3AiXc-_-mT1N0pl2rQKbPAuZ82hfTJdQS"/>
-</div>
-<div>
-<p class="text-xs font-black uppercase tracking-widest">Sarah &amp; Mike</p>
-<p class="text-[10px] text-onyx/40 uppercase">October 12</p>
-</div>
-</div>
-</div>
-<!-- Wish 2 -->
-<div class="break-inside-avoid bg-onyx text-white p-8 rounded-none group hover:bg-primary transition-all duration-500 cursor-default">
-<span class="material-symbols-outlined text-primary mb-4 group-hover:text-white">favorite</span>
-<p class="text-lg font-medium leading-relaxed mb-6">"Two of the most stylish people we know. Cheers to a lifetime of adventures!"</p>
-<div class="flex items-center gap-3">
-<div class="size-8 bg-white/10 rounded-full overflow-hidden">
-<img alt="David" class="grayscale" data-alt="Guest portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2KsEMeYjm1VYbseSPx80Obz0ljBb-dyOoGmHAmdFAWa3U43JxxDvL5sSeAI7egfPsllFXtsWCboVxSPm2_FkyEnypMWk4uOaNWHQAnCVuLnwiqHFlnkPw7g8V2XE-9l4KZ9akxbygDtKG0_sClMqr5R1CGKoNoqKmyvIsuNplTMdhHMEMKK8QupRma1Gc4QJ6OzV_aSv-bmTByQJj7IaX1G8F4HqwoxUOgJjEeLf8o5sfPmt_WxST5fcEOcs1jLOFgRjiENj1tDCD"/>
-</div>
-<div>
-<p class="text-xs font-black uppercase tracking-widest">The Millers</p>
-<p class="text-[10px] text-white/40 uppercase">Yesterday</p>
-</div>
-</div>
-</div>
-<!-- Wish 3 -->
-<div class="break-inside-avoid bg-white border industrial-border p-8 rounded-none group hover:border-primary transition-colors cursor-default">
-<span class="material-symbols-outlined text-primary/30 mb-4">celebration</span>
-<p class="text-lg font-medium leading-relaxed mb-6 italic">"Brooklyn isn't ready for this party. See you on the dance floor!"</p>
-<div class="flex items-center gap-3">
-<div class="size-8 bg-industrial-gray rounded-full overflow-hidden">
-<img alt="Elena" class="grayscale" data-alt="Guest portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGkbj3kNKCHzmZmrRRor-JY6Neh9K-sZ3dzrq69KIm0C4frgSXScxqHI3UBJnBk9E9Qky5Q647maYLTeY7tBW6P0quvagoG3HBjy55TfwVTosperWGXRny52RvcMTNxw21Q8GeuJc0t8mc7iYFYC_3f9VvQ81OeG2eh1KK1-AN2eZokBHMicyttmUH6vlK-w2FZNbS4fGWNNLl0cag_ae77LZFxAY5jwVNDkiVEfxkPwj6_WUuS0pPtxo1iTF9G7Z7eaWzZrFilNl6"/>
-</div>
-<div>
-<p class="text-xs font-black uppercase tracking-widest">Elena &amp; Julian</p>
-<p class="text-[10px] text-onyx/40 uppercase">2 days ago</p>
-</div>
-</div>
-</div>
-<!-- Input Card -->
-<div class="break-inside-avoid bg-industrial-gray p-8 rounded-none border border-dashed border-onyx/20 flex flex-col items-center justify-center text-center gap-4 py-12">
-<button class="size-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform">
-<span class="material-symbols-outlined">add</span>
-</button>
-<p class="text-xs font-bold uppercase tracking-widest">Add your message</p>
-</div>
-</div>
-</section>
-<!-- RSVP Section -->
-<section class="bg-background-light py-24 px-6 relative overflow-hidden">
-<div class="max-w-3xl mx-auto relative z-10 bg-white p-12 md:p-20 shadow-2xl rounded-none border-t-8 border-primary">
-<div class="text-center mb-12">
-<h2 class="text-4xl font-extrabold tracking-tighter uppercase mb-4">Confirm Attendance</h2>
-<p class="text-onyx/60 text-sm uppercase tracking-widest">Please respond by {{WeddingDate}}</p>
-</div>
-<form class="space-y-8">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<div class="space-y-2">
-<label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Full Name</label>
-<input class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium" placeholder="First Last" type="text"/>
-</div>
-<div class="space-y-2">
-<label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Email Address</label>
-<input class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium" placeholder="name@email.com" type="email"/>
-</div>
-</div>
-<div class="space-y-4">
-<label class="text-[10px] font-black uppercase tracking-widest text-onyx/40 block">Are you attending?</label>
-<div class="flex gap-8">
-<label class="flex items-center gap-3 cursor-pointer group">
-<input class="w-4 h-4 text-primary focus:ring-primary border-industrial-gray" name="attending" type="radio"/>
-<span class="text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors">Delighted to attend</span>
-</label>
-<label class="flex items-center gap-3 cursor-pointer group">
-<input class="w-4 h-4 text-primary focus:ring-primary border-industrial-gray" name="attending" type="radio"/>
-<span class="text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors">Regretfully decline</span>
-</label>
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Dietary Restrictions</label>
-<input class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium" placeholder="None, Vegan, GF, etc." type="text"/>
-</div>
-<button class="w-full bg-onyx text-white py-5 font-black uppercase tracking-[0.4em] text-xs hover:bg-primary transition-all" type="submit">
+            </div>
+        </div>
+    </section>
+    <!-- Our Journey -->
+    <section class="py-24 px-6 max-w-7xl mx-auto" id="story">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-6">
+            <div class="max-w-xl">
+                <h2 class="text-5xl font-extrabold tracking-tighter uppercase leading-none mb-6">{{Story_Title}} <span
+                        class="text-primary">/</span></h2>
+                <p class="text-onyx/60 text-lg leading-relaxed">{{Story_Body}}</p>
+            </div>
+            <span
+                class="text-primary font-black text-8xl opacity-10 leading-none select-none hidden md:block">2019-{{Year}}</span>
+        </div>
+        <div id="wedding-timeline" class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            <div class="absolute top-1/2 left-0 w-full h-[1px] bg-industrial-gray -z-10 hidden md:block"></div>
+            <!-- Step 1 -->
+            <div data-timeline-item="true" class="flex flex-col gap-6 group">
+                <div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
+                    <img alt="The Encounter"
+                        class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+                        data-alt="Two people looking at vinyl records"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_tk4pRlIVtRcYmthWchpUNu1k1kUjOP9Vq1UN4CD6dF7NAJgfy9zJ20t7zw3-oYhgL4lGgttBvLTlCr0dYhnNdLc73xiBmSpP0rR20RQ92YoKFC568CUo085n7MmzAui9D3fNwO-rYUujVVqOCJHjstnH78acHBywU-SLC58oGSKhKlBBoUuq5VwsMLjROQxLii7dtqM0gwfivf9Wtu79YLqCt5hc9TfNAXAFJkQJO1BpLFklvPqLeXhY5yU74FfIESR2gf18eRNb" />
+                    <div
+                        class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                        2019</div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold uppercase tracking-tight mb-2">{{Story_Event1_Title}}</h3>
+                    <p class="text-sm text-onyx/70 leading-relaxed">{{Story_Event1_Date}} — {{Story_Event1_Desc}}</p>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div data-timeline-item="true" class="flex flex-col gap-6 group md:translate-y-12">
+                <div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
+                    <img alt="The Proposal"
+                        class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+                        data-alt="Rooftop skyline in Brooklyn at sunset"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp6feRF8MfsSbvjTfLIp4vqhr5AOLleFExBHZbaWdbG9ze20ES1eCOZgNL5PHFXz8zXExYdgMoBNgtvOapFbz5mL0hCMT8fFOY2rFvnjnzf5hRFTJwK_KZGWMuV466L-IYe0Z0ChpMul0AC4NRIutCUp2Yoo-dpiovkEK2wq5SHRZ5I_uYtt-vJDnBVKsEktgy8Ak-KAKIHUB4BK6vLYAl40JM7xMcNDyJ0U0BORvMYERgBmHy72CcustndIGe3WSQt2YfM53yhC-F" />
+                    <div
+                        class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                        2022</div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold uppercase tracking-tight mb-2">{{Story_Event2_Title}}</h3>
+                    <p class="text-sm text-onyx/70 leading-relaxed">{{Story_Event2_Date}} — {{Story_Event2_Desc}}</p>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div data-timeline-item="true" class="flex flex-col gap-6 group">
+                <div class="relative overflow-hidden aspect-[4/5] bg-industrial-gray">
+                    <img alt="The Wedding"
+                        class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700"
+                        data-alt="Architecture with stark shadows and light"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRSytlVVNhzUIuzjqQML_iUwi-VpBA4QzmlwxW6xa0xY8DVpEokSCSBvkIVqX0pPkjyZzpfoXaBvAARuJUF1x2ZvKtDmdOmp4XTbJ9Fo63X9JWyVPMZ4_DA7Eg40h_9_EAzmgFtai_CF63RLfHVhEf8zqboBzromtbujRf624oJMPdPd7KZDjiZnA3OKBZtnzpvpWY9ldaflc_cnjIABO6Cw40-LrZx9yfk-zwEzB9oodzjurNWu3v2yrXx-VaV9p_fSR6cDEF0iVo" />
+                    <div
+                        class="absolute top-4 left-4 bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                        {{Year}}</div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold uppercase tracking-tight mb-2">{{Story_Event3_Title}}</h3>
+                    <p class="text-sm text-onyx/70 leading-relaxed">{{Story_Event3_Date}} — {{Story_Event3_Desc}}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Event Details -->
+    <section class="bg-onyx text-white py-24 px-6" id="details">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+            <div>
+                <h2 class="text-5xl font-extrabold tracking-tighter uppercase mb-12">The Logistics <span
+                        class="text-primary">.</span></h2>
+                <div class="space-y-12">
+                    <div class="flex gap-6 items-start border-l-2 border-primary pl-8 py-2">
+                        <span class="material-symbols-outlined text-primary text-3xl">schedule</span>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-2">When</h4>
+                            <p class="text-xl font-medium">Saturday, {{WeddingDate}}</p>
+                            <p class="text-sm text-white/50 mt-1">Ceremony at 5:30 PM • Cocktails &amp; Party to follow
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6 items-start border-l-2 border-white/10 pl-8 py-2">
+                        <span class="material-symbols-outlined text-white/50 text-3xl">location_on</span>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mb-2">Where</h4>
+                            <p class="text-xl font-medium">{{Venue}}</p>
+                            <p class="text-sm text-white/50 mt-1">42 Industrial Ave, 11211</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6 items-start border-l-2 border-white/10 pl-8 py-2">
+                        <span class="material-symbols-outlined text-white/50 text-3xl">apparel</span>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mb-2">Dress Code</h4>
+                            <p class="text-xl font-medium">Urban Black Tie</p>
+                            <p class="text-sm text-white/50 mt-1">Think sleek, monochromatic, and architectural.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="wedding-map" class="relative min-h-[400px] lg:min-h-full overflow-hidden rounded-xl">
+                <div class="absolute inset-0 bg-primary/10 z-10 pointer-events-none"></div>
+                <img alt="Map Location" class="w-full h-full object-cover grayscale brightness-50 contrast-125"
+                    data-alt="A monochromatic map of Brooklyn streets" data-location="Brooklyn, New York"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_l3BMr-HCctjA7499ZgKWbIqTwnan6nnB0wm8w5HjJppcFxaHJ14NtKkkh90cJQz3Ky6n5Xw2OCnsjeV10INcdk5-fB88gu9qkvsKdGc9kTcpmBvybWOVqcrCBZODktbr2JPdgUiUgt5nQUj4YwdCstRWuCwmcsGwOsfC3Q6ckd62e4wBljV_iIWf7mZXT6C5gyVVTHN6yUxvhxG11aTBIoaDe9UIXfAu0eYN0KWiybiKwjowARkBdTuVJsezmVl8yRzPLVuz251" />
+                <div class="absolute inset-0 flex items-center justify-center z-20">
+                    <div class="bg-primary w-4 h-4 rounded-full animate-ping absolute"></div>
+                    <div class="bg-primary w-4 h-4 rounded-full relative"></div>
+                </div>
+                <div
+                    class="absolute bottom-6 left-6 right-6 bg-onyx/80 backdrop-blur-md p-4 flex justify-between items-center z-20 border border-white/10">
+                    <span class="text-xs font-bold uppercase tracking-widest">Open in Maps</span>
+                    <span class="material-symbols-outlined text-primary">north_east</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Wishes Wall -->
+    <section class="py-24 px-6 max-w-7xl mx-auto" id="wishes">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl font-extrabold tracking-tighter uppercase mb-4">Wishes Wall <span
+                    class="text-primary">#</span></h2>
+            <p class="text-onyx/50 text-sm font-medium uppercase tracking-widest">Leave a tribute for the couple</p>
+        </div>
+        <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            <!-- Wish 1 -->
+            <div
+                class="break-inside-avoid bg-white border industrial-border p-8 rounded-none group hover:border-primary transition-colors cursor-default">
+                <span class="material-symbols-outlined text-primary/30 mb-4">format_quote</span>
+                <p class="text-lg font-medium leading-relaxed mb-6 italic">"So excited for you both! Can't wait to see
+                    this beautiful industrial masterpiece of a wedding."</p>
+                <div class="flex items-center gap-3">
+                    <div class="size-8 bg-industrial-gray rounded-full overflow-hidden">
+                        <img alt="{{BrideName}}" class="grayscale" data-alt="Guest portrait"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJBkeU5jebhNiaLOOD-8BPWp4JE-LEx0KUXaZqcA8iyk9VQMSTzJoZJd4NJV8_wP9hTcYK8TSAEomQeIjUw8aVGDgnPPvPvDvzw1ZEzvUNkM9n3MQ-bJzAZq5nNM1YT-ERqLzsbXmVt7hX-mrxB4dlgX3rSy7RXaqA1bA-HKxbOcyXQL-z04trzG7dm_WVPMoJnTfeItaxEJAuIPMhMdVP2KSacwChZHslnFTPj7YOAYE3AiXc-_-mT1N0pl2rQKbPAuZ82hfTJdQS" />
+                    </div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-widest">{{BrideName}} &amp; Mike</p>
+                        <p class="text-[10px] text-onyx/40 uppercase">October 12</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Wish 2 -->
+            <div
+                class="break-inside-avoid bg-onyx text-white p-8 rounded-none group hover:bg-primary transition-all duration-500 cursor-default">
+                <span class="material-symbols-outlined text-primary mb-4 group-hover:text-white">favorite</span>
+                <p class="text-lg font-medium leading-relaxed mb-6">"Two of the most stylish people we know. Cheers to a
+                    lifetime of adventures!"</p>
+                <div class="flex items-center gap-3">
+                    <div class="size-8 bg-white/10 rounded-full overflow-hidden">
+                        <img alt="David" class="grayscale" data-alt="Guest portrait"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2KsEMeYjm1VYbseSPx80Obz0ljBb-dyOoGmHAmdFAWa3U43JxxDvL5sSeAI7egfPsllFXtsWCboVxSPm2_FkyEnypMWk4uOaNWHQAnCVyLnwiqHFlnkPw7g8V2XE-9l4KZ9akxbygDtKG0_sClMqr5R1CGKoNoqKmyvIsuNplTMdhHMEMKK8QupRma1Gc4QJ6OzV_aSv-bmTByQJj7IaX1G8F4HqwoxUOgJjEeLf8o5sfPmt_WxST5fcEOcs1jLOFgRjiENj1tDCD" />
+                    </div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-widest">The Millers</p>
+                        <p class="text-[10px] text-white/40 uppercase">Yesterday</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Wish 3 -->
+            <div
+                class="break-inside-avoid bg-white border industrial-border p-8 rounded-none group hover:border-primary transition-colors cursor-default">
+                <span class="material-symbols-outlined text-primary/30 mb-4">celebration</span>
+                <p class="text-lg font-medium leading-relaxed mb-6 italic">"Brooklyn isn't ready for this party. See you
+                    on the dance floor!"</p>
+                <div class="flex items-center gap-3">
+                    <div class="size-8 bg-industrial-gray rounded-full overflow-hidden">
+                        <img alt="Elena" class="grayscale" data-alt="Guest portrait"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGkbj3kNKCHzmZmrRRor-JY6Neh9K-sZ3dzrq69KIm0C4frgSXScxqHI3UBJnBk9E9Qky5Q647maYLTeY7tBW6P0quvagoG3HBjy55TfwVTosperWGXRny52RvcMTNxw21Q8GeuJc0t8mc7iYFYC_3f9VvQ81OeG2eh1KK1-AN2eZokBHMicyttmUH6vlK-w2FZNbS4fGWNNLl0cag_ae77LZFxAY5jwVNDkiVEfxkPwj6_WUuS0pPtxo1iTF9G7Z7eaWzZrFilNl6" />
+                    </div>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-widest">Elena &amp; {{GroomName}}</p>
+                        <p class="text-[10px] text-onyx/40 uppercase">2 days ago</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Input Card -->
+            <div
+                class="break-inside-avoid bg-industrial-gray p-8 rounded-none border border-dashed border-onyx/20 flex flex-col items-center justify-center text-center gap-4 py-12">
+                <button
+                    class="size-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
+                <p class="text-xs font-bold uppercase tracking-widest">Add your message</p>
+            </div>
+        </div>
+    </section>
+    <!-- RSVP Section -->
+    <section class="bg-background-light py-24 px-6 relative overflow-hidden">
+        <div
+            class="max-w-3xl mx-auto relative z-10 bg-white p-12 md:p-20 shadow-2xl rounded-none border-t-8 border-primary">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold tracking-tighter uppercase mb-4">Confirm Attendance</h2>
+                <p class="text-onyx/60 text-sm uppercase tracking-widest">Please respond by {{WeddingDate}}</p>
+            </div>
+            <form class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Full Name</label>
+                        <input
+                            class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium"
+                            placeholder="First Last" type="text" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Email
+                            Address</label>
+                        <input
+                            class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium"
+                            placeholder="name@email.com" type="email" />
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-onyx/40 block">Are you
+                        attending?</label>
+                    <div class="flex gap-8">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="w-4 h-4 text-primary focus:ring-primary border-industrial-gray"
+                                name="attending" type="radio" />
+                            <span
+                                class="text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors">Delighted
+                                to attend</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="w-4 h-4 text-primary focus:ring-primary border-industrial-gray"
+                                name="attending" type="radio" />
+                            <span
+                                class="text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors">Regretfully
+                                decline</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-onyx/40">Dietary
+                        Restrictions</label>
+                    <input
+                        class="w-full border-0 border-b industrial-border bg-transparent px-0 py-3 focus:ring-0 focus:border-primary text-sm font-medium"
+                        placeholder="None, Vegan, GF, etc." type="text" />
+                </div>
+                <button
+                    class="w-full bg-onyx text-white py-5 font-black uppercase tracking-[0.4em] text-xs hover:bg-primary transition-all"
+                    type="submit">
                     Submit RSVP
                 </button>
-</form>
-</div>
-<!-- Background Decor -->
-<div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none hidden lg:block">
-<h3 class="text-[20rem] font-black italic tracking-tighter -mr-40 -mt-20">RSVP</h3>
-</div>
-</section>
-<!-- Footer -->
-<footer class="bg-onyx text-white py-20 px-6 border-t border-white/5">
-<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
-<div class="text-center md:text-left">
-<h4 class="text-2xl font-black tracking-tighter uppercase mb-2 italic">A+J <span class="text-primary">2024</span></h4>
-<p class="text-xs text-white/40 uppercase tracking-[0.2em]">Designed for the urban soul</p>
-</div>
-<div class="flex flex-col items-center md:items-end gap-4" id="registry">
-<p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">Gift Registry</p>
-<div class="flex gap-6">
-<a class="text-xs font-bold uppercase tracking-tighter hover:text-primary transition-colors border-b border-primary/20 pb-1" href="#">Williams Sonoma</a>
-<a class="text-xs font-bold uppercase tracking-tighter hover:text-primary transition-colors border-b border-primary/20 pb-1" href="#">The Floral Studio</a>
-<a class="text-xs font-bold uppercase tracking-tighter hover:text-primary transition-colors border-b border-primary/20 pb-1" href="#">Crate &amp; Barrel</a>
-</div>
-</div>
-</div>
-<div class="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">
-<p>© 2024 The Loft Wedding. All Rights Reserved.</p>
-                <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>
-<div class="flex gap-8 mt-4 md:mt-0">
-<a class="hover:text-white transition-colors" href="#">Instagram</a>
-<a class="hover:text-white transition-colors" href="#">Pinterest</a>
-<a class="hover:text-white transition-colors" href="#">Contact</a>
-</div>
-</div>
-</footer>
+            </form>
+        </div>
+        <!-- Background Decor -->
+        <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none hidden lg:block">
+            <h3 class="text-[20rem] font-black italic tracking-tighter -mr-40 -mt-20">RSVP</h3>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-onyx text-white py-20 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+            <div class="text-center md:text-left">
+                <h4 class="text-2xl font-black tracking-tighter uppercase mb-2 italic">{{GroomInitial}}+{{BrideInitial}}
+                    <span class="text-primary">{{Year}}</span>
+                </h4>
+                <p class="text-xs text-white/40 uppercase tracking-[0.2em]">Designed for the urban soul</p>
+            </div>
+            <div class="flex flex-col items-center md:items-end gap-4" id="registry">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">{{Registry_Title}}</p>
+                <p class="text-xs text-white/40 mb-4">{{Registry_Body}}</p>
+            </div>
+        </div>
+        <div
+            class="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">
+            <p>© {{Year}} The Loft Wedding. All Rights Reserved.</p>
+            <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.</p>
+            <div class="flex gap-8 mt-4 md:mt-0">
+                <a class="hover:text-white transition-colors" href="#">Instagram</a>
+                <a class="hover:text-white transition-colors" href="#">Pinterest</a>
+                <a class="hover:text-white transition-colors" href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

@@ -93,7 +93,7 @@
                     {{BrideName}}</h1>
                 <div class="flex flex-col gap-2">
                     <p class="text-white/90 text-lg md:text-2xl font-light italic">
-                        {{WeddingDate}} — The Rustic Maple Estate
+                        {{WeddingDate}} — {{Venue}}
                     </p>
                     <div class="w-24 h-1 bg-autumn-orange mx-auto mt-4 rounded-full"></div>
                 </div>
@@ -130,8 +130,7 @@
             <div class="max-w-5xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-autumn-red font-display text-4xl font-extrabold mb-4">Our Story</h2>
-                    <p class="text-slate-500 max-w-xl mx-auto">From a chance meeting under the falling leaves to a
-                        lifetime of autumns together.</p>
+                    <p class="text-slate-500 max-w-xl mx-auto">{{Story_Body}}</p>
                 </div>
                 <div
                     class="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
@@ -145,12 +144,11 @@
                         <div
                             class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between space-x-2 mb-1">
-                                <div class="font-bold text-slate-900 dark:text-white">How We Met</div>
-                                <time class="font-display text-autumn-orange font-bold text-sm">Fall 2018</time>
+                                <div class="font-bold text-slate-900 dark:text-white">{{Story_Event1_Title}}</div>
+                                <time
+                                    class="font-display text-autumn-orange font-bold text-sm">{{Story_Event1_Date}}</time>
                             </div>
-                            <div class="text-slate-500 text-sm leading-relaxed">It started at a small cider house in the
-                                Catskills. The air was crisp, the drinks were warm, and the conversation never ended.
-                            </div>
+                            <div class="text-slate-500 text-sm leading-relaxed">{{Story_Event1_Desc}}</div>
                         </div>
                     </div>
                     <!-- Item 2 -->
@@ -163,11 +161,11 @@
                         <div
                             class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between space-x-2 mb-1">
-                                <div class="font-bold text-slate-900 dark:text-white">The Proposal</div>
-                                <time class="font-display text-autumn-red font-bold text-sm">Winter 2022</time>
+                                <div class="font-bold text-slate-900 dark:text-white">{{Story_Event2_Title}}</div>
+                                <time
+                                    class="font-display text-autumn-red font-bold text-sm">{{Story_Event2_Date}}</time>
                             </div>
-                            <div class="text-slate-500 text-sm leading-relaxed">Under the first snowfall of the year,
-                                Julian asked the big question in the heart of Central Park.</div>
+                            <div class="text-slate-500 text-sm leading-relaxed">{{Story_Event2_Desc}}</div>
                         </div>
                     </div>
                     <!-- Item 3 -->
@@ -180,11 +178,11 @@
                         <div
                             class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between space-x-2 mb-1">
-                                <div class="font-bold text-slate-900 dark:text-white">The Big Day</div>
-                                <time class="font-display text-autumn-gold font-bold text-sm">Autumn 2024</time>
+                                <div class="font-bold text-slate-900 dark:text-white">{{Story_Event3_Title}}</div>
+                                <time
+                                    class="font-display text-autumn-gold font-bold text-sm">{{Story_Event3_Date}}</time>
                             </div>
-                            <div class="text-slate-500 text-sm leading-relaxed">We return to our favorite season to say
-                                'I do' surrounded by the warmth of family and fall colors.</div>
+                            <div class="text-slate-500 text-sm leading-relaxed">{{Story_Event3_Desc}}</div>
                         </div>
                     </div>
                 </div>
@@ -216,7 +214,7 @@
                                 <span class="text-xl font-black text-slate-400">{{EventTime}}</span>
                                 <div>
                                     <h4 class="font-bold text-lg">Reception &amp; Dinner</h4>
-                                    <p class="text-slate-500 text-sm">The Grand Lodge • Farm-to-Table Harvest Dinner</p>
+                                    <p class="text-slate-500 text-sm">{{Venue}} • Farm-to-Table Harvest Dinner</p>
                                 </div>
                             </div>
                             <div class="flex gap-6">
@@ -267,15 +265,16 @@
                     <h2 class="text-4xl font-black mb-4">Wishes Wall</h2>
                     <p class="opacity-80">Leave a note, advice, or your favorite memory with us!</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" id="wedding-gallery">
                     <!-- Wish Card 1 -->
-                    <div class="bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-2xl text-white">
+                    <div data-gallery-item="true"
+                        class="bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-2xl text-white">
                         <div class="flex items-center gap-3 mb-4">
                             <div
                                 class="w-10 h-10 rounded-full bg-autumn-gold flex items-center justify-center font-bold text-slate-900">
                                 SA</div>
                             <div>
-                                <h4 class="font-bold">Sarah &amp; {{GroomName}}</h4>
+                                <h4 class="font-bold">{{BrideName}} &amp; {{GroomName}}</h4>
                                 <span class="text-xs opacity-60 italic">October 12th</span>
                             </div>
                         </div>
@@ -311,7 +310,7 @@
                                 JD</div>
                             <div>
                                 <h4 class="font-bold">The Davidsons</h4>
-                                <span class="text-xs opacity-60 italic">October 15th</span>
+                                <span class="text-xs opacity-60 italic">{{WeddingDate}}</span>
                             </div>
                         </div>
                         <p class="text-sm leading-relaxed opacity-90">"Counting down the days! Looking forward to that
@@ -331,12 +330,11 @@
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-4xl font-black mb-4">The Venue</h2>
-                    <p class="text-slate-500">The Rustic Maple Estate • 123 Autumn Lane, Hudson Valley, NY</p>
+                    <p class="text-slate-500">{{Venue}} • 123 Autumn Lane, {{Location}}</p>
                 </div>
-                <div class="grid lg:grid-cols-3 gap-8">
-                    <div id="wedding-map"
-                        class="lg:col-span-2 rounded-2xl overflow-hidden shadow-2xl min-h-[400px] bg-slate-200"
-                        data-location="Hudson Valley, New York">
+                <div id="wedding-map" class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 rounded-2xl overflow-hidden shadow-2xl min-h-[400px] bg-slate-200"
+                        data-location="{{Location}}">
                         <iframe frameborder="0" height="100%" marginheight="0" marginwidth="0" scrolling="no"
                             src="{{MapEmbedLink}}" width="100%"></iframe>
                     </div>
@@ -345,8 +343,7 @@
                             class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                             <span class="material-symbols-outlined text-autumn-orange text-4xl mb-4">hotel</span>
                             <h4 class="text-xl font-bold mb-2">Accommodations</h4>
-                            <p class="text-sm text-slate-500 mb-4">We have reserved a block of rooms at the nearby
-                                Timberline Lodge. Mention '{{GroomName}} & {{BrideName}}' for a discount.</p>
+                            <p class="text-sm text-slate-500 mb-4">{{Lodging_Body}}</p>
                             <a class="text-primary font-bold text-sm underline underline-offset-4" href="#">Book Room
                                 →</a>
                         </div>
@@ -387,7 +384,8 @@
                         <span class="material-symbols-outlined text-autumn-gold">filter_vintage</span>
                         <h2 class="text-lg font-black uppercase">Autumn Harvest</h2>
                     </div>
-                    <p class="text-slate-500 text-sm">© 2024 Evelyn &amp; Julian. Made with love for a perfect fall.</p>
+                    <p class="text-slate-500 text-sm">© {{Year}} {{BrideName}} &amp; {{GroomName}}. Made with love for a
+                        perfect fall.</p>
                     <p class="mt-4 text-xs opacity-50 font-bold tracking-widest uppercase">Powered by WeddingWeb AI Inc.
                     </p>
                     <div class="flex gap-6">

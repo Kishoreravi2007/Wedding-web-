@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@200..800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -35,8 +43,11 @@
             },
         }
     </script>
-<style>
-        .serif-heading { font-family: 'Playfair Display', serif; }
+    <style>
+        .serif-heading {
+            font-family: 'Playfair Display', serif;
+        }
+
         .glass-nav {
             background: rgba(251, 250, 248, 0.8);
             backdrop-filter: blur(12px);
@@ -44,238 +55,307 @@
         }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 overflow-x-hidden">
-<!-- Sticky Navigation -->
-<header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-primary/10">
-<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="serif-heading text-2xl font-bold tracking-tighter text-primary">E&amp;M</span>
-</div>
-<nav class="hidden md:flex items-center gap-10">
-<a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors" href="#story">Our Story</a>
-<a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors" href="#details">Details</a>
-<a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors" href="#gallery">Gallery</a>
-<a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors" href="#wishes">Wishes</a>
-</nav>
-<button class="bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+    <!-- Sticky Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-primary/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span
+                    class="serif-heading text-2xl font-bold tracking-tighter text-primary">{{GroomInitial}}&amp;{{BrideInitial}}</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors"
+                    href="#story">Our Story</a>
+                <a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors"
+                    href="#details">Details</a>
+                <a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors"
+                    href="#gallery">Gallery</a>
+                <a class="text-sm font-semibold uppercase tracking-widest hover:text-primary transition-colors"
+                    href="#wishes">Wishes</a>
+            </nav>
+            <button
+                class="bg-primary text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
                 RSVP NOW
             </button>
-</div>
-</header>
-<main class="pt-20">
-<!-- Hero Billboard: Split Screen & Overlapping -->
-<section class="relative min-h-[90vh] flex flex-col lg:flex-row items-center overflow-hidden">
-<div class="w-full lg:w-7/12 h-[50vh] lg:h-[90vh] relative">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Candid romantic photo of a couple walking in a garden" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDxJhzy8oAmcEJqBqXs1PFNlYodE2shIUIQDBHu4z4PnqbEfwib0tBlvgYJdBKVqMprvZNiZ6PHkzH4zeRjJds_M3N9gFw6eQU-_L8p6syR-x95pOsIBQnzXUuapVL5pl9w86AHpeKmPRIkB2vlUo24wpvfHAwqFJhEiVo6HuBieqiGpum9IKECX6Hus07oGc_KvXrUdwO87AhVaaoPqbUNgMkTKbT8QgnCFowof7fr93rQ_DqgA0W3gk0g6Mo0n_VEjVxV-R8yLYXL');"></div>
-<!-- Floating Badge -->
-<div class="absolute top-10 right-10 bg-white/90 backdrop-blur p-6 rounded-xl shadow-xl transform rotate-3 z-10 hidden lg:block">
-<p class="text-xs font-bold uppercase tracking-widest text-primary mb-1">Save the Date</p>
-<p class="serif-heading text-xl">24 . 09 . 24</p>
-</div>
-</div>
-<div class="w-full lg:w-5/12 p-8 lg:p-20 flex flex-col justify-center bg-pastel-cream relative z-20 -mt-20 lg:mt-0 lg:-ml-24 rounded-tl-[4rem] lg:rounded-tl-none">
-<span class="text-primary font-bold tracking-[0.3em] uppercase mb-4 text-sm">Join us for the wedding of</span>
-<h1 class="serif-heading text-6xl lg:text-8xl mb-6 leading-tight">{{GroomName}} & {{BrideName}}</h1>
-<p class="text-lg text-slate-600 mb-8 max-w-sm">A celebration of love, laughter, and a lifetime of happiness under the autumn sky.</p>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary">location_on</span>
-<p class="font-semibold">The Glass House, New York City</p>
-</div>
-</div>
-</section>
-<!-- Our Story Section: Asymmetrical Grid -->
-<section class="max-w-7xl mx-auto px-6 py-24" id="story">
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-<div class="lg:col-span-5 order-2 lg:order-1">
-<h2 class="serif-heading text-4xl mb-8">How it all began...</h2>
-<div class="space-y-6 text-slate-700 leading-relaxed text-lg">
-<p>It started with a shared love for vintage vinyl and strong espresso. What was supposed to be a quick coffee turned into a five-hour conversation about architecture, travel, and the perfect sourdough starter.</p>
-<p>Three years, two cross-country road trips, and one adopted golden retriever later, Marcus popped the question at the very same cafe where it all began.</p>
-</div>
-<div class="mt-12 flex gap-4">
-<div class="bg-pastel-rose p-1 rounded-lg transform -rotate-2 shadow-md">
-<div class="w-32 h-40 bg-cover bg-center rounded" data-alt="Polaroid style photo of a couple at a cafe" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCx-qxvtJtcAy5ypKneB41aeC6kg0w-jcHQfiVuq-OqnL2hmovU8H7109eOfA3aZb5ogOTsvfWOodgiOWG79_Bn4pm79zjo_o2BH5eoPX2GidhAfbbyyCwY2x_-OR0wgIvqWESbXR5p97ZhARQzC4qdp_6DEeiI5GjaIDtZ3k3PDVvz87sDAdziBMWu6mHSomkTid1rmPjUaNM0k8NGXEJNpk6PJGx7m-YtoKAiMNyKeQ-m-mmghWMqpwZEtZ7H6ajAg3FiXTtP5ll0');"></div>
-</div>
-<div class="bg-pastel-sage p-1 rounded-lg transform rotate-3 shadow-md">
-<div class="w-32 h-40 bg-cover bg-center rounded" data-alt="Polaroid style photo of a couple hiking" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdMkWxHQ1AETHI7kSoWN8p1DdiBJJ6-yjhQZ9nR5EWD8cB_i66eGh27PApZ3dBiz9FHPiBKKgOzoWOJMdbZ3VOGdB9BwKugaJ55SP1JvLaUUGAXklAmSxX9gNLvblT2KwtXNmSE1cSvXmne9xQHFyw_CFKnVYRkfFFjOZV4soMoq4UJOSO8L1-gXL5JFgxMY6LyyAkbrZv02NuAmsk7crYB5F6ZH4rBNupwQFQo-zXfI9NohtBElnfM9ZY8w4Md4nQmk_cZTtoCb_k');"></div>
-</div>
-</div>
-</div>
-<div class="lg:col-span-7 grid grid-cols-2 gap-4 order-1 lg:order-2">
-<div class="space-y-4 pt-12">
-<div class="h-64 bg-cover bg-center rounded-2xl shadow-lg" data-alt="Close up of an engagement ring on a finger" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-wlfoBAK7feYw80mnQxeDGiXNrMRucUrATtEp70G71o0WWk1_4WdUqW2-_z3o7kuaH8s9xD6_L3I6GyCB_xd7jyCzj9t3uUoUPG2g5WosBjBlUSdyKJasCGN-HDA8Asexg3lda4PyqaMU2_8Rvmt339nT8Ty-8NQXQldGipU0N9G4RSS9ptfUzoxuIskhOjIIHK1BrjPpMQP1EPRM90GxvhHP2MGQpEmxkko4bxts6cY0hAcNvEMf38rs0BL_9PpMLRKVKzvipSXx');"></div>
-<div class="h-80 bg-cover bg-center rounded-2xl shadow-lg" data-alt="Couple laughing together in a field" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9q2ixirbNg77GmEwVi6MnJlE3IEVHx5mdZVhCY5bF9Jn88rRG4bFtOYt9qCrPiIWzmJwQJBwOXkX71u4Q0QAOS3Z0qNwpgY4Bd_2eEwvMaebMOAsH2KPe40X8dh_4qJo4ly4J_FCp69Ba18_91GOojGSlSWGgSdkd6UiTB0MmRAG1sMue80BoiLI9hkN5uSCOJ3-AaHoSTLzi4GYkD3IsVBBREezBRlBJQl4E9DWD1bEvcT22-fuICn1VKQDnRBhA3q2173yINEmc');"></div>
-</div>
-<div class="space-y-4">
-<div class="h-80 bg-cover bg-center rounded-2xl shadow-lg" data-alt="Romantic shot of a couple during sunset" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAgyoqD0ik9ts1aW6wCTCGMLYN8D8Bpw8ta40go7wi2KoCCb96hYObK59_H_jiBug1OvZKJJ3yOG9t1utKnXVqBgYLs7KxokH7uSQlRTDjhlFPlJo9XOwdwBWIkfJnR0I7avv_eIvP4rFULNTdCEhC8G7t4VjKvwWkX6QzpWh4IClg1m72Z6LA5LP5YISrUZgFYRBdQB3FhQdHESbMJH6EWvpG5sdAfwJmbK_FoJHp4ltMc-sLtKL1DlOKRcKuYd0B3OGHmWNss9nZq');"></div>
-<div class="h-64 bg-cover bg-center rounded-2xl shadow-lg" data-alt="Couple holding hands while walking" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPlA3f8WbdO3RcFeirYYpXv01NpRHSdkWP2atPZETQsj4b8kAq4nLJHkX3aBe8_WHtIDs0GF5pbYgvCiWSUECMJ2aeV-BQt55QbZ0LB_CRx8M0ihJ7v9KRLWMyyY4XY4AH8ii136JFbyGyxVlTSWWnvnsXKYLIYO-ltBGygm5hpOBVvEsMCmykRXl_wY7pfaKJnc1Z9ApWs7_DoUVftBfd4kyVZw48aIGXaXqQzl-uRKPyKTmwcF0Rw3JSoNpUy1b8G8b-TI9_5i-d');"></div>
-</div>
-</div>
-</div>
-</section>
-<!-- Event Timeline Section -->
-<section class="bg-pastel-cream py-24" id="details">
-<div class="max-w-4xl mx-auto px-6">
-<div class="text-center mb-20">
-<h2 class="serif-heading text-5xl mb-4">The Big Day</h2>
-<p class="text-slate-500 uppercase tracking-widest font-bold text-sm">Saturday, {{WeddingDate}}</p>
-</div>
-<div class="relative">
-<!-- Vertical Line -->
-<div class="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-primary/20"></div>
-<!-- Timeline Events -->
-<div class="space-y-24 relative">
-<div class="flex flex-col md:flex-row items-center justify-between">
-<div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
-<h4 class="serif-heading text-2xl mb-1">The Ceremony</h4>
-<p class="text-primary font-bold mb-2">4:30 PM</p>
-<p class="text-slate-600">The Glass House Rooftop</p>
-</div>
-<div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
-<div class="md:w-5/12 hidden md:block"></div>
-</div>
-<div class="flex flex-col md:flex-row items-center justify-between">
-<div class="md:w-5/12 hidden md:block"></div>
-<div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
-<div class="md:w-5/12 text-center md:text-left mb-4 md:mb-0">
-<h4 class="serif-heading text-2xl mb-1">Cocktail Hour</h4>
-<p class="text-primary font-bold mb-2">5:30 PM</p>
-<p class="text-slate-600">Sunset Lounge &amp; Terrace</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row items-center justify-between">
-<div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
-<h4 class="serif-heading text-2xl mb-1">Dinner &amp; Dancing</h4>
-<p class="text-primary font-bold mb-2">7:00 PM</p>
-<p class="text-slate-600">Main Ballroom</p>
-</div>
-<div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
-<div class="md:w-5/12 hidden md:block"></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Wishes Wall Section: Masonry-style -->
-<section class="py-24 px-6 max-w-7xl mx-auto" id="wishes">
-<div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
-<div class="max-w-xl">
-<h2 class="serif-heading text-5xl mb-4">Wishes Wall</h2>
-<p class="text-lg text-slate-600">Share your love, advice, or favorite memory with us. We'll treasure these notes forever.</p>
-</div>
-<button class="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-xl shadow-primary/20">
-<span class="material-symbols-outlined">edit_note</span>
+        </div>
+    </header>
+    <main class="pt-20">
+        <!-- Hero Billboard: Split Screen & Overlapping -->
+        <section class="relative min-h-[90vh] flex flex-col lg:flex-row items-center overflow-hidden">
+            <div class="w-full lg:w-7/12 h-[50vh] lg:h-[90vh] relative">
+                <div class="absolute inset-0 bg-cover bg-center hero-bg" data-hero-bg="true"
+                    data-alt="Candid romantic photo of a couple walking in a garden"
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDxJhzy8oAmcEJqBqXs1PFNlYodE2shIUIQDBHu4z4PnqbEfwib0tBlvgYJdBKVqMprvZNiZ6PHkzH4zeRjJds_M3N9gFw6eQU-_L8p6syR-x95pOsIBQnzXUuapVL5pl9w86AHpeKmPRIkB2vlUo24wpvfHAwqFJhEiVo6HuBieqiGpum9IKECX6Hus07oGc_KvXrUdwO87AhVaaoPqbUNgMkTKbT8QgnCFowof7fr93rQ_DqgA0W3gk0g6Mo0n_VEjVxV-R8yLYXL');">
+                </div>
+                <!-- Floating Badge -->
+                <div
+                    class="absolute top-10 right-10 bg-white/90 backdrop-blur p-6 rounded-xl shadow-xl transform rotate-3 z-10 hidden lg:block">
+                    <p class="text-xs font-bold uppercase tracking-widest text-primary mb-1">Save the Date</p>
+                    <p class="serif-heading text-xl">{{WeddingDate}}</p>
+                </div>
+            </div>
+            <div
+                class="w-full lg:w-5/12 p-8 lg:p-20 flex flex-col justify-center bg-pastel-cream relative z-20 -mt-20 lg:mt-0 lg:-ml-24 rounded-tl-[4rem] lg:rounded-tl-none">
+                <span class="text-primary font-bold tracking-[0.3em] uppercase mb-4 text-sm">Join us for the wedding
+                    of</span>
+                <h1 class="serif-heading text-6xl lg:text-8xl mb-6 leading-tight">{{GroomName}} & {{BrideName}}</h1>
+                <p class="text-lg text-slate-600 mb-8 max-w-sm">{{Story_Body}}</p>
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-primary">location_on</span>
+                    <p class="font-semibold">{{Venue}}, {{Location}}</p>
+                </div>
+            </div>
+        </section>
+        <!-- Our Story Section: Asymmetrical Grid -->
+        <section class="max-w-7xl mx-auto px-6 py-24" id="story">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-5 order-2 lg:order-1">
+                    <h2 class="serif-heading text-4xl mb-8">How it all began...</h2>
+                    <div class="space-y-6 text-slate-700 leading-relaxed text-lg">
+                        <p>{{Story_Body}}</p>
+                    </div>
+                    <div class="mt-12 flex gap-4">
+                        <div class="bg-pastel-rose p-1 rounded-lg transform -rotate-2 shadow-md">
+                            <div class="w-32 h-40 bg-cover bg-center rounded"
+                                data-alt="Polaroid style photo of a couple at a cafe"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCx-qxvtJtcAy5ypKneB41aeC6kg0w-jcHQfiVuq-OqnL2hmovU8H7109eOfA3aZb5ogOTsvfWOodgiOWG79_Bn4pm79zjo_o2BH5eoPX2GidhAfbbyyCwY2x_-OR0wgIvqWESbXR5p97ZhARQzC4qdp_6DEeiI5GjaIDtZ3k3PDVvz87sDAdziBMWu6mHSomkTid1rmPjUaNM0k8NGXEJNpk6PJGx7m-YtoKAiMNyKeQ-m-mmghWMqpwZEtZ7H6ajAg3FiXTtP5ll0');">
+                            </div>
+                        </div>
+                        <div class="bg-pastel-sage p-1 rounded-lg transform rotate-3 shadow-md">
+                            <div class="w-32 h-40 bg-cover bg-center rounded"
+                                data-alt="Polaroid style photo of a couple hiking"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdMkWxHQ1AETHI7kSoWN8p1DdiBJJ6-yjhQZ9nR5EWD8cB_i66eGh27PApZ3dBiz9FHPiBKKgOzoWOJMdbZ3VOGdB9BwKugaJ55SP1JvLaUUGAXklAmSxX9gNLvblT2KwtXNmSE1cSvXmne9xQHFyw_CFKnVYRkfFFjOZV4soMoq4UJOSO8L1-gXL5JFgxMY6LyyAkbrZv02NuAmsk7crYB5F6ZH4rBNupwQFQo-zXfI9NohtBElnfM9ZY8w4Md4nQmk_cZTtoCb_k');">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-7 grid grid-cols-2 gap-4 order-1 lg:order-2">
+                    <div class="space-y-4 pt-12">
+                        <div class="h-64 bg-cover bg-center rounded-2xl shadow-lg"
+                            data-alt="Close up of an engagement ring on a finger"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-wlfoBAK7feYw80mnQxeDGiXNrMRucUrATtEp70G71o0WWk1_4WdUqW2-_z3o7kuaH8s9xD6_L3I6GyCB_xd7jyCzj9t3uUoUPG2g5WosBjBlUSdyKJasCGN-HDA8Asexg3lda4PyqaMU2_8Rvmt339nT8Ty-8NQXQldGipU0N9G4RSS9ptfUzoxuIskhOjIIHK1BrjPpMQP1EPRM90GxvhHP2MGQpEmxkko4bxts6cY0hAcNvEMf38rs0BL_9PpMLRKVKzvipSXx');">
+                        </div>
+                        <div class="h-80 bg-cover bg-center rounded-2xl shadow-lg"
+                            data-alt="Couple laughing together in a field"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9q2ixirbNg77GmEwVi6MnJlE3IEVHx5mdZVhCY5bF9Jn88rRG4bFtOYt9qCrPiIWzmJwQJBwOXkX71u4Q0QAOS3Z0qNwpgY4Bd_2eEwvMaebMOAsH2KPe40X8dh_4qJo4ly4J_FCp69Ba18_91GOojGSlSWGgSdkd6UiTB0MmRAG1sMue80BoiLI9hkN5uSCOJ3-AaHoSTLzi4GYkD3IsVBBREezBRlBJQl4E9DWD1bEvcT22-fuICn1VKQDnRBhA3q2173yINEmc');">
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="h-80 bg-cover bg-center rounded-2xl shadow-lg"
+                            data-alt="Romantic shot of a couple during sunset"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAgyoqD0ik9ts1aW6wCTCGMLYN8D8Bpw8ta40go7wi2KoCCb96hYObK59_H_jiBug1OvZKJJ3yOG9t1utKnXVqBgYLs7KxokH7uSQlRTDjhlFPlJo9XOwdwBWIkfJnR0I7avv_eIvP4rFULNTdCEhC8G7t4VjKvwWkX6QzpWh4IClg1m72Z6LA5LP5YISrUZgFYRBdQB3FhQdHESbMJH6EWvpG5sdAfwJmbK_FoJHp4ltMc-sLtKL1DlOKRcKuYd0B3OGHmWNss9nZq');">
+                        </div>
+                        <div class="h-64 bg-cover bg-center rounded-2xl shadow-lg"
+                            data-alt="Couple holding hands while walking"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPlA3f8WbdO3RcFeirYYpXv01NpRHSdkWP2atPZETQsj4b8kAq4nLJHkX3aBe8_WHtIDs0GF5pbYgvCiWSUECMJ2aeV-BQt55QbZ0LB_CRx8M0ihJ7v9KRLWMyyY4XY4AH8ii136JFbyGyxVlTSWWnvnsXKYLIYO-ltBGygm5hpOBVvEsMCmykRXl_wY7pfaKJnc1Z9ApWs7_DoUVftBfd4kyVZw48aIGXaXqQzl-uRKPyKTmwcF0Rw3JSoNpUy1b8G8b-TI9_5i-d');">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Event Timeline Section -->
+        <section class="bg-pastel-cream py-24" id="details">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-20">
+                    <h2 class="serif-heading text-5xl mb-4">The Big Day</h2>
+                    <p class="text-slate-500 uppercase tracking-widest font-bold text-sm">Saturday, {{WeddingDate}}</p>
+                </div>
+                <div id="wedding-timeline" class="relative">
+                    <!-- Vertical Line -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-primary/20"></div>
+                    <!-- Timeline Events -->
+                    <div class="space-y-24 relative">
+                        <div data-timeline-item="true" class="flex flex-col md:flex-row items-center justify-between">
+                            <div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
+                                <h4 class="serif-heading text-2xl mb-1">The Ceremony</h4>
+                                <p class="text-primary font-bold mb-2">4:30 PM</p>
+                                <p class="text-slate-600">The Glass House Rooftop</p>
+                            </div>
+                            <div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
+                            <div class="md:w-5/12 hidden md:block"></div>
+                        </div>
+                        <div data-timeline-item="true" class="flex flex-col md:flex-row items-center justify-between">
+                            <div class="md:w-5/12 hidden md:block"></div>
+                            <div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
+                            <div class="md:w-5/12 text-center md:text-left mb-4 md:mb-0">
+                                <h4 class="serif-heading text-2xl mb-1">Cocktail Hour</h4>
+                                <p class="text-primary font-bold mb-2">5:30 PM</p>
+                                <p class="text-slate-600">Sunset Lounge &amp; Terrace</p>
+                            </div>
+                        </div>
+                        <div data-timeline-item="true" class="flex flex-col md:flex-row items-center justify-between">
+                            <div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
+                                <h4 class="serif-heading text-2xl mb-1">Dinner &amp; Dancing</h4>
+                                <p class="text-primary font-bold mb-2">7:00 PM</p>
+                                <p class="text-slate-600">Main Ballroom</p>
+                            </div>
+                            <div class="z-10 bg-primary w-4 h-4 rounded-full ring-8 ring-pastel-cream"></div>
+                            <div class="md:w-5/12 hidden md:block"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Wishes Wall Section: Masonry-style -->
+        <section class="py-24 px-6 max-w-7xl mx-auto" id="wishes">
+            <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+                <div class="max-w-xl">
+                    <h2 class="serif-heading text-5xl mb-4">Wishes Wall</h2>
+                    <p class="text-lg text-slate-600">Share your love, advice, or favorite memory with us. We'll
+                        treasure these notes forever.</p>
+                </div>
+                <button
+                    class="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-xl shadow-primary/20">
+                    <span class="material-symbols-outlined">edit_note</span>
                     Leave a Message
                 </button>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- Wish Card 1 -->
-<div class="bg-pastel-rose/40 p-8 rounded-2xl shadow-sm border border-pastel-rose hover:shadow-lg transition-shadow">
-<span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
-<p class="serif-heading text-xl mb-6 italic text-slate-800">"So incredibly happy for you both! Can't wait to see you walk down the aisle. May your life be as beautiful as this celebration."</p>
-<div class="flex items-center gap-3">
-<div class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">S</div>
-<p class="font-bold text-sm uppercase tracking-wider text-slate-600">The Sinclair Family</p>
-</div>
-</div>
-<!-- Wish Card 2 -->
-<div class="bg-pastel-sage/40 p-8 rounded-2xl shadow-sm border border-pastel-sage hover:shadow-lg transition-shadow lg:translate-y-12">
-<span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
-<p class="serif-heading text-xl mb-6 italic text-slate-800">"Elena, you've been my best friend since kindergarten. Watching you find Marcus has been the greatest joy. Love you both!"</p>
-<div class="flex items-center gap-3">
-<div class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">J</div>
-<p class="font-bold text-sm uppercase tracking-wider text-slate-600">Julia Thompson</p>
-</div>
-</div>
-<!-- Wish Card 3 -->
-<div class="bg-primary/5 p-8 rounded-2xl shadow-sm border border-primary/10 hover:shadow-lg transition-shadow">
-<span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
-<p class="serif-heading text-xl mb-6 italic text-slate-800">"Welcome to the family, Elena! Marcus, you finally made the best decision of your life. Can't wait for the dancing!"</p>
-<div class="flex items-center gap-3">
-<div class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">D</div>
-<p class="font-bold text-sm uppercase tracking-wider text-slate-600">Uncle Dave &amp; Aunt Liz</p>
-</div>
-</div>
-</div>
-</section>
-<!-- RSVP Form Section -->
-<section class="bg-white py-24" id="rsvp">
-<div class="max-w-2xl mx-auto px-6">
-<div class="bg-pastel-cream p-10 lg:p-16 rounded-[2rem] shadow-2xl relative overflow-hidden">
-<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full"></div>
-<div class="text-center mb-12">
-<h2 class="serif-heading text-4xl mb-4">Kindly RSVP</h2>
-<p class="text-slate-600">Please let us know if you can make it by August 1st.</p>
-</div>
-<form class="space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div>
-<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">First Name</label>
-<input class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800" placeholder="Your name" type="text"/>
-</div>
-<div>
-<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Last Name</label>
-<input class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800" placeholder="Your surname" type="text"/>
-</div>
-</div>
-<div>
-<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Attendance</label>
-<div class="flex gap-4">
-<label class="flex-1 cursor-pointer">
-<input checked=" class="hidden peer" name="attending" type="radio"/>
-<div class="bg-white p-4 rounded-xl text-center border-2 border-transparent peer-checked:border-primary peer-checked:text-primary font-bold transition-all">
+            </div>
+            <div id="wedding-gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Wish Card 1 -->
+                <div data-gallery-item="true"
+                    class="bg-pastel-rose/40 p-8 rounded-2xl shadow-sm border border-pastel-rose hover:shadow-lg transition-shadow">
+                    <span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
+                    <p class="serif-heading text-xl mb-6 italic text-slate-800">"So incredibly happy for you both! Can't
+                        wait to see you walk down the aisle. May your life be as beautiful as this celebration."</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                            S</div>
+                        <p class="font-bold text-sm uppercase tracking-wider text-slate-600">The Sinclair Family</p>
+                    </div>
+                </div>
+                <!-- Wish Card 2 -->
+                <div data-gallery-item="true"
+                    class="bg-pastel-sage/40 p-8 rounded-2xl shadow-sm border border-pastel-sage hover:shadow-lg transition-shadow lg:translate-y-12">
+                    <span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
+                    <p class="serif-heading text-xl mb-6 italic text-slate-800">"{{BrideFirst}}, you've been my best
+                        friend since kindergarten. Watching you find {{GroomFirst}} has been the greatest joy. Love you
+                        both!"</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                            J</div>
+                        <p class="font-bold text-sm uppercase tracking-wider text-slate-600">Julia Thompson</p>
+                    </div>
+                </div>
+                <!-- Wish Card 3 -->
+                <div data-gallery-item="true"
+                    class="bg-primary/5 p-8 rounded-2xl shadow-sm border border-primary/10 hover:shadow-lg transition-shadow">
+                    <span class="material-symbols-outlined text-primary mb-4 opacity-50">format_quote</span>
+                    <p class="serif-heading text-xl mb-6 italic text-slate-800">"Welcome to the family, {{BrideFirst}}!
+                        {{GroomFirst}}, you finally made the best decision of your life. Can't wait for the dancing!"
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="size-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                            D</div>
+                        <p class="font-bold text-sm uppercase tracking-wider text-slate-600">Uncle Dave &amp; Aunt Liz
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- RSVP Form Section -->
+        <section class="bg-white py-24" id="rsvp">
+            <div class="max-w-2xl mx-auto px-6">
+                <div class="bg-pastel-cream p-10 lg:p-16 rounded-[2rem] shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-bl-full"></div>
+                    <div class="text-center mb-12">
+                        <h2 class="serif-heading text-4xl mb-4">Kindly RSVP</h2>
+                        <p class="text-slate-600">Please let us know if you can make it by August 1st.</p>
+                    </div>
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">First
+                                    Name</label>
+                                <input
+                                    class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800"
+                                    placeholder="Your name" type="text" />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Last
+                                    Name</label>
+                                <input
+                                    class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800"
+                                    placeholder="Your surname" type="text" />
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Attendance</label>
+                            <div class="flex gap-4">
+                                <label class="flex-1 cursor-pointer">
+                                    <input checked=" class=" hidden peer" name="attending" type="radio" />
+                                    <div
+                                        class="bg-white p-4 rounded-xl text-center border-2 border-transparent peer-checked:border-primary peer-checked:text-primary font-bold transition-all">
                                         Joyfully Attend
                                     </div>
-</label>
-<label class="flex-1 cursor-pointer">
-<input class="hidden peer" name="attending" type="radio"/>
-<div class="bg-white p-4 rounded-xl text-center border-2 border-transparent peer-checked:border-primary peer-checked:text-primary font-bold transition-all">
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input class="hidden peer" name="attending" type="radio" />
+                                    <div
+                                        class="bg-white p-4 rounded-xl text-center border-2 border-transparent peer-checked:border-primary peer-checked:text-primary font-bold transition-all">
                                         Regretfully Decline
                                     </div>
-</label>
-</div>
-</div>
-<div>
-<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Meal Preference</label>
-<select class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800">
-<option>Grilled Atlantic Salmon</option>
-<option>Herb Roasted Chicken</option>
-<option>Wild Mushroom Risotto (V)</option>
-<option>Beef Tenderloin</option>
-</select>
-</div>
-<div>
-<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Song Request</label>
-<input class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800" placeholder="What song will get you on the dance floor?" type="text"/>
-</div>
-<button class="w-full bg-primary text-white py-5 rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/30 mt-4" type="button">
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Meal
+                                Preference</label>
+                            <select
+                                class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800">
+                                <option>Grilled Atlantic Salmon</option>
+                                <option>Herb Roasted Chicken</option>
+                                <option>Wild Mushroom Risotto (V)</option>
+                                <option>Beef Tenderloin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Song
+                                Request</label>
+                            <input
+                                class="w-full bg-white border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 text-slate-800"
+                                placeholder="What song will get you on the dance floor?" type="text" />
+                        </div>
+                        <button
+                            class="w-full bg-primary text-white py-5 rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/30 mt-4"
+                            type="button">
                             Submit Response
                         </button>
-</form>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-background-dark text-white py-20">
-<div class="max-w-7xl mx-auto px-6 text-center">
-<h2 class="serif-heading text-4xl mb-6">See you in New York!</h2>
-<p class="text-slate-400 mb-12">#ElenaAndMarcus2024</p>
-<div class="flex justify-center gap-8 mb-16">
-<a class="hover:text-primary transition-colors" href="#">Registry</a>
-<a class="hover:text-primary transition-colors" href="#">Travel</a>
-<a class="hover:text-primary transition-colors" href="#">FAQ</a>
-</div>
-<p class="text-xs text-slate-600 font-bold tracking-[0.3em] uppercase">Made with love for Elena &amp; Marcus</p>
-</div>
-</footer>
-<!-- Floating RSVP Button (Mobile Only / Persistent) -->
-<div class="fixed bottom-8 right-8 z-40 md:hidden">
-<button class="size-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
-<span class="material-symbols-outlined">mail</span>
-</button>
-</div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer id="wedding-map" class="bg-background-dark text-white py-20">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h2 class="serif-heading text-4xl mb-6">See you in {{Location}}!</h2>
+            <p class="text-slate-400 mb-12">#{{BrideFirst}}And{{GroomFirst}}{{Year}}</p>
+            <div class="flex justify-center gap-8 mb-16">
+                <a class="hover:text-primary transition-colors" href="#">Registry</a>
+                <a class="hover:text-primary transition-colors" href="#">Travel</a>
+                <a class="hover:text-primary transition-colors" href="#">FAQ</a>
+            </div>
+            <p class="text-xs text-slate-600 font-bold tracking-[0.3em] uppercase">Made with love for {{BrideFirst}}
+                &amp; {{GroomFirst}}</p>
+        </div>
+    </footer>
+    <!-- Floating RSVP Button (Mobile Only / Persistent) -->
+    <div class="fixed bottom-8 right-8 z-40 md:hidden">
+        <button
+            class="size-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined">mail</span>
+        </button>
+    </div>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

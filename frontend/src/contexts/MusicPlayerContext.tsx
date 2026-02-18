@@ -37,7 +37,11 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   const [volume, setVolumeState] = useState(0.3);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(() => {
-    return sessionStorage.getItem('musicUserInteracted') === 'true';
+    try {
+      return sessionStorage.getItem('musicUserInteracted') === 'true';
+    } catch (e) {
+      return false;
+    }
   });
   const [hasError, setHasError] = useState(false);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
@@ -47,10 +51,10 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
 
   // Check if we're on a company or photographer page (hide/pause music)
   const isExcludedPage = useMemo(() => {
-    return location.pathname === '/' ||
-      location.pathname.startsWith('/company') ||
+    return location.pathname.startsWith('/company') ||
       location.pathname.startsWith('/client') ||
       location.pathname.startsWith('/photographer') ||
+      location.pathname.startsWith('/admin') ||
       location.pathname === '/privacy' ||
       location.pathname === '/terms';
   }, [location.pathname]);
@@ -201,7 +205,11 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
     const handleFirstInteraction = async () => {
       if (!hasUserInteracted && audioRef.current) {
         setHasUserInteracted(true);
-        sessionStorage.setItem('musicUserInteracted', 'true');
+        try {
+          sessionStorage.setItem('musicUserInteracted', 'true');
+        } catch (e) {
+          // Ignore storage errors safely
+        }
         playCurrentTrack();
       }
     };

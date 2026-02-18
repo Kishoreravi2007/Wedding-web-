@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{{GroomName}} & {{BrideName}} | {{WeddingDate}}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -34,261 +40,321 @@
             },
         }
     </script>
-<style>
+    <style>
         .glass-panel {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(23, 84, 207, 0.1);
         }
+
         .neon-glow-blue {
             box-shadow: 0 0 15px rgba(23, 84, 207, 0.3);
         }
+
         .neon-text-blue {
             text-shadow: 0 0 8px rgba(23, 84, 207, 0.4);
         }
+
         .geometric-bg {
             background-image: radial-gradient(circle at 2px 2px, rgba(23, 84, 207, 0.05) 1px, transparent 0);
             background-size: 40px 40px;
         }
     </style>
 </head>
+
 <body class="bg-background-light font-display text-slate-900 geometric-bg min-h-screen">
-<!-- Navigation -->
-<nav class="sticky top-0 z-50 w-full px-4 py-3">
-<div class="max-w-7xl mx-auto glass-panel rounded-xl px-6 py-3 flex items-center justify-between shadow-sm">
-<div class="flex items-center gap-3">
-<div class="bg-primary p-1.5 rounded-lg text-white">
-<span class="material-symbols-outlined text-xl">blur_on</span>
-</div>
-<h1 class="font-extrabold tracking-tighter text-lg uppercase">N <span class="text-primary">&amp;</span> O</h1>
-</div>
-<div class="hidden md:flex items-center gap-8">
-<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#story">Protocol</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#schedule">Timeline</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest" href="#wishes">Network</a>
-<button class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold tracking-widest uppercase hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 w-full px-4 py-3">
+        <div class="max-w-7xl mx-auto glass-panel rounded-xl px-6 py-3 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="bg-primary p-1.5 rounded-lg text-white">
+                    <span class="material-symbols-outlined text-xl">blur_on</span>
+                </div>
+                <h1 class="font-extrabold tracking-tighter text-lg uppercase">{{GroomInitial}} <span
+                        class="text-primary">&amp;</span> {{BrideInitial}}</h1>
+            </div>
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest"
+                    href="#story">Protocol</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest"
+                    href="#schedule">Timeline</a>
+                <a class="text-sm font-semibold hover:text-primary transition-colors uppercase tracking-widest"
+                    href="#wishes">Network</a>
+                <button
+                    class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold tracking-widest uppercase hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
                     RSVP
                 </button>
-</div>
-<button class="md:hidden material-symbols-outlined">menu</button>
-</div>
-</nav>
-<main class="max-w-7xl mx-auto px-4">
-<!-- Hero Section -->
-<section class="relative py-20 flex flex-col items-center text-center overflow-hidden">
-<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] -z-10"></div>
-<div class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 glass-panel rounded-full border border-primary/20">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Status: Initializing Union</span>
-</div>
-<h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-4 leading-none uppercase">
-                Nova <span class="text-primary italic">+</span> <br/>Orion
+            </div>
+            <button class="md:hidden material-symbols-outlined">menu</button>
+        </div>
+    </nav>
+    <main class="max-w-7xl mx-auto px-4">
+        <!-- Hero Section -->
+        <section class="relative py-20 flex flex-col items-center text-center overflow-hidden">
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] -z-10">
+            </div>
+            <div
+                class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 glass-panel rounded-full border border-primary/20">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">Status: Initializing
+                    Union</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-4 leading-none uppercase">
+                {{BrideFirst}} <span class="text-primary italic">+</span> <br />{{GroomFirst}}
             </h1>
-<p class="text-lg md:text-xl font-light tracking-[0.2em] text-slate-500 mb-12 uppercase">
-                {{WeddingDate}} <span class="mx-4 text-primary opacity-50">/</span> Neo-Tokyo Orbit
+            <p class="text-lg md:text-xl font-light tracking-[0.2em] text-slate-500 mb-12 uppercase">
+                {{WeddingDate}} <span class="mx-4 text-primary opacity-50">/</span> {{Location}}
             </p>
-<!-- Countdown -->
-<div class="grid grid-cols-4 gap-4 md:gap-8 w-full max-w-3xl">
-<div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
-<span class="text-3xl md:text-5xl font-black text-primary mb-1">124</span>
-<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cycles</span>
-</div>
-<div class="glass-panel p-6 rounded-2xl flex flex-col items-center border-b-2 border-primary">
-<span class="text-3xl md:text-5xl font-black text-primary mb-1">05</span>
-<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hours</span>
-</div>
-<div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
-<span class="text-3xl md:text-5xl font-black text-primary mb-1">42</span>
-<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Minutes</span>
-</div>
-<div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
-<span class="text-3xl md:text-5xl font-black text-primary mb-1">18</span>
-<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Seconds</span>
-</div>
-</div>
-</section>
-<!-- Our Story Grid -->
-<section class="py-24" id="story">
-<div class="flex flex-col md:flex-row gap-12 items-center">
-<div class="flex-1 space-y-8">
-<div class="space-y-4">
-<h2 class="text-4xl font-black uppercase tracking-tight">The <span class="text-primary">Genesis</span> Protocol</h2>
-<div class="h-1 w-24 bg-primary rounded-full"></div>
-</div>
-<p class="text-slate-600 leading-relaxed text-lg font-light">
-                        In a world of silicon and signals, our meeting was the ultimate anomaly. Two nodes in a vast network, colliding at the speed of light. Nova, a systems architect, and Orion, a nebula explorer, found harmony in the digital chaos.
+            <!-- Countdown -->
+            <div class="grid grid-cols-4 gap-4 md:gap-8 w-full max-w-3xl">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
+                    <span class="text-3xl md:text-5xl font-black text-primary mb-1">124</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cycles</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center border-b-2 border-primary">
+                    <span class="text-3xl md:text-5xl font-black text-primary mb-1">05</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hours</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
+                    <span class="text-3xl md:text-5xl font-black text-primary mb-1">42</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Minutes</span>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl flex flex-col items-center">
+                    <span class="text-3xl md:text-5xl font-black text-primary mb-1">18</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Seconds</span>
+                </div>
+            </div>
+        </section>
+        <!-- Our Story Grid -->
+        <section class="py-24" id="story">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="flex-1 space-y-8">
+                    <div class="space-y-4">
+                        <h2 class="text-4xl font-black uppercase tracking-tight">The <span
+                                class="text-primary">Genesis</span> Protocol</h2>
+                        <div class="h-1 w-24 bg-primary rounded-full"></div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed text-lg font-light">
+                        {{Story_Body}}
                     </p>
-<div class="grid grid-cols-2 gap-4">
-<div class="p-4 border-l-2 border-primary/30 bg-primary/5">
-<h4 class="font-bold text-sm uppercase tracking-widest text-primary mb-1">Encounter</h4>
-<p class="text-xs text-slate-500 uppercase">Station Zero-One</p>
-</div>
-<div class="p-4 border-l-2 border-accent-violet/30 bg-accent-violet/5">
-<h4 class="font-bold text-sm uppercase tracking-widest text-accent-violet mb-1">Sync Date</h4>
-<p class="text-xs text-slate-500 uppercase">05.12.2108</p>
-</div>
-</div>
-</div>
-<div class="flex-1 grid grid-cols-2 gap-4 w-full">
-<div class="rounded-2xl overflow-hidden aspect-[4/5] relative group">
-<img alt="Couple walking in futuristic city" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Couple walking in neon lit futuristic city" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvdsNqUURIaiSx0r14YJ2is-UpD7ZKvnbF92mt5nVQNGkLkCRGVU3Zxvryne2FHEznUzz2pqtJtBjv4wvInTOF9Sce-E9xxiaPBug4E6Sj4AWZ21yAJZmC4pfN3Gb2liH7myx0UDELFsD0J7BFxE-VyJ46f1PjYs2i0lWYLknEKIxuwhwRS6R4iqPAOlPTCnkHYCWrVIZIa8ZKsUnWDeDBNgQCq--grpjZvVtZaPp34cbI92qsAP7aMZ0bFqrEggcEPWMSij36RMDU"/>
-<div class="absolute inset-0 border-2 border-primary/20 m-4 rounded-xl pointer-events-none"></div>
-</div>
-<div class="rounded-2xl overflow-hidden aspect-[4/5] mt-12 relative group">
-<img alt="Abstract tech hands" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Detailed shot of hands with glowing interfaces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpPc-6Uf2jVI40ANKyfQGAGPvPtdg3LIIx4gI0rddNHpej4mk4ZMxdZUkipgxeSC-43djHnGbhpMeEnonkIGO7Qfx2_jflqFbC0VUCxlLgH51siTuCMY1-6bpGcMlDLHJCjgBTAeSjSrSR-F5BtRbCUX-qv86XNKyb1ZjiDBBQjx5fcHRsJ59LaXVDTwcrbBmRGEQoywjE-LPaP0R-nwXHF-vaQqgqgLymsJmMiIButNKl95HFdJMFuCHuNdUFHjys1D-ISXtzpjkg"/>
-<div class="absolute inset-0 border-2 border-accent-violet/20 m-4 rounded-xl pointer-events-none"></div>
-</div>
-</div>
-</div>
-</section>
-<!-- Timeline Schedule -->
-<section class="py-24 glass-panel rounded-[2rem] p-8 md:p-16 overflow-hidden relative" id="schedule">
-<div class="absolute top-0 right-0 p-12 opacity-5">
-<span class="material-symbols-outlined text-[200px]">hub</span>
-</div>
-<h2 class="text-4xl font-black uppercase tracking-tight mb-16 text-center">Event <span class="text-primary">Timeline</span></h2>
-<div id="wedding-timeline" class="max-w-4xl mx-auto space-y-0 relative>
-<div id="wedding-timeline" class="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent -translate-x-1/2 hidden md:block"></div>
-<!-- Event 1 -->
-<div class="relative flex flex-col md:flex-row items-center justify-between mb-16 group">
-<div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
-<h3 class="text-xl font-bold uppercase tracking-widest text-primary">The Assembly</h3>
-<p class="text-slate-500 text-sm">Arrival &amp; Biometric Check</p>
-</div>
-<div class="z-10 bg-background-light p-2 rounded-full border border-primary shadow-[0_0_10px_rgba(23,84,207,0.3)]">
-<div class="w-4 h-4 bg-primary rounded-full"></div>
-</div>
-<div class="md:w-5/12 text-center md:text-left mt-4 md:mt-0">
-<span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">17:00 GST</span>
-</div>
-</div>
-<!-- Event 2 -->
-<div class="relative flex flex-col md:flex-row-reverse items-center justify-between mb-16 group">
-<div class="md:w-5/12 text-center md:text-left mb-4 md:mb-0">
-<h3 class="text-xl font-bold uppercase tracking-widest text-accent-violet">Unity Protocol</h3>
-<p class="text-slate-500 text-sm">Main Ceremony &amp; Vows</p>
-</div>
-<div class="z-10 bg-background-light p-2 rounded-full border border-accent-violet shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-<div class="w-4 h-4 bg-accent-violet rounded-full"></div>
-</div>
-<div class="md:w-5/12 text-center md:text-right mt-4 md:mt-0">
-<span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">18:30 GST</span>
-</div>
-</div>
-<!-- Event 3 -->
-<div class="relative flex flex-col md:flex-row items-center justify-between group">
-<div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
-<h3 class="text-xl font-bold uppercase tracking-widest text-primary">The Celebration</h3>
-<p class="text-slate-500 text-sm">Gastronomy &amp; Visual Performance</p>
-</div>
-<div class="z-10 bg-background-light p-2 rounded-full border border-primary">
-<div class="w-4 h-4 bg-primary rounded-full"></div>
-</div>
-<div class="md:w-5/12 text-center md:text-left mt-4 md:mt-0">
-<span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">20:00 GST</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Digital Wishes Wall -->
-<section class="py-24" id="wishes">
-<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6" data-timeline-item="true">
-<div class="space-y-2">
-<h2 class="text-4xl font-black uppercase tracking-tight">Digital <span class="text-primary">Wishes</span> Wall</h2>
-<p class="text-slate-500 tracking-widest text-sm uppercase">Secure Network Messages for the Couple</p>
-</div>
-<button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold tracking-[0.2em] flex items-center gap-3 transition-all shadow-xl shadow-primary/30 uppercase text-xs">
-<span class="material-symbols-outlined text-base">edit</span> Leave a Wish
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 border-l-2 border-primary/30 bg-primary/5">
+                            <h4 class="font-bold text-sm uppercase tracking-widest text-primary mb-1">Encounter</h4>
+                            <p class="text-xs text-slate-500 uppercase">Station Zero-One</p>
+                        </div>
+                        <div class="p-4 border-l-2 border-accent-violet/30 bg-accent-violet/5">
+                            <h4 class="font-bold text-sm uppercase tracking-widest text-accent-violet mb-1">
+                                {{Story_Event1_Title}}
+                            </h4>
+                            <p class="text-xs text-slate-500 uppercase">{{Story_Event1_Date}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 grid grid-cols-2 gap-4 w-full">
+                    <div class="rounded-2xl overflow-hidden aspect-[4/5] relative group">
+                        <img alt="Couple walking in futuristic city"
+                            class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                            data-alt="Couple walking in neon lit futuristic city"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvdsNqUURIaiSx0r14YJ2is-UpD7ZKvnbF92mt5nVQNGkLkCRGVU3Zxvryne2FHEznUzz2pqtJtBjv4wvInTOF9Sce-E9xxiaPBug4E6Sj4AWZ21yAJZmC4pfN3Gb2liH7myx0UDELFsD0J7BFxE-VyJ46f1PjYs2i0lWYLknEKIxuwhwRS6R4iqPAOlPTCnkHYCWrVIZIa8ZKsUnWDeDBNgQCq--grpjZvVtZaPp34cbI92qsAP7aMZ0bFqrEggcEPWMSij36RMDU" />
+                        <div class="absolute inset-0 border-2 border-primary/20 m-4 rounded-xl pointer-events-none">
+                        </div>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden aspect-[4/5] mt-12 relative group">
+                        <img alt="Abstract tech hands"
+                            class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                            data-alt="Detailed shot of hands with glowing interfaces"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpPc-6Uf2jVI40ANKyfQGAGPvPtdg3LIIx4gI0rddNHpej4mk4ZMxdZUkipgxeSC-43djHnGbhpMeEnonkIGO7Qfx2_jflqFbC0VUCxlLgH51siTuCMY1-6bpGcMlDLHJCjgBTAeSjSrSR-F5BtRbCUX-qv86XNKyb1ZjiDBBQjx5fcHRsJ59LaXVDTwcrbBmRGEQoywjE-LPaP0R-nwXHF-vaQqgqgLymsJmMiIButNKl95HFdJMFuCHuNdUFHjys1D-ISXtzpjkg" />
+                        <div
+                            class="absolute inset-0 border-2 border-accent-violet/20 m-4 rounded-xl pointer-events-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Timeline Schedule -->
+        <section class="py-24 glass-panel rounded-[2rem] p-8 md:p-16 overflow-hidden relative" id="schedule">
+            <div class="absolute top-0 right-0 p-12 opacity-5">
+                <span class="material-symbols-outlined text-[200px]">hub</span>
+            </div>
+            <h2 class="text-4xl font-black uppercase tracking-tight mb-16 text-center">Event <span
+                    class="text-primary">Timeline</span></h2>
+            <div id="wedding-timeline" class="max-w-4xl mx-auto space-y-0 relative">
+                <div
+                    class="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent -translate-x-1/2 hidden md:block">
+                </div>
+                <!-- Event 1 -->
+                <div data-timeline-item="true"
+                    class="relative flex flex-col md:flex-row items-center justify-between mb-16 group">
+                    <div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-primary">The Assembly</h3>
+                        <p class="text-slate-500 text-sm">Arrival &amp; Biometric Check</p>
+                    </div>
+                    <div
+                        class="z-10 bg-background-light p-2 rounded-full border border-primary shadow-[0_0_10px_rgba(23,84,207,0.3)]">
+                        <div class="w-4 h-4 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="md:w-5/12 text-center md:text-left mt-4 md:mt-0">
+                        <span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">17:00 GST</span>
+                    </div>
+                </div>
+                <!-- Event 2 -->
+                <div data-timeline-item="true"
+                    class="relative flex flex-col md:flex-row-reverse items-center justify-between mb-16 group">
+                    <div class="md:w-5/12 text-center md:text-left mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-accent-violet">Unity Protocol</h3>
+                        <p class="text-slate-500 text-sm">Main Ceremony &amp; Vows</p>
+                    </div>
+                    <div
+                        class="z-10 bg-background-light p-2 rounded-full border border-accent-violet shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                        <div class="w-4 h-4 bg-accent-violet rounded-full"></div>
+                    </div>
+                    <div class="md:w-5/12 text-center md:text-right mt-4 md:mt-0">
+                        <span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">18:30 GST</span>
+                    </div>
+                </div>
+                <!-- Event 3 -->
+                <div data-timeline-item="true"
+                    class="relative flex flex-col md:flex-row items-center justify-between group">
+                    <div class="md:w-5/12 text-center md:text-right mb-4 md:mb-0">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-primary">The Celebration</h3>
+                        <p class="text-slate-500 text-sm">Gastronomy &amp; Visual Performance</p>
+                    </div>
+                    <div class="z-10 bg-background-light p-2 rounded-full border border-primary">
+                        <div class="w-4 h-4 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="md:w-5/12 text-center md:text-left mt-4 md:mt-0">
+                        <span class="glass-panel px-4 py-2 rounded-full font-mono font-bold text-xs">20:00 GST</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Digital Wishes Wall -->
+        <section class="py-24" id="wishes">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="space-y-2">
+                    <h2 class="text-4xl font-black uppercase tracking-tight">Digital <span
+                            class="text-primary">Wishes</span> Wall</h2>
+                    <p class="text-slate-500 tracking-widest text-sm uppercase">Secure Network Messages for the Couple
+                    </p>
+                </div>
+                <button
+                    class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold tracking-[0.2em] flex items-center gap-3 transition-all shadow-xl shadow-primary/30 uppercase text-xs">
+                    <span class="material-symbols-outlined text-base">edit</span> Leave a Wish
                 </button>
-</div>
-<div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-<!-- Wish 1 -->
-<div class="glass-panel p-6 rounded-2xl break-inside-avoid hover:neon-glow-blue transition-all duration-500 border-l-4 border-primary">
-<div class="flex justify-between items-start mb-4">
-<span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 8821</span>
-<span class="material-symbols-outlined text-primary/30 text-sm">verified</span>
-</div>
-<p class="text-slate-700 font-medium leading-relaxed mb-6">"May your love continue to expand like the universe itself. To many more lightyears of happiness!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">Z</div>
-<div>
-<p class="text-sm font-bold uppercase tracking-tighter">Commander Zephyr</p>
-<p class="text-[10px] text-slate-400 uppercase">Alpha Centauri Station</p>
-</div>
-</div>
-</div>
-<!-- Wish 2 -->
-<div class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-accent-violet">
-<div class="flex justify-between items-start mb-4">
-<span class="text-[10px] font-mono font-bold text-accent-violet">TRANS_ID: 9042</span>
-<span class="material-symbols-outlined text-accent-violet/30 text-sm">favorite</span>
-</div>
-<p class="text-slate-700 font-medium leading-relaxed mb-6">"The perfect algorithmic match. Science proves you guys are meant to be. Congratulations!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-accent-violet/10 flex items-center justify-center text-accent-violet font-bold">L</div>
-<div>
-<p class="text-sm font-bold uppercase tracking-tighter">Luna V.</p>
-<p class="text-[10px] text-slate-400 uppercase">Data Scientist</p>
-</div>
-</div>
-</div>
-<!-- Wish 3 -->
-<div class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-primary">
-<div class="flex justify-between items-start mb-4">
-<span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 7710</span>
-</div>
-<p class="text-slate-700 font-medium leading-relaxed mb-6">"So glad to be witnessing this union across the digital divide. Sending all my love from the outer rims!"</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">K</div>
-<div>
-<p class="text-sm font-bold uppercase tracking-tighter">Kai &amp; Sora</p>
-<p class="text-[10px] text-slate-400 uppercase">The Ring Colony</p>
-</div>
-</div>
-</div>
-<!-- Wish 4 -->
-<div class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-primary">
-<div class="flex justify-between items-start mb-4">
-<span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 1109</span>
-</div>
-<p class="text-slate-700 font-medium leading-relaxed mb-6">"Binary hearts beating as one. A truly spectacular celebration."</p>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">X</div>
-<div>
-<p class="text-sm font-bold uppercase tracking-tighter">X-AE-12</p>
-<p class="text-[10px] text-slate-400 uppercase">Synthetic Life Observer</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="mt-24 bg-white/50 backdrop-blur-xl border-t border-primary/10 py-16">
-<div class="max-w-7xl mx-auto px-4 flex flex-col items-center">
-<div class="mb-8 flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-3xl">language</span>
-<span class="text-2xl font-black tracking-tighter uppercase">Nexus Union</span>
-</div>
-<div class="flex gap-8 mb-12">
-<a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest" href="#">Protocol</a>
-<a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest" href="#">Registry</a>
-<a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest" href="#">Contact</a>
-<a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest" href="#">Privacy</a>
-</div>
-<p class="text-slate-400 text-[10px] font-mono uppercase tracking-[0.4em] text-center">
+            </div>
+            <div id="wedding-gallery" class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                <!-- Wish 1 -->
+                <div data-gallery-item="true"
+                    class="glass-panel p-6 rounded-2xl break-inside-avoid hover:neon-glow-blue transition-all duration-500 border-l-4 border-primary">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 8821</span>
+                        <span class="material-symbols-outlined text-primary/30 text-sm">verified</span>
+                    </div>
+                    <p class="text-slate-700 font-medium leading-relaxed mb-6">"May your love continue to expand like
+                        the universe itself. To many more lightyears of happiness!"</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            Z</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-tighter">Commander Zephyr</p>
+                            <p class="text-[10px] text-slate-400 uppercase">Alpha Centauri Station</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wish 2 -->
+                <div data-gallery-item="true"
+                    class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-accent-violet">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-mono font-bold text-accent-violet">TRANS_ID: 9042</span>
+                        <span class="material-symbols-outlined text-accent-violet/30 text-sm">favorite</span>
+                    </div>
+                    <p class="text-slate-700 font-medium leading-relaxed mb-6">"The perfect algorithmic match. Science
+                        proves you guys are meant to be. Congratulations!"</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-accent-violet/10 flex items-center justify-center text-accent-violet font-bold">
+                            L</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-tighter">Luna V.</p>
+                            <p class="text-[10px] text-slate-400 uppercase">Data Scientist</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wish 3 -->
+                <div data-gallery-item="true"
+                    class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-primary">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 7710</span>
+                    </div>
+                    <p class="text-slate-700 font-medium leading-relaxed mb-6">"So glad to be witnessing this union
+                        across the digital divide. Sending all my love from the outer rims!"</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
+                            K</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-tighter">Kai &amp; Sora</p>
+                            <p class="text-[10px] text-slate-400 uppercase">The Ring Colony</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wish 4 -->
+                <div data-gallery-item="true"
+                    class="glass-panel p-6 rounded-2xl break-inside-avoid border-l-4 border-primary">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-mono font-bold text-primary">TRANS_ID: 1109</span>
+                    </div>
+                    <p class="text-slate-700 font-medium leading-relaxed mb-6">"Binary hearts beating as one. A truly
+                        spectacular celebration."</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                            X</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-tighter">X-AE-12</p>
+                            <p class="text-[10px] text-slate-400 uppercase">Synthetic Life Observer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="mt-24 bg-white/50 backdrop-blur-xl border-t border-primary/10 py-16">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center">
+            <div class="mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">language</span>
+                <span class="text-2xl font-black tracking-tighter uppercase">{{GroomInitial}} &amp; {{BrideInitial}}
+                    Union</span>
+            </div>
+            <div class="flex gap-8 mb-12">
+                <a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest"
+                    href="#">Protocol</a>
+                <a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest"
+                    href="#">Registry</a>
+                <a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest"
+                    href="#">Contact</a>
+                <a class="text-slate-400 hover:text-primary transition-colors uppercase font-bold text-xs tracking-widest"
+                    href="#">Privacy</a>
+            </div>
+            <p class="text-slate-400 text-[10px] font-mono uppercase tracking-[0.4em] text-center">
                 Built on the Ethereum 2112 Network • No Rights Reserved • Love is Open Source
             </p>
-<!-- Floating FAB for Mobile -->
-<div class="fixed bottom-6 right-6 md:hidden">
-<button class="w-14 h-14 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white">
-<span class="material-symbols-outlined">chat_bubble</span>
-</button>
-</div>
-</div>
-</footer>
+            <!-- Floating FAB for Mobile -->
+            <div class="fixed bottom-6 right-6 md:hidden">
+                <button
+                    class="w-14 h-14 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined">chat_bubble</span>
+                </button>
+            </div>
+        </div>
+    </footer>
 
-    
-    
-</body></html>
+
+
+</body>
+
+</html>

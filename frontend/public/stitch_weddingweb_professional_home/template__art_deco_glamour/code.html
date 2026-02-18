@@ -63,6 +63,7 @@
 
         .gold-gradient-text {
             background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -124,18 +125,20 @@
         </header>
         <main class="flex-1 mt-16">
             <!-- Hero Section -->
-            <section class="relative h-[90vh] flex items-center justify-center overflow-hidden" id="union">
+            <section class="relative h-[90vh] flex items-center justify-center overflow-hidden hero-bg" id="union"
+                data-hero-bg="true">
                 <div class="absolute inset-0 bg-cover bg-center" data-alt="Black and white high-end wedding celebration"
                     style='background-image: linear-gradient(rgba(10, 10, 12, 0.7), rgba(10, 10, 12, 0.7)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzmhc4Vulm10j_EujH5FMpySGF03Hfr4zj2855SIg_UdTqLsbx3RsenL-IXpIbYE9VuIjfZQmP4ZLZEvhkB-aM4yH04Fyn1SrIgVLBb0gZmHViClwnDyNJGRMHRDVL4gMl68O4yGQ7iG60wvkM1LhZdkjMGiQcDUi1F8-ESPNKrzaRq_2E0vjNni_1sBodji4U4s9DTcPIpjUAT46JkuXiyTL_yovnr1-mFtRUThKvJov_964fAj6LK0cah1K_-H_dva5-lnlL_oGV");'>
                 </div>
                 <div class="relative z-10 text-center px-4 max-w-4xl">
                     <div class="mb-6 flex justify-center">
                         <div class="w-24 h-[1px] bg-gold self-center"></div>
-                        <span class="mx-4 text-gold tracking-[0.5em] text-sm uppercase">EST. 2026</span>
+                        <span class="mx-4 text-gold tracking-[0.5em] text-sm uppercase font-bold">EST. {{Year}}</span>
                         <div class="w-24 h-[1px] bg-gold self-center"></div>
                     </div>
                     <h1
-                        class="gold-gradient-text text-5xl md:text-8xl font-black leading-tight tracking-tighter uppercase mb-6">{{GroomName}} & {{BrideName}}</h1>
+                        class="gold-gradient-text text-5xl md:text-8xl font-black leading-tight tracking-tighter uppercase mb-6">
+                        {{GroomName}} & {{BrideName}}</h1>
                     <div class="inline-block p-1 border border-gold/30">
                         <div class="border border-gold px-8 py-4 bg-deco-black/40 backdrop-blur-sm">
                             <p class="text-white text-lg md:text-xl font-light tracking-[0.3em] uppercase">
@@ -243,9 +246,8 @@
                         but for those who wish to contribute...</p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         <div class="group deco-border p-8 hover:bg-gold/5 transition-colors cursor-pointer">
-                            <span class="material-symbols-outlined text-gold text-4xl mb-4">flight_takeoff</span>
-                            <h4 class="text-white font-bold tracking-widest uppercase mb-2">Honeymoon Fund</h4>
-                            <p class="text-white/50 text-xs tracking-widest uppercase mb-6">Paris &amp; Venice</p>
+                            <h4 class="text-white font-bold tracking-widest uppercase mb-2">{{Registry_Title}}</h4>
+                            <p class="text-white/50 text-xs tracking-widest uppercase mb-6">{{Registry_Body}}</p>
                             <button
                                 class="text-gold border-b border-gold pb-1 text-xs font-bold tracking-widest uppercase group-hover:text-white group-hover:border-white transition-colors">Contribute</button>
                         </div>
@@ -271,7 +273,7 @@
                     <div
                         class="relative group p-1 bg-gradient-to-br from-gold/50 to-transparent shadow-2xl overflow-hidden">
                         <div class="absolute inset-0 border border-gold/20 pointer-events-none z-10"></div>
-                        <iframe width="100%" height="450"
+                        <iframe id="wedding-map" width="100%" height="450"
                             style="border:0; filter: grayscale(1) contrast(1.2) invert(0.9);" loading="lazy"
                             allowfullscreen src="{{MapEmbedLink}}" referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
@@ -312,8 +314,8 @@
         </footer>
     </div>
 
-    
-    
+
+
 </body>
 
 </html>

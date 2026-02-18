@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { CompanyNavbar } from "@/components/company/dashboard/CompanyNavbar";
-import { LandingToolbar } from "@/components/LandingToolbar";
+import { WeddingWebHeader } from "@/components/WeddingWebHeader";
+
 import {
   Camera,
   Sparkles,
@@ -32,7 +32,7 @@ const Services = () => {
       title: "Build Your Own Wedding Website",
       description: "Create a beautiful, personalized wedding website in minutes with our easy-to-use builder",
       color: "from-rose-500 to-pink-500",
-      image: "/wedding.jpg",
+      image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=900&auto=format&fit=crop",
       features: [
         "Drag-and-drop website builder",
         "Beautiful customizable templates",
@@ -47,7 +47,7 @@ const Services = () => {
       title: "AI-Powered Face Detection",
       description: "Revolutionary face recognition technology that helps guests find their photos instantly",
       color: "from-purple-500 to-pink-500",
-      image: "/kishore-photo.jpg",
+      image: "https://images.unsplash.com/photo-1535016120720-40c646be5580?q=80&w=900&auto=format&fit=crop",
       features: [
         "Advanced facial recognition algorithms",
         "99%+ accuracy rate",
@@ -62,7 +62,7 @@ const Services = () => {
       title: "Smart Photo Gallery",
       description: "Beautiful, organized galleries that make sharing and downloading photos effortless",
       color: "from-blue-500 to-cyan-500",
-      image: "/hero-gallery.jpg",
+      image: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=900&auto=format&fit=crop",
       features: [
         "Unlimited photo storage",
         "Auto-categorization by event",
@@ -77,7 +77,7 @@ const Services = () => {
       title: "Live Streaming",
       description: "Broadcast your special moments to family and friends around the world in real-time",
       color: "from-red-500 to-orange-500",
-      image: "/reception-background.jpg",
+      image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=900&auto=format&fit=crop",
       features: [
         "HD video streaming",
         "No viewer limits",
@@ -92,7 +92,7 @@ const Services = () => {
       title: "Photographer Portal",
       description: "Professional dashboard for photographers to upload and manage photos seamlessly",
       color: "from-green-500 to-emerald-500",
-      image: "/ganapathy.jpg",
+      image: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?q=80&w=900&auto=format&fit=crop",
       features: [
         "Bulk photo upload",
         "Automatic face processing",
@@ -107,7 +107,7 @@ const Services = () => {
       title: "Digital Wishes",
       description: "Collect heartfelt messages and blessings from your guests in a beautiful digital guestbook",
       color: "from-pink-500 to-rose-500",
-      image: "/ayinoon-background.jpg",
+      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=900&auto=format&fit=crop",
       features: [
         "Customizable wish forms",
         "Moderation tools",
@@ -122,7 +122,7 @@ const Services = () => {
       title: "Event Management",
       description: "Keep guests informed with detailed schedules, countdowns, and real-time updates",
       color: "from-indigo-500 to-purple-500",
-      image: "/thiruvathirakali-background.jpg",
+      image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=900&auto=format&fit=crop",
       features: [
         "Interactive event timeline",
         "Countdown timers",
@@ -198,10 +198,7 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-slate-50/50">
       {/* Navigation */}
-      <CompanyNavbar />
-
-      {/* Sidebar Toolbar */}
-      <LandingToolbar />
+      <WeddingWebHeader />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 lg:pt-40 overflow-hidden">
@@ -238,7 +235,7 @@ const Services = () => {
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-4 border-white">
                 <img
-                  src="/hero-wedding.jpg"
+                  src="https://images.unsplash.com/photo-1606216794079-73f85bbd57d5?q=80&w=900&auto=format&fit=crop"
                   alt="Wedding Features"
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
                 />
