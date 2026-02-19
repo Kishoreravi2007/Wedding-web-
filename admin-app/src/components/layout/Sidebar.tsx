@@ -17,7 +17,7 @@ export default function Sidebar() {
             <div className="flex flex-col gap-8 p-8">
                 <div className="flex items-center gap-3">
                     <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-neon-blue p-1.5 overflow-hidden">
-                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
+                        <img src="./logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
                     </div>
                     <div>
                         <h1 className="text-lg font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white transition-colors">WeddingWeb</h1>

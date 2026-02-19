@@ -7,12 +7,16 @@ function createWindow() {
         width: 1280,
         height: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
+            preload: path.join(__dirname, 'preload.cjs'),
             nodeIntegration: false,
             contextIsolation: true,
         },
-        icon: path.join(__dirname, '../public/vite.svg'), // Temporary icon
+        icon: isDev
+            ? path.join(__dirname, '../public/logo.png')
+            : path.join(__dirname, '../dist/logo.png'),
     });
+
+    mainWindow.setMenu(null);
 
     if (isDev) {
         mainWindow.loadURL('http://localhost:5173');

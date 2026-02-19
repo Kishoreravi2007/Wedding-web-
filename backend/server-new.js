@@ -48,6 +48,7 @@ const whitelist = [
   'https://www.weddingweb.co.in',
   'https://wedding-backend-rst3dulcnq-el.a.run.app',
   'https://wedding-backend-979970479540.asia-south1.run.app', // Added from .env
+  'file://',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 

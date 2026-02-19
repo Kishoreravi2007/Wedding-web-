@@ -32,7 +32,9 @@ export default function Login() {
             login(token, user);
             navigate(from, { replace: true });
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.');
+            console.error('Login Error:', err);
+            const detailedError = err.response?.data?.message || err.message || 'Network error or invalid credentials';
+            setError(detailedError);
         } finally {
             setIsLoading(false);
         }
@@ -50,7 +52,7 @@ export default function Login() {
                     <div className="bg-[#0a0e17]/80 backdrop-blur-3xl rounded-[2.3rem] p-8 md:p-10 border border-white/5">
                         <div className="flex flex-col items-center mb-10">
                             <div className="size-20 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-neon-blue mb-6 scale-110 p-3 overflow-hidden">
-                                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
+                                <img src="./logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight text-center">WeddingWeb</h1>
                             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mt-2">Administrative Console</p>

@@ -12,7 +12,7 @@
     "electron:build": "npm run build && electron-builder",
     "electron:pack": "npm run build && electron-builder --dir"
   },
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "build": {
     "appId": "com.weddingweb.admin",
     "productName": "WeddingWeb Admin",
@@ -23,8 +23,20 @@
       "dist/**/*",
       "electron/**/*"
     ],
+    "icon": "public/logo.png",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "public/logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "WeddingWeb Admin",
+      "runAfterFinish": true,
+      "welcomePageFixed": true,
+      "deleteAppDataOnUninstall": true
     }
   },
   "dependencies": {
