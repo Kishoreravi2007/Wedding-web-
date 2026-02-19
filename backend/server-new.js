@@ -83,7 +83,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://apis.google.com", "https://www.gstatic.com", "https://www.googletagmanager.com"],
       workerSrc: ["'self'", "blob:"],
       connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://wedding-deepface-rst3dulcnq-el.a.run.app", "https://*.firebaseio.com", "https://firebaseinstallations.googleapis.com", "https://*.googleapis.com", "https://www.google-analytics.com", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:5002" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:3001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
-      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://storage.googleapis.com", "https://*.unsplash.com", process.env.FRONTEND_URL].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://storage.googleapis.com", "https://*.unsplash.com", "https://ui-avatars.com", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://*.firebaseapp.com", "https://*.google.com"],
@@ -139,7 +139,7 @@ app.get('/', (req, res) => {
     status: 'running',
     version: '2.0.1',
     services: {
-      gcp_sql: '✓ (photos, faces, wishes)',
+      gcp_sql: '✓ (Supabase PostgreSQL)',
     },
     timestamp: new Date().toISOString()
   });
@@ -345,20 +345,20 @@ async function runAutoMigration() {
   console.log('🔄 Checking database schema...');
   try {
     const { query } = require('./lib/db-gcp');
-    const schemaPath = path.join(__dirname, 'unified_production_schema.sql');
+    // Use embedded schema to avoid file system issues in production container
+    const schemaSql = require('./lib/production-schema');
 
-    if (fs.existsSync(schemaPath)) {
-      const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-      console.log('📜 Applying strict production schema from unified_production_schema.sql...');
+    if (schemaSql) {
+      console.log('📜 Applying strict production schema from lib/production-schema.js...');
       await query(schemaSql);
       console.log('✅ Schema Applied Successfully.');
     } else {
-      console.warn('⚠️ Schema file not found:', schemaPath);
+      console.warn('⚠️ Schema content is empty!');
     }
   } catch (error) {
     console.error('❌ Schema Migration Failed:', error);
-    // We don't exit process here to allow server to start even if migration fails (e.g. transient DB error)
-    // But for "relation does not exist", this is critical.
+    // Log the error but allow server to start so we can inspect logs if needed
+    // In production, you might want to exit(1) here if schema is critical
   }
 }
 
