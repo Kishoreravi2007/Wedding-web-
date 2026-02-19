@@ -20,11 +20,13 @@ const allowedOrigins = [
   'http://localhost:3002',
   'http://localhost:3003',
   'http://localhost:5173', // Vite default port
+  'http://localhost:5192', // Current user port
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001',
   'http://127.0.0.1:3002',
   'http://127.0.0.1:3003',
   'http://127.0.0.1:5173',
+  'http://127.0.0.1:5192',
   // Deployed frontend URLs
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
@@ -170,6 +172,10 @@ app.use('/api/live', liveSyncRouter);
 // Premium membership & builder routes
 const premiumRouter = require('./routes/premium');
 app.use('/api/premium', premiumRouter);
+
+// Coupons management
+const couponsRouter = require('./routes/coupons');
+app.use('/api/coupons', couponsRouter);
 
 // Resolve 404 errors on Client Portal
 const profilesRouter = require('./routes/profiles');

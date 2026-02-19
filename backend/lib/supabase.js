@@ -1,18 +1,23 @@
+/**
+ * Supabase Client for Backend
+ * 
+ * Used for verifying auth tokens and interacting with Supabase services.
+ */
 
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-console.log('📡 Initializing Supabase client...');
-console.log('🔗 URL:', supabaseUrl);
-console.log('🔑 Key (first 10 chars):', supabaseKey ? supabaseKey.substring(0, 10) + '...' : 'MISSING');
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Supabase URL or Key missing in environment variables.');
+if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('⚠️ Supabase URL or Service Role Key missing in backend .env');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
-console.log('✅ Supabase client created');
+const supabase = createClient(supabaseUrl || '', supabaseServiceKey || '', {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false
+    }
+});
 
 module.exports = { supabase };

@@ -6,12 +6,9 @@ import { Heart, Gift, Shirt, Camera } from "lucide-react";
 import { useWebsite } from "@/contexts/WebsiteContext";
 import { motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useMusicPlayer } from "@/contexts/MusicPlayerContext"; // Import useMusicPlayer
-
 const Index = () => {
   const { content } = useWebsite();
   const { t } = useTranslation();
-  const { playTrack } = useMusicPlayer(); // Get playTrack from the context
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -126,7 +123,7 @@ const Index = () => {
 
       <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-12 relative z-10" variants={containerVariants}>
         <motion.div variants={cardVariants}>
-          <Link to="/parvathy" className="group" onClick={() => playTrack('/wedding-music.mp3')}>
+          <Link to="/parvathy" className="group">
             <motion.div
               whileHover="hover"
               variants={cardVariants}
@@ -177,7 +174,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div variants={cardVariants}>
-          <Link to="/sreedevi" className="group" onClick={() => playTrack('/another-song.mp3')}> {/* Add onClick handler */}
+          <Link to="/sreedevi" className="group">
             <motion.div
               whileHover="hover"
               variants={cardVariants}

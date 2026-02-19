@@ -5,6 +5,7 @@
  */
 
 import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+
 import * as path from 'path';
 import * as fs from 'fs';
 import { watchFolder, stopWatching, isWatching } from './services/folderWatcher';
@@ -53,7 +54,7 @@ if (!app.isPackaged || process.env.NODE_ENV === 'development') {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: any = null;
 
 function createWindow() {
   try {
@@ -82,12 +83,12 @@ function createWindow() {
 
     if (isDev) {
       log('Loading URL: http://localhost:5173');
-      mainWindow.loadURL('http://localhost:5173').catch(err => log(`Load URL Error: ${err.message}`));
+      mainWindow.loadURL('http://localhost:5173').catch((err: any) => log(`Load URL Error: ${err.message}`));
       mainWindow.webContents.openDevTools();
     } else {
       const filePath = path.join(__dirname, '../dist/index.html');
       log(`Loading File: ${filePath}`);
-      mainWindow.loadFile(filePath).catch(err => log(`Load File Error: ${err.message}`));
+      mainWindow.loadFile(filePath).catch((err: any) => log(`Load File Error: ${err.message}`));
     }
 
     mainWindow.on('closed', () => {
@@ -119,7 +120,7 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
-}).catch(err => log(`App Ready Error: ${err.message}`));
+}).catch((err: any) => log(`App Ready Error: ${err.message}`));
 
 app.on('window-all-closed', () => {
   stopWatching();
@@ -135,7 +136,7 @@ ipcMain.handle('get-config', async () => {
   return getConfig();
 });
 
-ipcMain.handle('save-config', async (_, config) => {
+ipcMain.handle('save-config', async (_: any, config: any) => {
   saveConfig(config);
   return { success: true };
 });
@@ -158,7 +159,7 @@ ipcMain.handle('detect-cameras', async () => {
 });
 
 // Folder watching
-ipcMain.handle('start-watching', async (_, folderPath: string) => {
+ipcMain.handle('start-watching', async (_: any, folderPath: string) => {
   if (!mainWindow) return { success: false, error: 'Window not available' };
 
   try {
@@ -194,17 +195,17 @@ ipcMain.handle('is-watching', async () => {
 });
 
 // API validation
-ipcMain.handle('validate-api-key', async (_, baseUrl: string, apiKey: string) => {
+ipcMain.handle('validate-api-key', async (_: any, baseUrl: string, apiKey: string) => {
   return validateApiKey(baseUrl, apiKey);
 });
 
 // Fetch weddings
-ipcMain.handle('fetch-weddings', async (_, baseUrl: string, apiKey: string) => {
+ipcMain.handle('fetch-weddings', async (_: any, baseUrl: string, apiKey: string) => {
   return fetchWeddings(baseUrl, apiKey);
 });
 
 // Check connection
-ipcMain.handle('check-connection', async (_, baseUrl: string) => {
+ipcMain.handle('check-connection', async (_: any, baseUrl: string) => {
   return checkConnection(baseUrl);
 });
 
@@ -232,7 +233,7 @@ ipcMain.handle('clear-completed', async () => {
 });
 
 // Test upload
-ipcMain.handle('test-upload', async (_, filePath: string) => {
+ipcMain.handle('test-upload', async (_: any, filePath: string) => {
   const config = getConfig();
   if (!config.apiKey) {
     return { success: false, error: 'API key not configured' };
@@ -246,7 +247,7 @@ ipcMain.handle('test-upload', async (_, filePath: string) => {
 });
 
 // Open folder in system file manager
-ipcMain.handle('open-folder', async (_, folderPath: string) => {
+ipcMain.handle('open-folder', async (_: any, folderPath: string) => {
   shell.openPath(folderPath);
   return { success: true };
 });

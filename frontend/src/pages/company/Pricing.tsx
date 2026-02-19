@@ -75,6 +75,33 @@ interface PricingFeature {
   popular?: boolean;
 }
 
+interface CouponValidationResponse {
+  valid: boolean;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number | string;
+}
+
+interface CheckoutResponse {
+  success: boolean;
+  checkoutId: string;
+  amount: number;
+  currency: string;
+  razorpayOrder: {
+    id: string;
+    amount: number;
+    currency: string;
+    status: string;
+  };
+  razorpayKeyId: string;
+  isCapped?: boolean;
+}
+
+interface ActivateResponse {
+  success: boolean;
+  message: string;
+  membership?: any;
+}
+
 const pricingFeatures: PricingFeature[] = [
   // Core Features
   {
@@ -368,18 +395,41 @@ const Pricing = () => {
     }
   };
 
-  const handleApplyCoupon = () => {
-    const normalized = couponCode.trim().toLowerCase();
-    if (normalized === 'dridhi') {
-      setCouponDiscount(0.25);
-      setCouponStatus('applied');
-    } else {
+  const [fixedDiscount, setFixedDiscount] = useState(0);
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim();
+    if (!code) return;
+
+    setCouponStatus('idle');
+    try {
+      const response = await apiCall<CouponValidationResponse>(`/api/coupons/validate/${code}`);
+
+      if (response.valid) {
+        const val = Number(response.discount_value);
+        if (response.discount_type === 'percentage') {
+          setCouponDiscount(val / 100);
+          setFixedDiscount(0);
+        } else {
+          setCouponDiscount(0);
+          setFixedDiscount(val);
+        }
+        setCouponStatus('applied');
+      }
+    } catch (err) {
       setCouponDiscount(0);
+      setFixedDiscount(0);
       setCouponStatus('invalid');
     }
   };
 
   const handleBookNow = async () => {
+    if (!currentUser) {
+      showError('Please log in to continue with your purchase.');
+      navigate('/login');
+      return;
+    }
+
     if (selectedFeatures.size === 0) {
       showError('Please select at least one feature before booking.');
       return;
@@ -394,7 +444,7 @@ const Pricing = () => {
       const activeDur = durationOptions.find((o) => o.key === duration);
       const months = activeDur?.months ?? 1;
 
-      const response = await apiCall('/api/premium/checkout', {
+      const response = await apiCall<CheckoutResponse>('/api/premium/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -426,7 +476,7 @@ const Pricing = () => {
         order_id: response.razorpayOrder.id,
         handler: async (payload: any) => {
           try {
-            await apiCall('/api/premium/activate', {
+            await apiCall<ActivateResponse>('/api/premium/activate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -491,7 +541,7 @@ const Pricing = () => {
 
   const baseSubtotal = calculateBaseSubtotal();
   const subtotal = calculateSubtotal();
-  const roundedTotal = Math.max(0, Math.round(subtotal * (1 - couponDiscount)));
+  const roundedTotal = Math.max(0, Math.round(subtotal * (1 - couponDiscount) - fixedDiscount));
   const total = roundedTotal;
   const storageExtraDurationCost = getStorageExtraDurationCost();
   const discountAmount = Math.max(subtotal - total, 0);
@@ -977,9 +1027,11 @@ const Pricing = () => {
                               </span>
                             </div>
                           )}
-                          {couponDiscount > 0 && discountAmount > 0 && (
+                          {(couponDiscount > 0 || fixedDiscount > 0) && discountAmount > 0 && (
                             <div className="flex items-center justify-between text-base text-rose-600">
-                              <span className="text-slate-600">Coupon discount (25%)</span>
+                              <span className="text-slate-600">
+                                Coupon discount ({couponDiscount > 0 ? `${(couponDiscount * 100).toFixed(0)}%` : `₹${fixedDiscount.toLocaleString('en-IN')}`})
+                              </span>
                               <span className="font-semibold text-rose-600">
                                 -₹{discountAmount.toLocaleString('en-IN')}
                               </span>
@@ -1021,8 +1073,8 @@ const Pricing = () => {
                                 }`}
                             >
                               {couponStatus === 'applied'
-                                ? `Coupon "${couponCode}" applied. Enjoy 25% off!`
-                                : 'Coupon code invalid. Try DRIDHI (case-insensitive).'}
+                                ? `Coupon "${couponCode}" applied successfully!`
+                                : 'Coupon code invalid.'}
                             </p>
                           )}
                         </div>

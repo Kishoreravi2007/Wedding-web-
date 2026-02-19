@@ -2,11 +2,11 @@
   "name": "weddingweb-desktop",
   "version": "1.0.0",
   "description": "WeddingWeb Desktop App for Live Photo Sync",
-  "main": "dist-electron/main.js",
+  "main": "launcher.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:electron\" \"npm run dev:react\"",
     "dev:react": "vite",
-    "dev:electron": "tsc -p tsconfig.electron.json && electron . --user-data-dir=./temp-electron-data",
+    "dev:electron": "tsc -p tsconfig.electron.json && set ELECTRON_RUN_AS_NODE= && .\\node_modules\\electron-bin\\dist\\electron.exe . --user-data-dir=./temp-electron-data",
     "build": "npm run build:react && npm run build:electron",
     "build:react": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
@@ -36,7 +36,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.24",
     "concurrently": "^8.2.2",
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
@@ -72,11 +72,7 @@
       ]
     },
     "win": {
-      "icon": "assets/icon.ico",
-      "target": [
-        "nsis",
-        "portable"
-      ]
+      "icon": "assets/icon.ico"
     },
     "linux": {
       "icon": "assets/icon.png",

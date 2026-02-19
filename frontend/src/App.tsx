@@ -6,13 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, Easing } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import MusicPlayer from "./components/MusicPlayer";
 import { WebsiteProvider } from "./contexts/WebsiteContext";
 import { ThemeProvider } from "./components/theme-provider";
-import { useMusicPlayer } from "./contexts/MusicPlayerContext";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "./components/ui/button";
-import { X, Music, MessageSquare } from "lucide-react";
+import { X, MessageSquare } from "lucide-react";
 import CountdownTimer from "./components/CountdownTimer";
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -101,11 +99,9 @@ const itemVariants = {
 };
 
 const App = () => {
-  const [showMusicPlayer, setShowMusicPlayer] = useState(true);
   const [feedbackCompact, setFeedbackCompact] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
-  const { isPlaying, togglePlay } = useMusicPlayer();
 
   // Set language attribute on document root
   useEffect(() => {
@@ -183,20 +179,6 @@ const App = () => {
                 </Button>
               </Link>
             )}
-            {/* Music Player Toggle - Hidden on excluded pages, feedback page, and wedding pages (which have their own player) */}
-            {!isExcludedPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && location.pathname !== '/feedback' && (
-              <Button
-                variant="outline"
-                size="icon"
-                className={`fixed left-4 z-50 rounded-full w-10 h-10 transition-all ${hasBottomNav ? 'bottom-[4.5rem]' : 'bottom-4'}`}
-                onClick={() => setShowMusicPlayer(!showMusicPlayer)}
-              >
-                {showMusicPlayer ? <X className="w-4 h-4" /> : <Music className="w-4 h-4" />}
-              </Button>
-            )}
-            {/* Music Player - Hidden on excluded pages and wedding pages */}
-            {!isExcludedPage && !location.pathname.startsWith('/weddings/') && !location.pathname.startsWith('/w/') && showMusicPlayer && <MusicPlayer />}
-
             {/* Feedback Button - Available on all pages except feedback page itself */}
             {location.pathname !== '/feedback' && (
               <Link to="/feedback" className={`fixed right-4 z-[45] transition-all duration-500 ${hasBottomNav ? 'bottom-32' : isExcludedPage ? 'bottom-20' : 'bottom-20'}`}>

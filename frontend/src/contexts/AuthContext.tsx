@@ -122,6 +122,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
 
         checkSession();
+
+        // Listen for Supabase session changes (e.g. from Google Login)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session?.access_token) {
+                try {
+                    // Sync Supabase token with Backend native token
+                    const syncResponse = await fetch(`${API_BASE_URL}/api/auth/social-sync`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ token: session.access_token }),
+                    });
+
+                    if (syncResponse.ok) {
+                        const syncData = await syncResponse.json();
+                        const nativeToken = syncData.token || syncData.accessToken;
+
+                        if (nativeToken) {
+                            localStorage.setItem('wedding_auth_token', nativeToken);
+                            // Refresh profile using the NEW native token
+                            const profileRes = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+                                headers: {
+                                    'Authorization': `Bearer ${nativeToken}`,
+                                },
+                            });
+
+                            if (profileRes.ok) {
+                                const profileData = await profileRes.json();
+                                setCurrentUser(normalizeUser(profileData.user || profileData));
+                            }
+                        }
+                    }
+                } catch (syncError) {
+                    console.error('Failed to sync social login:', syncError);
+                }
+            } else if (event === 'SIGNED_OUT') {
+                localStorage.removeItem('wedding_auth_token');
+                setCurrentUser(null);
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
     // ── Login ─────────────────────────────────────────────────────────────────

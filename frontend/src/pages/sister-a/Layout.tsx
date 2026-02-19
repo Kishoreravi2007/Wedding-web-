@@ -1,18 +1,9 @@
 import { Outlet } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
 
 const SisterALayout = () => {
   const { t } = useTranslation();
-  const { setWeddingMusic } = useMusicPlayer();
-
-  useEffect(() => {
-    setWeddingMusic('/wedding-music.mp3');
-    // Optional: Reset on unmount if we don't want it to persist at all elsewhere
-    // return () => setWeddingMusic(null);
-  }, [setWeddingMusic]);
 
   return (
     <div

@@ -1,12 +1,27 @@
-/**
- * Profile API
- * 
- * Handles user profile operations using Cloud SQL.
- */
-
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const { query } = require('../lib/db-gcp');
+const { authMiddleware } = require('../lib/secure-auth');
+const authenticateToken = authMiddleware.verifyToken;
+
+// Load storage provider
+const storageProvider = process.env.STORAGE_PROVIDER || 'supabase';
+let storage;
+try {
+    if (storageProvider === 'gcs') storage = require('../lib/gcs-storage');
+    else if (storageProvider === 'local') storage = require('../lib/local-storage');
+    else storage = require('../lib/supabase-storage');
+} catch (err) {
+    storage = require('../lib/supabase-storage');
+}
+const { uploadFile } = storage;
+
+// Multer config for avatar
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
 
 /**
  * GET /api/profiles
@@ -26,8 +41,35 @@ router.get('/', async (req, res) => {
  * POST /api/profiles
  * Create or update a user profile
  */
-const { authMiddleware } = require('../lib/secure-auth');
-const authenticateToken = authMiddleware.verifyToken;
+// router.post('/', authenticateToken, ... (rest of the file remains same)
+/**
+ * POST /api/profiles/upload
+ * Upload profile avatar
+ */
+router.post('/upload', authenticateToken, upload.single('avatar'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
+        const userId = req.user.id;
+        const fileName = `avatars/${userId}_${Date.now()}_${req.file.originalname}`;
+
+        const publicUrl = await uploadFile('profiles', fileName, req.file.buffer, req.file.mimetype);
+
+        // Update profile with new avatar_url
+        const updateQuery = 'UPDATE profiles SET avatar_url = $1, updated_at = NOW() WHERE user_id = $2 RETURNING *';
+        const { rows } = await query(updateQuery, [publicUrl, userId]);
+
+        res.json({
+            message: 'Avatar updated successfully',
+            avatar_url: publicUrl,
+            profile: rows[0]
+        });
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        res.status(500).json({ message: 'Error uploading avatar', error: error.message });
+    }
+});
+
 router.post('/', authenticateToken, async (req, res) => {
     try {
         const { full_name, location, bio, avatar_url, email } = req.body;

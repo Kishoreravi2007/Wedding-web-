@@ -278,16 +278,43 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const { PhotoDB } = require('../lib/sql-db');
 
-    // Check for photos
-    const photoCheck = await query('SELECT id FROM photos WHERE wedding_id = $1 LIMIT 1', [id]);
-    if (photoCheck.rows.length > 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Cannot delete wedding with existing photos. Please delete photos first or archive the wedding.'
-      });
+    // Initialize storage provider for file deletion
+    const storageProvider = process.env.STORAGE_PROVIDER || 'supabase';
+    let storage;
+    try {
+      if (storageProvider === 'gcs') {
+        storage = require('../lib/gcs-storage');
+      } else if (storageProvider === 'local') {
+        storage = require('../lib/local-storage');
+      } else {
+        storage = require('../lib/supabase-storage');
+      }
+    } catch (err) {
+      console.warn('Fallback to supabase storage for delete op');
+      storage = require('../lib/supabase-storage');
+    }
+    const { deleteFile } = storage;
+
+    // 1. Fetch all photos for this wedding
+    const photos = await PhotoDB.findAll({ weddingId: id, limit: 10000 });
+    console.log(`🗑️ Processing cascading delete for wedding ${id}. Found ${photos.length} photos.`);
+
+    // 2. Delete physical files
+    for (const photo of photos) {
+      if (photo.file_path) {
+        try {
+          await deleteFile(photo.file_path);
+        } catch (fileErr) {
+          console.error(`Failed to delete file ${photo.file_path}:`, fileErr.message);
+          // Continue deletion despite file error
+        }
+      }
     }
 
+    // 3. Delete wedding record (CASCADE will handle photos, people, wishes rows)
+    // Note: We depend on ON DELETE CASCADE in the schema for the rows.
     const { rowCount } = await query('DELETE FROM weddings WHERE id = $1', [id]);
 
     if (rowCount === 0) {
@@ -296,7 +323,7 @@ router.delete('/:id', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Wedding deleted successfully'
+      message: `Wedding and ${photos.length} photos deleted successfully`
     });
   } catch (error) {
     console.error('Error deleting wedding:', error);

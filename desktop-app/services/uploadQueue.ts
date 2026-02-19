@@ -6,7 +6,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
+import type { app as AppType } from 'electron';
+// @ts-ignore
+const { app } = require('electron');
 import { uploadPhoto } from './uploader';
 
 interface QueueItem {
@@ -28,7 +30,7 @@ interface UploadConfig {
     maxRetries?: number;
 }
 
-const QUEUE_FILE = path.join(app.getPath('userData'), 'upload-queue.json');
+const getQueueFile = () => path.join(app.getPath('userData'), 'upload-queue.json');
 const MAX_CONCURRENT = 3;
 
 let queue: QueueItem[] = [];
@@ -41,8 +43,9 @@ let onProgressCallback: ((item: QueueItem) => void) | null = null;
  */
 export function initQueue(): void {
     try {
-        if (fs.existsSync(QUEUE_FILE)) {
-            const data = fs.readFileSync(QUEUE_FILE, 'utf-8');
+        const queueFile = getQueueFile();
+        if (fs.existsSync(queueFile)) {
+            const data = fs.readFileSync(queueFile, 'utf-8');
             queue = JSON.parse(data);
             // Reset uploading items to pending (in case app crashed)
             queue = queue.map(item =>
@@ -61,7 +64,7 @@ export function initQueue(): void {
  */
 function saveQueue(): void {
     try {
-        fs.writeFileSync(QUEUE_FILE, JSON.stringify(queue, null, 2));
+        fs.writeFileSync(getQueueFile(), JSON.stringify(queue, null, 2));
     } catch (error) {
         console.error('Error saving queue:', error);
     }

@@ -45,7 +45,8 @@ export const getAccessToken = () => {
     localStorage.getItem('auth_token') ||
     localStorage.getItem('token') ||
     localStorage.getItem('accessToken') ||
-    localStorage.getItem('admin_token');
+    localStorage.getItem('admin_token') ||
+    import.meta.env.VITE_ADMIN_TOKEN;
 
   // Robust check for invalid token strings
   if (!token || token === 'undefined' || token === 'null' || token === '[object Object]') {

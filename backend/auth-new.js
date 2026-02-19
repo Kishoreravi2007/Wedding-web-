@@ -11,6 +11,7 @@ const router = express.Router();
 const { SecureUserDB, TokenManager, authMiddleware } = require('./lib/secure-auth');
 const emailService = require('./services/email-service');
 const OTPAuth = require('otpauth');
+const { supabase } = require('./lib/supabase');
 
 console.log('🛡️  auth-new.js module loading... (Secure SQL Auth)');
 
@@ -151,6 +152,90 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(401).json({ message: error.message || 'Login failed' });
+  }
+});
+
+/**
+ * POST /api/auth/social-sync
+ * Sync social login (Supabase) with local SQL DB
+ */
+router.post('/social-sync', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Supabase token is required' });
+    }
+
+    // Verify token with Supabase
+    const { data: { user: sbUser }, error: sbError } = await supabase.auth.getUser(token);
+
+    if (sbError || !sbUser) {
+      console.error('Supabase token verification failed:', sbError);
+      return res.status(401).json({ message: 'Invalid social login session' });
+    }
+
+    const email = sbUser.email.toLowerCase();
+    const { query } = require('./lib/db-gcp');
+
+    // 1. Check if user already exists in SQL DB
+    const { rows: existingUsers } = await query(
+      'SELECT * FROM users WHERE LOWER(username) = $1',
+      [email]
+    );
+
+    let user = existingUsers[0];
+
+    // 2. If user doesn't exist, create them
+    if (!user) {
+      console.log(`🆕 Creating new SQL user for social login: ${email}`);
+      const { rows: newUserRows } = await query(
+        `INSERT INTO users (username, password, role, is_active, created_at)
+         VALUES ($1, $2, $3, true, NOW())
+         RETURNING *`,
+        [email, 'SOC_' + require('crypto').randomBytes(16).toString('hex'), 'user']
+      );
+      user = newUserRows[0];
+
+      // Create Profile
+      try {
+        await query(
+          `INSERT INTO profiles (user_id, full_name, email, created_at, updated_at) 
+           VALUES ($1, $2, $3, NOW(), NOW())
+           ON CONFLICT (user_id) DO NOTHING`,
+          [user.id, sbUser.user_metadata?.full_name || email.split('@')[0], email]
+        );
+      } catch (pErr) {
+        console.error('Failed to create profile during social sync:', pErr);
+      }
+    }
+
+    // 3. Generate native backend token
+    const nativeToken = TokenManager.generateToken(user);
+
+    // 4. Log sync success
+    await SecureUserDB.logAuthAttempt(user.id, 'social_sync_success', true, {
+      username: email,
+      provider: 'google',
+      ip_address: getClientIp(req)
+    });
+
+    res.json({
+      message: 'Social login synchronized',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        is_active: user.is_active,
+        wedding_id: user.wedding_id
+      },
+      token: nativeToken,
+      accessToken: nativeToken
+    });
+
+  } catch (error) {
+    console.error('Social sync error:', error);
+    res.status(500).json({ message: 'Failed to synchronize social login' });
   }
 });
 

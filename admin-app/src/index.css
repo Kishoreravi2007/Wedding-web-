@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #00f2ff;
+  --color-secondary: #7000ff;
+  --color-accent: #ff00e5;
+  --color-background-dark: #05070a;
+  --font-sans: 'Manrope', sans-serif;
+  --font-display: 'Manrope', sans-serif;
+
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  --shadow-neon-blue: 0 0 15px rgba(0, 242, 255, 0.4);
+  --shadow-neon-purple: 0 0 15px rgba(112, 0, 255, 0.4);
+}
+
+@layer base {
+  body {
+    @apply antialiased font-display transition-colors duration-500;
+    @apply bg-slate-50 text-slate-900;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    @apply bg-background-dark text-slate-100;
+    background: radial-gradient(circle at 0% 0%, #05070a 0%, #0a0e17 100%);
+  }
+}
+
+@layer utilities {
+  .mesh-gradient {
+    background:
+      radial-gradient(at 0% 0%, rgba(0, 242, 255, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(112, 0, 255, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(255, 0, 229, 0.1) 0px, transparent 50%);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .light .glass-card,
+  :root:not(.dark) .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+
+  .holographic-card {
+    background: linear-gradient(135deg, rgba(0, 242, 255, 0.2), rgba(112, 0, 255, 0.2));
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .filled {
+    font-variation-settings: 'FILL' 1;
+  }
+}

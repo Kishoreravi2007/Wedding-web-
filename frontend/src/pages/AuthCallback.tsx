@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
+import { API_BASE_URL } from '@/lib/api';
+
 const AuthCallback = () => {
     const navigate = useNavigate();
 
@@ -17,6 +19,30 @@ const AuthCallback = () => {
             }
 
             if (data?.session) {
+                try {
+                    // Sync Supabase token with Backend native token
+                    const syncResponse = await fetch(`${API_BASE_URL}/api/auth/social-sync`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ token: data.session.access_token }),
+                    });
+
+                    if (syncResponse.ok) {
+                        const syncData = await syncResponse.json();
+                        const nativeToken = syncData.token || syncData.accessToken;
+
+                        if (nativeToken) {
+                            localStorage.setItem('wedding_auth_token', nativeToken);
+                        }
+                    } else {
+                        console.error('Failed to sync session with backend');
+                    }
+                } catch (syncError) {
+                    console.error('Sync error:', syncError);
+                }
+
                 // Determine redirect path based on user role/metadata
                 const user = data.session.user;
                 const role = user.user_metadata?.role || 'user';

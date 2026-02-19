@@ -18,8 +18,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
  */
 async function uploadFile(bucketName, filePath, buffer, mimeType) {
     try {
-        // Ensure bucket exists (optional, could be done once at startup)
-        // await createBucketIfNotExists(bucketName);
+        // Ensure bucket exists
+        await createBucketIfNotExists(bucketName);
 
         const { data, error } = await supabase.storage
             .from(bucketName)

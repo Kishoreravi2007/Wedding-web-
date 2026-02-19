@@ -40,8 +40,25 @@ echo "✅ Infrastructure Ready."
 echo "   DB Connection: $INSTANCE_CONNECTION_NAME"
 echo "   Bucket: $BUCKET_NAME"
 
-# 2. Build Backend Container
-echo "Step 2: Building Backend Container..."
+# 2. Build Frontend
+echo "Step 2: Building Frontend..."
+cd frontend
+# Install dependencies if node_modules missing
+if [ ! -d "node_modules" ]; then
+    npm install
+fi
+
+# Build (default output to 'dist')
+npm run build
+
+echo "   Moving frontend build to backend/build..."
+# Prepare backend build directory
+rm -rf ../backend/build
+mv dist ../backend/build
+cd ..
+
+# 3. Build Backend Container
+echo "Step 3: Building Backend Container..."
 cd backend
 # Submit build to Cloud Build
 gcloud builds submit --tag gcr.io/$PROJECT_ID/wedding-backend . --quiet

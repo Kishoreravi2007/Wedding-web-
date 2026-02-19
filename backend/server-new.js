@@ -36,7 +36,7 @@ const rateLimit = require('express-rate-limit');
 // EXPRESS APP SETUP
 // =============================================================================
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 
 // =============================================================================
 // Security Middleware Configuration
@@ -136,7 +136,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Wedding Web Backend API',
     status: 'running',
-    version: '2.0.0',
+    version: '2.0.1',
     services: {
       gcp_sql: '✓ (photos, faces, wishes)',
     },
@@ -207,6 +207,11 @@ app.use('/api/faces', facesRouter);
 console.log('👤 Registering /api/profiles routes...');
 const profilesRouter = require('./routes/profiles');
 app.use('/api/profiles', profilesRouter);
+
+// Analytics routes
+console.log('📊 Registering /api/analytics routes...');
+const analyticsRouter = require('./analytics');
+app.use('/api/analytics', authenticateToken, analyticsRouter);
 
 // Admin setup routes (one-time user creation)
 const adminSetupRouter = require('./routes/admin-setup');

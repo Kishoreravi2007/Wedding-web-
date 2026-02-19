@@ -6,7 +6,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
+import type { app as AppType } from 'electron';
+// @ts-ignore
+const { app } = require('electron');
 
 interface AppConfig {
   apiKey?: string;
@@ -20,10 +22,10 @@ interface AppConfig {
   selectedCameraId?: string;
 }
 
-const CONFIG_FILE = path.join(app.getPath('userData'), 'config.json');
+const getConfigFile = () => path.join(app.getPath('userData'), 'config.json');
 
 const DEFAULT_CONFIG: AppConfig = {
-  apiBaseUrl: 'http://localhost:5001',
+  apiBaseUrl: 'https://wedding-backend-979970479540.asia-south1.run.app',
   compressImages: false,
   maxRetries: 3,
   cameraMode: 'hot-folder',
@@ -31,8 +33,9 @@ const DEFAULT_CONFIG: AppConfig = {
 
 export function getConfig(): AppConfig {
   try {
-    if (fs.existsSync(CONFIG_FILE)) {
-      const data = fs.readFileSync(CONFIG_FILE, 'utf-8');
+    const configFile = getConfigFile();
+    if (fs.existsSync(configFile)) {
+      const data = fs.readFileSync(configFile, 'utf-8');
       return { ...DEFAULT_CONFIG, ...JSON.parse(data) };
     }
   } catch (error) {
@@ -45,7 +48,7 @@ export function saveConfig(config: Partial<AppConfig>): void {
   try {
     const currentConfig = getConfig();
     const newConfig = { ...currentConfig, ...config };
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(newConfig, null, 2));
+    fs.writeFileSync(getConfigFile(), JSON.stringify(newConfig, null, 2));
     console.log('✅ Configuration saved');
   } catch (error) {
     console.error('Error saving config:', error);
