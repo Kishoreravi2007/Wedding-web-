@@ -86,7 +86,7 @@ router.post('/migrate-schema', async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        const schemaPath = path.join(__dirname, '../gcp_schema.sql');
+        const schemaPath = path.join(__dirname, '../unified_production_schema.sql');
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
 
         console.log('Running schema migration...');

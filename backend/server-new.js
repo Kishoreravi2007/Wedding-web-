@@ -339,10 +339,37 @@ app.use((error, req, res, next) => {
 // SERVER START
 // =============================================================================
 
-const server = app.listen(PORT, () => {
+const fs = require('fs');
+
+async function runAutoMigration() {
+  console.log('🔄 Checking database schema...');
+  try {
+    const { query } = require('./lib/db-gcp');
+    const schemaPath = path.join(__dirname, 'unified_production_schema.sql');
+
+    if (fs.existsSync(schemaPath)) {
+      const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+      console.log('📜 Applying strict production schema from unified_production_schema.sql...');
+      await query(schemaSql);
+      console.log('✅ Schema Applied Successfully.');
+    } else {
+      console.warn('⚠️ Schema file not found:', schemaPath);
+    }
+  } catch (error) {
+    console.error('❌ Schema Migration Failed:', error);
+    // We don't exit process here to allow server to start even if migration fails (e.g. transient DB error)
+    // But for "relation does not exist", this is critical.
+  }
+}
+
+const server = app.listen(PORT, async () => {
   console.log('\n' + '='.repeat(80));
   console.log('🎉 Wedding Web Application Server Started');
   console.log('='.repeat(80));
+
+  // Run migration immediately on startup
+  await runAutoMigration();
+
   console.log(`📍 Server running on port ${PORT}`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`\n📋 API Endpoints:`);
