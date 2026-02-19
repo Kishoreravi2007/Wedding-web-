@@ -37,6 +37,7 @@ interface PhotoFile {
   status: 'pending' | 'uploading' | 'completed' | 'error';
   progress: number;
   id: string;
+  isPublic: boolean;
 }
 
 interface PhotoUploadProps {
@@ -84,7 +85,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
         setFaceModelsLoaded(true);
         return;
       }
-      
+
       try {
         setLoadingFaceModels(true);
         await loadFaceModels();
@@ -145,7 +146,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
       storageProvider: storageProvider, // Set storage provider
       status: 'pending',
       progress: 0,
-      id: Date.now() + Math.random().toString()
+      id: Date.now() + Math.random().toString(),
+      isPublic: false // Private by default as requested
     }));
 
     setPhotos(prev => [...prev, ...newPhotos]);
@@ -199,15 +201,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
             setPhotos(prev => prev.map(p =>
               p.id === photo.id ? { ...p, progress: 10 } : p
             ));
-            
+
             faceData = await extractFaceDescriptors(photo.file);
-            
+
             if (faceData && faceData.count > 0) {
               console.log(`✅ Found ${faceData.count} face(s) in ${photo.file.name}`);
             } else {
               console.log(`ℹ️ No faces detected in ${photo.file.name}`);
             }
-            
+
             setPhotos(prev => prev.map(p =>
               p.id === photo.id ? { ...p, progress: 30 } : p
             ));
@@ -240,7 +242,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
         formData.append('storageProvider', photo.storageProvider);
         formData.append('eventType', photo.eventType);
         formData.append('tags', JSON.stringify(photo.tags));
-        
+        formData.append('isPublic', String(photo.isPublic));
+
         // Add face data if extracted
         if (faceData && faceData.faces && faceData.faces.length > 0) {
           formData.append('faces', JSON.stringify(faceData.faces));
@@ -583,6 +586,22 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotosUploaded, className }
                     })}
                     placeholder="wedding, ceremony, family"
                   />
+                </div>
+
+                <div className="col-span-2 flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="isPublicToggle"
+                    checked={selectedPhoto.isPublic}
+                    onChange={(e) => updatePhotoMetadata(selectedPhotoIndex!, { isPublic: e.target.checked })}
+                    className="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
+                  />
+                  <label htmlFor="isPublicToggle" className="text-sm font-medium cursor-pointer">
+                    Show in Public Website Gallery
+                  </label>
+                  <p className="text-xs text-gray-500 ml-auto italic">
+                    {selectedPhoto.isPublic ? "Visible to everyone" : "Private - only finds via Face Search"}
+                  </p>
                 </div>
               </div>
 

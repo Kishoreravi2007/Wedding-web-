@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
     const { username, email, password, role = 'user', fullName, location, bio, avatarUrl } = req.body;
 
     // Support both username and email fields (map email to username if needed)
-    const effectiveUsername = username || email;
+    const effectiveUsername = (username || email || '').toLowerCase();
 
     if (!effectiveUsername || !password) {
       return res.status(400).json({
@@ -114,7 +114,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    const effectiveUsername = username || email;
+    const effectiveUsername = (username || email || '').toLowerCase();
 
     if (!effectiveUsername || !password) {
       return res.status(400).json({ message: 'Username/Email and password are required' });
@@ -151,6 +151,75 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(401).json({ message: error.message || 'Login failed' });
+  }
+});
+
+/**
+ * GET /api/auth/profile
+ * Get current user profile (validates JWT session)
+ */
+router.get('/profile', authMiddleware.verifyToken, async (req, res) => {
+  try {
+    // req.user is populated by authMiddleware.verifyToken
+    const user = req.user;
+
+    // Fetch wedding data and profile for a complete response
+    const { query } = require('./lib/db-gcp');
+    const { rows } = await query(
+      `SELECT u.id, u.username, u.role, u.is_active, u.is_2fa_enabled,
+              u.email_offers_opt_in, u.has_premium_access, u.wedding_id,
+              w.groom_name, w.bride_name, w.wedding_date, w.venue, w.guest_count, w.theme,
+              p.full_name, p.email, p.location, p.bio, p.avatar_url
+       FROM users u
+       LEFT JOIN weddings w ON u.id = w.user_id
+       LEFT JOIN profiles p ON u.id::text = p.user_id
+       WHERE u.id = $1`,
+      [user.id]
+    );
+
+    const fullUser = rows[0] || user;
+
+    // Build profile with wedding data
+    const profile = {
+      full_name: fullUser.full_name || fullUser.username?.split('@')[0],
+      email: fullUser.email || fullUser.username,
+      location: fullUser.location,
+      bio: fullUser.bio,
+      avatar_url: fullUser.avatar_url,
+    };
+
+    if (fullUser.groom_name || fullUser.bride_name) {
+      profile.weddingData = {
+        groomName: fullUser.groom_name,
+        brideName: fullUser.bride_name,
+        weddingDate: fullUser.wedding_date,
+        venue: fullUser.venue,
+        guestCount: fullUser.guest_count,
+        theme: fullUser.theme,
+      };
+    }
+
+    // Get premium features
+    const premiumFeatures = await SecureUserDB.getActiveFeatures(user.id);
+
+    res.json({
+      user: {
+        id: fullUser.id,
+        username: fullUser.username,
+        role: fullUser.role,
+        is_active: fullUser.is_active,
+        is_2fa_enabled: fullUser.is_2fa_enabled || false,
+        email_offers_opt_in: fullUser.email_offers_opt_in || false,
+        has_premium_access: fullUser.has_premium_access || false,
+        premium_features: premiumFeatures,
+        wedding_id: fullUser.wedding_id,
+        profile: profile
+      }
+    });
+
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    res.status(500).json({ message: 'Failed to fetch profile' });
   }
 });
 
@@ -823,8 +892,8 @@ router.get('/client/wedding', authMiddleware.verifyToken, async (req, res) => {
       };
     }
 
-    console.log('📡 [GET /client/wedding] Sending response:', JSON.stringify(weddingData, null, 2));
-    res.json(weddingData);
+    console.log('📡 [GET /client/wedding] Sending response:', JSON.stringify({ wedding: weddingData }, null, 2));
+    res.json({ wedding: weddingData });
 
   } catch (error) {
     console.error('Get client wedding error:', error);

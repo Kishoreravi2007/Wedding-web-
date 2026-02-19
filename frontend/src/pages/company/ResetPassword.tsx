@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff, ShieldCheck, Mail } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api";
 
 const CompanyResetPassword = () => {
@@ -88,141 +88,161 @@ const CompanyResetPassword = () => {
         }
     };
 
-    if (isSuccess) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900">
-                <div className="flex min-h-screen flex-col">
-                    <header className="flex items-center justify-between px-6 py-6 sm:px-10">
+    return (
+        <div className="min-h-screen flex items-center justify-center p-0 m-0 overflow-x-hidden bg-background-light dark:bg-background-dark font-display">
+            {/* Main Container: Split Screen Layout */}
+            <div className="flex flex-col md:flex-row w-full min-h-screen">
+
+                {/* Left Side: Brand Image */}
+                <div className="hidden md:flex md:w-1/2 lg:w-3/5 relative overflow-hidden bg-primary">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                        style={{
+                            backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDJS-IrKc86M45Jsock7s8PTm6sp5R7cRqDXauY37SagQ7Kroe0IDNSnBOps9FSEXob8f9HJbl7pvenkCEsoF6KLki42YvIO1P_N10500_X-JJtXeBMd9ddl2bHhlbCXNo0Kxb4FvVfJ1v71LUknADYf2HgcE7aq6YcXvCPC44QXDOgkczavC8Gdz2yPWVxAUfGhu6pg-q9hTsGdoT0BVjg4cItaaShO9REsnkPbQyRkhJhLPtPdFoLuY3HVXEW2FNvN8AKCy7-mR7F')"
+                        }}
+                    >
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+                    <div className="absolute bottom-12 left-12 right-12 text-white">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm overflow-hidden text-primary">
+                                <img src="/logo.png" alt="WeddingWeb" className="w-full h-full object-contain" />
+                            </div>
+                            <h1 className="text-3xl font-extrabold tracking-tight">WeddingWeb</h1>
+                        </div>
+                        <p className="text-xl font-light max-w-md leading-relaxed opacity-90">
+                            Securely update your password and get back to planning your perfect day.
+                        </p>
+                        <div className="mt-8 flex items-center gap-4 text-sm font-medium">
+                            <span className="flex items-center gap-1">
+                                <CheckCircle size={18} /> Verified Account
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <Lock size={18} /> 256-bit Encryption
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Side: Form */}
+                <div className="w-full md:w-1/2 lg:w-2/5 flex flex-col justify-center items-center bg-white dark:bg-background-dark px-6 py-12 lg:px-20">
+                    <div className="w-full max-w-md">
+                        {/* Mobile Logo */}
+                        <div className="flex md:hidden items-center justify-center gap-3 mb-8">
+                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-sm border border-slate-100 overflow-hidden text-primary">
+                                <img src="/logo.png" alt="WeddingWeb" className="w-full h-full object-contain" />
+                            </div>
+                            <span className="text-2xl font-bold tracking-tight text-[#111318]">WeddingWeb</span>
+                        </div>
+
                         <Link
                             to="/company/login"
-                            className="flex items-center gap-2 text-lg font-semibold tracking-wide text-slate-700 transition hover:text-rose-500"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-primary transition-colors mb-8"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back to Login
                         </Link>
-                    </header>
 
-                    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10 sm:px-6">
-                        <Card className="border-slate-200 shadow-xl">
-                            <CardContent className="p-8 text-center">
-                                <div className="w-16 h-16 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
-                                    <CheckCircle className="w-8 h-8 text-green-600" />
+                        {!isSuccess ? (
+                            <>
+                                <div className="text-center md:text-left mb-8">
+                                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 text-primary md:mx-0 mx-auto">
+                                        <Lock className="w-7 h-7" />
+                                    </div>
+                                    <h2 className="text-3xl font-extrabold text-[#111318] dark:text-white mb-2">New password</h2>
+                                    <p className="text-[#636f88] dark:text-slate-400">
+                                        Please enter a new password for <strong className="text-slate-900 dark:text-slate-200">{email}</strong>
+                                    </p>
                                 </div>
-                                <h2 className="text-2xl font-semibold text-slate-900 mb-2">Password Reset!</h2>
-                                <p className="text-slate-600 mb-6">
-                                    Your password has been successfully updated. You can now log in with your new credentials.
+
+                                <form className="space-y-5" onSubmit={handleSubmit}>
+                                    <div>
+                                        <Label htmlFor="password" title="password" className="block text-sm font-semibold text-[#111318] dark:text-slate-200 mb-2">
+                                            New Password
+                                        </Label>
+                                        <div className="relative">
+                                            <input
+                                                id="password"
+                                                type={showPassword ? "text" : "password"}
+                                                required
+                                                className="w-full pl-4 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                                                placeholder="••••••••"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                            >
+                                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="confirmPassword" title="confirmPassword" className="block text-sm font-semibold text-[#111318] dark:text-slate-200 mb-2">
+                                            Confirm Password
+                                        </Label>
+                                        <div className="relative">
+                                            <input
+                                                id="confirmPassword"
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                required
+                                                className="w-full pl-4 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                                                placeholder="••••••••"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                            >
+                                                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-6 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? "Updating..." : "Reset Password"}
+                                    </Button>
+                                </form>
+                            </>
+                        ) : (
+                            <div className="text-center md:text-left py-4">
+                                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 md:mx-0 mx-auto">
+                                    <CheckCircle className="w-8 h-8" />
+                                </div>
+                                <h2 className="text-3xl font-extrabold text-[#111318] dark:text-white mb-2">All set!</h2>
+                                <p className="text-[#636f88] dark:text-slate-400 mb-8">
+                                    Your password has been successfully reset. You can now use your new password to sign in.
                                 </p>
-                                <div className="space-y-3">
-                                    <Link to="/company/login" className="block">
-                                        <Button className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700">
-                                            Go to Login
+                                <div className="flex flex-col gap-3">
+                                    <Link to="/company/login">
+                                        <Button className="w-full bg-primary hover:bg-blue-700 py-6 rounded-xl font-bold">
+                                            Return to Login
                                         </Button>
                                     </Link>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </main>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-900">
-            <div className="flex min-h-screen flex-col">
-                <header className="flex items-center justify-between px-6 py-6 sm:px-10">
-                    <Link
-                        to="/company/login"
-                        className="flex items-center gap-2 text-lg font-semibold tracking-wide text-slate-700 transition hover:text-rose-500"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Login
-                    </Link>
-                </header>
-
-                <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10 sm:px-6">
-                    <Card className="border-slate-200 shadow-xl">
-                        <CardHeader className="text-center pb-2">
-                            <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center">
-                                <Lock className="w-7 h-7 text-rose-600" />
                             </div>
-                            <p className="text-sm uppercase tracking-[0.5em] text-slate-500 mb-2">Security Update</p>
-                            <CardTitle className="text-2xl font-semibold text-slate-900">
-                                Set new password
-                            </CardTitle>
-                            <CardDescription className="text-slate-600">
-                                Please enter a new password for your account associated with <strong>{email}</strong>
-                            </CardDescription>
-                        </CardHeader>
+                        )}
 
-                        <CardContent className="p-6 pt-4">
-                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                <div className="space-y-2">
-                                    <Label htmlFor="password" className="text-slate-700 font-medium">
-                                        New Password
-                                    </Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="password"
-                                            type={showPassword ? "text" : "password"}
-                                            required
-                                            placeholder="••••••••"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="h-12 border-slate-300 focus:border-rose-400 focus:ring-rose-400 pr-10"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                        >
-                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="confirmPassword" className="text-slate-700 font-medium">
-                                        Confirm Password
-                                    </Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="confirmPassword"
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            required
-                                            placeholder="••••••••"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="h-12 border-slate-300 focus:border-rose-400 focus:ring-rose-400 pr-10"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                        >
-                                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-medium"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <span className="animate-spin mr-2">⏳</span>
-                                            Updating password...
-                                        </>
-                                    ) : (
-                                        "Reset Password"
-                                    )}
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </main>
+                        <div className="mt-12 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                Need more help?{" "}
+                                <Link to="/company/contact" className="text-primary font-bold hover:underline">
+                                    Contact Support
+                                </Link>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

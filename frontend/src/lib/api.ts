@@ -41,7 +41,8 @@ console.log('🌐 API Base URL:', API_BASE_URL);
 
 // Helper function to get access token from various storage keys
 export const getAccessToken = () => {
-  let token = localStorage.getItem('auth_token') ||
+  let token = localStorage.getItem('wedding_auth_token') ||
+    localStorage.getItem('auth_token') ||
     localStorage.getItem('token') ||
     localStorage.getItem('accessToken') ||
     localStorage.getItem('admin_token');

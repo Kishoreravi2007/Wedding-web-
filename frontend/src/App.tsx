@@ -62,6 +62,7 @@ import CompanyBlog from "./pages/company/Blog";
 import CompanyCareers from "./pages/company/Careers";
 import CompanyPress from "./pages/company/Press";
 import CompanyHelpCenter from "./pages/company/HelpCenter";
+import AuthCallback from "./pages/AuthCallback";
 import CompanyCookieSettings from "./pages/company/CookieSettings";
 import CompanyPayments from "./pages/company/Payments";
 import CompanySettings from "./pages/company/Settings";
@@ -223,6 +224,7 @@ const App = () => {
                 <Route path="/company/signup" element={<CompanySignup />} />
                 <Route path="/company/forgot-password" element={<CompanyForgotPassword />} />
                 <Route path="/company/reset-password" element={<CompanyResetPassword />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/company/account" element={<AuthGuard><CompanyAccount /></AuthGuard>} />
                 <Route path="/company" element={<AuthGuard><CompanyDashboard /></AuthGuard>} />
                 <Route path="/company/wishes" element={<AuthGuard><ClientWishes /></AuthGuard>} />

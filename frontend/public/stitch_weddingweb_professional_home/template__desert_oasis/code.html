@@ -57,8 +57,9 @@
         <header
             class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-white/80 backdrop-blur-md px-6 md:px-20 py-3">
             <div class="flex items-center gap-3 text-[#111318]">
-                <div class="size-6 text-terracotta">
-                    <span class="material-symbols-outlined text-3xl">wb_sunny</span>
+                <div class="h-10 flex items-center">
+                    <img src="{{CoupleLogo}}" alt="Logo" class="h-10 w-auto object-contain"
+                        onerror="this.onerror=null; this.src='/logo.png';">
                 </div>
                 <h2 class="text-[#111318] text-xl font-extrabold leading-tight tracking-[-0.015em]">{{GroomFirst}} &amp;
                     {{BrideFirst}}</h2>
@@ -316,9 +317,43 @@
                         </button>
                     </div>
                     <div id="wedding-map" class="h-80 md:h-auto md:w-1/2 bg-gray-200">
-                        <div class="h-full w-full bg-cover bg-center grayscale contrast-125"
-                            data-alt="Map area of desert location" data-location="Joshua Tree, California"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDuRTkPlwbm-XI64Tn8QYzvQS4fWdp7BTB-57RnXJCWnlF0wN1uL92UcUVNgaJ59WIF7UzLPXIpyyzmKxjQw7Cw8zpsaL8ot0JrjWSGxZcc7nzRvcTWdKqxfbtJoWj8-dH7XyvWi4SDbq1w--2nyrt6sBKDhRtv5DLK7THBogLG9NcAn5W2DKff5TNrjMJ0LPuA_RxfUETOo8DmsAaLKl_HtgP_ZvkcKMFkJAsvrnXHZSqzdKFQVaBCTJCABfmgbyGveWtuoeo2upBM');">
+                        <iframe src="{{MapEmbedLink}}" width="100%" height="450" frameborder="0" style="border:0;"
+                            allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                    </div>
+                </div>
+            </section>
+            <!-- Travel & Logistics Section -->
+            <section class="py-24 px-6 md:px-20 bg-white">
+                <div class="mx-auto max-w-6xl">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl font-black text-[#111318] mb-4">{{Travel_Title}}</h2>
+                        <div class="h-1 w-20 bg-terracotta mx-auto"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div
+                            class="p-8 rounded-2xl bg-background-light border border-sand/30 hover:shadow-xl transition-all">
+                            <span class="material-symbols-outlined text-terracotta text-4xl mb-4">train</span>
+                            <h3 class="font-bold text-lg mb-2">Railway</h3>
+                            <p class="text-sm text-slate-600">{{Travel_Railway}}</p>
+                        </div>
+                        <div
+                            class="p-8 rounded-2xl bg-background-light border border-sand/30 hover:shadow-xl transition-all">
+                            <span class="material-symbols-outlined text-terracotta text-4xl mb-4">directions_bus</span>
+                            <h3 class="font-bold text-lg mb-2">Bus Stand</h3>
+                            <p class="text-sm text-slate-600">{{Travel_BusStand}}</p>
+                        </div>
+                        <div
+                            class="p-8 rounded-2xl bg-background-light border border-sand/30 hover:shadow-xl transition-all">
+                            <span class="material-symbols-outlined text-terracotta text-4xl mb-4">location_on</span>
+                            <h3 class="font-bold text-lg mb-2">Bus Stop</h3>
+                            <p class="text-sm text-slate-600">{{Travel_BusStop}}</p>
+                        </div>
+                        <div
+                            class="p-8 rounded-2xl bg-background-light border border-sand/30 hover:shadow-xl transition-all">
+                            <span class="material-symbols-outlined text-terracotta text-4xl mb-4">flight</span>
+                            <h3 class="font-bold text-lg mb-2">Airport</h3>
+                            <p class="text-sm text-slate-600">{{Travel_Airport}}</p>
                         </div>
                     </div>
                 </div>

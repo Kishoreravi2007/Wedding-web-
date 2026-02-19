@@ -5,13 +5,14 @@ import { WeddingTemplate } from '@/components/WeddingTemplate';
 import { PremiumWeddingTemplate } from '@/components/PremiumWeddingTemplate';
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Loader2, Eye, EyeOff, MonitorPlay, ExternalLink, GripVertical, RefreshCw, Sun, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Eye, EyeOff, MonitorPlay, ExternalLink, GripVertical, RefreshCw, Sun, ImageIcon, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getAccessToken, API_BASE_URL } from '@/lib/api';
 import BackgroundAdjusterModal, { ImageAdjustments } from '@/components/premium/BackgroundAdjusterModal';
 import PremiumGate from '@/components/premium/PremiumGate';
+import EditorSidebar from '@/components/premium/EditorSidebar';
 
 const VisualEditor = () => {
     console.log("🛠️ VisualEditor Mounting...");
@@ -27,7 +28,8 @@ const VisualEditor = () => {
     // Background Adjuster State
     const [isAdjusterOpen, setIsAdjusterOpen] = useState(false);
     const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
-
+    // Sidebar State
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Fetch Data
     useEffect(() => {
@@ -485,6 +487,21 @@ const VisualEditor = () => {
 
                             <div className="w-px h-6 bg-white/20 mx-1"></div>
 
+                            {/* Design Sidebar Toggle */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={isSidebarOpen ? "default" : "ghost"}
+                                        size="icon"
+                                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                        className={`rounded-full w-10 h-10 transition-all ${isSidebarOpen ? 'bg-indigo-500 hover:bg-indigo-600 text-white' : 'hover:bg-indigo-500/20 hover:text-indigo-400 text-white/70'}`}
+                                    >
+                                        <Layers className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="bg-slate-800 text-white border-slate-700">Design Designer</TooltipContent>
+                            </Tooltip>
+
                             {/* Save Status / Live Indicator */}
                             <div className="px-4 flex items-center gap-2">
                                 {saving ? (
@@ -532,6 +549,14 @@ const VisualEditor = () => {
                         onConfirm={handleAdjustedUpload}
                     />
                 )}
+
+                {/* Editor Sidebar */}
+                <EditorSidebar
+                    isOpen={isSidebarOpen}
+                    onClose={() => setIsSidebarOpen(false)}
+                    weddingData={weddingData}
+                    onUpdateCustomization={handleUpdateCustomization}
+                />
             </div>
         </PremiumGate>
     );

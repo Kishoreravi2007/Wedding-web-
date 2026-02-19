@@ -136,8 +136,8 @@ app.use('/api/analytics', analyticsRouter); // Public track, admin read
 const weddingsRouter = require('./routes/weddings');
 app.use('/api/weddings', weddingsRouter); // Wedding customer management
 
-// Firebase photos endpoint
-const photosFirebaseRouter = require('./photos');
+// Firebase photos endpoint (Replaced with SQL-backed photos-new)
+const photosFirebaseRouter = require('./photos-new');
 app.use('/api/photos', photosFirebaseRouter);
 
 // Local filesystem photo uploads (primary upload endpoint)

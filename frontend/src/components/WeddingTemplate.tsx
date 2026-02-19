@@ -1,8 +1,14 @@
-
 import React from 'react';
-import { Loader2, Calendar, MapPin, Heart, Clock, ExternalLink, Camera, Image as ImageIcon, Upload, X, Play, Pause, Volume2, Music, ChevronUp, ChevronDown, Search as SearchIcon } from 'lucide-react';
+import {
+    Heart, Gift, Shirt, Camera, MapPin, ExternalLink,
+    Upload, X, ChevronUp, ChevronDown, Image as ImageIcon,
+    Search as SearchIcon, Loader2, Music, Play, Pause,
+    Volume2, Sun, Train, Bus, Plane, Calendar, Clock,
+    Upload as UploadIcon
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProfessionalStitchV2 from '@/components/ProfessionalStitchV2';
+import ArtDecoGlamour from '@/components/templates/ArtDecoGlamour';
+import BotanicalGarden from '@/components/templates/BotanicalGarden';
 import CountdownTimer from '@/components/premium/CountdownTimer';
 import { Button } from "@/components/ui/button";
 import { EditableText } from '@/components/ui/editable-text';
@@ -81,7 +87,7 @@ export const WeddingTemplate = ({
     const customizations = weddingData.customizations || {};
 
     // Section Ordering Logic
-    const defaultOrder = ['hero', 'timeline', 'gallery', 'main'];
+    const defaultOrder = ['hero', 'timeline', 'gallery', 'wishes', 'travel', 'main'];
     let sectionOrder = defaultOrder;
 
     if (customizations.sectionOrder) {
@@ -163,6 +169,43 @@ export const WeddingTemplate = ({
     };
 
     const renderSection = (sectionId: string) => {
+        // Respect section visibility toggles
+        if (customizations[`hide_${sectionId}`] === 'true') {
+            return null;
+        }
+
+        // Designer v3 themes are currently "full-page" wrappers for simplicity 
+        // until we break them into interoperable blocks
+        if (config?.designerVersion === 3) {
+            if (sectionId !== 'hero' && sectionId !== 'main') return null; // Avoid duplicate rendering for now
+            if (sectionId === 'main') return null; // Handled by hero
+
+            switch (weddingData.theme) {
+                case 'Art Deco Glamour':
+                    return (
+                        <ArtDecoGlamour
+                            key="art-deco"
+                            weddingData={weddingData}
+                            timeline={timeline}
+                            photos={photos}
+                            isEditing={isEditing}
+                            onUpdateCustomization={onUpdateCustomization}
+                        />
+                    );
+                case 'Botanical Garden':
+                    return (
+                        <BotanicalGarden
+                            key="botanical-garden"
+                            weddingData={weddingData}
+                            timeline={timeline}
+                            photos={photos}
+                            isEditing={isEditing}
+                            onUpdateCustomization={onUpdateCustomization}
+                        />
+                    );
+            }
+        }
+
         switch (sectionId) {
             case 'hero':
                 return (
@@ -173,9 +216,6 @@ export const WeddingTemplate = ({
                     >
                         <SectionControls sectionId="hero" />
                         {(() => {
-                            if (config?.layout === 'professional-stitch-v2') {
-                                return <ProfessionalStitchV2 weddingData={weddingData} timeline={timeline} photos={photos} />;
-                            }
                             switch (config?.layout) {
                                 case 'minimal-split':
                                     return (
@@ -499,23 +539,36 @@ export const WeddingTemplate = ({
                                 />
 
                                 {!isEditing && (
-                                    <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-                                        <Button
-                                            onClick={onSearchPhotos}
-                                            className="bg-rose-500 hover:bg-rose-600 text-white rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-rose-500/25 transition-all duration-300 group w-full sm:w-auto"
-                                        >
-                                            <SearchIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                                            Search Your Photos
-                                        </Button>
+                                    <div className="pt-6 flex flex-col items-center gap-6">
+                                        {/* Premium Face Search Button Area */}
+                                        <div className="bg-gradient-to-r from-rose-50 to-purple-50 p-8 rounded-[2rem] border border-rose-100 shadow-xl max-w-2xl w-full">
+                                            <div className="flex flex-col md:flex-row items-center gap-6">
+                                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md text-rose-500 shrink-0">
+                                                    <SearchIcon className="w-8 h-8" />
+                                                </div>
+                                                <div className="text-left space-y-1">
+                                                    <h3 className="text-xl font-bold text-gray-900">Find Yourself in Our Gallery</h3>
+                                                    <p className="text-sm text-gray-500">Upload a selfie and our AI will find all photos you're in! Private photos are only visible to you.</p>
+                                                </div>
+                                                <Button
+                                                    onClick={onSearchPhotos}
+                                                    className="bg-gray-900 hover:bg-black text-white rounded-2xl px-8 py-6 font-bold shadow-lg transition-all hover:scale-105 active:scale-95 shrink-0"
+                                                >
+                                                    Start Face Search
+                                                </Button>
+                                            </div>
+                                        </div>
 
-                                        <Button
-                                            onClick={() => setShowUploadDialog && setShowUploadDialog(true)}
-                                            variant="outline"
-                                            className="border-rose-200 text-rose-600 hover:bg-rose-50 rounded-full px-8 py-6 text-lg transition-all duration-300 group w-full sm:w-auto"
-                                        >
-                                            <Camera className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                                            Add Your Photo
-                                        </Button>
+                                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                                            <Button
+                                                onClick={() => setShowUploadDialog && setShowUploadDialog(true)}
+                                                variant="outline"
+                                                className="border-rose-200 text-rose-600 hover:bg-rose-50 rounded-full px-8 py-6 text-lg transition-all duration-300 group w-full sm:w-auto"
+                                            >
+                                                <Camera className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                                                Share Your Perspective (Upload)
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -553,6 +606,186 @@ export const WeddingTemplate = ({
                                     ))}
                                 </div>
                             )}
+                        </div>
+                    </motion.section>
+                );
+            case 'travel':
+                return (
+                    <motion.section
+                        key="travel"
+                        layout
+                        className="py-24 px-4 bg-slate-50 relative group"
+                    >
+                        <SectionControls sectionId="travel" />
+                        <div className="max-w-5xl mx-auto space-y-12">
+                            <div className="text-center space-y-4">
+                                <div className="inline-block p-3 rounded-full bg-blue-500/10 mb-2">
+                                    <MapPin className="w-6 h-6 text-blue-600 fill-blue-500/20" />
+                                </div>
+                                <EditableText
+                                    initialValue={customizations.travelTitle || "Travel & Logistics"}
+                                    onSave={(val) => onUpdateCustomization('travelTitle', val)}
+                                    isEditing={isEditing}
+                                    className={`text-4xl md:text-5xl ${headingFont} font-bold tracking-tight text-slate-900`}
+                                    tag="h2"
+                                />
+                                <p className="text-lg opacity-60 italic max-w-2xl mx-auto text-slate-600">
+                                    Helpful information for your journey to our celebration.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-100 space-y-3">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                        <Train className="w-5 h-5 shadow-sm" />
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 border-none">Railway</h3>
+                                    <EditableText
+                                        initialValue={customizations.travelRailway || "Nearest Station: Central (10 mins away)"}
+                                        onSave={(val) => onUpdateCustomization('travelRailway', val)}
+                                        isEditing={isEditing}
+                                        className="text-sm opacity-70 leading-relaxed"
+                                        tag="p"
+                                    />
+                                </div>
+
+                                <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-100 space-y-3">
+                                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                                        <Bus className="w-5 h-5 shadow-sm" />
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 border-none">Bus Stand</h3>
+                                    <EditableText
+                                        initialValue={customizations.travelBusStand || "Main Terminal (15 mins away)"}
+                                        onSave={(val) => onUpdateCustomization('travelBusStand', val)}
+                                        isEditing={isEditing}
+                                        className="text-sm opacity-70 leading-relaxed"
+                                        tag="p"
+                                    />
+                                </div>
+
+                                <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-100 space-y-3">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <MapPin className="w-5 h-5 shadow-sm" />
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 border-none">Bus Stop</h3>
+                                    <EditableText
+                                        initialValue={customizations.travelBusStop || "Garden Gate (2 mins walk)"}
+                                        onSave={(val) => onUpdateCustomization('travelBusStop', val)}
+                                        isEditing={isEditing}
+                                        className="text-sm opacity-70 leading-relaxed"
+                                        tag="p"
+                                    />
+                                </div>
+
+                                <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-100 space-y-3">
+                                    <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                        <Plane className="w-5 h-5 shadow-sm" />
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 border-none">Airport</h3>
+                                    <EditableText
+                                        initialValue={customizations.travelAirport || "Intl Airport (45 mins drive)"}
+                                        onSave={(val) => onUpdateCustomization('travelAirport', val)}
+                                        isEditing={isEditing}
+                                        className="text-sm opacity-70 leading-relaxed"
+                                        tag="p"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.section>
+                );
+            case 'wishes':
+                return (
+                    <motion.section
+                        key="wishes"
+                        layout
+                        className="py-24 px-4 bg-gradient-to-b from-white to-rose-50/30 relative group"
+                    >
+                        <SectionControls sectionId="wishes" />
+                        <div className="max-w-4xl mx-auto space-y-12">
+                            <div className="text-center space-y-4">
+                                <div className="inline-block p-3 rounded-full bg-rose-500/10 mb-2">
+                                    <Heart className="w-6 h-6 text-rose-500 fill-rose-500/20" />
+                                </div>
+                                <EditableText
+                                    initialValue={customizations.wishesTitle || "Send Your Wishes"}
+                                    onSave={(val) => onUpdateCustomization('wishesTitle', val)}
+                                    isEditing={isEditing}
+                                    className={`text-4xl md:text-5xl ${headingFont} font-bold tracking-tight text-slate-900`}
+                                    tag="h2"
+                                />
+                                <p className="text-lg opacity-60 italic max-w-2xl mx-auto text-slate-600">
+                                    Your love and blessings mean the world to us.
+                                </p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-12 items-start">
+                                {/* Wish Form */}
+                                {!isEditing && onWishSubmit && (
+                                    <div className="p-8 rounded-3xl bg-white shadow-xl shadow-rose-500/5 border border-rose-100 space-y-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="guestName">Your Name</Label>
+                                            <Input id="guestName" placeholder="Enter your name" className="rounded-xl border-rose-200 focus:border-rose-400 focus:ring-rose-400" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="wishMessage">Your Wish</Label>
+                                            <textarea
+                                                id="wishMessage"
+                                                rows={4}
+                                                placeholder="Write your beautiful wish here..."
+                                                className="w-full rounded-xl border-rose-200 focus:border-rose-400 focus:ring-rose-400 p-3 text-sm resize-none border shadow-sm outline-none"
+                                            ></textarea>
+                                        </div>
+                                        <Button
+                                            onClick={async (e) => {
+                                                const btn = e.currentTarget;
+                                                const nameInput = document.getElementById('guestName') as HTMLInputElement;
+                                                const msgInput = document.getElementById('wishMessage') as HTMLTextAreaElement;
+                                                if (!nameInput.value || !msgInput.value) {
+                                                    alert("Please fill in both name and message");
+                                                    return;
+                                                }
+                                                btn.disabled = true;
+                                                try {
+                                                    await onWishSubmit(nameInput.value, msgInput.value);
+                                                    nameInput.value = '';
+                                                    msgInput.value = '';
+                                                    alert("Wish sent successfully!");
+                                                } catch (err) {
+                                                    console.error(err);
+                                                } finally {
+                                                    btn.disabled = false;
+                                                }
+                                            }}
+                                            className="w-full bg-rose-500 hover:bg-rose-600 text-white rounded-xl py-6 font-bold text-lg shadow-lg hover:shadow-rose-500/25 transition-all"
+                                        >
+                                            Send Wish
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Recent Wishes Display */}
+                                <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {(wishes.length > 0 ? wishes : [
+                                        { id: '1', name: 'Example Guest', wish: 'Heartfelt congratulations to the beautiful couple! May your journey together be filled with joy and infinite love.' },
+                                        { id: '2', name: 'A Dear Friend', wish: 'Wishing you both a lifetime of happiness. Your wedding is as magical as your love story!' }
+                                    ]).map((wish, idx) => (
+                                        <motion.div
+                                            key={wish.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-rose-100 shadow-sm relative overflow-hidden group"
+                                        >
+                                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                                                <Heart className="w-12 h-12 text-rose-500" />
+                                            </div>
+                                            <h4 className="font-bold text-rose-700 mb-2">{wish.name}</h4>
+                                            <p className="text-sm text-slate-700 italic leading-relaxed">"{wish.wish}"</p>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </motion.section>
                 );

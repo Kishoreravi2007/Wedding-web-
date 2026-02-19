@@ -1,11 +1,12 @@
 /**
- * Authentication Context - Backend API Auth
+ * Authentication Context - Supabase Auth Integration
  * 
- * Provides authentication using the backend SQL auth system (auth-new.js).
- * All ~25 consumer components import useAuth() from this file.
+ * Provides authentication using Supabase Auth.
+ * Enables Google Login and native session management.
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase, GOOGLE_AUTH_CONFIG } from '../lib/supabase';
 import { API_BASE_URL } from '../lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -32,6 +33,8 @@ export interface AuthContextType {
     signup: (...args: any[]) => Promise<any>;
     logout: () => Promise<void>;
     loginWithGoogle: () => Promise<any>;
+    loginWithGithub: () => Promise<any>;
+    loginWithDiscord: () => Promise<any>;
     resetPassword: (email: string) => Promise<void>;
     refreshProfile: () => Promise<void>;
     enable2FA: (enabled: boolean, secret?: string) => Promise<void>;
@@ -49,66 +52,36 @@ export const useAuth = () => {
     return context;
 };
 
-// Alias for photographer login compatibility
 export const useFirebaseAuth = useAuth;
 
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
-const getStoredToken = (): string | null => {
-    return localStorage.getItem('auth_token') ||
-        localStorage.getItem('token') ||
-        localStorage.getItem('accessToken') ||
-        null;
-};
-
-const storeToken = (token: string) => {
-    localStorage.setItem('auth_token', token);
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('token', token);
-};
-
-const clearTokens = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('token');
-    localStorage.removeItem('admin_token');
-};
-
-const authFetch = async (endpoint: string, options: RequestInit = {}) => {
-    const token = getStoredToken();
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...(options.headers as Record<string, string> || {}),
-    };
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const url = `${API_BASE_URL}/api/auth${endpoint}`;
-    const response = await fetch(url, { ...options, headers });
-    return response;
-};
-
 // ─── Normalise user response ──────────────────────────────────────────────────
 
-const normalizeUser = (raw: any): User => ({
-    id: String(raw.id || raw.uid || ''),
-    uid: String(raw.id || raw.uid || ''),
-    email: raw.email || raw.username || null,
-    username: raw.username || raw.email || null,
-    displayName: raw.displayName || raw.full_name || raw.username?.split?.('@')?.[0] || null,
-    role: raw.role || 'user',
-    profile: raw.profile,
-    is_2fa_enabled: raw.is_2fa_enabled ?? false,
-    email_offers_opt_in: raw.email_offers_opt_in ?? false,
-    has_premium_access: raw.has_premium_access ?? false,
-    premium_features: raw.premium_features || [],
-    wedding_id: raw.wedding_id || null,
-});
+const normalizeUser = (backendUser: any): User => {
+    if (!backendUser) return null as any;
+
+    // The backend returns user data directly, sometimes with weddingData in profile
+    const profile = backendUser.profile || {};
+    const weddingData = profile.weddingData || {};
+
+    return {
+        id: backendUser.id,
+        uid: backendUser.id,
+        email: backendUser.username || null, // Backend uses username as primary identifier (which is the email)
+        username: backendUser.username || null,
+        displayName: profile.full_name || backendUser.username?.split('@')[0] || null,
+        role: backendUser.role || 'user',
+        profile: profile,
+        is_2fa_enabled: backendUser.is_2fa_enabled || false,
+        email_offers_opt_in: backendUser.email_offers_opt_in ?? false,
+        has_premium_access: backendUser.has_premium_access ?? false,
+        premium_features: backendUser.premium_features || [],
+        wedding_id: backendUser.wedding_id || null,
+    };
+};
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -116,165 +89,204 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Restore session from stored token on mount
+    // Initial session check
     useEffect(() => {
-        const restoreSession = async () => {
-            const token = getStoredToken();
+        const checkSession = async () => {
+            const token = localStorage.getItem('wedding_auth_token');
             if (!token) {
                 setLoading(false);
                 return;
             }
 
             try {
-                const res = await authFetch('/profile', { method: 'GET' });
-                if (res.ok) {
-                    const userData = await res.json();
-                    setCurrentUser(normalizeUser(userData));
-                    console.log('✅ Session restored for:', userData.username || userData.email);
+                const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setCurrentUser(normalizeUser(data.user || data));
                 } else {
-                    // Token is invalid/expired – clear it
-                    clearTokens();
+                    localStorage.removeItem('wedding_auth_token');
                     setCurrentUser(null);
                 }
-            } catch {
-                clearTokens();
+            } catch (error) {
+                console.error('Session check error:', error);
+                localStorage.removeItem('wedding_auth_token');
                 setCurrentUser(null);
             } finally {
                 setLoading(false);
             }
         };
 
-        restoreSession();
+        checkSession();
     }, []);
 
     // ── Login ─────────────────────────────────────────────────────────────────
 
     const login = useCallback(async (email: string, password: string) => {
         try {
-            const res = await authFetch('/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
-                body: JSON.stringify({ email, password }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email.toLowerCase(), password }),
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Login failed');
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
 
-            // Store token
             const token = data.token || data.accessToken;
-            if (token) storeToken(token);
+            if (token) {
+                localStorage.setItem('wedding_auth_token', token);
+            }
 
             const user = normalizeUser(data.user);
             setCurrentUser(user);
-            console.log('✅ Login successful:', user.email);
-
             return { user, token };
-        } catch (error: any) {
+        } catch (error) {
             console.error('Login error:', error);
-            throw new Error(error.message || 'Login failed');
+            throw error;
         }
     }, []);
 
-    // Alias for photographer LoginFirebase.tsx compatibility
     const signIn = login;
 
     // ── Signup ────────────────────────────────────────────────────────────────
 
     const signup = useCallback(async (...args: any[]) => {
-        // Support both calling conventions:
-        // 1. signup(email, password, emailOptIn, fullName, location, bio, photo) — Signup.tsx
-        // 2. signup(email, password, displayName, role) — older callers
         const email = args[0] as string;
         const password = args[1] as string;
-
-        let fullName: string | undefined;
-        let role = 'user';
-        let emailOptIn = false;
-        let locationStr: string | undefined;
-        let bio: string | undefined;
-        let avatarUrl: string | undefined;
-
-        if (typeof args[2] === 'boolean') {
-            // Convention 1: signup(email, password, emailOptIn, fullName, location, bio, photo)
-            emailOptIn = args[2];
-            fullName = args[3] as string | undefined;
-            locationStr = args[4] as string | undefined;
-            bio = args[5] as string | undefined;
-            avatarUrl = args[6] as string | undefined;
-        } else {
-            // Convention 2: signup(email, password, displayName, role)
-            fullName = args[2] as string | undefined;
-            role = (args[3] as string) || 'user';
-        }
+        const email_offers_opt_in = typeof args[2] === 'boolean' ? args[2] : false;
+        const fullName = typeof args[2] === 'boolean' ? args[3] : args[2];
+        const location = typeof args[2] === 'boolean' ? args[4] : null;
+        const bio = typeof args[2] === 'boolean' ? args[5] : null;
 
         try {
-            const res = await authFetch('/register', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
-                    email,
-                    username: email,
+                    email: email.toLowerCase(),
                     password,
+                    email_offers_opt_in,
                     fullName,
-                    role,
-                    email_offers_opt_in: emailOptIn,
-                    location: locationStr,
-                    bio,
-                    avatarUrl,
+                    location,
+                    bio
                 }),
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Registration failed');
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Signup failed');
+            }
 
-            // Auto-login after signup
             const token = data.token || data.accessToken;
-            if (token) storeToken(token);
+            if (token) {
+                localStorage.setItem('wedding_auth_token', token);
+            }
 
             const user = normalizeUser(data.user);
             setCurrentUser(user);
-            console.log('✅ Signup successful:', user.email);
-
-            // Return { data, error } shape for Signup.tsx compatibility
             return { data: { user, token }, error: null };
         } catch (error: any) {
             console.error('Signup error:', error);
-            // Return { data, error } shape for Signup.tsx compatibility
-            return { data: null, error: new Error(error.message || 'Signup failed') };
+            return { data: null, error };
         }
     }, []);
 
     // ── Logout ────────────────────────────────────────────────────────────────
 
     const logout = useCallback(async () => {
-        clearTokens();
+        localStorage.removeItem('wedding_auth_token');
         setCurrentUser(null);
-        console.log('✅ Logout successful');
     }, []);
 
-    // ── Google Login (stub) ───────────────────────────────────────────────────
+    // ── Google Login (OAuth still uses Supabase for now) ───────────────────────
 
     const loginWithGoogle = useCallback(async () => {
-        throw new Error('Google login is not available in the current configuration. Please use email/password login.');
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
+            }
+        });
+        if (error) throw error;
+        return data;
+    }, []);
+
+    const loginWithGithub = useCallback(async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            }
+        });
+        if (error) throw error;
+        return data;
+    }, []);
+
+
+    const loginWithDiscord = useCallback(async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'discord',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            }
+        });
+        if (error) throw error;
+        return data;
     }, []);
 
     // ── Password Reset ────────────────────────────────────────────────────────
 
     const resetPassword = useCallback(async (email: string) => {
-        const res = await authFetch('/forgot-password', {
-            method: 'POST',
-            body: JSON.stringify({ email }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to send reset email');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email.toLowerCase() }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to send reset link');
+            }
+        } catch (error: any) {
+            console.error('Reset password error:', error);
+            throw error;
+        }
     }, []);
 
     // ── Refresh Profile ───────────────────────────────────────────────────────
 
     const refreshProfile = useCallback(async () => {
+        const token = localStorage.getItem('wedding_auth_token');
+        if (!token) return;
+
         try {
-            const res = await authFetch('/profile', { method: 'GET' });
-            if (res.ok) {
-                const userData = await res.json();
-                setCurrentUser(normalizeUser(userData));
+            const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCurrentUser(normalizeUser(data.user || data));
             }
         } catch (error) {
             console.error('Refresh profile error:', error);
@@ -283,30 +295,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // ── 2FA Toggle ────────────────────────────────────────────────────────────
 
-    const enable2FA = useCallback(async (enabled: boolean, secret?: string) => {
-        const res = await authFetch('/2fa/toggle', {
-            method: 'POST',
-            body: JSON.stringify({ enabled, secret }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to update 2FA');
-        // Refresh user state
-        await refreshProfile();
-    }, [refreshProfile]);
+    const enable2FA = useCallback(async (enabled: boolean) => {
+        console.warn('Backend 2FA should be managed via /api/auth endpoints');
+    }, []);
 
     // ── Email Preference ──────────────────────────────────────────────────────
 
     const updateEmailPreference = useCallback(async (enabled: boolean) => {
-        const res = await authFetch('/preferences/email', {
-            method: 'POST',
-            body: JSON.stringify({ enabled }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to update email preference');
-        await refreshProfile();
-    }, [refreshProfile]);
+        const token = localStorage.getItem('wedding_auth_token');
+        if (!token) return;
 
-    // ── Context Value ─────────────────────────────────────────────────────────
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/preferences/email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ enabled }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCurrentUser(normalizeUser(data.user));
+            }
+        } catch (error) {
+            console.error('Update email preference error:', error);
+            throw error;
+        }
+    }, []);
 
     const value: AuthContextType = {
         currentUser,
@@ -315,6 +332,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signup,
         logout,
         loginWithGoogle,
+        loginWithGithub,
+        loginWithDiscord,
         resetPassword,
         refreshProfile,
         enable2FA,

@@ -92,6 +92,11 @@ const PhotoDB = {
       params.push(filters.tags);
     }
 
+    if (filters.isPublic !== undefined) {
+      conditions.push(`p.is_public = $${paramIndex++}`);
+      params.push(filters.isPublic === 'true' || filters.isPublic === true);
+    }
+
     // Join filter logic would be complex here for simple WHERE, 
     // but standard SQL structure:
 
@@ -222,6 +227,11 @@ const PhotoDB = {
     } else {
       // Consistent with findAll, exclude 'hero' types from general counts
       conditions.push(`event_type != 'hero'`);
+    }
+
+    if (filters.isPublic !== undefined) {
+      conditions.push(`is_public = $${params.length + 1}`);
+      params.push(filters.isPublic === 'true' || filters.isPublic === true);
     }
 
     if (conditions.length > 0) {

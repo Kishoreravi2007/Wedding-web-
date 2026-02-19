@@ -286,36 +286,65 @@ const sendPasswordResetEmail = async (to, resetToken, name = 'User') => {
   const resetUrl = `${process.env.FRONTEND_URL || 'https://weddingweb.co.in'}/company/reset-password?token=${resetToken}&email=${encodeURIComponent(to)}`;
 
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
-      <div style="text-align: center; margin-bottom: 30px;">
-        <img src="cid:logo" alt="WeddingWeb Logo" style="width: 60px; height: 60px; object-fit: contain;">
-        <h1 style="color: #e11d48; margin-top: 10px;">Reset Your Password</h1>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+    <body style="margin: 0; padding: 0; background-color: #f6f6f8; font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased;">
+      <div style="max-width: 600px; margin: 32px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+        
+        <!-- Header / Logo -->
+        <div style="text-align: center; padding: 32px 0; border-bottom: 1px solid #f1f5f9;">
+          <table cellpadding="0" cellspacing="0" border="0" align="center">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 10px;">
+                <img src="cid:logo" alt="WeddingWeb" style="width: 36px; height: 36px; object-fit: contain; border-radius: 8px;" />
+              </td>
+              <td style="vertical-align: middle;">
+                <span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">WeddingWeb</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 40px 32px; text-align: center;">
+          <div style="width: 64px; height: 64px; background-color: rgba(23,84,207,0.1); border-radius: 16px; margin: 0 auto 24px auto; display: flex; align-items: center; justify-content: center; line-height: 64px; font-size: 32px; color: #1754cf;">
+            🔐
+          </div>
+          <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Reset your password</h2>
+          <p style="font-size: 16px; color: #64748b; line-height: 1.7; margin: 0 0 40px 0;">
+            Hi ${name},<br/>
+            We received a request to reset the password for your account. No worries, it happens to the best of us! Click the button below to set a new password.
+          </p>
+
+          <!-- Primary CTA -->
+          <a href="${resetUrl}" 
+             style="display: inline-block; width: 100%; max-width: 400px; padding: 18px 32px; background-color: #1754cf; color: #ffffff; font-weight: 700; font-size: 16px; text-decoration: none; border-radius: 10px; text-align: center; box-sizing: border-box; box-shadow: 0 4px 14px rgba(23,84,207,0.3);">
+            Set New Password
+          </a>
+
+          <p style="font-size: 14px; color: #94a3b8; margin: 40px 0 0 0;">
+            This link will expire in 1 hour. If you didn't request this, you can safely ignore this email.
+          </p>
+        </div>
+
+        <!-- Link Fallback -->
+        <div style="padding: 0 32px 40px 32px; text-align: center;">
+          <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px;">If the button doesn't work, copy and paste this link:</p>
+          <a href="${resetUrl}" style="font-size: 12px; color: #1754cf; word-break: break-all; text-decoration: none;">${resetUrl}</a>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; padding: 32px; text-align: center; border-top: 1px solid #f1f5f9;">
+          <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin: 0 0 4px 0;">WeddingWeb</p>
+          <p style="font-size: 11px; color: #94a3b8; margin: 0 0 16px 0;">weddingweb.co.in</p>
+          <p style="font-size: 10px; color: #cbd5e1; margin: 0;">
+            &copy; 2026 WeddingWeb AI Inc. Made with ❤️ in Kerala.
+          </p>
+        </div>
       </div>
-      <p style="font-size: 16px; color: #334155;">Hi ${name},</p>
-      <p style="font-size: 16px; color: #334155; line-height: 1.6;">
-        We received a request to reset the password for your WeddingWeb account. 
-        Click the button below to create a new password.
-      </p>
-      <div style="text-align: center; margin: 40px 0;">
-        <a href="${resetUrl}" 
-           style="background: linear-gradient(to right, #e11d48, #db2777); color: white; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block;">
-           Reset Password
-        </a>
-      </div>
-      <p style="font-size: 14px; color: #64748b; line-height: 1.5;">
-        This link will expire in 1 hour. If you didn't request a password reset, 
-        you can safely ignore this email - your password will remain unchanged.
-      </p>
-      <p style="font-size: 14px; color: #64748b;">
-        If the button doesn't work, copy and paste this link into your browser:
-        <br/>
-        <a href="${resetUrl}" style="color: #e11d48; word-break: break-all;">${resetUrl}</a>
-      </p>
-      <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;">
-      <p style="font-size: 12px; color: #94a3b8; text-align: center;">
-        &copy; 2026 WeddingWeb AI Inc. Made with ❤️ in Kerala.
-      </p>
-    </div>
+    </body>
+    </html>
   `;
 
   return sendEmail({

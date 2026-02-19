@@ -5,12 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { showSuccess, showError } from '@/utils/toast';
 
 const CoupleLogin = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -21,28 +23,12 @@ const CoupleLogin = () => {
     setIsLoading(true);
 
     try {
-      const { API_BASE_URL } = await import('@/lib/api');
-      const axios = (await import('axios')).default;
-
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
-        username: credentials.username,
-        password: credentials.password,
-      });
-
-      const token = response.data.accessToken || response.data.token;
-
-      if (token) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', response.data.user?.role || 'couple');
-        showSuccess('Welcome to your special portal! 💕');
-        navigate('/couple');
-      } else {
-        throw new Error('Authentication failed. No token received.');
-      }
+      await login(credentials.email, credentials.password);
+      showSuccess('Welcome to your special portal! 💕');
+      navigate('/couple');
     } catch (error: any) {
       console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred. Please try again.';
-      showError(errorMessage);
+      showError(error.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -79,15 +65,15 @@ const CoupleLogin = () => {
           <CardContent className="pt-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-base font-medium text-rose-800">
-                  Username
+                <Label htmlFor="email" className="text-base font-medium text-rose-800">
+                  Email Address
                 </Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter your shared username"
-                  value={credentials.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={credentials.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   className="text-lg"
                   required
                 />

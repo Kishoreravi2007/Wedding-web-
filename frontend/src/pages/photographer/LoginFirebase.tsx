@@ -31,7 +31,7 @@ const PhotographerLoginFirebase = () => {
     setIsLoading(true);
 
     try {
-      const user = await signIn(credentials.email, credentials.password);
+      const { user } = await signIn(credentials.email, credentials.password);
 
       // Check if user has photographer role
       if (user.role !== 'photographer') {

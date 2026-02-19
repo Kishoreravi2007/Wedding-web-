@@ -155,6 +155,7 @@ router.get('/', async (req, res) => {
       eventType,
       tags: tags ? JSON.parse(tags) : undefined,
       personId,
+      isPublic: req.query.isPublic !== undefined ? (req.query.isPublic === 'all' ? undefined : req.query.isPublic) : true,
       limit: limit ? parseInt(limit) : 50,
       offset: offset ? parseInt(offset) : 0
     };
@@ -362,7 +363,7 @@ router.post('/public', upload.single('photo'), async (req, res) => {
     return res.status(400).json({ message: 'No photo file uploaded' });
   }
 
-  const { sister, title, description, eventType, tags } = req.body;
+  const { sister, title, description, eventType, tags, isPublic } = req.body;
 
   // Validate required fields
   if (!sister) {
@@ -393,7 +394,8 @@ router.post('/public', upload.single('photo'), async (req, res) => {
       event_type: eventType || 'photobooth',
       tags: tags ? (typeof tags === 'string' ? JSON.parse(tags) : tags) : ['guest-upload'],
       storage_provider: 'supabase',
-      photographer_id: null // Public upload
+      photographer_id: null, // Public upload
+      is_public: isPublic === 'false' || isPublic === false ? false : true // Public by default for public route
     };
 
     const photo = await PhotoDB.create(photoData);
@@ -437,7 +439,7 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
     return res.status(400).json({ message: 'No photo file uploaded' });
   }
 
-  const { sister, title, description, eventType, tags } = req.body;
+  const { sister, title, description, eventType, tags, isPublic } = req.body;
   const faces = req.body.faces || req.body.faceDescriptors || req.body.face_descriptors;
 
   // Validate required fields
@@ -512,7 +514,8 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res) => 
       event_type: eventType || '',
       tags: parsedTags,
       storage_provider: 'supabase',
-      photographer_id: req.user?.id || null // From authentication middleware
+      photographer_id: req.user?.id || null, // From authentication middleware
+      is_public: isPublic === 'true' || isPublic === true ? true : false // Private by default as requested
     };
 
     const photo = await PhotoDB.create(photoData);
@@ -662,7 +665,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
  */
 router.patch('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { title, description, eventType, tags } = req.body;
+  const { title, description, eventType, tags, isPublic } = req.body;
 
   try {
     const updates = {};
@@ -670,6 +673,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
     if (eventType !== undefined) updates.event_type = eventType;
+    if (isPublic !== undefined) updates.is_public = isPublic === 'true' || isPublic === true;
     if (tags !== undefined) {
       updates.tags = Array.isArray(tags) ? tags : JSON.parse(tags);
     }

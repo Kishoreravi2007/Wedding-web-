@@ -27,6 +27,7 @@ interface Photo {
   uploadedAt: string;
   sister: string;
   tags?: string[];
+  isPublic: boolean;
 }
 
 interface PhotoManagerProps {
@@ -49,7 +50,7 @@ const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_BASE_URL}/api/photos?weddingId=${weddingId}`);
+      const response = await fetch(`${API_BASE_URL}/api/photos?weddingId=${weddingId}&isPublic=all`);
 
       if (response.ok) {
         const data = await response.json();
@@ -62,7 +63,8 @@ const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
           size: parseInt(p.size) || 0,
           uploadedAt: p.uploaded_at || p.created_at || p.timestamp,
           sister: p.sister || 'none',
-          tags: p.tags || []
+          tags: p.tags || [],
+          isPublic: p.is_public !== false // Default to true for display safety if missing
         })));
       }
     } catch (error) {
@@ -144,7 +146,32 @@ const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
       showSuccess('Tags updated!');
     } catch (error) {
       console.error('Error updating tags:', error);
-      alert('Failed to update tags. Please try again.');
+    }
+  };
+
+  const togglePhotoVisibility = async (photo: Photo) => {
+    try {
+      const nextPublic = !photo.isPublic;
+      const response = await fetch(`${API_BASE_URL}/api/photos/${photo.id}`, {
+        method: 'PATCH',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isPublic: nextPublic })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update visibility');
+      }
+
+      // Update local state
+      setPhotos(prev => prev.map(p => (p.id === photo.id ? { ...p, isPublic: nextPublic } : p)));
+
+      showSuccess(`Photo is now ${nextPublic ? 'Public' : 'Private'}`);
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+      alert('Failed to update visibility. Please try again.');
     }
   };
 
@@ -253,6 +280,23 @@ const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
             <Trash2 className="w-3 h-3 mr-1" />
             Delete Photo
           </Button>
+
+          <div className="pt-2 border-t mt-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium">Visibility</span>
+              <Badge variant={photo.isPublic ? "default" : "secondary"} className="text-[10px] px-1 h-4">
+                {photo.isPublic ? 'Public' : 'Private'}
+              </Badge>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full text-xs h-8"
+              onClick={() => togglePhotoVisibility(photo)}
+            >
+              {photo.isPublic ? 'Make Private' : 'Make Public'}
+            </Button>
+          </div>
           {renderTagEditor(photo)}
         </CardContent>
       </Card>

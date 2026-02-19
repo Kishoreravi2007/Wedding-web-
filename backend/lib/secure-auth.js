@@ -19,6 +19,7 @@ const SecureUserDB = {
   async createUser(userData) {
     try {
       const { username, password, role } = userData;
+      const normalizedUsername = username.toLowerCase();
 
       // Validate input
       if (!username || !password || !role) {
@@ -26,8 +27,8 @@ const SecureUserDB = {
       }
 
       // Check if user already exists
-      const checkQuery = 'SELECT id FROM users WHERE username = $1';
-      const { rows: existingUsers } = await query(checkQuery, [username]);
+      const checkQuery = 'SELECT id FROM users WHERE LOWER(username) = $1';
+      const { rows: existingUsers } = await query(checkQuery, [normalizedUsername]);
 
       if (existingUsers.length > 0) {
         throw new Error('Username already exists');
@@ -44,7 +45,7 @@ const SecureUserDB = {
       `;
 
       const { rows } = await query(insertQuery, [
-        username,
+        normalizedUsername,
         hashedPassword,
         role,
         userData.email_offers_opt_in || false,
@@ -54,7 +55,7 @@ const SecureUserDB = {
 
       return {
         id: rows[0].id,
-        username,
+        username: normalizedUsername,
         role,
         email_offers_opt_in: userData.email_offers_opt_in || false,
         has_premium_access: userData.has_premium_access || false,
@@ -72,6 +73,7 @@ const SecureUserDB = {
    */
   async authenticateUser(username, password, ipAddress, userAgent) {
     try {
+      const normalizedUsername = username.toLowerCase();
       // Get user data - using SELECT * to be defensive against schema changes
       // AND join with weddings table to populate weddingData
       const { rows } = await query(
@@ -79,12 +81,12 @@ const SecureUserDB = {
             w.groom_name, w.bride_name, w.wedding_date, w.venue, w.guest_count, w.theme
          FROM users u
          LEFT JOIN weddings w ON u.id = w.user_id
-         WHERE u.username = $1`,
-        [username]
+         WHERE LOWER(u.username) = $1`,
+        [normalizedUsername]
       );
 
       const user = rows[0];
-      const authDetails = { username, ip_address: ipAddress, user_agent: userAgent };
+      const authDetails = { username: normalizedUsername, ip_address: ipAddress, user_agent: userAgent };
 
       if (!user) {
         // Log failed attempt (generic user_not_found)

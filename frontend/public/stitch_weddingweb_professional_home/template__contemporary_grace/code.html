@@ -61,6 +61,8 @@
     <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-primary/10">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-2">
+                <img src="{{CoupleLogo}}" alt="Logo" class="h-10 w-auto object-contain"
+                    onerror="this.onerror=null; this.src='/logo.png';">
                 <span
                     class="serif-heading text-2xl font-bold tracking-tighter text-primary">{{GroomInitial}}&amp;{{BrideInitial}}</span>
             </div>
@@ -256,6 +258,51 @@
                 </div>
             </div>
         </section>
+        <!-- Venue Map Section -->
+        <section class="py-24 bg-pastel-cream/30" id="map">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="serif-heading text-5xl mb-4">The Venue</h2>
+                    <p class="text-lg text-slate-600">Find your way to our celebration at {{Venue}}</p>
+                </div>
+                <div class="rounded-[2rem] overflow-hidden shadow-2xl border border-primary/10 h-[500px]">
+                    <iframe src="{{MapEmbedLink}}" width="100%" height="100%" frameborder="0" style="border:0;"
+                        allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Travel & Logistics Section -->
+        <section class="py-24 px-6 max-w-7xl mx-auto" id="travel">
+            <div class="text-center mb-16">
+                <h2 class="serif-heading text-5xl mb-4">{{Travel_Title}}</h2>
+                <p class="text-lg text-slate-600">Helpful info for your journey.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="p-8 rounded-2xl bg-white shadow-sm border border-primary/5 hover:shadow-xl transition-all">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-4">train</span>
+                    <h3 class="serif-heading text-2xl mb-2">Railway</h3>
+                    <p class="text-sm text-slate-600">{{Travel_Railway}}</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white shadow-sm border border-primary/5 hover:shadow-xl transition-all">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-4">directions_bus</span>
+                    <h3 class="serif-heading text-2xl mb-2">Bus Stand</h3>
+                    <p class="text-sm text-slate-600">{{Travel_BusStand}}</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white shadow-sm border border-primary/5 hover:shadow-xl transition-all">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-4">location_on</span>
+                    <h3 class="serif-heading text-2xl mb-2">Bus Stop</h3>
+                    <p class="text-sm text-slate-600">{{Travel_BusStop}}</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white shadow-sm border border-primary/5 hover:shadow-xl transition-all">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-4">flight</span>
+                    <h3 class="serif-heading text-2xl mb-2">Airport</h3>
+                    <p class="text-sm text-slate-600">{{Travel_Airport}}</p>
+                </div>
+            </div>
+        </section>
+
         <!-- RSVP Form Section -->
         <section class="bg-white py-24" id="rsvp">
             <div class="max-w-2xl mx-auto px-6">

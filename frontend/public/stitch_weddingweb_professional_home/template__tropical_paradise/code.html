@@ -73,8 +73,9 @@
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-primary/10">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary text-3xl">palm_logo</span>
+            <div class="flex items-center gap-4">
+                <img src="{{CoupleLogo}}" alt="Logo" class="h-10 w-auto object-contain"
+                    onerror="this.onerror=null; this.src='/logo.png';">
                 <h1 class="text-xl font-extrabold tracking-tight text-primary uppercase">{{GroomFirst}} &amp;
                     {{BrideFirst}}</h1>
             </div>
@@ -199,41 +200,55 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div id="wedding-map"
                     class="rounded-3xl overflow-hidden shadow-2xl aspect-video lg:aspect-square relative">
-                    <div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
-                    <img alt="Tropical Map" class="w-full h-full object-cover"
-                        data-alt="Aerial view of a luxury tropical resort on Maui coast" data-location="Maui, Hawaii"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-3tZxPcDwUyrzkcSxVi5tnLzORZz__B-YF8ZFaCUwDaLpgv0x4XAMnoofjCbsj4fo3JtSty7XdEFelj8yiR-_a87byEu7Zob074As_pY18XV9EsH5j74PuD5s5Pblc78MwWCUP_1OSz_RGwRLo7XnPIDunuP7risAOJduWV3J4aE06CovdvOkfN7CWZaM7kBXQiuDN5SCWSMXbdhw63RsSbwdSlfKXIOdWlgX1Xr9LPjQC7J2OwyT8823HVJMVBCEYBMVInNdz4VV" />
+                    <iframe src="{{MapEmbedLink}}" width="100%" height="100%" frameborder="0" style="border:0;"
+                        allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
                 </div>
                 <div class="space-y-8">
                     <div>
-                        <span class="text-primary font-black uppercase tracking-widest text-sm">{{Lodging_Title}}</span>
-                        <h2 class="text-4xl font-black mt-2">Where to Stay &amp; How to Get Here</h2>
+                        <span class="text-primary font-black uppercase tracking-widest text-sm">{{Travel_Title}}</span>
+                        <h2 class="text-4xl font-black mt-2">Getting to Paradise</h2>
                     </div>
-                    <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">train</span>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-tighter">Railway</h4>
+                                <p class="text-[#636f88] text-xs">{{Travel_Railway}}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">directions_bus</span>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-tighter">Bus Stand</h4>
+                                <p class="text-[#636f88] text-xs">{{Travel_BusStand}}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">location_on</span>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-tighter">Bus Stop</h4>
+                                <p class="text-[#636f88] text-xs">{{Travel_BusStop}}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">flight</span>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase tracking-tighter">Airport</h4>
+                                <p class="text-[#636f88] text-xs">{{Travel_Airport}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
                         <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
                             <span
                                 class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">hotel</span>
                             <div>
                                 <h4 class="font-bold text-lg">Hotel Accommodations</h4>
                                 <p class="text-[#636f88] text-sm">{{Lodging_Body}}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
-                            <span
-                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">flight_takeoff</span>
-                            <div>
-                                <h4 class="font-bold text-lg">Arrival Terminal</h4>
-                                <p class="text-[#636f88] text-sm">Kahului Airport (OGG) is the main hub. Complimentary
-                                    shuttle service provided for Azure guests.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4 items-start bg-white p-6 rounded-2xl shadow-sm">
-                            <span
-                                class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">checkroom</span>
-                            <div>
-                                <h4 class="font-bold text-lg">Dress Code: Island Chic</h4>
-                                <p class="text-[#636f88] text-sm">Think linen suits, floral midi dresses, and
-                                    comfortable footwear suitable for beach terrain.</p>
                             </div>
                         </div>
                     </div>
