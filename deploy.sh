@@ -70,7 +70,7 @@ gcloud run deploy wedding-backend \
     --platform managed \
     --region asia-south1 \
     --allow-unauthenticated \
-    --set-env-vars="DATABASE_URL=postgresql://postgres.ihjrcrcxzmvwrqcmfgam:Kishore%402007@aws-1-ap-south-1.pooler.supabase.com:6543/postgres,SUPABASE_URL=https://ihjrcrcxzmvwrqcmfgam.supabase.co,SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloanJjcmN4em12d3JxY21mZ2FtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTYxMTM5MCwiZXhwIjoyMDg1MTg3MzkwfQ.wL-zfv3CQP3IinEScqaT-hpaz7Xiz_09Q6TK1aThnyc,NODE_ENV=production" \
+    --set-env-vars="DATABASE_URL=postgresql://postgres.ihjrcrcxzmvwrqcmfgam:Kishore%402007@aws-1-ap-south-1.pooler.supabase.com:5432/postgres,SUPABASE_URL=https://ihjrcrcxzmvwrqcmfgam.supabase.co,SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloanJjcmN4em12d3JxY21mZ2FtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTYxMTM5MCwiZXhwIjoyMDg1MTg3MzkwfQ.wL-zfv3CQP3IinEScqaT-hpaz7Xiz_09Q6TK1aThnyc,NODE_ENV=production" \
     --quiet
 
 echo "🎉 Deployment Complete!"

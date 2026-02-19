@@ -1,65 +1,31 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
 
-const runTest = async (params) => {
-  const desc = `${params.user}@${params.host}:${params.port}`;
-  console.log(`Testing: ${desc}`);
-  const client = new Client({
-    ...params,
-    ssl: {
-      rejectUnauthorized: false
-    },
-    connectionTimeoutMillis: 10000
-  });
-  try {
-    await client.connect();
-    console.log("✅ Connection: SUCCESS");
-    const res = await client.query('SELECT current_user, current_database()');
-    console.log("   User:", res.rows[0].current_user);
-    console.log("   DB:", res.rows[0].current_database);
-    await client.end();
-    return true;
-  } catch (err) {
-    console.error("❌ Connection: FAILED");
-    console.error("   Error:", err.message);
-    if (client) try { await client.end(); } catch (e) { }
-    return false;
+// Trying Session Mode on the same host
+const sessionConnectionString = 'postgresql://postgres.ihjrcrcxzmvwrqcmfgam:Kishore%402007@aws-1-ap-south-1.pooler.supabase.com:5432/postgres';
+
+const pool = new Pool({
+  connectionString: sessionConnectionString,
+  ssl: {
+    rejectUnauthorized: false
   }
-};
+});
 
-(async () => {
-  const projectRef = "ihjrcrcxzmvwrqcmfgam";
-  const pass = "Kishore@2007";
-  const poolerHost = "aws-1-ap-south-1.pooler.supabase.com";
-  const directHost = "db.ihjrcrcxzmvwrqcmfgam.supabase.co";
+async function test() {
+  console.log('Testing connection to:', sessionConnectionString);
+  try {
+    const client = await pool.connect();
+    console.log('✅ Connected successfully!');
+    const res = await client.query('SELECT NOW()');
+    console.log('Time:', res.rows[0].now);
+    client.release();
+    process.exit(0);
+  } catch (err) {
+    console.error('❌ Connection failed:', err.message);
+    if (err.message.includes('SSL')) {
+      console.log('-> This confirms the SSL negotiation failed.');
+    }
+    process.exit(1);
+  }
+}
 
-  console.log(`Starting DNS diagnostics for project: ${projectRef}`);
-
-  // Variant 1: Pooler Transaction (Port 6543)
-  await runTest({
-    host: poolerHost,
-    port: 6543,
-    user: `postgres.${projectRef}`,
-    password: pass,
-    database: "postgres"
-  });
-
-  // Variant 2: Pooler Session (Port 5432)
-  await runTest({
-    host: poolerHost,
-    port: 5432,
-    user: `postgres.${projectRef}`,
-    password: pass,
-    database: "postgres"
-  });
-
-  // Variant 3: Direct DB (Port 5432)
-  await runTest({
-    host: directHost,
-    port: 5432,
-    user: "postgres",
-    password: pass,
-    database: "postgres"
-  });
-
-  console.log("Diagnostics complete.");
-})();
+test();
