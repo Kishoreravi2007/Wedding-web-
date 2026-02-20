@@ -14,3 +14,17 @@ services:
       - key: PORT
         value: 10000
 
+  - type: static
+    name: wedding-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://backend-w8zt.onrender.com/api
+      - key: VITE_BACKEND_URL
+        value: https://backend-w8zt.onrender.com
+      - key: VITE_API_URL
+        value: https://backend-w8zt.onrender.com
+      - key: VITE_DEEPFACE_API_URL
+        value: https://backend-w8zt.onrender.com/api/deepface
