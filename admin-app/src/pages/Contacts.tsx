@@ -7,6 +7,7 @@ export default function Contacts() {
     const [filter, setFilter] = useState<'all' | 'pending' | 'read' | 'replied'>('all');
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
 
     const fetchMessages = () => {
         setIsLoading(true);
@@ -23,6 +24,9 @@ export default function Contacts() {
         try {
             await contactService.updateStatus(id, status);
             fetchMessages();
+            if (selectedMessage?.id === id) {
+                setSelectedMessage(prev => prev ? { ...prev, status } : null);
+            }
         } catch (err) {
             alert('Failed to update status');
         }
@@ -36,6 +40,9 @@ export default function Contacts() {
             await contactService.reply(id, reply);
             fetchMessages();
             alert('Reply sent successfully!');
+            if (selectedMessage?.id === id) {
+                setSelectedMessage(null);
+            }
         } catch (err) {
             alert('Failed to send reply');
         }
@@ -46,6 +53,9 @@ export default function Contacts() {
         try {
             await contactService.delete(id);
             fetchMessages();
+            if (selectedMessage?.id === id) {
+                setSelectedMessage(null);
+            }
         } catch (err) {
             alert('Failed to delete message');
         }
@@ -60,7 +70,7 @@ export default function Contacts() {
     });
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
+        <div className="space-y-10 animate-in fade-in duration-700 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Lead Uplink</h1>
@@ -118,21 +128,24 @@ export default function Contacts() {
                                     }`}>
                                     {msg.status}
                                 </span>
-                                <button onClick={() => handleDelete(msg.id)} className="opacity-0 group-hover:opacity-100 size-8 rounded-lg bg-red-500/5 text-slate-500 hover:text-red-500 flex items-center justify-center transition-all">
+                                <button onClick={(e) => { e.stopPropagation(); handleDelete(msg.id); }} className="opacity-0 group-hover:opacity-100 size-8 rounded-lg bg-red-500/5 text-slate-500 hover:text-red-500 flex items-center justify-center transition-all">
                                     <span className="material-symbols-outlined text-base">delete_sweep</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div onClick={() => msg.status === 'pending' && handleUpdateStatus(msg.id, 'read')} className="cursor-pointer relative z-10">
+                        <div onClick={() => {
+                            setSelectedMessage(msg);
+                            if (msg.status === 'pending') handleUpdateStatus(msg.id, 'read');
+                        }} className="cursor-pointer relative z-10">
                             <h3 className="text-lg font-black text-slate-900 dark:text-white truncate uppercase tracking-tighter">{msg.name}</h3>
                             <p className="text-[10px] font-black text-primary truncate uppercase tracking-widest mt-0.5">{msg.email}</p>
-                        </div>
 
-                        <div className="glass-card !bg-black/20 p-5 rounded-2xl border border-white/5 min-h-[100px] flex items-center italic">
-                            <p className="text-xs font-semibold text-slate-400 line-clamp-4 leading-relaxed tracking-wide">
-                                "{msg.message}"
-                            </p>
+                            <div className="glass-card !bg-black/20 p-5 rounded-2xl border border-white/5 min-h-[100px] flex items-center italic mt-4 hover:bg-black/40 transition-all">
+                                <p className="text-xs font-semibold text-slate-400 line-clamp-4 leading-relaxed tracking-wide">
+                                    "{msg.message}"
+                                </p>
+                            </div>
                         </div>
 
                         {msg.event_date && (
@@ -147,31 +160,112 @@ export default function Contacts() {
                             <div className="flex gap-4">
                                 {msg.status !== 'replied' && (
                                     <button
-                                        onClick={() => handleReply(msg.id)}
+                                        onClick={(e) => { e.stopPropagation(); handleReply(msg.id); }}
                                         className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors"
                                     >
                                         Reply
-                                    </button>
-                                )}
-                                {msg.status === 'pending' && (
-                                    <button
-                                        onClick={() => handleUpdateStatus(msg.id, 'read')}
-                                        className="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-white transition-colors"
-                                    >
-                                        Ignore
                                     </button>
                                 )}
                             </div>
                         </div>
                     </div>
                 ))}
-                {!isLoading && filteredMessages.length === 0 && (
-                    <div className="col-span-full py-20 text-center glass-card !bg-white/5 rounded-[2.5rem] border border-white/10">
-                        <span className="material-symbols-outlined text-slate-800 text-5xl mb-4">mail_lock</span>
-                        <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">Communication array empty</p>
-                    </div>
-                )}
             </div>
+
+            {/* DETAIL MODAL */}
+            {selectedMessage && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="glass-card w-full max-w-2xl bg-slate-900/90 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                        {/* Header */}
+                        <div className="relative p-8 border-b border-white/5 bg-white/5">
+                            <button onClick={() => setSelectedMessage(null)} className="absolute right-6 top-6 size-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                            <div className="flex items-center gap-6">
+                                <div className="size-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-neon-blue">
+                                    <span className="material-symbols-outlined text-4xl">person_search</span>
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{selectedMessage.name}</h2>
+                                    <p className="text-xs font-black text-primary uppercase tracking-widest mt-1">Lead Analysis Results</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Email Address</p>
+                                    <p className="text-sm font-bold text-white break-all">{selectedMessage.email}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Phone Identity</p>
+                                    <p className="text-sm font-bold text-white uppercase">{selectedMessage.phone || 'N/A'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Guest Count</p>
+                                    <p className="text-sm font-bold text-white uppercase">{selectedMessage.guest_count || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-6">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Target Date</p>
+                                    <p className="text-sm font-bold text-white uppercase">
+                                        {selectedMessage.event_date ? new Date(selectedMessage.event_date).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'N/A'}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Arrival Timestamp</p>
+                                    <p className="text-sm font-bold text-white uppercase">
+                                        {new Date(selectedMessage.created_at).toLocaleString()}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Protocol Status</p>
+                                    <span className={`inline-block px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-lg border mt-1 ${selectedMessage.status === 'pending' ? 'bg-secondary/10 text-secondary border-secondary/20' :
+                                        selectedMessage.status === 'replied' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-white/5'
+                                        }`}>
+                                        {selectedMessage.status}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="col-span-full pt-4">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Transmission Content</p>
+                                <div className="glass-card !bg-black/40 p-6 rounded-3xl border border-white/10 italic leading-relaxed text-slate-300">
+                                    "{selectedMessage.message}"
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-8 bg-white/5 border-t border-white/5 flex gap-4">
+                            {selectedMessage.status !== 'replied' && (
+                                <button
+                                    onClick={() => handleReply(selectedMessage.id)}
+                                    className="flex-1 bg-primary text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                >
+                                    Transmit Reply
+                                </button>
+                            )}
+                            <button
+                                onClick={() => handleDelete(selectedMessage.id)}
+                                className="px-8 border border-red-500/20 text-red-500 bg-red-500/10 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all"
+                            >
+                                Terminate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {!isLoading && filteredMessages.length === 0 && (
+                <div className="col-span-full py-20 text-center glass-card !bg-white/5 rounded-[2.5rem] border border-white/10">
+                    <span className="material-symbols-outlined text-slate-800 text-5xl mb-4">mail_lock</span>
+                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">Communication array empty</p>
+                </div>
+            )}
         </div>
     );
 }

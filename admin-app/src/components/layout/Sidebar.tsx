@@ -46,6 +46,7 @@ export default function Sidebar() {
         { path: '/purchases', icon: 'payments', label: 'Purchases' },
         { path: '/feedback', icon: 'chat_bubble', label: 'Feedback', badge: pendingFeedback > 0 ? pendingFeedback : undefined },
         { path: '/contacts', icon: 'contacts', label: 'Contacts' },
+        { path: '/email', icon: 'mail', label: 'Email Hub' },
         { path: '/coupons', icon: 'confirmation_number', label: 'Promotions' },
         ...(user?.email === 'kishorekailas1@gmail.com' ? [{ path: '/admins', icon: 'admin_panel_settings', label: 'Identity' }] : []),
         { path: '/settings', icon: 'settings', label: 'Settings' },

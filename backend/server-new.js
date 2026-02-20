@@ -238,6 +238,7 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
 // AI Email Webhook (for Google Apps Script fallback)
 console.log('✉️ Registering /api/email routes...');
 app.use('/api/email', require('./routes/email-webhook'));
+app.use('/api/email-hub', require('./routes/email'));
 console.log('✅ Registered /api/email routes.');
 
 

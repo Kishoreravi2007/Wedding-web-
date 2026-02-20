@@ -31,12 +31,15 @@ export interface ContactMessage {
     id: string;
     name: string;
     email: string;
+    subject?: string;
     phone: string | null;
     event_date: string | null;
     guest_count: number | null;
     message: string;
-    status: 'pending' | 'read' | 'replied';
+    status: 'new' | 'pending' | 'read' | 'replied';
+    response?: string;
     created_at: string;
+    updated_at?: string;
 }
 
 export interface Coupon {

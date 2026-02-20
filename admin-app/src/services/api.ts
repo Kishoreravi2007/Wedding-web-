@@ -98,3 +98,12 @@ export const premiumService = {
     listAdmins: async () => (await api.get<{ success: boolean; admins: any[] }>('/premium/admins')).data.admins,
     deleteAdmin: async (id: string) => (await api.delete(`/premium/admins/${id}`)).data,
 };
+
+export const emailHubService = {
+    getInbox: async () => (await api.get<ContactMessage[]>('/email-hub/inbox')).data,
+    enhanceReply: async (messageId: string, draftReply: string) =>
+        (await api.post<{ enhancedText: string; isMock: boolean; modelUsed: string }>('/email-hub/enhance-reply', { messageId, draftReply })).data,
+    sendReply: async (messageId: string, replyText: string) =>
+        (await api.post<{ success: boolean }>('/email-hub/send-reply', { messageId, replyText })).data,
+    delete: async (id: string) => (await api.delete(`/email-hub/${id}`)).data,
+};

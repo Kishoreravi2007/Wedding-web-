@@ -8,6 +8,7 @@ import FeedbackList from './pages/FeedbackList';
 import Contacts from './pages/Contacts';
 import Settings from './pages/Settings';
 import Admins from './pages/Admins';
+import EmailHub from './pages/EmailHub';
 import Login from './pages/Login';
 
 import AppLayout from './components/layout/AppLayout';
@@ -34,6 +35,7 @@ function App() {
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/admins" element={<Admins />} />
+                  <Route path="/email" element={<EmailHub />} />
                 </Routes>
               </AppLayout>
             </ProtectedRoute>

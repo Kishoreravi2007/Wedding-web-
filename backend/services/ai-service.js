@@ -254,6 +254,43 @@ const AIService = {
             isMock: result.isMock,
             modelUsed: result.modelUsed
         };
+    },
+
+    /**
+     * Enhance/Refactor a human-written email reply draft using Gemini
+     * @param {Object} context - { originalMessage, draftReply }
+     * @returns {Promise<Object>} - { enhancedText, isMock }
+     */
+    async enhanceReplyDraft(context) {
+        const { originalMessage, draftReply } = context;
+
+        const prompt = `You are an expert customer relations manager for WeddingWeb (weddingweb.co.in).
+        I have a rough draft of a reply to a user's inquiry. Please REFACTOR and ENHANCE it to be more professional, warm, and clear.
+
+        Original Inquiry:
+        "${originalMessage}"
+
+        My Rough Draft:
+        "${draftReply}"
+
+        Rules for Enhancement:
+        1. Maintain the core meaning and any specific info I provided in the draft.
+        2. Improve grammar, tone (make it empathetic), and professionalism.
+        3. Keep it relatively concise.
+        4. DO NOT use markdown formatting (no asterisks, no bold).
+        5. Start immediately with the enhanced email body. No "Here is your enhanced draft" text.
+
+        Enhanced Professional Reply:`;
+
+        const mockEnhanced = `Thank you for your patience. Regarding your inquiry, ${draftReply}. We appreciate your interest in WeddingWeb and are here to ensure you have the best experience possible.`;
+
+        const result = await this.generateContent(prompt, mockEnhanced);
+
+        return {
+            enhancedText: this.cleanResponse(result.text),
+            isMock: result.isMock,
+            modelUsed: result.modelUsed
+        };
     }
 };
 

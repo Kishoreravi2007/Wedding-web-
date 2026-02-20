@@ -7,6 +7,7 @@ export default function FeedbackList() {
     const [filter, setFilter] = useState<'all' | 'new' | 'reviewed' | 'resolved'>('all');
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
 
     const fetchFeedback = () => {
         setIsLoading(true);
@@ -23,6 +24,9 @@ export default function FeedbackList() {
         try {
             await feedbackService.updateStatus(id, status);
             fetchFeedback();
+            if (selectedFeedback?.id === id) {
+                setSelectedFeedback(prev => prev ? { ...prev, status } : null);
+            }
         } catch (err) {
             alert('Failed to update status');
         }
@@ -33,6 +37,9 @@ export default function FeedbackList() {
         try {
             await feedbackService.delete(id);
             fetchFeedback();
+            if (selectedFeedback?.id === id) {
+                setSelectedFeedback(null);
+            }
         } catch (err) {
             alert('Failed to delete feedback');
         }
@@ -46,7 +53,7 @@ export default function FeedbackList() {
     });
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
+        <div className="space-y-10 animate-in fade-in duration-700 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-black text-white tracking-tight">Vibe Intelligence</h1>
@@ -100,7 +107,10 @@ export default function FeedbackList() {
                             <div className="flex flex-col md:flex-row gap-8 relative z-10">
                                 <div className="flex-1 space-y-4">
                                     <div className="flex justify-between items-start">
-                                        <div>
+                                        <div onClick={() => {
+                                            setSelectedFeedback(item);
+                                            if (item.status === 'new') handleUpdateStatus(item.id, 'reviewed');
+                                        }} className="cursor-pointer">
                                             <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-3">
                                                 {item.name}
                                                 {item.status === 'new' && <span className="size-2 bg-primary rounded-full animate-ping"></span>}
@@ -116,8 +126,11 @@ export default function FeedbackList() {
                                         </div>
                                     </div>
 
-                                    <div className="glass-card !bg-black/20 p-6 rounded-2xl border border-white/5 italic">
-                                        <p className="text-sm font-medium text-slate-300 leading-relaxed tracking-wide">
+                                    <div onClick={() => {
+                                        setSelectedFeedback(item);
+                                        if (item.status === 'new') handleUpdateStatus(item.id, 'reviewed');
+                                    }} className="cursor-pointer glass-card !bg-black/20 p-6 rounded-2xl border border-white/5 italic hover:bg-black/40 transition-all">
+                                        <p className="text-sm font-medium text-slate-300 leading-relaxed tracking-wide line-clamp-2">
                                             "{item.message}"
                                         </p>
                                     </div>
@@ -136,14 +149,14 @@ export default function FeedbackList() {
                                         <div className="ml-auto flex gap-4">
                                             {item.status !== 'resolved' && (
                                                 <button
-                                                    onClick={() => handleUpdateStatus(item.id, 'resolved')}
+                                                    onClick={(e) => { e.stopPropagation(); handleUpdateStatus(item.id, 'resolved'); }}
                                                     className="px-4 py-2 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all"
                                                 >
                                                     Solve Logic
                                                 </button>
                                             )}
                                             <button
-                                                onClick={() => handleDelete(item.id)}
+                                                onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
                                                 className="px-4 py-2 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 text-red-500 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all"
                                             >
                                                 Purge Signal
@@ -154,14 +167,96 @@ export default function FeedbackList() {
                             </div>
                         </div>
                     ))}
-                    {!isLoading && filteredFeedback.length === 0 && (
-                        <div className="py-20 text-center glass-card !bg-white/5 rounded-[2.5rem] border border-white/10">
-                            <span className="material-symbols-outlined text-slate-700 text-5xl mb-4">settings_input_antenna</span>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">No valid signals detected in this sector</p>
-                        </div>
-                    )}
                 </div>
             </div>
+
+            {/* DETAIL MODAL */}
+            {selectedFeedback && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="glass-card w-full max-w-2xl bg-slate-900/90 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                        {/* Header */}
+                        <div className="relative p-8 border-b border-white/5 bg-white/5">
+                            <button onClick={() => setSelectedFeedback(null)} className="absolute right-6 top-6 size-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                            <div className="flex items-center gap-6">
+                                <div className="size-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-neon-blue">
+                                    <span className="material-symbols-outlined text-4xl">sensors</span>
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{selectedFeedback.name}</h2>
+                                    <p className="text-xs font-black text-primary uppercase tracking-widest mt-1">Signal Analysis Results</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Email Signature</p>
+                                    <p className="text-sm font-bold text-white break-all">{selectedFeedback.email || 'Anonymous Signal'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Signal Category</p>
+                                    <p className="text-sm font-bold text-white uppercase">{selectedFeedback.category} Component</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Intensity Rating</p>
+                                    <div className="flex gap-2 mt-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <span key={i} className={`material-symbols-outlined text-xl ${i < selectedFeedback.rating ? 'text-primary' : 'text-slate-800'}`}>
+                                                {i < selectedFeedback.rating ? 'noise_control_off' : 'radio_button_unchecked'}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-6">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Capture Timestamp</p>
+                                    <p className="text-sm font-bold text-white uppercase">
+                                        {new Date(selectedFeedback.created_at).toLocaleString()}
+                                    </p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Logic Status</p>
+                                    <span className={`inline-block px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-lg border mt-1 ${selectedFeedback.status === 'new' ? 'bg-primary/10 text-primary border-primary/20' :
+                                        selectedFeedback.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-white/5'
+                                        }`}>
+                                        {selectedFeedback.status}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="col-span-full pt-4">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Signal Content</p>
+                                <div className="glass-card !bg-black/40 p-6 rounded-3xl border border-white/10 italic leading-relaxed text-slate-300">
+                                    "{selectedFeedback.message}"
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-8 bg-white/5 border-t border-white/5 flex gap-4">
+                            {selectedFeedback.status !== 'resolved' && (
+                                <button
+                                    onClick={() => handleUpdateStatus(selectedFeedback.id, 'resolved')}
+                                    className="flex-1 bg-emerald-500 text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                >
+                                    Solve Logic
+                                </button>
+                            )}
+                            <button
+                                onClick={() => handleDelete(selectedFeedback.id)}
+                                className="px-8 border border-red-500/20 text-red-500 bg-red-500/10 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all"
+                            >
+                                Purge Signal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
