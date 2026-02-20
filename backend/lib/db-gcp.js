@@ -9,26 +9,34 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Pool } = require('pg');
 
 // Get database credentials from environment variables
-const dbConfig = {
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false // Required for Supabase/Cloud SQL
+const buildDbConfig = (useSSL = true) => {
+    const config = {
+        connectionString: process.env.DATABASE_URL,
+    };
+
+    // Only add SSL if requested - Supabase Transaction Pooler (6543) does NOT support SSL
+    if (useSSL) {
+        config.ssl = { rejectUnauthorized: false };
+    } else {
+        config.ssl = false;
     }
+
+    // Fallback to individual vars if DATABASE_URL is missing (legacy)
+    if (!process.env.DATABASE_URL) {
+        config.user = process.env.DB_USER;
+        config.password = process.env.DB_PASSWORD;
+        config.database = process.env.DB_NAME;
+        config.host = process.env.DB_HOST;
+        config.port = process.env.DB_PORT || 5432;
+    }
+
+    // Pool settings
+    config.max = 20;
+    config.idleTimeoutMillis = 30000;
+    config.connectionTimeoutMillis = 10000;
+
+    return config;
 };
-
-// Fallback to individual vars if DATABASE_URL is missing (legacy)
-if (!process.env.DATABASE_URL) {
-    dbConfig.user = process.env.DB_USER;
-    dbConfig.password = process.env.DB_PASSWORD;
-    dbConfig.database = process.env.DB_NAME;
-    dbConfig.host = process.env.DB_HOST;
-    dbConfig.port = process.env.DB_PORT || 5432;
-}
-
-// Add pool settings
-dbConfig.max = 20;
-dbConfig.idleTimeoutMillis = 30000;
-dbConfig.connectionTimeoutMillis = 10000;
 
 // Validate configuration
 if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
@@ -36,14 +44,37 @@ if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
     console.warn('   Database operations will fail until DATABASE_URL or DB_* vars are set.');
 }
 
-// Create connection pool
-const pool = new Pool(dbConfig);
+// Create connection pool - try with SSL first
+let pool = new Pool(buildDbConfig(true));
+let sslFallbackAttempted = false;
 
-// Keep track of connection errors
-pool.on('error', (err, client) => {
-    console.error('❌ Unexpected error on idle client', err);
-    process.exit(-1);
-});
+// Handle SSL rejection gracefully
+const initPool = async () => {
+    try {
+        const client = await pool.connect();
+        console.log('✅ Database connected (SSL)');
+        client.release();
+    } catch (err) {
+        if (err.message && err.message.includes('SSL') && !sslFallbackAttempted) {
+            console.warn('⚠️  SSL rejected by server, reconnecting without SSL...');
+            sslFallbackAttempted = true;
+            await pool.end();
+            pool = new Pool(buildDbConfig(false));
+            try {
+                const client = await pool.connect();
+                console.log('✅ Database connected (no-SSL fallback)');
+                client.release();
+            } catch (err2) {
+                console.error('❌ Database connection failed even without SSL:', err2.message);
+            }
+        } else {
+            console.error('❌ Database connection failed:', err.message);
+        }
+    }
+};
+
+// Run init - store promise so queries can await it
+const initPromise = initPool();
 
 /**
  * Execute a SQL query
@@ -51,6 +82,7 @@ pool.on('error', (err, client) => {
  * @param {Array} params - Query parameters
  */
 const query = async (text, params) => {
+    await initPromise; // Wait for SSL negotiation to complete
     const start = Date.now();
     try {
         const res = await pool.query(text, params);
@@ -67,6 +99,7 @@ const query = async (text, params) => {
  * Get a client from the pool (for transactions)
  */
 const getClient = async () => {
+    await initPromise; // Wait for SSL negotiation to complete
     const client = await pool.connect();
     const query = client.query;
     const release = client.release;
@@ -94,5 +127,5 @@ const getClient = async () => {
 module.exports = {
     query,
     getClient,
-    pool
+    get pool() { return pool; }
 };
