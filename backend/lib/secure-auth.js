@@ -540,9 +540,11 @@ const authMiddleware = {
   }
 };
 
+const superAdminOnly = authMiddleware.requireRole(['admin']);
+
 module.exports = {
   SecureUserDB,
   TokenManager,
   authMiddleware,
-  // supabase // Removed Supabase export
+  superAdminOnly
 };

@@ -29,7 +29,7 @@ router.post('/auto-reply-webhook', async (req, res) => {
     console.log(`[Webhook] 📥 Incoming request to /auto-reply-webhook`);
     console.log(`[Webhook] 📦 Body:`, JSON.stringify(req.body, null, 2));
 
-    const { secret, from, subject, body } = req.body;
+    const { secret, from, subject, body, messageId } = req.body;
 
     // 1. Verify Secret
     if (secret !== WEBHOOK_SECRET) {
@@ -40,16 +40,22 @@ router.post('/auto-reply-webhook', async (req, res) => {
     console.log(`[Webhook] 📩 Verified email from ${from}: ${subject}`);
 
     try {
-        // 2. Save to Database
-        console.log(`[Webhook] 💾 Saving message from ${from} to database...`);
+        // 2. Parse name and email more robustly
+        const name = from.includes('<') ? from.split('<')[0].trim() : from.split('@')[0];
+        const email = from.includes('<') ? (from.match(/<(.+)>/)?.[1] || from) : from;
+
+        // 3. Save to Database
+        console.log(`[Webhook] 💾 Saving message from ${email} to database...`);
         const insertQuery = `
-            INSERT INTO contact_messages (name, email, subject, message, status, created_at)
-            VALUES ($1, $2, $3, $4, 'new', NOW())
+            INSERT INTO contact_messages (name, email, subject, message, status, email_message_id, created_at)
+            VALUES ($1, $2, $3, $4, 'new', $5, NOW())
+            ON CONFLICT (email_message_id) 
+            DO UPDATE SET created_at = EXCLUDED.created_at
             RETURNING *
         `;
 
         try {
-            const res = await db.query(insertQuery, [from.split('<')[0].trim() || from, from.match(/<(.+)>/)?.[1] || from, subject, body]);
+            const res = await db.query(insertQuery, [name, email, subject, body, messageId || null]);
             console.log(`[Webhook] 💾 INSERT Result:`, res.rowCount > 0 ? 'Success' : 'No rows inserted');
             if (res.rows[0]) console.log(`[Webhook] 🆔 Inserted ID:`, res.rows[0].id);
         } catch (dbErr) {
