@@ -1,3 +1,5 @@
+const express = require('express');
+const router = express.Router();
 const db = require('../lib/db-gcp');
 const AIService = require('../services/ai-service');
 const EmailService = require('../services/email-service');
