@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Send, Sparkles, Trash2, Search, ArrowLeft, Loader2, CheckCircle2, Clock } from 'lucide-react';
+import { Mail, Send, Sparkles, Trash2, Search, ArrowLeft, Loader2, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { emailHubService } from '../services/api';
 import type { ContactMessage } from '../types';
 import { format } from 'date-fns';
@@ -8,6 +8,7 @@ const EmailHub: React.FC = () => {
     const [messages, setMessages] = useState<ContactMessage[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [sending, setSending] = useState(false);
     const [enhancing, setEnhancing] = useState(false);
     const [replyDraft, setReplyDraft] = useState('');
@@ -20,8 +21,10 @@ const EmailHub: React.FC = () => {
         fetchInbox();
     }, []);
 
-    const fetchInbox = async () => {
-        setLoading(true);
+    const fetchInbox = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+
         try {
             const data = await emailHubService.getInbox();
             setMessages(data);
@@ -29,6 +32,7 @@ const EmailHub: React.FC = () => {
             console.error('Failed to load inbox:', error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -51,7 +55,7 @@ const EmailHub: React.FC = () => {
         try {
             await emailHubService.sendReply(selectedId, replyDraft);
             // Refresh inbox to show replied status
-            await fetchInbox();
+            await fetchInbox(true);
             setReplyDraft('');
             // Toast or success message could go here
         } catch (error) {
@@ -81,7 +85,7 @@ const EmailHub: React.FC = () => {
 
         const matchesFilter =
             filter === 'all' ||
-            (filter === 'new' && m.status === 'new') ||
+            (filter === 'new' && (m.status === 'new' || m.status === 'pending')) ||
             (filter === 'replied' && m.status === 'replied');
 
         return matchesSearch && matchesFilter;
@@ -96,6 +100,14 @@ const EmailHub: React.FC = () => {
                         <Mail className="text-blue-500" />
                         Email Hub
                     </h1>
+                    <button
+                        onClick={() => fetchInbox(true)}
+                        disabled={refreshing || loading}
+                        className="p-2 hover:bg-white/10 rounded-full transition-all group active:scale-95 disabled:opacity-50"
+                        title="Rescan Frequency"
+                    >
+                        <RefreshCw className={`w-5 h-5 text-white/60 group-hover:text-white ${refreshing ? 'animate-spin' : ''}`} />
+                    </button>
                 </div>
 
                 <div className="flex gap-2 p-1 bg-white/5 rounded-lg border border-white/10">

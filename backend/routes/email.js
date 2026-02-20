@@ -13,7 +13,6 @@ router.get('/inbox', authMiddleware, superAdminOnly, async (req, res) => {
     try {
         const { rows } = await db.query(`
             SELECT * FROM contact_messages 
-            WHERE subject IS NOT NULL 
             ORDER BY created_at DESC
         `);
         res.json(rows);
