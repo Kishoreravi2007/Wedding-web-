@@ -564,7 +564,7 @@ router.get('/admins', authenticateToken, async (req, res) => {
     const { rows } = await query(
       `SELECT u.id, u.username, u.role, u.is_active, u.created_at, p.full_name, p.email, p.avatar_url
        FROM users u
-       LEFT JOIN profiles p ON u.id::uuid = p.user_id::uuid
+       LEFT JOIN profiles p ON u.id::text = p.user_id::text
        WHERE u.role = 'admin'
        ORDER BY u.created_at DESC`
     );
@@ -594,14 +594,14 @@ router.delete('/admins/:id', authenticateToken, async (req, res) => {
     }
 
     // Check if target is actually an admin
-    const { rows: target } = await query('SELECT role FROM users WHERE id = $1', [adminId]);
+    const { rows: target } = await query('SELECT role FROM users WHERE id::text = $1', [adminId]);
     if (target.length === 0 || target[0].role !== 'admin') {
       return res.status(404).json({ success: false, error: 'Admin not found' });
     }
 
     // Delete user (cascade will handle profile if configured, but let's be safe)
-    await query('DELETE FROM profiles WHERE user_id = $1::uuid', [adminId]);
-    await query('DELETE FROM users WHERE id = $1', [adminId]);
+    await query('DELETE FROM profiles WHERE user_id::text = $1', [adminId]);
+    await query('DELETE FROM users WHERE id::text = $1', [adminId]);
 
     res.json({ success: true, message: 'Admin deleted successfully' });
   } catch (error) {
