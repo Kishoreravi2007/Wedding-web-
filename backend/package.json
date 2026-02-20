@@ -32,6 +32,7 @@
     "googleapis": "^166.0.0",
     "helmet": "^8.1.0",
     "imap-simple": "^5.1.0",
+    "imapflow": "^1.2.10",
     "jsonwebtoken": "^9.0.2",
     "jszip": "^3.10.1",
     "mailparser": "^3.9.3",

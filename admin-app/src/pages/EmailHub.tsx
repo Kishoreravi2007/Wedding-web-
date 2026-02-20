@@ -26,6 +26,10 @@ const EmailHub: React.FC = () => {
         else setLoading(true);
 
         try {
+            if (isManual) {
+                console.log('📡 [Signal Hub] Initiating direct IMAP sync protocol...');
+                await emailHubService.sync();
+            }
             const data = await emailHubService.getInbox();
             setMessages(data);
         } catch (error) {

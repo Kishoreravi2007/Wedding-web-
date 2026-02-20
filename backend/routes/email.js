@@ -1,9 +1,19 @@
-const express = require('express');
-const router = express.Router();
 const db = require('../lib/db-gcp');
 const AIService = require('../services/ai-service');
 const EmailService = require('../services/email-service');
+const EmailIngestionService = require('../services/email-ingestion-service');
 const { authMiddleware, superAdminOnly } = require('../lib/secure-auth');
+
+// Sync Inbox via IMAP
+router.post('/sync', authMiddleware, superAdminOnly, async (req, res) => {
+    console.log('🔄 [Email Hub] Sync requested by admin');
+    const result = await EmailIngestionService.syncInbox();
+    if (result.success) {
+        res.json(result);
+    } else {
+        res.status(500).json(result);
+    }
+});
 
 /**
  * GET /api/email/inbox

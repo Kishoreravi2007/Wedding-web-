@@ -55,7 +55,7 @@ export default function Login() {
                                 <img src="./logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight text-center">WeddingWeb</h1>
-                            <p className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">Version 1.5.8 Protocol active</p>
+                            <p className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">Version 1.5.9 Protocol active</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
