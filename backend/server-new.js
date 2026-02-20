@@ -278,6 +278,22 @@ console.log('💎 Registering /api/premium routes...');
 app.use('/api/premium', require('./routes/premium'));
 console.log('✅ Registered /api/premium routes.');
 
+// Coupon Routes
+console.log('🎫 Registering /api/coupons routes...');
+app.use('/api/coupons', require('./routes/coupons'));
+
+// Feedback Routes
+console.log('💬 Registering /api/feedback routes...');
+app.use('/api/feedback', require('./routes/feedback'));
+
+// Call Schedules Routes
+console.log('📞 Registering /api/call-schedules routes...');
+app.use('/api/call-schedules', require('./routes/call-schedules'));
+
+// N8N Integration Routes
+console.log('🕸️ Registering /api/n8n routes...');
+app.use('/api/n8n', require('./routes/n8n-integration'));
+
 // =============================================================================
 // =============================================================================
 // FRONTEND SERVING (Production Only)
