@@ -10,8 +10,6 @@ services:
       - key: PORT
         fromValue: PORT # Render will inject the dynamic port
       - key: JWT_SECRET
-        sync: false # Set to true if you want to sync secrets from .env
-        value: 3l7V8l32FZ6JWP5vtvShIICWA12umi3GBCNX4+2YnSn6p+5eO/icU1OdjJPCU60ncLDqW3TaeeiMgCxkuDcHoQ==
+        sync: false
       - key: DATABASE_URL
         sync: false
-        value: postgresql://postgres:Kishore@2007@db.rkqtglurixkdlewqqhqv.supabase.co:5432/postgres
