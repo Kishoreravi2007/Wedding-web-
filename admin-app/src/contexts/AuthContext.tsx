@@ -38,7 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setUser(response.data);
+            const userData = response.data.user || response.data;
+            setUser(userData);
         } catch (error) {
             console.error('Auth verification failed:', error);
             logout();

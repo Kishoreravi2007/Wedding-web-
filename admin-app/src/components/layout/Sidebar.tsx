@@ -1,14 +1,15 @@
 
 
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { dashboardService, premiumService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
     const [pendingFeedback, setPendingFeedback] = useState<number>(0);
 
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAdminModal, setShowAdminModal] = useState(false);
     const [adminForm, setAdminForm] = useState({
@@ -103,12 +104,19 @@ export default function Sidebar() {
                         src={user?.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuA49t2CuLcUYubZ4cYoXAThYoQdaSxWtyH14c_wrM6RGpWXxCesa7pXk7aJkglwTX63D4bIBjDbwjQPRZ7Ult1VEpCMs4g0SxXYGT_01FPO2f1gNNqqkAXmfr2w0Lz12Tj_nz39osEO0Nshy2xfid2FFMMRt6FUwjC8ASNix4ZLHzxDPd7O6H9Sc1dpLipHE32czwmrzZbWM34gyFEG8CiPGAqqRwWiQEjzTeu9-oZA8Rw2taR_u_oubbJLPhc2D37JazyQ8Bmhvnmm"}
                         alt={user?.full_name || user?.username || "Admin"}
                     />
-                    <div className="overflow-hidden">
+                    <div className="overflow-hidden flex-1">
                         <p className="font-bold text-sm truncate text-slate-900 dark:text-white transition-colors">
                             {user?.full_name || (user?.username === 'kishore' ? 'Kishore Ravi' : (user?.username || 'Admin'))}
                         </p>
                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">{user?.role === 'admin' ? 'Super Admin' : 'Staff'}</p>
                     </div>
+                    <button
+                        onClick={() => { logout(); navigate('/login'); }}
+                        className="size-9 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all shrink-0"
+                        title="Sign Out"
+                    >
+                        <span className="material-symbols-outlined text-lg">logout</span>
+                    </button>
                 </div>
             </div>
 

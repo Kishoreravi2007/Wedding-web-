@@ -5,6 +5,7 @@ const navLinks = [
     { path: '/weddings', icon: 'favorite', label: 'Wed' },
     { path: '/feedback', icon: 'chat_bubble', label: 'Chat' },
     { path: '/coupons', icon: 'confirmation_number', label: 'Gift' },
+    { path: '/settings', icon: 'settings', label: 'Config' },
 ];
 
 export default function BottomNav() {

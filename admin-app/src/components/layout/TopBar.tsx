@@ -1,11 +1,12 @@
 
 
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function TopBar() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <header className="flex items-center justify-between px-5 pt-6 pb-4 bg-transparent sticky top-0 z-10 backdrop-blur-xl border-b border-white/5 dark:border-white/5">
@@ -45,6 +46,13 @@ export default function TopBar() {
                         alt={user?.username || "Admin"}
                     />
                 </Link>
+                <button
+                    onClick={() => { logout(); navigate('/login'); }}
+                    className="p-2 text-red-400 hover:bg-red-500/10 rounded-full transition-colors md:hidden"
+                    title="Sign Out"
+                >
+                    <span className="material-symbols-outlined text-xl">logout</span>
+                </button>
             </div>
         </header>
     );
