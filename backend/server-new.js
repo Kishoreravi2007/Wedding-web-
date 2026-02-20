@@ -46,10 +46,13 @@ const PORT = process.env.PORT || 5002;
 const whitelist = [
   'https://weddingweb.co.in',
   'https://www.weddingweb.co.in',
+  'https://wedding-frontend-ciqw.onrender.com',
+  'https://backend-w8zt.onrender.com',
   'https://wedding-backend-rst3dulcnq-el.a.run.app',
   'https://wedding-backend-979970479540.asia-south1.run.app', // Added from .env
   'file://',
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  process.env.BACKEND_URL
 ].filter(Boolean);
 
 // Add local origins in development
@@ -82,8 +85,8 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://apis.google.com", "https://www.gstatic.com", "https://www.googletagmanager.com"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://wedding-deepface-rst3dulcnq-el.a.run.app", "https://*.firebaseio.com", "https://firebaseinstallations.googleapis.com", "https://*.googleapis.com", "https://www.google-analytics.com", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:5002" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:3001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
-      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://storage.googleapis.com", "https://*.unsplash.com", "https://ui-avatars.com", process.env.FRONTEND_URL].filter(Boolean),
+      connectSrc: ["'self'", "https://weddingweb.co.in", "https://*.onrender.com", "https://*.supabase.co", "https://api.emailjs.com", "https://api.razorpay.com", "https://*.razorpay.com", "https://lumberjack.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://wedding-deepface-rst3dulcnq-el.a.run.app", "https://*.firebaseio.com", "https://firebaseinstallations.googleapis.com", "https://*.googleapis.com", "https://www.google-analytics.com", process.env.DEEPFACE_API_URL, process.env.NODE_ENV !== 'production' ? "http://localhost:5001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:5002" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:3001" : "", process.env.NODE_ENV !== 'production' ? "http://localhost:8002" : ""].filter(Boolean),
+      imgSrc: ["'self'", "data:", "blob:", "https://*.onrender.com", "https://*.supabase.co", "https://*.razorpay.com", "https://wedding-backend-rst3dulcnq-el.a.run.app", "https://*.googleusercontent.com", "https://*.gstatic.com", "https://storage.googleapis.com", "https://*.unsplash.com", "https://ui-avatars.com", process.env.FRONTEND_URL].filter(Boolean),
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://*.razorpay.com", "https://*.firebaseapp.com", "https://*.google.com"],
