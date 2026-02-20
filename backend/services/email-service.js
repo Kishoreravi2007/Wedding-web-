@@ -8,11 +8,24 @@ const AIService = require('./ai-service');
 
 // Configure transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USER || 'help.weddingweb@gmail.com',
-    // It's highly recommended to use an App Password for Gmail
-    pass: process.env.EMAIL_PASSWORD
+    user: process.env.EMAIL_USER || process.env.SMTP_USER,
+    pass: process.env.EMAIL_PASSWORD || process.env.SMTP_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false // Often needed for cloud environments
+  }
+});
+
+// Verify connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ SMTP Connection Error:', error);
+  } else {
+    console.log('✅ SMTP Server is ready to take messages');
   }
 });
 

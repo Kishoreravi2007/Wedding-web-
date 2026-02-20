@@ -78,10 +78,12 @@ const SecureUserDB = {
       // AND join with weddings table to populate weddingData
       const { rows } = await query(
         `SELECT u.*, 
-            w.groom_name, w.bride_name, w.wedding_date, w.venue, w.guest_count, w.theme
+            w.groom_name, w.bride_name, w.wedding_date, w.venue, w.guest_count, w.theme,
+            p.email as profile_email, p.full_name, p.avatar_url as profile_avatar
          FROM users u
          LEFT JOIN weddings w ON u.id = w.user_id
-         WHERE LOWER(u.username) = $1`,
+         LEFT JOIN profiles p ON u.id = p.user_id::uuid OR u.username = p.email
+         WHERE LOWER(u.username) = $1 OR LOWER(p.email) = $1`,
         [normalizedUsername]
       );
 
@@ -159,7 +161,9 @@ const SecureUserDB = {
         has_premium_access: user.has_premium_access, // Keep for backward compatibility
         premium_features: premiumFeatures, // New atomic features list
         wedding_id: user.wedding_id,
-        profile: user.profile
+        profile: user.profile,
+        full_name: user.full_name,
+        avatar_url: user.profile_avatar || user.avatar_url
       };
 
     } catch (error) {
@@ -191,7 +195,7 @@ const SecureUserDB = {
   async getUserById(id) {
     try {
       const { rows } = await query(
-        `SELECT u.id, u.username, u.role, u.is_active, u.email_offers_opt_in, u.has_premium_access, u.wedding_id, p.avatar_url 
+        `SELECT u.id, u.username, u.role, u.is_active, u.email_offers_opt_in, u.has_premium_access, u.wedding_id, p.avatar_url, p.full_name 
          FROM users u
          LEFT JOIN profiles p ON u.id = p.user_id::uuid OR u.username = p.email
          WHERE u.id = $1`,

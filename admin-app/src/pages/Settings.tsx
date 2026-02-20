@@ -109,13 +109,20 @@ export default function Settings() {
                         </div>
 
                         <div className="text-center md:text-left">
-                            <h4 className="text-2xl font-black dark:text-white text-slate-900 tracking-tighter uppercase transition-colors">Kishore Ravi</h4>
-                            <p className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">Super Admin Protocol Class v4</p>
+                            <h4 className="text-2xl font-black dark:text-white text-slate-900 tracking-tighter uppercase transition-colors">
+                                {user?.full_name || user?.username || "Kishore Ravi"}
+                            </h4>
+                            <p className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">
+                                {user?.role === 'admin' ? 'Super Admin Protocol Class v4' : 'Staff Access Protocol'}
+                            </p>
                             <div className="flex flex-col md:flex-row gap-4 mt-4">
                                 <div className="glass-card px-4 py-2 rounded-xl border border-white/5">
                                     <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Digital Address</p>
-                                    <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">admin@weddingweb.co.in</p>
+                                    <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">
+                                        {user?.email || "admin@weddingweb.co.in"}
+                                    </p>
                                 </div>
+                                规
                                 <div className="glass-card px-4 py-2 rounded-xl border border-white/5">
                                     <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Network Cluster</p>
                                     <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">Mumbai-HQ-01</p>

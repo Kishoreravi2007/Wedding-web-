@@ -87,24 +87,29 @@ export default function Sidebar() {
             </div>
 
             <div className="p-6 mt-auto space-y-4">
-                {user?.username === 'kishore' && (
-                    <button
-                        onClick={() => setShowAdminModal(true)}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
-                    >
-                        <span className="material-symbols-outlined !text-sm">shield_person</span>
-                        Spawn Admin
-                    </button>
-                )}
+                {(user?.username === 'kishore' ||
+                    user?.username === 'admin' ||
+                    user?.username === 'kr5770203@gmail.com' ||
+                    user?.email === 'admin@weddingweb.co.in') && (
+                        <button
+                            onClick={() => setShowAdminModal(true)}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
+                        >
+                            <span className="material-symbols-outlined !text-sm">shield_person</span>
+                            Spawn Admin
+                        </button>
+                    )}
 
                 <div className="glass-card p-4 rounded-3xl flex items-center gap-3 bg-white/50 dark:!bg-white/5 border border-slate-200 dark:border-transparent">
                     <img
                         className="size-10 rounded-full object-cover border-2 border-white/50 shadow-sm"
                         src={user?.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuA49t2CuLcUYubZ4cYoXAThYoQdaSxWtyH14c_wrM6RGpWXxCesa7pXk7aJkglwTX63D4bIBjDbwjQPRZ7Ult1VEpCMs4g0SxXYGT_01FPO2f1gNNqqkAXmfr2w0Lz12Tj_nz39osEO0Nshy2xfid2FFMMRt6FUwjC8ASNix4ZLHzxDPd7O6H9Sc1dpLipHE32czwmrzZbWM34gyFEG8CiPGAqqRwWiQEjzTeu9-oZA8Rw2taR_u_oubbJLPhc2D37JazyQ8Bmhvnmm"}
-                        alt={user?.username || "Admin"}
+                        alt={user?.full_name || user?.username || "Admin"}
                     />
                     <div className="overflow-hidden">
-                        <p className="font-bold text-sm truncate text-slate-900 dark:text-white transition-colors">{user?.username === 'kishore' ? 'Kishore Ravi' : (user?.username || 'Admin')}</p>
+                        <p className="font-bold text-sm truncate text-slate-900 dark:text-white transition-colors">
+                            {user?.full_name || (user?.username === 'kishore' ? 'Kishore Ravi' : (user?.username || 'Admin'))}
+                        </p>
                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">{user?.role === 'admin' ? 'Super Admin' : 'Staff'}</p>
                     </div>
                 </div>

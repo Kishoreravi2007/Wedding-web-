@@ -247,13 +247,13 @@ export default function Coupons() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[80px] pointer-events-none"></div>
                         <h3 className="text-xl font-black text-white tracking-tight mb-8">Node Config</h3>
                         <form onSubmit={handleCreate} className="space-y-6">
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative z-50">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Unique Identifier</label>
                                 <input
                                     required
                                     type="text"
-                                    placeholder="TOKEN_ID"
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-black text-white outline-none focus:ring-1 focus:ring-primary/40 transition-all placeholder:text-slate-700 uppercase"
+                                    placeholder="e.g. SAVE50"
+                                    className="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-sm font-black text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-slate-600 uppercase relative z-[60]"
                                     value={formData.code}
                                     onChange={e => setFormData({ ...formData, code: e.target.value })}
                                 />
