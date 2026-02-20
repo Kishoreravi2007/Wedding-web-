@@ -500,9 +500,9 @@ router.get('/purchases', authenticateToken, async (req, res) => {
  */
 router.post('/generate-admin-credentials', authenticateToken, async (req, res) => {
   try {
-    // STRICT SUPER ADMIN ONLY CHECK (kr5770203@gmail.com)
-    const superAdminEmail = 'kr5770203@gmail.com';
-    if (req.user.email !== superAdminEmail && req.user.username !== 'kishore') {
+    // STRICT SUPER ADMIN ONLY CHECK
+    const superAdminEmails = ['kr5770203@gmail.com', 'kishorekailas1@gmail.com'];
+    if (!superAdminEmails.includes(req.user.email) && req.user.username !== 'kishore') {
       return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
     }
 

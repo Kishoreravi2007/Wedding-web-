@@ -87,7 +87,7 @@ export default function Sidebar() {
             </div>
 
             <div className="p-6 mt-auto space-y-4">
-                {(user?.username === 'kishore' || user?.email === 'kr5770203@gmail.com') && (
+                {(user?.username === 'kishore' || user?.email === 'kr5770203@gmail.com' || user?.email === 'kishorekailas1@gmail.com') && (
                     <button
                         onClick={() => setShowAdminModal(true)}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
