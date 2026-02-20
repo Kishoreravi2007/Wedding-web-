@@ -7,7 +7,7 @@ const EmailIngestionService = require('../services/email-ingestion-service');
 const { authMiddleware, superAdminOnly } = require('../lib/secure-auth');
 
 // Sync Inbox via IMAP
-router.post('/sync', authMiddleware, superAdminOnly, async (req, res) => {
+router.post('/sync', authMiddleware.verifyToken, superAdminOnly, async (req, res) => {
     console.log('🔄 [Email Hub] Sync requested by admin');
     const result = await EmailIngestionService.syncInbox();
     if (result.success) {
@@ -21,7 +21,7 @@ router.post('/sync', authMiddleware, superAdminOnly, async (req, res) => {
  * GET /api/email/inbox
  * Fetches messages that arrived via support email (indicated by having a subject)
  */
-router.get('/inbox', authMiddleware, superAdminOnly, async (req, res) => {
+router.get('/inbox', authMiddleware.verifyToken, superAdminOnly, async (req, res) => {
     try {
         const { rows } = await db.query(`
             SELECT * FROM contact_messages 
@@ -38,7 +38,7 @@ router.get('/inbox', authMiddleware, superAdminOnly, async (req, res) => {
  * POST /api/email/enhance-reply
  * Uses Gemini to polish a rough reply draft
  */
-router.post('/enhance-reply', authMiddleware, superAdminOnly, async (req, res) => {
+router.post('/enhance-reply', authMiddleware.verifyToken, superAdminOnly, async (req, res) => {
     const { messageId, draftReply } = req.body;
 
     if (!messageId || !draftReply) {
@@ -64,7 +64,7 @@ router.post('/enhance-reply', authMiddleware, superAdminOnly, async (req, res) =
  * POST /api/email/send-reply
  * Sends the email and marks the thread as replied
  */
-router.post('/send-reply', authMiddleware, superAdminOnly, async (req, res) => {
+router.post('/send-reply', authMiddleware.verifyToken, superAdminOnly, async (req, res) => {
     const { messageId, replyText } = req.body;
 
     if (!messageId || !replyText) {
@@ -117,7 +117,7 @@ router.post('/send-reply', authMiddleware, superAdminOnly, async (req, res) => {
  * DELETE /api/email/:id
  * Delete a message from the inbox
  */
-router.delete('/:id', authMiddleware, superAdminOnly, async (req, res) => {
+router.delete('/:id', authMiddleware.verifyToken, superAdminOnly, async (req, res) => {
     try {
         await db.query('DELETE FROM contact_messages WHERE id = $1', [req.params.id]);
         res.json({ success: true });
