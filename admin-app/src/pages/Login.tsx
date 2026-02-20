@@ -118,7 +118,7 @@ export default function Login() {
                         </form>
 
                         <div className="mt-10 text-center">
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.0</p>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.2</p>
                         </div>
                     </div>
                 </div>

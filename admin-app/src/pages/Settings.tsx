@@ -122,7 +122,6 @@ export default function Settings() {
                                         {user?.email || "admin@weddingweb.co.in"}
                                     </p>
                                 </div>
-                                规
                                 <div className="glass-card px-4 py-2 rounded-xl border border-white/5">
                                     <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Network Cluster</p>
                                     <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">Mumbai-HQ-01</p>
