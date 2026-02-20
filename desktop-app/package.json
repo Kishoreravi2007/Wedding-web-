@@ -59,6 +59,7 @@
       "dist/**/*",
       "dist-electron/**/*",
       "assets/**/*",
+      "launcher.js",
       "node_modules/**/*",
       "!node_modules/**/README*",
       "!node_modules/**/*.md"
