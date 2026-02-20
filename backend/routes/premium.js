@@ -501,8 +501,7 @@ router.get('/purchases', authenticateToken, async (req, res) => {
 router.post('/generate-admin-credentials', authenticateToken, async (req, res) => {
   try {
     // STRICT SUPER ADMIN ONLY CHECK
-    const superAdminEmails = ['kr5770203@gmail.com', 'kishorekailas1@gmail.com'];
-    if (!superAdminEmails.includes(req.user.email) && req.user.username !== 'kishore') {
+    if (req.user.email !== 'kishorekailas1@gmail.com') {
       return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
     }
 
@@ -548,6 +547,65 @@ router.post('/generate-admin-credentials', authenticateToken, async (req, res) =
     });
   } catch (error) {
     console.error('Error generating admin credentials:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * GET ALL ADMINS
+ * Restricted to Super Admin only
+ */
+router.get('/admins', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.email !== 'kishorekailas1@gmail.com') {
+      return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
+    }
+
+    const { rows } = await query(
+      `SELECT u.id, u.username, u.role, u.is_active, u.created_at, p.full_name, p.email, p.avatar_url
+       FROM users u
+       LEFT JOIN profiles p ON u.id = p.user_id::uuid
+       WHERE u.role = 'admin'
+       ORDER BY u.created_at DESC`
+    );
+
+    res.json({ success: true, admins: rows });
+  } catch (error) {
+    console.error('Error fetching admins:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE ADMIN
+ * Restricted to Super Admin only
+ */
+router.delete('/admins/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.email !== 'kishorekailas1@gmail.com') {
+      return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
+    }
+
+    const adminId = req.params.id;
+
+    // Check if trying to delete self
+    if (adminId === req.user.id) {
+      return res.status(400).json({ success: false, error: 'Cannot delete yourself' });
+    }
+
+    // Check if target is actually an admin
+    const { rows: target } = await query('SELECT role FROM users WHERE id = $1', [adminId]);
+    if (target.length === 0 || target[0].role !== 'admin') {
+      return res.status(404).json({ success: false, error: 'Admin not found' });
+    }
+
+    // Delete user (cascade will handle profile if configured, but let's be safe)
+    await query('DELETE FROM profiles WHERE user_id = $1::uuid', [adminId]);
+    await query('DELETE FROM users WHERE id = $1', [adminId]);
+
+    res.json({ success: true, message: 'Admin deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting admin:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

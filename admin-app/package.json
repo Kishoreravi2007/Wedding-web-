@@ -1,7 +1,7 @@
 {
   "name": "admin-app",
   "private": true,
-  "version": "1.5.3",
+  "version": "1.5.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
   "main": "electron/main.cjs",
   "build": {
     "appId": "com.weddingweb.admin",
-    "productName": "WeddingWeb Admin 1.5.2",
+    "productName": "WeddingWeb Admin",
     "directories": {
       "output": "release"
     },

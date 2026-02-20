@@ -95,4 +95,6 @@ export const profileService = {
 export const premiumService = {
     getPurchases: async () => (await api.get<{ success: boolean; purchases: Purchase[] }>('/premium/purchases')).data.purchases,
     generateAdminCredentials: async (credentials: any) => (await api.post('/premium/generate-admin-credentials', credentials)).data,
+    listAdmins: async () => (await api.get<{ success: boolean; admins: any[] }>('/premium/admins')).data.admins,
+    deleteAdmin: async (id: string) => (await api.delete(`/premium/admins/${id}`)).data,
 };

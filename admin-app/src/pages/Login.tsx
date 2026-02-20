@@ -41,13 +41,13 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-background-dark mesh-gradient p-6 font-display">
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="relative flex min-h-screen w-full items-center justify-center bg-background-dark mesh-gradient p-6 font-display">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full"></div>
                 <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full"></div>
             </div>
 
-            <div className="w-full max-w-md relative z-10">
+            <div className="w-full max-w-md relative z-20">
                 <div className="glass-card p-1 rounded-[2.5rem] bg-gradient-to-br from-white/20 to-white/5 shadow-2xl">
                     <div className="bg-[#0a0e17]/80 backdrop-blur-3xl rounded-[2.3rem] p-8 md:p-10 border border-white/5">
                         <div className="flex flex-col items-center mb-10">
@@ -118,7 +118,7 @@ export default function Login() {
                         </form>
 
                         <div className="mt-10 text-center">
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.3</p>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.4</p>
                         </div>
                     </div>
                 </div>

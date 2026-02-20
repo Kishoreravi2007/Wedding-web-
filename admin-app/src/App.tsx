@@ -7,6 +7,7 @@ import Coupons from './pages/Coupons';
 import FeedbackList from './pages/FeedbackList';
 import Contacts from './pages/Contacts';
 import Settings from './pages/Settings';
+import Admins from './pages/Admins';
 import Login from './pages/Login';
 
 import AppLayout from './components/layout/AppLayout';
@@ -32,6 +33,7 @@ function App() {
                   <Route path="/feedback" element={<FeedbackList />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/admins" element={<Admins />} />
                 </Routes>
               </AppLayout>
             </ProtectedRoute>
