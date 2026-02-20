@@ -1,5 +1,6 @@
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
+import Purchases from './pages/Purchases';
 import Weddings from './pages/Weddings';
 import WeddingDetail from './pages/WeddingDetail';
 import Coupons from './pages/Coupons';
@@ -26,6 +27,7 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/weddings" element={<Weddings />} />
                   <Route path="/weddings/:id" element={<WeddingDetail />} />
+                  <Route path="/purchases" element={<Purchases />} />
                   <Route path="/coupons" element={<Coupons />} />
                   <Route path="/feedback" element={<FeedbackList />} />
                   <Route path="/contacts" element={<Contacts />} />

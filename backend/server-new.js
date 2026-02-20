@@ -142,7 +142,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Wedding Web Backend API',
     status: 'running',
-    version: '2.0.1',
+    version: '1.5.0',
     services: {
       gcp_sql: '✓ (Supabase PostgreSQL)',
     },

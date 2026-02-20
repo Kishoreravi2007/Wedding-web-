@@ -32,6 +32,30 @@ export default function WeddingDetail() {
         }
     };
 
+    const handleRotateCredentials = async () => {
+        if (!id) return;
+        try {
+            const result = await weddingService.generatePhotographerCredentials(id);
+            if (result.success) {
+                fetchWedding(); // Refresh data
+                alert('Photographer credentials rotated successfully');
+            }
+        } catch (err) {
+            console.error("Failed to rotate credentials:", err);
+            alert('Failed to rotate credentials');
+        }
+    };
+
+    const handlePreview = () => {
+        if (!wedding) return;
+        const frontendUrl = 'https://wedding-frontend-ciqw.onrender.com';
+        window.open(`${frontendUrl}/weddings/${wedding.wedding_code}`, '_blank');
+    };
+
+    const handleAdminOverride = () => {
+        navigate('/client');
+    };
+
     if (isLoading) return (
         <div className="flex h-[80vh] w-full items-center justify-center">
             <div className="flex flex-col items-center gap-4">
@@ -73,9 +97,9 @@ export default function WeddingDetail() {
                     </p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="px-6 py-3 glass-card !bg-white/5 border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all">Preview Site</button>
-                    <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-black font-black rounded-xl shadow-neon-blue hover:scale-105 transition-all text-[10px] uppercase tracking-widest">Update Protocol</button>
-                    <button onClick={handleArchive} className="size-11 rounded-xl glass-card !bg-white/5 border-white/10 text-slate-500 hover:text-red-500 flex items-center justify-center transition-all"><span className="material-symbols-outlined">inventory_2</span></button>
+                    <button onClick={handlePreview} className="px-6 py-3 glass-card !bg-white/5 dark:!bg-white/5 border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-primary transition-all">Preview Site</button>
+                    <button onClick={handleRotateCredentials} className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-black font-black rounded-xl shadow-neon-blue hover:scale-105 transition-all text-[10px] uppercase tracking-widest">Update Protocol</button>
+                    <button onClick={handleArchive} className="size-11 rounded-xl glass-card !bg-white/5 dark:!bg-white/5 border-white/10 dark:border-white/10 text-slate-500 hover:text-red-500 flex items-center justify-center transition-all"><span className="material-symbols-outlined">inventory_2</span></button>
                 </div>
             </div>
 
@@ -136,10 +160,28 @@ export default function WeddingDetail() {
                                     <button className="text-[9px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest shadow-neon-blue px-3 py-1 rounded-lg border border-primary/20">Rotate Identity</button>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <code className="text-sm font-mono font-black text-white break-all bg-black/40 px-4 py-3 rounded-xl border border-white/5 flex-1 select-all">
-                                        {wedding.photographer_api_key || 'PROTOCOL_KEY_MISSING'}
-                                    </code>
-                                    <button className="size-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-primary transition-all">
+                                    <div className="flex-1 space-y-2">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[8px] font-black text-slate-500 uppercase">Username</span>
+                                            <code className="text-sm font-mono font-black text-white dark:text-white break-all bg-black/40 px-4 py-2 rounded-xl border border-white/5 select-all">
+                                                {wedding.photographer_username || 'PROTOCOL_KEY_MISSING'}
+                                            </code>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[8px] font-black text-slate-500 uppercase">Password</span>
+                                            <code className="text-sm font-mono font-black text-white dark:text-white break-all bg-black/40 px-4 py-2 rounded-xl border border-white/5 select-all">
+                                                {wedding.photographer_password || '••••••••'}
+                                            </code>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const creds = `Username: ${wedding.photographer_username}\nPassword: ${wedding.photographer_password}`;
+                                            navigator.clipboard.writeText(creds);
+                                            alert('Credentials copied to clipboard');
+                                        }}
+                                        className="size-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-primary transition-all"
+                                    >
                                         <span className="material-symbols-outlined">content_copy</span>
                                     </button>
                                 </div>
@@ -206,7 +248,7 @@ export default function WeddingDetail() {
                                 <p className="text-[10px] font-black text-secondary uppercase tracking-widest">Private Mesh</p>
                             </div>
                         </div>
-                        <button className="w-full mt-10 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-black rounded-2xl hover:bg-white/10 hover:border-primary/40 transition-all uppercase tracking-[0.2em]">Enter Admin Override</button>
+                        <button onClick={handleAdminOverride} className="w-full mt-10 py-4 bg-white/5 border border-white/10 text-slate-900 dark:text-white text-[10px] font-black rounded-2xl hover:bg-white/10 hover:border-primary/40 transition-all uppercase tracking-[0.2em]">Enter Admin Override</button>
                     </div>
 
                     {/* Infrastructure Stats */}

@@ -56,10 +56,10 @@ export default function Weddings() {
         <div className="space-y-10 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tight">Weddings Radar</h1>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Weddings Radar</h1>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mt-1">Global Event Management</p>
                 </div>
-                <button className="bg-gradient-to-r from-primary to-secondary text-white font-black px-8 py-4 rounded-2xl shadow-neon-blue hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-sm tracking-widest uppercase">
+                <button className="bg-gradient-to-r from-primary to-secondary text-slate-900 dark:text-white font-black px-8 py-4 rounded-2xl shadow-neon-blue hover:scale-105 active:scale-95 transition-all flex items-center gap-3 text-sm tracking-widest uppercase">
                     <span className="material-symbols-outlined font-black">add_circle</span>
                     New Registration
                 </button>
@@ -72,7 +72,7 @@ export default function Weddings() {
                     <input
                         type="text"
                         placeholder="ID, Couple or Token..."
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-primary/30 transition-all placeholder:text-slate-600"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/30 transition-all placeholder:text-slate-600"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -123,7 +123,7 @@ export default function Weddings() {
                                                 <span className="text-[10px] font-black text-primary uppercase">{w.bride_name?.[0]}{w.groom_name?.[0]}</span>
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-white tracking-tight uppercase group-hover:text-primary transition-colors">{w.bride_name} & {w.groom_name}</p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight uppercase group-hover:text-primary transition-colors">{w.bride_name} & {w.groom_name}</p>
                                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Unified Event Identity</p>
                                             </div>
                                         </div>
@@ -138,7 +138,7 @@ export default function Weddings() {
                                     <td className="py-5">
                                         <div className="flex items-center gap-2">
                                             <span className="material-symbols-outlined text-slate-600 !text-sm">photo_library</span>
-                                            <span className="text-xs font-black text-white">{(w.photo_count || 0).toLocaleString()}</span>
+                                            <span className="text-xs font-black text-slate-900 dark:text-white">{(w.photo_count || 0).toLocaleString()}</span>
                                         </div>
                                     </td>
                                     <td className="py-5">

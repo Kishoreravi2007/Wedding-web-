@@ -7,7 +7,7 @@ import { profileService } from '../services/api';
 
 export default function Settings() {
     const { isDarkMode, toggleTheme } = useTheme();
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const [telemetry, setTelemetry] = useState(false);
     const [encryption, setEncryption] = useState(false);
     const [avatar, setAvatar] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuA49t2CuLcUYubZ4cYoXAThYoQdaSxWtyH14c_wrM6RGpWXxCesa7pXk7aJkglwTX63D4bIBjDbwjQPRZ7Ult1VEpCMs4g0SxXYGT_01FPO2f1gNNqqkAXmfr2w0Lz12Tj_nz39osEO0Nshy2xfid2FFMMRt6FUwjC8ASNix4ZLHzxDPd7O6H9Sc1dpLipHE32czwmrzZbWM34gyFEG8CiPGAqqRwWiQEjzTeu9-oZA8Rw2taR_u_oubbJLPhc2D37JazyQ8Bmhvnmm");
@@ -18,7 +18,9 @@ export default function Settings() {
 
     // Fetch actual profile on mount
     useEffect(() => {
-        if (user?.id) {
+        if (user?.avatar_url) {
+            setAvatar(user.avatar_url);
+        } else if (user?.id) {
             profileService.getProfile(user.id).then(data => {
                 if (data && data.avatar_url) {
                     setAvatar(data.avatar_url);
@@ -40,6 +42,7 @@ export default function Settings() {
                 const result = await profileService.uploadAvatar(file);
                 if (result.avatar_url) {
                     setAvatar(result.avatar_url);
+                    await refreshUser(); // Update global state
                     alert("Profile image updated successfully.");
                 }
             } catch (err) {

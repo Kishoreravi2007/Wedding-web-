@@ -31,7 +31,7 @@ export default function StatCard({ label, value, trend, trendUp, isLive, variant
                     </div>
                 )}
             </div>
-            <h3 className="text-4xl font-extrabold mb-2 tracking-tighter text-white">{value}</h3>
+            <h3 className="text-4xl font-extrabold mb-2 tracking-tighter text-slate-900 dark:text-white">{value}</h3>
             <p className={`text-[10px] font-black flex items-center gap-1 mt-2 uppercase tracking-wide ${trendUp ? 'text-primary' : 'text-slate-500'}`}>
                 {trendUp && <span className="material-symbols-outlined !text-[14px]">trending_up</span>}
                 {trend}

@@ -16,7 +16,7 @@ export default function ActivityItem({ activity }: { activity: Activity }) {
                 <span className="material-symbols-outlined text-[20px]">{icon}</span>
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold dark:text-white truncate">{activity.title}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{activity.title}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{activity.description}</p>
             </div>
             <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0 whitespace-nowrap pt-1">

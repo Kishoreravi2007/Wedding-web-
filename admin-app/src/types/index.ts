@@ -12,7 +12,8 @@ export interface Wedding {
     photographer_name?: string;
     photographer_email?: string;
     created_at: string;
-    photographer_api_key?: string;
+    photographer_username?: string;
+    photographer_password?: string;
 }
 
 export interface Feedback {
@@ -68,4 +69,17 @@ export interface Activity {
     title: string;
     description: string;
     timestamp: string;
+}
+
+export interface Purchase {
+    id: string;
+    user_id: string;
+    customer_email: string;
+    wedding_id?: string;
+    amount: number;
+    duration: number;
+    features: string[];
+    status: 'pending' | 'completed' | 'failed';
+    payment_gateway: string | null;
+    created_at: string;
 }

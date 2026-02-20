@@ -63,7 +63,7 @@ export default function Contacts() {
         <div className="space-y-10 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tight">Lead Uplink</h1>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Lead Uplink</h1>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mt-1">External Inquiries & Comms Hub</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export default function Contacts() {
                     <input
                         type="text"
                         placeholder="Scan identities..."
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-black text-white outline-none focus:ring-1 focus:ring-primary/40 transition-all placeholder:text-slate-700 uppercase tracking-widest"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-black text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-primary/40 transition-all placeholder:text-slate-700 uppercase tracking-widest"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -125,7 +125,7 @@ export default function Contacts() {
                         </div>
 
                         <div onClick={() => msg.status === 'pending' && handleUpdateStatus(msg.id, 'read')} className="cursor-pointer relative z-10">
-                            <h3 className="text-lg font-black text-white truncate uppercase tracking-tighter">{msg.name}</h3>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white truncate uppercase tracking-tighter">{msg.name}</h3>
                             <p className="text-[10px] font-black text-primary truncate uppercase tracking-widest mt-0.5">{msg.email}</p>
                         </div>
 

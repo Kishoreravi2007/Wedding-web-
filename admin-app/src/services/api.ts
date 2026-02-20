@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Wedding, Feedback, ContactMessage, Coupon, DashboardStats, Activity } from '../types';
+import type { Wedding, Feedback, ContactMessage, Coupon, DashboardStats, Activity, Purchase } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-w8zt.onrender.com/api';
 
@@ -21,8 +21,9 @@ export const weddingService = {
     getAll: async () => (await api.get<{ success: boolean; weddings: Wedding[] }>('/weddings')).data.weddings,
     getById: async (id: string) => (await api.get<{ success: boolean; wedding: Wedding }>(`/weddings/${id}`)).data.wedding,
     getStats: async (id: string) => (await api.get(`/weddings/${id}/stats`)).data,
-    archive: async (id: string) => (await api.post(`/weddings/${id}/archive`)).data,
-    delete: async (id: string) => (await api.delete(`/weddings/${id}`)).data,
+    archive: (id: string): Promise<any> => api.post(`/weddings/${id}/archive`).then(r => r.data),
+    delete: (id: string): Promise<any> => api.delete(`/weddings/${id}`).then(r => r.data),
+    generatePhotographerCredentials: (id: string): Promise<any> => api.post(`/weddings/${id}/photographer`).then(r => r.data),
 };
 
 export const feedbackService = {
@@ -47,11 +48,11 @@ export const dashboardService = {
 
         // Map backend stats to frontend structure
         return {
-            online_users: data.totalUsers || 0, // Using total users as proxy for online for now
-            total_weddings: data.totalPhotos || 0, // Using photos as proxy or we can add a weddings count to analytics
-            pending_feedbacks: data.wishesSubmitted || 0,
-            monthly_revenue: 0, // Not yet in analytics.js
-            revenue_trends: [
+            online_users: data.onlineUsers || 0,
+            total_weddings: data.totalWeddings || 0,
+            pending_feedbacks: data.pendingFeedbackCount || 0,
+            monthly_revenue: data.monthlyRevenue || 0,
+            revenue_trends: data.revenueTrends || [
                 { month: 'Jan', revenue: 0 },
                 { month: 'Feb', revenue: 0 },
                 { month: 'Mar', revenue: 0 },
@@ -89,4 +90,9 @@ export const profileService = {
             headers: { 'Content-Type': 'multipart/form-data' }
         })).data;
     }
+};
+
+export const premiumService = {
+    getPurchases: async () => (await api.get<{ success: boolean; purchases: Purchase[] }>('/premium/purchases')).data.purchases,
+    generateAdminCredentials: async (credentials: any) => (await api.post('/premium/generate-admin-credentials', credentials)).data,
 };

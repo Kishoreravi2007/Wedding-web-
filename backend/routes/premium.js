@@ -466,4 +466,89 @@ router.get('/status', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/premium/purchases
+ * List all purchases (Admin only)
+ */
+router.get('/purchases', authenticateToken, async (req, res) => {
+  try {
+    // Basic admin check (could be more robust)
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Access denied. Admin only.' });
+    }
+
+    const { rows } = await query(`
+      SELECT p.*, u.username as customer_email, u.wedding_id 
+      FROM payment_history p
+      JOIN users u ON p.user_id = u.id
+      ORDER BY p.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      purchases: rows
+    });
+  } catch (error) {
+    console.error('Error fetching purchases:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/premium/generate-admin-credentials
+ * Restricted tool for kishore only to generate a temporary admin
+ */
+router.post('/generate-admin-credentials', authenticateToken, async (req, res) => {
+  try {
+    // STRICT KISHORE ONLY CHECK
+    if (req.user.username !== 'kishore') {
+      return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
+    }
+
+    const { username, password, email, fullName } = req.body;
+    if (!username || !password || !email) {
+      return res.status(400).json({ success: false, error: 'Username, password and email are required' });
+    }
+
+    const bcrypt = require('bcryptjs');
+
+    // Check if user exists
+    const { rows: existing } = await query('SELECT id FROM users WHERE username = $1 OR username = $2', [username, email.toLowerCase()]);
+    if (existing.length > 0) {
+      return res.status(400).json({ success: false, error: 'User or email already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const { rows: newUserRows } = await query(
+      `INSERT INTO users (username, password, role, is_active, created_at)
+       VALUES ($1, $2, 'admin', true, NOW())
+       RETURNING id, username, role`,
+      [username, hashedPassword]
+    );
+
+    const newUser = newUserRows[0];
+
+    // Create Profile
+    try {
+      await query(
+        `INSERT INTO profiles (user_id, full_name, email, created_at, updated_at) 
+         VALUES ($1, $2, $3, NOW(), NOW())`,
+        [newUser.id, fullName || username, email.toLowerCase()]
+      );
+    } catch (profileError) {
+      console.error('Failed to create profile for new admin:', profileError);
+    }
+
+    res.json({
+      success: true,
+      message: `Admin '${username}' generated successfully`,
+      user: newUser
+    });
+  } catch (error) {
+    console.error('Error generating admin credentials:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

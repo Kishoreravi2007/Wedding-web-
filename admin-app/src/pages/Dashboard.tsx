@@ -33,7 +33,7 @@ export default function Dashboard() {
         <div className="space-y-10 animate-in fade-in duration-700 font-display px-2 md:px-0">
             {/* Header section moved to TopBar, but we can add secondary title here */}
             <div>
-                <h2 className="text-3xl font-black text-white tracking-tight">System Overview</h2>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">System Overview</h2>
                 <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1">Real-time Performance & Metrics</p>
             </div>
 
@@ -73,7 +73,7 @@ export default function Dashboard() {
                     <div className="glass-card p-8 rounded-[2.5rem] !bg-white/5">
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h3 className="text-xl font-black text-white tracking-tight">System Growth</h3>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">System Growth</h3>
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Twelve month pulse analytics</p>
                             </div>
                             <div className="glass-card !bg-white/5 p-1 rounded-xl flex gap-1">
@@ -127,7 +127,7 @@ export default function Dashboard() {
                     {/* Recent Weddings Table */}
                     <div className="glass-card p-8 rounded-[2.5rem] !bg-white/5">
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-xl font-black text-white tracking-tight">Active Registrations</h3>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Active Registrations</h3>
                             <button onClick={() => navigate('/weddings')} className="text-primary text-[10px] font-black uppercase tracking-widest border-b border-primary/30 hover:border-primary transition-all">View All Active</button>
                         </div>
 
@@ -149,7 +149,7 @@ export default function Dashboard() {
                                                     <div className="size-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-primary/40 transition-all">
                                                         <span className="text-[10px] font-black text-primary">{wedding.bride_name[0]}{wedding.groom_name[0]}</span>
                                                     </div>
-                                                    <span className="text-sm font-bold text-white">{wedding.bride_name} & {wedding.groom_name}</span>
+                                                    <span className="text-sm font-bold text-slate-900 dark:text-white">{wedding.bride_name} & {wedding.groom_name}</span>
                                                 </div>
                                             </td>
                                             <td className="py-5">
@@ -184,7 +184,7 @@ export default function Dashboard() {
                 <div className="lg:col-span-4 space-y-8">
                     {/* Quick Control Hub */}
                     <div className="glass-card p-8 rounded-[2.5rem] !bg-white/5">
-                        <h3 className="text-xl font-black text-white tracking-tight mb-6">Control Hub</h3>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-6">Control Hub</h3>
                         <div className="grid grid-cols-2 gap-4">
                             <button onClick={() => navigate('/coupons')} className="p-4 glass-card !bg-white/5 border-white/10 hover:border-primary/40 transition-all group flex flex-col items-center gap-3">
                                 <div className="size-10 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform text-primary border border-white/10 group-hover:shadow-neon-blue">
@@ -216,7 +216,7 @@ export default function Dashboard() {
                     {/* Real-time Pulse Feed */}
                     <div className="glass-card p-8 rounded-[2.5rem] !bg-white/5">
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-xl font-black text-white tracking-tight">System Pulse</h3>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">System Pulse</h3>
                             <div className="size-2 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.6)] animate-pulse"></div>
                         </div>
                         <div className="space-y-8 relative before:absolute before:left-5 before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">

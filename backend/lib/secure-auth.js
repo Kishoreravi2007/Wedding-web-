@@ -191,7 +191,10 @@ const SecureUserDB = {
   async getUserById(id) {
     try {
       const { rows } = await query(
-        'SELECT id, username, role, is_active, email_offers_opt_in, has_premium_access, wedding_id FROM users WHERE id = $1',
+        `SELECT u.id, u.username, u.role, u.is_active, u.email_offers_opt_in, u.has_premium_access, u.wedding_id, p.avatar_url 
+         FROM users u
+         LEFT JOIN profiles p ON u.id = p.user_id::uuid OR u.username = p.email
+         WHERE u.id = $1`,
         [id]
       );
 
