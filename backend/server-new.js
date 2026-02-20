@@ -50,6 +50,8 @@ const whitelist = [
   'https://backend-w8zt.onrender.com',
   'https://wedding-backend-rst3dulcnq-el.a.run.app',
   'https://wedding-backend-979970479540.asia-south1.run.app', // Added from .env
+  'http://localhost',
+  'capacitor://localhost',
   'file://',
   process.env.FRONTEND_URL,
   process.env.BACKEND_URL
