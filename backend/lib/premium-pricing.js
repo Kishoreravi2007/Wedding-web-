@@ -185,7 +185,7 @@ const calculatePremiumTotal = ({ features = [], duration = 1 }) => {
     duration: normalizedDuration,
     features: selectedFeatures,
     total: Number.isFinite(total) ? total : base,
-    isCapped: !isProd && total === testLimit && total < (base * multiplier)
+    isCapped: false
   };
 };
 
