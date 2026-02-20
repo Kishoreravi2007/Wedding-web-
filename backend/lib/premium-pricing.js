@@ -175,15 +175,9 @@ const calculatePremiumTotal = ({ features = [], duration = 1 }) => {
   // Calculate total: Frontend uses a CUMULATIVE multiplier (e.g. 12 months is 7x base, NOT 12x0.85x)
   let total = Number((base * multiplier).toFixed(2));
 
-  // TEST MODE CAPPING: Razorpay Test Mode often rejects amounts > 15,000 or 50,000
-  // If not in production, cap at 5000 to allow testing the flow.
+  // TEST MODE CAPPING: Disabled to allow real pricing sync
+  // If not in production, we still want to see the actual amount
   const isProd = process.env.NODE_ENV === 'production';
-  const testLimit = Number(process.env.RAZORPAY_TEST_LIMIT || '5000');
-
-  if (!isProd && total > testLimit) {
-    console.log(`⚠️ [TEST MODE] Capping amount from ₹${total} to ₹${testLimit} for Razorpay testing`);
-    total = testLimit;
-  }
 
   return {
     base,

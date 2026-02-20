@@ -138,6 +138,7 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
+        email: user.email || user.profile_email || user.username,
         role: user.role,
         is_active: user.is_active,
         email_offers_opt_in: user.email_offers_opt_in,
@@ -291,6 +292,7 @@ router.get('/profile', authMiddleware.verifyToken, async (req, res) => {
       user: {
         id: fullUser.id,
         username: fullUser.username,
+        email: fullUser.email || profile.email,
         role: fullUser.role,
         is_active: fullUser.is_active,
         is_2fa_enabled: fullUser.is_2fa_enabled || false,

@@ -161,6 +161,7 @@ const SecureUserDB = {
         has_premium_access: user.has_premium_access, // Keep for backward compatibility
         premium_features: premiumFeatures, // New atomic features list
         wedding_id: user.wedding_id,
+        email: user.email || user.profile_email || user.username,
         profile: user.profile,
         full_name: user.full_name,
         avatar_url: user.profile_avatar || user.avatar_url

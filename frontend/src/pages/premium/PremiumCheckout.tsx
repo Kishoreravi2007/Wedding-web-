@@ -118,7 +118,8 @@ const PremiumCheckout = () => {
     }, 0);
 
     const multiplier = options?.durations?.find((item) => item.months === selectedDuration)?.multiplier ?? 1;
-    const total = Number((base * selectedDuration * multiplier).toFixed(2));
+    const total = Number((base * multiplier).toFixed(2));
+    规
 
     return { base, multiplier, total };
   }, [options, selectedFeatures, selectedDuration]);
