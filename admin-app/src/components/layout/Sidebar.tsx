@@ -87,18 +87,15 @@ export default function Sidebar() {
             </div>
 
             <div className="p-6 mt-auto space-y-4">
-                {(user?.username === 'kishore' ||
-                    user?.username === 'admin' ||
-                    user?.username === 'kr5770203@gmail.com' ||
-                    user?.email === 'admin@weddingweb.co.in') && (
-                        <button
-                            onClick={() => setShowAdminModal(true)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
-                        >
-                            <span className="material-symbols-outlined !text-sm">shield_person</span>
-                            Spawn Admin
-                        </button>
-                    )}
+                {(user?.username === 'kishore' || user?.email === 'kr5770203@gmail.com') && (
+                    <button
+                        onClick={() => setShowAdminModal(true)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
+                    >
+                        <span className="material-symbols-outlined !text-sm">shield_person</span>
+                        Spawn Admin
+                    </button>
+                )}
 
                 <div className="glass-card p-4 rounded-3xl flex items-center gap-3 bg-white/50 dark:!bg-white/5 border border-slate-200 dark:border-transparent">
                     <img

