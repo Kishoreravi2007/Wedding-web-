@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Wedding, Feedback, ContactMessage, Coupon, DashboardStats, Activity, Purchase } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://weddingweb.co.in/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-w8zt.onrender.com/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,

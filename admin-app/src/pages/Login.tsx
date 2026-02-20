@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://weddingweb.co.in/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-w8zt.onrender.com/api';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -118,7 +118,7 @@ export default function Login() {
                         </form>
 
                         <div className="mt-10 text-center">
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.5</p>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.6</p>
                         </div>
                     </div>
                 </div>
