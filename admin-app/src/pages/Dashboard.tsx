@@ -34,7 +34,7 @@ export default function Dashboard() {
             {/* Header section moved to TopBar, but we can add secondary title here */}
             <div>
                 <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">System Overview</h2>
-                <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1">Real-time Performance & Metrics</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-widest mt-1">Real-time Performance & Metrics</p>
             </div>
 
             {/* Stats Grid */}
@@ -74,7 +74,7 @@ export default function Dashboard() {
                         <div className="flex justify-between items-center mb-8">
                             <div>
                                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">System Growth</h3>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Twelve month pulse analytics</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-1">Twelve month pulse analytics</p>
                             </div>
                             <div className="glass-card !bg-white/5 p-1 rounded-xl flex gap-1">
                                 <button className="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-white transition-colors">Weekly</button>
@@ -134,7 +134,7 @@ export default function Dashboard() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="text-[10px] uppercase tracking-widest text-slate-500 font-bold border-b border-white/10">
+                                    <tr className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold border-b border-white/10">
                                         <th className="pb-4">Couple</th>
                                         <th className="pb-4">Event Context</th>
                                         <th className="pb-4">Status</th>
@@ -190,25 +190,25 @@ export default function Dashboard() {
                                 <div className="size-10 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform text-primary border border-white/10 group-hover:shadow-neon-blue">
                                     <span className="material-symbols-outlined">confirmation_number</span>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add Gift</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Add Gift</p>
                             </button>
                             <button onClick={() => navigate('/weddings')} className="p-4 glass-card !bg-white/5 border-white/10 hover:border-primary/40 transition-all group flex flex-col items-center gap-3">
                                 <div className="size-10 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform text-primary border border-white/10 group-hover:shadow-neon-blue">
                                     <span className="material-symbols-outlined">favorite</span>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Active</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Active</p>
                             </button>
                             <button className="p-4 glass-card !bg-white/5 border-white/10 hover:border-secondary/40 transition-all group flex flex-col items-center gap-3">
                                 <div className="size-10 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform text-secondary border border-white/10 group-hover:shadow-neon-purple">
                                     <span className="material-symbols-outlined">chat_bubble</span>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Broadcast</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Broadcast</p>
                             </button>
                             <button onClick={() => navigate('/settings')} className="p-4 glass-card !bg-white/5 border-white/10 hover:border-accent/40 transition-all group flex flex-col items-center gap-3">
                                 <div className="size-10 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform text-accent border border-white/10 group-hover:shadow-[0_0_15px_rgba(255,0,229,0.4)]">
                                     <span className="material-symbols-outlined">payments</span>
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Revenue</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Revenue</p>
                             </button>
                         </div>
                     </div>

@@ -76,7 +76,7 @@ export default function Settings() {
                 {/* Profile Identity */}
                 <div className="glass-card p-8 rounded-[2.5rem] border border-white/10 relative overflow-hidden group transition-all">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] pointer-events-none"></div>
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 mb-8 pl-1">Authorized Personnel</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 dark:text-slate-400 mb-8 pl-1">Authorized Personnel</h3>
 
                     <div className="flex flex-col md:flex-row items-center gap-8">
                         <div className="relative group/avatar">
@@ -117,13 +117,13 @@ export default function Settings() {
                             </p>
                             <div className="flex flex-col md:flex-row gap-4 mt-4">
                                 <div className="glass-card px-4 py-2 rounded-xl border border-white/5">
-                                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Digital Address</p>
+                                    <p className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Digital Address</p>
                                     <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">
                                         {user?.email || "admin@weddingweb.co.in"}
                                     </p>
                                 </div>
                                 <div className="glass-card px-4 py-2 rounded-xl border border-white/5">
-                                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Network Cluster</p>
+                                    <p className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Network Cluster</p>
                                     <p className="text-[10px] font-bold dark:text-white text-slate-700 transition-colors">Mumbai-HQ-01</p>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@ export default function Settings() {
 
                 {/* System Preferences */}
                 <div className="glass-card p-8 rounded-[2.5rem] border border-white/10">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 mb-8 pl-1">Global Overrides</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 dark:text-slate-400 mb-8 pl-1">Global Overrides</h3>
 
                     <div className="space-y-6">
                         <div className="flex items-center justify-between p-6 rounded-3xl border border-white/5 bg-white/5 group hover:border-primary/20 transition-all">
@@ -143,7 +143,7 @@ export default function Settings() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-tight transition-colors">Dark Mode Matrix</p>
-                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Enable high-contrast night vision</p>
+                                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Enable high-contrast night vision</p>
                                 </div>
                             </div>
                             <button
@@ -161,7 +161,7 @@ export default function Settings() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-tight transition-colors">Real-time Telemetry</p>
-                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Push notifications for new activity</p>
+                                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Push notifications for new activity</p>
                                 </div>
                             </div>
                             <button
@@ -179,7 +179,7 @@ export default function Settings() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-black dark:text-white text-slate-900 uppercase tracking-tight transition-colors">Advanced Encryption</p>
-                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Force 256-bit AES on all uplinks</p>
+                                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Force 256-bit AES on all uplinks</p>
                                 </div>
                             </div>
                             <button

@@ -17,7 +17,7 @@ export default function TopBar() {
                     <input
                         type="text"
                         placeholder="Search data..."
-                        className="w-full glass-card bg-white/80 dark:!bg-white/5 border border-slate-200 dark:!border-white/10 rounded-2xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/40 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white transition-all shadow-sm dark:shadow-none"
+                        className="w-full glass-card bg-white/80 dark:!bg-white/5 border border-slate-200 dark:!border-white/10 rounded-2xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/40 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-400 text-slate-900 dark:text-white transition-all shadow-sm dark:shadow-none"
                     />
                 </div>
                 <div className="md:hidden flex items-center gap-3">
@@ -26,7 +26,7 @@ export default function TopBar() {
                     </div>
                     <div>
                         <h1 className="text-lg font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white">WeddingWeb</h1>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Admin Panel</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-300">Admin Panel</p>
                     </div>
                 </div>
             </div>

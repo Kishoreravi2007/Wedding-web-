@@ -61,7 +61,7 @@ export default function Sidebar() {
                     </div>
                     <div>
                         <h1 className="text-lg font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white transition-colors">WeddingWeb</h1>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Admin Panel</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-300">Admin Panel</p>
                     </div>
                 </div>
 
@@ -73,7 +73,7 @@ export default function Sidebar() {
                             className={({ isActive }: { isActive: boolean }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all border border-transparent ${isActive
                                     ? 'bg-primary/10 dark:bg-white/10 text-primary font-bold shadow-sm border-primary/20 dark:border-white/20'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 font-medium'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 font-medium'
                                 }`
                             }
                         >
@@ -110,7 +110,7 @@ export default function Sidebar() {
                         <p className="font-bold text-sm truncate text-slate-900 dark:text-white transition-colors">
                             {user?.full_name || (user?.username === 'kishore' ? 'Kishore Ravi' : (user?.username || 'Admin'))}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">{user?.role === 'admin' ? 'Super Admin' : 'Staff'}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tighter">{user?.role === 'admin' ? 'Super Admin' : 'Staff'}</p>
                     </div>
                     <button
                         onClick={() => { logout(); navigate('/login'); }}

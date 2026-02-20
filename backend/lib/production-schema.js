@@ -131,11 +131,13 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(20),
+  subject TEXT,
   event_date DATE,
   guest_count INTEGER,
   message TEXT NOT NULL,
   status VARCHAR(50) DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied', 'archived')),
   response TEXT,
+  email_message_id VARCHAR(255) UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

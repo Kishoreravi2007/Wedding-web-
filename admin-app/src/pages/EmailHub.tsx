@@ -58,8 +58,8 @@ const EmailHub: React.FC = () => {
         setSending(true);
         try {
             await emailHubService.sendReply(selectedId, replyDraft);
-            // Refresh inbox to show replied status
-            await fetchInbox(true);
+            // Refresh inbox from database only (no IMAP sync) for instant update
+            await fetchInbox(false);
             setReplyDraft('');
             // Toast or success message could go here
         } catch (error) {

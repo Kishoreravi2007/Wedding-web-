@@ -25,13 +25,13 @@ class EmailIngestionService {
             let lock = await client.getMailboxLock('INBOX');
 
             try {
-                // Fetch last 50 messages
+                // Fetch last 20 messages (reduced from 50 for speed)
                 const count = client.mailbox.exists;
-                const startRange = Math.max(1, count - 49);
+                const startRange = Math.max(1, count - 19);
                 const query = `${startRange}:${count}`;
 
-                console.log(`📡 [IMAP] Scanning range ${query} (${count} total messages)...`);
-
+                console.log(`📡 [IMAP] Scanning range ${query} (${count} total)...`);
+                const startTime = Date.now();
                 let stats = { new: 0, duplicates: 0, errors: 0 };
 
                 for await (let message of client.fetch(query, { source: true, envelope: true })) {
@@ -74,7 +74,8 @@ class EmailIngestionService {
                     }
                 }
 
-                console.log(`✅ [IMAP] Sync complete. New: ${stats.new}, Duplicates: ${stats.duplicates}, Errors: ${stats.errors}`);
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                console.log(`✅ [IMAP] Sync complete in ${duration}s. New: ${stats.new}, Duplicates: ${stats.duplicates}, Errors: ${stats.errors}`);
                 return { success: true, stats };
 
             } finally {

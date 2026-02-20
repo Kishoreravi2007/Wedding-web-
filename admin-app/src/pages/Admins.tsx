@@ -55,7 +55,7 @@ export default function Admins() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Admin Personnel</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium">Manage and monitor administrative access protocols</p>
+                    <p className="text-slate-500 dark:text-slate-300 font-medium">Manage and monitor administrative access protocols</p>
                 </div>
             </div>
 
