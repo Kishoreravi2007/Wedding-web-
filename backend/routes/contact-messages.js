@@ -11,7 +11,7 @@ const { SecureUserDB } = require('../lib/secure-auth');
 router.get('/', async (req, res) => {
   try {
     const { rows } = await db.query(
-      'SELECT * FROM contact_messages ORDER BY created_at DESC'
+      'SELECT * FROM contact_messages WHERE email_message_id IS NULL ORDER BY created_at DESC'
     );
     res.json({ success: true, messages: rows });
   } catch (error) {

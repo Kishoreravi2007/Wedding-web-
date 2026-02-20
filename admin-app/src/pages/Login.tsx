@@ -55,7 +55,7 @@ export default function Login() {
                                 <img src="./logo.png" alt="Logo" className="w-full h-full object-contain brightness-0 invert" />
                             </div>
                             <h1 className="text-3xl font-black text-white tracking-tight text-center">WeddingWeb</h1>
-                            <p className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">Version 1.6.2 Protocol active</p>
+                            <p className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">Version 1.6.3 Protocol active</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -118,7 +118,7 @@ export default function Login() {
                         </form>
 
                         <div className="mt-10 text-center">
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.5.6</p>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Secure Environment v1.6.3</p>
                         </div>
                     </div>
                 </div>
