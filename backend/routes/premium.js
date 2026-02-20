@@ -564,7 +564,7 @@ router.get('/admins', authenticateToken, async (req, res) => {
     const { rows } = await query(
       `SELECT u.id, u.username, u.role, u.is_active, u.created_at, p.full_name, p.email, p.avatar_url
        FROM users u
-       LEFT JOIN profiles p ON u.id = p.user_id::uuid
+       LEFT JOIN profiles p ON u.id::uuid = p.user_id::uuid
        WHERE u.role = 'admin'
        ORDER BY u.created_at DESC`
     );
