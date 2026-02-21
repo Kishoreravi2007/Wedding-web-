@@ -46,11 +46,46 @@ transporter.verify((error, success) => {
  * @param {Object} options - Email options (to, subject, text, html)
  */
 const sendEmail = async ({ to, subject, text, html }) => {
+  // Try Resend first if API key is available
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const { Resend } = require('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
+      console.log(`🚀 [Email Service] Routing via Resend API: ${to}`);
+      const data = await resend.emails.send({
+        from: process.env.SMTP_FROM || 'WeddingWeb Support <help@weddingweb.co.in>',
+        to: [to],
+        subject,
+        text,
+        html
+      });
+
+      if (data.error) throw new Error(data.error.message);
+
+      console.log('✅ Email sent via Resend successfully:', data.id);
+      return { success: true, messageId: data.id, provider: 'resend' };
+    } catch (resendError) {
+      console.warn('⚠️ Resend API failed, falling back to SMTP:', resendError.message);
+      // Fall through to SMTP logic
+    }
+  }
+
   try {
     const supportEmails = ['help.weddingweb@gmail.com', 'help@weddingweb.co.in'];
-    if (supportEmails.some(email => to.toLowerCase().includes(email.toLowerCase()))) {
-      console.warn(`⚠️ [Email Service] Skipping send to support address: ${to}. Subject: ${subject}`);
-      return { success: true, skipped: true, message: 'Skipped support address' };
+    const lowerSubject = (subject || '').toLowerCase();
+    const isException = lowerSubject.includes('welcome') ||
+      lowerSubject.includes('gallery') ||
+      lowerSubject.includes('invitation') ||
+      lowerSubject.includes('reset') ||
+      lowerSubject.includes('password') ||
+      lowerSubject.includes('enquiry') ||
+      lowerSubject.includes('thanks') ||
+      lowerSubject.includes('memories');
+
+    if (supportEmails.some(email => to.toLowerCase().includes(email.toLowerCase())) && !isException) {
+      console.warn(`⚠️ [Email Service] Skipping send to support address (auto-loop protection): ${to}. Subject: ${subject}`);
+      return { success: true, skipped: true, message: 'Skipped support address (loop protection)' };
     }
     // Filter attachments to only include those referenced in the HTML
     const allAttachments = [
@@ -83,8 +118,8 @@ const sendEmail = async ({ to, subject, text, html }) => {
       html,
       attachments: activeAttachments
     });
-    console.log('📧 Email sent successfully: %s', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('📧 Email sent via SMTP successfully: %s', info.messageId);
+    return { success: true, messageId: info.messageId, provider: 'smtp' };
   } catch (error) {
     console.error('❌ Email delivery failed:');
     console.error('   To:', to);

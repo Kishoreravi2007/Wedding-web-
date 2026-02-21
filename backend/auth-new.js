@@ -89,12 +89,18 @@ router.post('/register', async (req, res) => {
     }
 
     // Send AI Welcome Email (Non-blocking)
-    try {
-      const displayName = fullName || effectiveUsername.split('@')[0];
-      emailService.sendWelcomeEmailAI(effectiveUsername, displayName);
-    } catch (emailError) {
-      console.error('Failed to send AI welcome email:', emailError);
-    }
+    const displayName = fullName || effectiveUsername.split('@')[0];
+    emailService.sendWelcomeEmailAI(effectiveUsername, displayName)
+      .then(result => {
+        if (result && result.success) {
+          console.log(`✅ Welcome email dispatched to ${effectiveUsername}`);
+        } else {
+          console.warn(`⚠️ Welcome email dispatch finished with status:`, result);
+        }
+      })
+      .catch(emailError => {
+        console.error('❌ Failed to send AI welcome email during registration:', emailError);
+      });
 
   } catch (error) {
     console.error('Registration error:', error);
