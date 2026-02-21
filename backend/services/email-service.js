@@ -47,6 +47,11 @@ transporter.verify((error, success) => {
  */
 const sendEmail = async ({ to, subject, text, html }) => {
   try {
+    const supportEmails = ['help.weddingweb@gmail.com', 'help@weddingweb.co.in'];
+    if (supportEmails.some(email => to.toLowerCase().includes(email.toLowerCase()))) {
+      console.warn(`⚠️ [Email Service] Skipping send to support address: ${to}. Subject: ${subject}`);
+      return { success: true, skipped: true, message: 'Skipped support address' };
+    }
     // Filter attachments to only include those referenced in the HTML
     const allAttachments = [
       {
