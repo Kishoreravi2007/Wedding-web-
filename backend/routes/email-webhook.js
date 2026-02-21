@@ -39,6 +39,27 @@ router.post('/auto-reply-webhook', async (req, res) => {
 
     console.log(`[Webhook] 📩 Verified email from ${from}: ${subject}`);
 
+    // 2. Loop Prevention Guards
+    const supportEmails = [
+        'help.weddingweb@gmail.com',
+        'help@weddingweb.co.in',
+        'onboarding@resend.dev'
+    ];
+
+    const senderEmail = from.includes('<') ? (from.match(/<(.+)>/)?.[1] || from) : from;
+    const lowerSubject = (subject || '').toLowerCase();
+    const lowerBody = (body || '').toLowerCase();
+
+    const isSystemSender = supportEmails.some(email => senderEmail.toLowerCase().includes(email.toLowerCase()));
+    const isDiagnostic = lowerSubject.includes('diagnostic') || lowerSubject.includes('test-email');
+    const isAutoReply = lowerBody.includes('automated response from weddingweb') || lowerSubject.includes('re: re: re:');
+
+    if (isSystemSender || isDiagnostic || isAutoReply) {
+        console.log(`[Webhook] 🛡️ Loop Prevention Triggered: SystemSender=${isSystemSender}, Diagnostic=${isDiagnostic}, AutoReply=${isAutoReply}`);
+        console.log(`[Webhook] ⏭️ Skipping auto-reply for ${senderEmail}`);
+        return res.json({ success: true, message: 'Loop prevention triggered', skipped: true });
+    }
+
     try {
         // 2. Parse name and email more robustly
         const name = from.includes('<') ? from.split('<')[0].trim() : from.split('@')[0];

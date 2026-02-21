@@ -9,32 +9,21 @@ const AIService = require('./ai-service');
 // Email Service Configuration
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Initialize transporter
-let transporter;
-
-if (process.env.RESEND_API_KEY) {
-  console.log('📬 [Email Service] Using Resend as primary email provider');
-  // Dummy transporter for verify() compatibility
-  transporter = {
-    verify: (cb) => cb(null, true)
-  };
-} else {
-  console.log(`📬 [Email Service] Using SMTP (${process.env.SMTP_HOST || 'smtp.gmail.com'})`);
-  transporter = nodemailer.createTransport({
-    // 'service: gmail' is often more reliable on Render/Cloud than manual host/port
-    service: (!process.env.SMTP_HOST || process.env.SMTP_HOST === 'smtp.gmail.com') ? 'gmail' : undefined,
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: process.env.SMTP_PORT === '465' || !process.env.SMTP_PORT,
-    auth: {
-      user: process.env.EMAIL_USER || process.env.SMTP_USER,
-      pass: process.env.EMAIL_PASSWORD || process.env.SMTP_PASSWORD
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-}
+// Configure transporter
+const transporter = nodemailer.createTransport({
+  // 'service: gmail' is often more reliable on Render/Cloud than manual host/port
+  service: (!process.env.SMTP_HOST || process.env.SMTP_HOST === 'smtp.gmail.com') ? 'gmail' : undefined,
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+  auth: {
+    user: process.env.EMAIL_USER || process.env.SMTP_USER,
+    pass: process.env.EMAIL_PASSWORD || process.env.SMTP_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false // Often needed for cloud environments
+  }
+});
 
 // Verify connection on startup
 transporter.verify((error, success) => {
@@ -58,42 +47,7 @@ transporter.verify((error, success) => {
  */
 const sendEmail = async ({ to, subject, text, html }) => {
   try {
-    // Resend Fallback Logic
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const fetch = require('node-fetch');
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: process.env.SMTP_FROM || 'WeddingWeb Support <help@weddingweb.co.in>',
-            to,
-            subject,
-            text,
-            html,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          console.log('📧 Email sent via Resend: %s', data.id);
-          return { success: true, messageId: data.id };
-        } else {
-          console.error('❌ Resend API Error:', data.message);
-          // Don't throw, let it potentially attempt fallback if SMTP is also configured? 
-          // For now, if Resend is set, it's the primary.
-          return { success: false, error: data.message };
-        }
-      } catch (err) {
-        console.error('❌ Resend dispatch failed:', err.message);
-        return { success: false, error: err.message };
-      }
-    }
-
-    // Default Nodemailer logic
+    // Filter attachments to only include those referenced in the HTML
     const allAttachments = [
       {
         filename: 'logo.png',
