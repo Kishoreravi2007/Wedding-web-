@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Heart, ShieldCheck, Camera, Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
@@ -182,7 +182,7 @@ const LoginPage = () => {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-sm font-semibold text-[#111318] dark:text-slate-200" htmlFor="password">Password</label>
-                  <a href="/company/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot Password?</a>
+                  <Link to="/company/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot Password?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -277,7 +277,7 @@ const LoginPage = () => {
             {/* Sign Up Footer */}
             <p className="mt-10 text-center text-sm text-slate-600 dark:text-slate-400">
               New to WeddingWeb?{' '}
-              <a href="/company/signup" className="text-primary font-bold hover:underline">Create an account</a>
+              <Link to="/company/signup" className="text-primary font-bold hover:underline">Create an account</Link>
             </p>
 
             {/* Secure Badge */}

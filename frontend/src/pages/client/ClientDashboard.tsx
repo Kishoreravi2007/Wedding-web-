@@ -3180,7 +3180,7 @@ const ClientDashboard = () => {
             {/* Footer */}
             <footer className="bg-white/80 border-t border-gray-200 py-6 mt-12">
                 <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-                    <p>© 2026 WeddingWeb AI Inc. Need help? <a href="/company/contact" className="text-rose-600 hover:underline">Contact Support</a></p>
+                    <p>© 2026 WeddingWeb AI Inc. Need help? <Link to="/company/contact" className="text-rose-600 hover:underline">Contact Support</Link></p>
                 </div>
             </footer>
         </div>

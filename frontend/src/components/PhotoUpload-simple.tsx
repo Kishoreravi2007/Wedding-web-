@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -17,6 +18,7 @@ interface PhotoUploadSimpleProps {
 }
 
 export function PhotoUploadSimple({ weddingId, onUploadSuccess, events }: PhotoUploadSimpleProps) {
+  const navigate = useNavigate();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
@@ -60,7 +62,7 @@ export function PhotoUploadSimple({ weddingId, onUploadSuccess, events }: PhotoU
     if (!token) {
       toast.error('Please login to upload photos. Redirecting to login page...');
       setTimeout(() => {
-        window.location.href = '/photographer-login';
+        navigate('/photographer-login');
       }, 2000);
       return;
     }

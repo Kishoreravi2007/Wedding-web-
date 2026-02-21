@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, Bell, Menu, User, Settings, LogOut, ChevronDown, Heart, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import { formatDistanceToNow } from 'date-fns';
 // Navigation items defined inside the component based on role
 
 export function CompanyNavbar() {
+    const navigate = useNavigate();
     const location = useLocation();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { currentUser, logout } = useAuth();
@@ -101,7 +102,7 @@ export function CompanyNavbar() {
     const handleLogout = async () => {
         try {
             await logout();
-            window.location.href = '/company/login';
+            navigate('/company/login');
         } catch (error) {
             console.error("Logout failed", error);
         }
