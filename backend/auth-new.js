@@ -61,6 +61,7 @@ router.post('/register', async (req, res) => {
     // Generate token
     const token = TokenManager.generateToken(newUser);
 
+    // 1. Send immediate response to the user
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -74,33 +75,38 @@ router.post('/register', async (req, res) => {
       accessToken: token
     });
 
-    // Create User Profile (SQL)
-    try {
-      const { query } = require('./lib/db-gcp');
-      await query(
-        `INSERT INTO profiles (user_id, full_name, email, location, bio, avatar_url, created_at, updated_at) 
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
-        [newUser.id, fullName || effectiveUsername.split('@')[0], effectiveUsername, location || null, bio || null, avatarUrl || null]
-      );
-      console.log(`👤 Profile created for user ${newUser.id}`);
-    } catch (profileError) {
-      console.error('Failed to create user profile during registration:', profileError);
-      // Non-blocking: user is still created
-    }
-
-    // Send AI Welcome Email (Non-blocking)
-    const displayName = fullName || effectiveUsername.split('@')[0];
-    emailService.sendWelcomeEmailAI(effectiveUsername, displayName)
-      .then(result => {
-        if (result && result.success) {
-          console.log(`✅ Welcome email dispatched to ${effectiveUsername}`);
-        } else {
-          console.warn(`⚠️ Welcome email dispatch finished with status:`, result);
+    // 2. Perform background tasks (Non-blocking)
+    setImmediate(async () => {
+      try {
+        // Create User Profile (SQL)
+        try {
+          const { query: dbQuery } = require('./lib/db-gcp');
+          await dbQuery(
+            `INSERT INTO profiles (user_id, full_name, email, location, bio, avatar_url, created_at, updated_at) 
+             VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
+            [newUser.id, fullName || effectiveUsername.split('@')[0], effectiveUsername, location || null, bio || null, avatarUrl || null]
+          );
+          console.log(`👤 Background: Profile created for user ${newUser.id}`);
+        } catch (profileError) {
+          console.error('👤 Background Error: Failed to create user profile:', profileError);
         }
-      })
-      .catch(emailError => {
-        console.error('❌ Failed to send AI welcome email during registration:', emailError);
-      });
+
+        // Send AI Welcome Email
+        const displayName = fullName || effectiveUsername.split('@')[0];
+        try {
+          const emailResult = await emailService.sendWelcomeEmailAI(effectiveUsername, displayName);
+          if (emailResult && emailResult.success) {
+            console.log(`✅ Background: Welcome email dispatched to ${effectiveUsername}`);
+          } else {
+            console.warn(`⚠️ Background: Welcome email status:`, emailResult);
+          }
+        } catch (emailError) {
+          console.error('❌ Background Error: Failed to send welcome email:', emailError);
+        }
+      } catch (fatalBgError) {
+        console.error('💥 Fatal Background Error during registration tasks:', fatalBgError);
+      }
+    });
 
   } catch (error) {
     console.error('Registration error:', error);

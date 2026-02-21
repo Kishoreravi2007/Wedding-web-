@@ -51,8 +51,17 @@ let sslFallbackAttempted = false;
 // Handle SSL rejection gracefully
 const initPool = async () => {
     try {
+        // We now check the connection string to decide SSL default
+        const isSupabasePooler = process.env.DATABASE_URL && process.env.DATABASE_URL.includes('pooler');
+
+        if (isSupabasePooler) {
+            console.log('📡 Supabase Pooler detected, defaulting to non-SSL...');
+            pool = new Pool(buildDbConfig(false));
+            sslFallbackAttempted = true;
+        }
+
         const client = await pool.connect();
-        console.log('✅ Database connected (SSL)');
+        console.log(`✅ Database connected (${sslFallbackAttempted ? 'non-SSL' : 'SSL'})`);
         client.release();
     } catch (err) {
         if (err.message && err.message.includes('SSL') && !sslFallbackAttempted) {
