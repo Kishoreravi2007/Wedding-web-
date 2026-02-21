@@ -17,9 +17,9 @@ const CompanyResetPassword = () => {
     // Redirect if no token or email
     useEffect(() => {
         if (!token || !email) {
-            window.location.href = "https://weddingweb.co.in";
+            navigate('/');
         }
-    }, [token, email]);
+    }, [token, email, navigate]);
 
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");

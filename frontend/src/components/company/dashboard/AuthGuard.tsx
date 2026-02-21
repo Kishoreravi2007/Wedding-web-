@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Lock, LogIn, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { CompanyNavbar } from './CompanyNavbar';
 
 interface AuthGuardProps {
@@ -12,6 +12,7 @@ interface AuthGuardProps {
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     const { currentUser, loading } = useAuth();
+    const location = useLocation();
 
     if (loading) {
         return (
@@ -64,8 +65,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
     // Role-based restriction: Photographers should NOT access client/company dashboards
     if (currentUser.role === 'photographer') {
-        const isClientPath = window.location.pathname.startsWith('/client') ||
-            window.location.pathname.startsWith('/company');
+        const isClientPath = location.pathname.startsWith('/client') ||
+            location.pathname.startsWith('/company');
 
         if (isClientPath) {
             return (
@@ -101,8 +102,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     }
 
     // Role-based restriction: Non-photographers should NOT access photographer portal
-    if (window.location.pathname.startsWith('/photographer') && currentUser.role !== 'photographer' && currentUser.role !== 'admin') {
-        const isPhotographerPath = window.location.pathname.startsWith('/photographer');
+    if (location.pathname.startsWith('/photographer') && currentUser.role !== 'photographer' && currentUser.role !== 'admin') {
+        const isPhotographerPath = location.pathname.startsWith('/photographer');
 
         if (isPhotographerPath) {
             return (

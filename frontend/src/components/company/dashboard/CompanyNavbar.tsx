@@ -31,7 +31,7 @@ export function CompanyNavbar() {
     const isClient = !isProfessional;
 
     const navItems = isProfessional ? [
-        { label: "Overview", href: "/" },
+        { label: "Overview", href: "/company" },
         { label: "Leads", href: "/#leads" },
         { label: "Portfolio", href: "/#portfolio" },
         { label: "Services", href: "/#services" },
@@ -39,7 +39,7 @@ export function CompanyNavbar() {
         { label: "Payments", href: "/company/payments" },
         { label: "Settings", href: "/company/settings" },
     ] : [
-        { label: "Overview", href: "/" },
+        { label: "Overview", href: "/company" },
         { label: "Services", href: "/company/services" },
         { label: "Pricing", href: "/company/pricing" },
         { label: "Contact", href: "/company/contact" },
@@ -142,7 +142,7 @@ export function CompanyNavbar() {
             <div className="w-full max-w-6xl bg-white/95 backdrop-blur-xl rounded-[2.5rem] border border-slate-200/50 shadow-[0_12px_40px_rgba(0,0,0,0.12)] flex items-center justify-between p-2 pointer-events-auto">
 
                 <div className="flex items-center gap-3 pl-4">
-                    <Link to="/" className="flex items-center gap-3 group">
+                    <Link to="/company" className="flex items-center gap-3 group">
                         <div className="h-10 w-10 flex items-center justify-center bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden p-1.5 transition-transform group-hover:scale-105">
                             <img src="/logo.png" alt="WeddingWeb" className="h-full w-full object-contain" />
                         </div>
@@ -232,7 +232,7 @@ export function CompanyNavbar() {
                         </SheetTrigger>
                         <SheetContent side="left" className="pr-0">
                             <div className="px-7">
-                                <Link to="/" className="flex items-center gap-3 font-bold text-2xl mb-8">
+                                <Link to="/company" className="flex items-center gap-3 font-bold text-2xl mb-8">
                                     <img src="/logo.png" alt="WeddingWeb Logo" className="h-10 w-10 rounded-xl object-contain" />
                                     <span className="bg-gradient-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
                                         WeddingWeb
