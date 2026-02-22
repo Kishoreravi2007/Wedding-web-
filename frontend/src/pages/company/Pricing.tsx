@@ -449,7 +449,8 @@ const Pricing = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           features: featureKeys,
-          duration: months
+          duration: months,
+          couponCode: couponStatus === 'applied' ? couponCode : undefined
         })
       });
 

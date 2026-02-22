@@ -122,15 +122,12 @@ app.use('/uploads', express.static(uploadsPath));
 app.use(['/binaries', '/api/binaries'], express.static(path.join(__dirname, 'binaries')));
 
 
-// Request logging middleware (Development only)
-if (process.env.NODE_ENV !== 'production') {
-  app.use((req, res, next) => {
-    console.log('\n--- Incoming Request ---');
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-    console.log('------------------------\n');
-    next();
-  });
-}
+// Request logging middleware
+app.use((req, res, next) => {
+  // Only log method and path to avoid leaking sensitive data in production logs
+  console.log(`📡 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
 
 // =============================================================================
 // ROUTES

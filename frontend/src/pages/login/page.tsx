@@ -54,7 +54,7 @@ const LoginPage = () => {
   };
 
 
-  const from = (location.state as any)?.from?.pathname || (userType === 'photographer' ? '/photographer' : '/client');
+  const from = (location.state as any)?.from?.pathname || (userType === 'photographer' ? '/photographer' : '/company');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,8 +71,8 @@ const LoginPage = () => {
       } else if (user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
-        // Default to client/couple dashboard
-        navigate('/client');
+        // Default to company dashboard as requested
+        navigate('/company');
       }
 
     } catch (error: any) {

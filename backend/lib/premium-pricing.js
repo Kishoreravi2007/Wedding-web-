@@ -158,36 +158,91 @@ const sanitizeFeatures = (features = []) => {
   return Array.from(new Set(features.filter((key) => validKeys.includes(key))));
 };
 
-/**
- * Calculate the premium booking amount starting from selected features + duration
- */
-const calculatePremiumTotal = ({ features = [], duration = 1 }) => {
-  const normalizedDuration = sanitizeDuration(duration);
-  const selectedFeatures = sanitizeFeatures(features);
-  const featureSubtotal = selectedFeatures.reduce((sum, key) => {
-    const feature = FEATURE_CATALOG.find((item) => item.key === key);
-    return sum + (feature ? feature.price : 0);
-  }, 0);
+const FEATURE_BASE_PRICES = FEATURE_CATALOG.reduce((acc, feature) => {
+  acc[feature.key] = feature.price;
+  return acc;
+}, {});
 
+const { query } = require('./db-gcp');
+
+/**
+ * Calculate total price for selected features and duration
+ *
+ * @param {Array} featureKeys - Array of feature IDs
+ * @param {number} duration - Number of months (1, 3, 6, 12)
+ * @param {string} couponCode - Optional coupon code
+ * @returns {Object} - { base, multiplier, total, discountAmount, couponDetails }
+ */
+async function calculatePremiumTotal(featureKeys, duration, couponCode = null) {
+  if (!Array.isArray(featureKeys) || featureKeys.length === 0) {
+    return { base: 0, multiplier: 1, total: 0, discountAmount: 0, couponDetails: null };
+  }
+
+  // Calculate base price (sum of monthly prices for each feature)
+  let featureSubtotal = 0;
+  featureKeys.forEach(key => {
+    const price = FEATURE_BASE_PRICES[key] || 0;
+    featureSubtotal += price;
+  });
+
+  // Get duration multiplier
+  const normalizedDuration = sanitizeDuration(duration);
   const multiplier = DURATION_MULTIPLIERS[normalizedDuration] ?? 1;
   const base = Number(featureSubtotal.toFixed(2));
 
-  // Calculate total: Frontend uses a CUMULATIVE multiplier (e.g. 12 months is 7x base, NOT 12x0.85x)
-  let total = Number((base * multiplier).toFixed(2));
+  // Use Math.round to ensure total is an integer (rupees) to match Pricing page and avoid paise discrepancies
+  let subtotal = Math.round(base * multiplier);
+  let total = subtotal;
+  let discountAmount = 0;
+  let couponDetails = null;
 
-  // TEST MODE CAPPING: Disabled to allow real pricing sync
-  // If not in production, we still want to see the actual amount
-  const isProd = process.env.NODE_ENV === 'production';
+  // Apply Coupon if provided
+  if (couponCode) {
+    try {
+      const { rows } = await query(
+        'SELECT * FROM coupons WHERE LOWER(code) = LOWER($1) AND status = \'active\'',
+        [couponCode]
+      );
+
+      if (rows.length > 0) {
+        const coupon = rows[0];
+
+        // Basic validation: expiry
+        const isExpired = coupon.expiry_date && new Date(coupon.expiry_date) < new Date();
+        const isLimitReached = coupon.usage_limit && coupon.usage_count >= coupon.usage_limit;
+
+        if (!isExpired && !isLimitReached) {
+          if (coupon.discount_type === 'percentage') {
+            discountAmount = Math.round(subtotal * (coupon.discount_value / 100));
+          } else if (coupon.discount_type === 'fixed') {
+            discountAmount = Math.round(coupon.discount_value);
+          }
+
+          total = Math.max(0, subtotal - discountAmount);
+          couponDetails = {
+            code: coupon.code,
+            type: coupon.discount_type,
+            value: coupon.discount_value
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error validating coupon in pricing logic:', error);
+      // Fallback: No discount if DB fails
+    }
+  }
 
   return {
     base,
     multiplier,
-    duration: normalizedDuration,
-    features: selectedFeatures,
-    total: Number.isFinite(total) ? total : base,
-    isCapped: false
+    duration: normalizedDuration, // Keep duration for consistency with old return
+    features: featureKeys, // Keep features for consistency with old return
+    subtotal,
+    total: Number.isFinite(total) ? total : base, // Ensure total is finite
+    discountAmount,
+    couponDetails
   };
-};
+}
 
 const getDurationPayload = () => {
   return DURATION_OPTIONS.map((option) => ({

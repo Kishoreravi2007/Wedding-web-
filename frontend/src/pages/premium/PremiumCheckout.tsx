@@ -91,11 +91,16 @@ const PremiumCheckout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [fixedDiscount, setFixedDiscount] = useState(0);
+  const [couponStatus, setCouponStatus] = useState<"idle" | "applied" | "invalid">("idle");
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const result = await apiCall("/api/premium/options");
+        const result = await apiCall<PremiumOptionsResponse>("/api/premium/options");
         setOptions(result);
 
         const firstDuration = result?.durations?.[0]?.months ?? 1;
@@ -118,11 +123,12 @@ const PremiumCheckout = () => {
     }, 0);
 
     const multiplier = options?.durations?.find((item) => item.months === selectedDuration)?.multiplier ?? 1;
-    const total = Number((base * multiplier).toFixed(2));
-    规
+    const subtotal = Math.round(base * multiplier);
+    const total = Math.max(0, Math.round(subtotal * (1 - couponDiscount) - fixedDiscount));
+    const discountAmount = subtotal - total;
 
-    return { base, multiplier, total };
-  }, [options, selectedFeatures, selectedDuration]);
+    return { base, multiplier, subtotal, total, discountAmount };
+  }, [options, selectedFeatures, selectedDuration, couponDiscount, fixedDiscount]);
 
   const toggleFeature = (featureKey: string) => {
     setSelectedFeatures((prev) =>
@@ -203,12 +209,13 @@ const PremiumCheckout = () => {
 
     setIsProcessing(true);
     try {
-      const response = await apiCall("/api/premium/checkout", {
+      const response = await apiCall<CheckoutResponse>("/api/premium/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           features: selectedFeatures,
-          duration: selectedDuration
+          duration: selectedDuration,
+          couponCode: couponStatus === 'applied' ? couponCode : undefined
         })
       });
 
@@ -223,6 +230,39 @@ const PremiumCheckout = () => {
     } catch (error: any) {
       showError(error.message || "Failed to create checkout. Please try again.");
       setIsProcessing(false);
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidatingCoupon(true);
+    setCouponStatus("idle");
+    try {
+      const response = await apiCall<{
+        valid: boolean;
+        discount_type: "percentage" | "fixed";
+        discount_value: number;
+      }>(`/api/coupons/validate/${couponCode}`);
+
+      if (response.valid) {
+        if (response.discount_type === "percentage") {
+          setCouponDiscount(response.discount_value / 100);
+          setFixedDiscount(0);
+        } else {
+          setFixedDiscount(response.discount_value);
+          setCouponDiscount(0);
+        }
+        setCouponStatus("applied");
+        showSuccess(`Coupon "${couponCode}" applied!`);
+      } else {
+        setCouponStatus("invalid");
+        showError("Invalid coupon code.");
+      }
+    } catch (error) {
+      setCouponStatus("invalid");
+      showError("Invalid coupon code.");
+    } finally {
+      setIsValidatingCoupon(false);
     }
   };
 
@@ -454,6 +494,51 @@ const PremiumCheckout = () => {
                             <span className="text-slate-500">Duration</span>
                             <span className="font-medium text-slate-700">{getDurationLabel(selectedDuration)}</span>
                           </div>
+                          {summary.discountAmount > 0 && (
+                            <div className="flex justify-between text-sm text-rose-600 font-medium">
+                              <span>Discount</span>
+                              <span>-{formatCurrency(summary.discountAmount)}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Coupon Input */}
+                        <div className="bg-white/50 border border-slate-200 rounded-xl p-3 space-y-2">
+                          <Label htmlFor="coupon" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Coupon Code
+                          </Label>
+                          <div className="flex gap-2">
+                            <input
+                              id="coupon"
+                              type="text"
+                              value={couponCode}
+                              onChange={(e) => {
+                                setCouponCode(e.target.value);
+                                if (couponStatus !== "idle") {
+                                  setCouponStatus("idle");
+                                  setCouponDiscount(0);
+                                  setFixedDiscount(0);
+                                }
+                              }}
+                              placeholder="EG: SAVE20"
+                              className="flex-1 text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400"
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleApplyCoupon}
+                              disabled={isValidatingCoupon || !couponCode.trim()}
+                              className="text-xs h-auto py-2"
+                            >
+                              {isValidatingCoupon ? <Loader2 className="w-3 h-3 animate-spin" /> : "Apply"}
+                            </Button>
+                          </div>
+                          {couponStatus === "invalid" && (
+                            <p className="text-[10px] text-rose-500">Invalid coupon code</p>
+                          )}
+                          {couponStatus === "applied" && (
+                            <p className="text-[10px] text-green-600 font-medium">Coupon applied successfully!</p>
+                          )}
                         </div>
 
                         <div className="border-t-2 border-rose-200 pt-4">

@@ -33,6 +33,7 @@ const getClientIp = (req) => {
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password, role = 'user', fullName, location, bio, avatarUrl } = req.body;
+    console.log(`📝 [Register] Request received for email: ${email}`);
 
     // Support both username and email fields (map email to username if needed)
     const effectiveUsername = (username || email || '').toLowerCase();
@@ -683,15 +684,15 @@ router.post('/preferences/email', authMiddleware.verifyToken, async (req, res) =
  * Request a password reset email
  */
 router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  console.log(`🔐 [ForgotPassword] Request received for email: ${email}`);
+
+  if (!email) {
+    console.warn('⚠️ [ForgotPassword] Missing email in request body');
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
   try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-
-    console.log('🔐 Password reset requested for:', email);
-
     // Check if user exists (email is stored in username column)
     const { query } = require('./lib/db-gcp');
     const { rows } = await query(
@@ -701,7 +702,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // Always return success to prevent email enumeration attacks
     if (rows.length === 0) {
-      console.log('⚠️ Password reset requested for non-existent email:', email);
+      console.log(`ℹ️ [ForgotPassword] User not found: ${email}. Returning success to avoid enumeration.`);
       return res.json({
         message: 'If an account exists with this email, a reset link has been sent.',
         success: true

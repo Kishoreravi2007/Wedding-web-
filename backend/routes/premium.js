@@ -103,21 +103,21 @@ router.post('/checkout', authenticateToken, async (req, res) => {
       return res.status(401).json({ success: false, error: 'Invalid user session' });
     }
 
-    const { features, duration } = req.body;
+    const { features, duration, couponCode } = req.body;
     console.log('🔍 Checkout Request Body:', JSON.stringify(req.body));
 
     if (!Array.isArray(features) || features.length === 0) {
       return res.status(400).json({ success: false, error: 'Select at least one feature before checkout' });
     }
 
-    const pricing = calculatePremiumTotal({ features, duration });
+    const pricing = await calculatePremiumTotal(features, duration, couponCode);
     console.log('🔍 Calculated Pricing:', JSON.stringify(pricing));
 
     const { rows } = await query(
-      `INSERT INTO payment_history (user_id, amount, duration, features, status)
-       VALUES ($1, $2, $3, $4, 'pending')
+      `INSERT INTO payment_history (user_id, amount, duration, features, status, payment_gateway_response)
+       VALUES ($1, $2, $3, $4, 'pending', $5)
        RETURNING *`,
-      [userId, pricing.total, pricing.duration, pricing.features]
+      [userId, pricing.total, pricing.duration, pricing.features, JSON.stringify({ coupon: pricing.couponDetails })]
     );
 
     const data = rows[0];
@@ -128,7 +128,8 @@ router.post('/checkout', authenticateToken, async (req, res) => {
       notes: {
         user_id: userId,
         features: pricing.features.join(','),
-        duration: `${pricing.duration} months`
+        duration: `${pricing.duration} months`,
+        coupon: pricing.couponDetails?.code || 'none'
       }
     });
 
@@ -137,7 +138,8 @@ router.post('/checkout', authenticateToken, async (req, res) => {
       order_id: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
-      status: razorpayOrder.status
+      status: razorpayOrder.status,
+      coupon: pricing.couponDetails
     };
 
     await query(
@@ -149,6 +151,9 @@ router.post('/checkout', authenticateToken, async (req, res) => {
       success: true,
       checkoutId: data.id,
       amount: pricing.total,
+      subtotal: pricing.subtotal,
+      discountAmount: pricing.discountAmount,
+      coupon: pricing.couponDetails,
       base: pricing.base,
       multiplier: pricing.multiplier,
       currency: PREMIUM_PAYMENT_CURRENCY,
