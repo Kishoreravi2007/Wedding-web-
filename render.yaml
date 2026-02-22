@@ -31,4 +31,4 @@ services:
       - key: VITE_API_URL
         value: https://backend-w8zt.onrender.com
       - key: VITE_DEEPFACE_API_URL
-        value: https://backend-w8zt.onrender.com/api/deepface
+        value: https://wedding-deepface-979970479540.asia-south1.run.app/api/faces/detect
