@@ -34,8 +34,14 @@ transporter.verify((error, success) => {
     if (error.code === 'EAUTH') {
       console.error('   💡 TIP: Check if Gmail App Password is correct or if 2FA is enabled.');
     } else if (error.code === 'ESOCKET') {
-      console.error('   💡 TIP: Connection blocked. Port 587 is often restricted on Render. Switch to Port 465.');
+      console.error('   💡 TIP: Connection blocked. Port 587 is often restricted on Render. Switch to Port 465 (secure: true).');
     }
+    console.error('   Config Used:', {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: process.env.SMTP_PORT || '587',
+      user: process.env.EMAIL_USER || process.env.SMTP_USER,
+      secure: process.env.SMTP_PORT === '465'
+    });
   } else {
     console.log('✅ SMTP Server Connection Verified - Service is active');
   }
@@ -110,22 +116,37 @@ const sendEmail = async ({ to, subject, text, html }) => {
       html && html.includes(`cid:${attachment.cid}`)
     );
 
+    const fromAddress = process.env.SMTP_FROM || `"WeddingWeb Support" <${process.env.EMAIL_USER || process.env.SMTP_USER || 'help.weddingweb@gmail.com'}>`;
+
+    console.log(`📧 [Email Service] Sending via SMTP to: ${to}`);
+    console.log(`   Subject: ${subject}`);
+    console.log(`   From: ${fromAddress}`);
+
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || `"WeddingWeb Support" <${process.env.EMAIL_USER || 'help.weddingweb@gmail.com'}>`,
+      from: fromAddress,
       to,
       subject,
       text,
       html,
       attachments: activeAttachments
     });
-    console.log('📧 Email sent via SMTP successfully: %s', info.messageId);
+    console.log('✅ Email sent via SMTP successfully: %s', info.messageId);
     return { success: true, messageId: info.messageId, provider: 'smtp' };
   } catch (error) {
     console.error('❌ Email delivery failed:');
     console.error('   To:', to);
     console.error('   Subject:', subject);
-    console.error('   Error:', error.message);
-    return { success: false, error: error.message };
+    console.error('   Error Message:', error.message);
+    console.error('   Error Code:', error.code);
+    if (error.stack) console.error('   Stack Trace:', error.stack);
+
+    return {
+      success: false,
+      error: error.message,
+      code: error.code,
+      tip: error.code === 'EAUTH' ? 'Gmail App Password may be invalid or expired' :
+        error.code === 'ESOCKET' ? 'Connectivity issue - check if port 465/587 is blocked' : null
+    };
   }
 };
 

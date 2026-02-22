@@ -77,6 +77,7 @@ router.post('/register', async (req, res) => {
 
     // 2. Perform background tasks (Non-blocking)
     setImmediate(async () => {
+      console.log(`🚀 [Register] Starting background tasks for user: ${newUser.id} (${effectiveUsername})`);
       try {
         // Create User Profile (SQL)
         try {
@@ -86,25 +87,26 @@ router.post('/register', async (req, res) => {
              VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
             [newUser.id, fullName || effectiveUsername.split('@')[0], effectiveUsername, location || null, bio || null, avatarUrl || null]
           );
-          console.log(`👤 Background: Profile created for user ${newUser.id}`);
+          console.log(`👤 [Register] Background: Profile created for user ${newUser.id}`);
         } catch (profileError) {
-          console.error('👤 Background Error: Failed to create user profile:', profileError);
+          console.error('👤 [Register] Background Error: Failed to create user profile:', profileError);
         }
 
         // Send AI Welcome Email
         const displayName = fullName || effectiveUsername.split('@')[0];
         try {
+          console.log(`📧 [Register] Background: Prompting welcome email for ${effectiveUsername}...`);
           const emailResult = await emailService.sendWelcomeEmailAI(effectiveUsername, displayName);
           if (emailResult && emailResult.success) {
-            console.log(`✅ Background: Welcome email dispatched to ${effectiveUsername}`);
+            console.log(`✅ [Register] Background: Welcome email dispatched successfully to ${effectiveUsername}`);
           } else {
-            console.warn(`⚠️ Background: Welcome email status:`, emailResult);
+            console.warn(`⚠️ [Register] Background: Welcome email dispatch FAILED for ${effectiveUsername}:`, emailResult);
           }
         } catch (emailError) {
-          console.error('❌ Background Error: Failed to send welcome email:', emailError);
+          console.error(`❌ [Register] Background Error: Exception during welcome email for ${effectiveUsername}:`, emailError);
         }
       } catch (fatalBgError) {
-        console.error('💥 Fatal Background Error during registration tasks:', fatalBgError);
+        console.error('💥 [Register] Fatal Background Error during registration tasks:', fatalBgError);
       }
     });
 
@@ -737,11 +739,12 @@ router.post('/forgot-password', async (req, res) => {
 
     res.json({
       message: 'If an account exists with this email, a reset link has been sent.',
-      success: true
+      success: true,
+      debug_info: process.env.NODE_ENV !== 'production' ? { email_sent: emailResult.success, error: emailResult.error } : undefined
     });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('❌ [ForgotPassword] Error processing request:', error);
     res.status(500).json({ message: 'Failed to process password reset request' });
   }
 });
