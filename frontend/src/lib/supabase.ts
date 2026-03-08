@@ -17,6 +17,6 @@ export const GOOGLE_AUTH_CONFIG = {
             access_type: 'offline',
             prompt: 'consent',
         },
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `https://weddingweb.co.in/auth/callback`
     }
 };
