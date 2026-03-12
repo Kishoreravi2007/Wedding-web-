@@ -148,7 +148,7 @@ async function handleStatusCommand(interaction) {
         : COLORS.WARNING
     )
     .setTimestamp()
-    .setFooter({ text: "Discord Automation Bot" });
+    .setFooter({ text: "WeddingWeb AI" });
 
   await interaction.editReply({ embeds: [embed] });
 }

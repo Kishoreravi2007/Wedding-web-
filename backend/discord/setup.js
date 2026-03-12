@@ -171,7 +171,7 @@ async function runSetup(guild) {
       )
       .setColor(COLORS.SUCCESS)
       .setTimestamp()
-      .setFooter({ text: "Discord Automation Bot" });
+      .setFooter({ text: "WeddingWeb AI" });
 
     await logServerEvent(
       guild,

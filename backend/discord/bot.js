@@ -59,7 +59,7 @@ client.once("ready", async () => {
   client.user.setPresence({
     activities: [
       {
-        name: "your server | /ticket /status /ai",
+        name: "your server | WeddingWeb AI",
         type: ActivityType.Watching,
       },
     ],
@@ -147,7 +147,7 @@ client.on("guildMemberAdd", async (member) => {
         .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
         .setColor(COLORS.SUCCESS)
         .setTimestamp()
-        .setFooter({ text: `Member #${member.guild.memberCount}` });
+        .setFooter({ text: "WeddingWeb AI — Member #" + member.guild.memberCount });
 
       await generalChannel.send({ embeds: [welcomeEmbed] });
     }
