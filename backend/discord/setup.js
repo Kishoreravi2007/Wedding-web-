@@ -1,61 +1,8 @@
-/**
- * Discord Server Auto-Setup Module
- * Creates categories, channels, and roles when bot joins a new guild.
- * Idempotent — skips anything that already exists.
- */
-
 const { ChannelType, PermissionsBitField, EmbedBuilder } = require("discord.js");
 const { setupRoles } = require("./roles");
 const { logServerEvent, COLORS } = require("./logger");
+const { CHANNELS, CATEGORIES, SERVER_STRUCTURE, MESSAGES } = require("./config");
 
-// Category → Channel definitions
-const SERVER_STRUCTURE = {
-  INFO: [
-    "announcements",
-    "rules",
-    "about-project",
-    "website-link",
-    "updates",
-  ],
-  COMMUNITY: [
-    "general",
-    "help",
-    "feedback",
-    "feature-requests",
-  ],
-  SUPPORT: [
-    "support-chat",
-    "bug-report",
-    "api-issues",
-  ],
-  TICKETS: [
-    "open-ticket",
-    "ticket-logs",
-  ],
-  BOT: [
-    "bot-commands",
-    "ai-chat",
-    "status-check",
-    "bot-logs",
-  ],
-  DEVELOPERS: [
-    "dev-chat",
-    "backend",
-    "frontend",
-    "database",
-    "errors",
-  ],
-  ADMIN: [
-    "admin-only",
-    "deployments",
-    "mod-chat",
-  ],
-  LOGS: [
-    "server-logs",
-    "join-logs",
-    "error-logs",
-  ],
-};
 
 /**
  * Run the full auto-setup for a guild.
@@ -162,8 +109,8 @@ async function runSetup(guild) {
 
     // ──── 3. Send confirmation ────
     const summaryEmbed = new EmbedBuilder()
-      .setTitle("✅ Server Auto-Setup Complete!")
-      .setDescription("Your server has been fully configured by the bot.")
+      .setTitle(MESSAGES.SETUP.TITLE)
+      .setDescription(MESSAGES.SETUP.DESC)
       .addFields(
         { name: "Categories Created", value: `${stats.categoriesCreated}`, inline: true },
         { name: "Channels Created", value: `${stats.channelsCreated}`, inline: true },
@@ -175,8 +122,11 @@ async function runSetup(guild) {
 
     await logServerEvent(
       guild,
-      "Server Setup Complete",
-      `Categories: ${stats.categoriesCreated} new | Channels: ${stats.channelsCreated} new | Skipped: ${stats.skipped}`
+      MESSAGES.SETUP.LOG_TITLE,
+      MESSAGES.SETUP.LOG_DESC
+        .replace("%CAT%", stats.categoriesCreated)
+        .replace("%CHAN%", stats.channelsCreated)
+        .replace("%SKIP%", stats.skipped)
     );
 
     // Also try to post in #general

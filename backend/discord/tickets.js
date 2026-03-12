@@ -13,17 +13,8 @@ const {
   ButtonStyle,
 } = require("discord.js");
 const { logTicketEvent, COLORS } = require("./logger");
+const { CHANNELS, TICKET_TYPES } = require("./config");
 
-// Ticket counter per guild (in-memory — use DB for production persistence)
-const ticketCounters = new Map();
-
-const TICKET_TYPES = [
-  { label: "Support",  value: "support",  emoji: "💬", description: "General support request" },
-  { label: "Bug",      value: "bug",      emoji: "🐛", description: "Report a bug or issue" },
-  { label: "Payment",  value: "payment",  emoji: "💳", description: "Payment or billing issue" },
-  { label: "API",      value: "api",      emoji: "🔌", description: "API-related question" },
-  { label: "Other",    value: "other",    emoji: "📝", description: "Other inquiry" },
-];
 
 /**
  * Handle the /ticket slash command — sends a select menu.
@@ -32,7 +23,7 @@ const TICKET_TYPES = [
 async function handleTicketCommand(interaction) {
   const selectMenu = new StringSelectMenuBuilder()
     .setCustomId("ticket_type_select")
-    .setPlaceholder("Select ticket type...")
+    .setPlaceholder(MESSAGES.TICKETS.SELECT_PLACEHOLDER)
     .addOptions(
       TICKET_TYPES.map((t) => ({
         label: t.label,
@@ -45,9 +36,9 @@ async function handleTicketCommand(interaction) {
   const row = new ActionRowBuilder().addComponents(selectMenu);
 
   const embed = new EmbedBuilder()
-    .setTitle("🎫 Open a Ticket")
+    .setTitle(MESSAGES.TICKETS.OPEN_TITLE)
     .setDescription(
-      "Select the type of issue you need help with from the dropdown below."
+      MESSAGES.TICKETS.OPEN_DESC
     )
     .setColor(COLORS.TICKET)
     .setTimestamp();
@@ -74,7 +65,9 @@ async function handleTicketSelect(interaction) {
   ticketCounters.set(guild.id, counter);
 
   const ticketNumber = String(counter).padStart(3, "0");
-  const channelName = `ticket-${user.username.toLowerCase().replace(/[^a-z0-9]/g, "")}-${ticketNumber}`;
+  const channelName = MESSAGES.TICKETS.CHANNEL_NAME
+    .replace("%USER_NAME%", user.username.toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .replace("%NUMBER%", ticketNumber);
 
   try {
     // Find TICKETS category
@@ -130,14 +123,14 @@ async function handleTicketSelect(interaction) {
     const typeInfo = TICKET_TYPES.find((t) => t.value === ticketType);
 
     const ticketEmbed = new EmbedBuilder()
-      .setTitle(`${typeInfo.emoji} Ticket #${ticketNumber} — ${typeInfo.label}`)
+      .setTitle(MESSAGES.TICKETS.WELCOME_TITLE.replace("%EMOJI%", typeInfo.emoji).replace("%NUMBER%", ticketNumber).replace("%LABEL%", typeInfo.label))
       .setDescription(
-        `Hello <@${user.id}>!\n\nYour **${typeInfo.label}** ticket has been created.\nPlease describe your issue in detail and a team member will assist you shortly.`
+        MESSAGES.TICKETS.WELCOME_DESC.replace("%USER_ID%", user.id).replace("%LABEL%", typeInfo.label)
       )
       .addFields(
         { name: "Type", value: typeInfo.label, inline: true },
-        { name: "Priority", value: "Normal", inline: true },
-        { name: "Status", value: "🟢 Open", inline: true }
+        { name: MESSAGES.TICKETS.PRIORITY_LABEL, value: MESSAGES.TICKETS.PRIORITY_VALUE, inline: true },
+        { name: MESSAGES.TICKETS.STATUS_LABEL, value: MESSAGES.TICKETS.STATUS_OPEN, inline: true }
       )
       .setColor(COLORS.TICKET)
       .setTimestamp()
@@ -145,7 +138,7 @@ async function handleTicketSelect(interaction) {
 
     const closeButton = new ButtonBuilder()
       .setCustomId("ticket_close")
-      .setLabel("Close Ticket")
+      .setLabel(MESSAGES.TICKETS.CLOSE_BUTTON)
       .setStyle(ButtonStyle.Danger)
       .setEmoji("🔒");
 
@@ -158,7 +151,7 @@ async function handleTicketSelect(interaction) {
 
     // Reply to user
     await interaction.update({
-      content: `✅ Your ticket has been created: <#${ticketChannel.id}>`,
+      content: MESSAGES.TICKETS.REPLY_CREATED.replace("%CHANNEL_ID%", ticketChannel.id),
       embeds: [],
       components: [],
     });
@@ -166,7 +159,7 @@ async function handleTicketSelect(interaction) {
     // Log the ticket
     await logTicketEvent(
       guild,
-      "Ticket Opened",
+      MESSAGES.TICKETS.LOG_OPEN_TITLE,
       `**User:** <@${user.id}>\n**Type:** ${typeInfo.label}\n**Channel:** <#${ticketChannel.id}>\n**Ticket:** #${ticketNumber}`
     );
   } catch (error) {
@@ -201,17 +194,20 @@ async function handleTicketClose(interaction) {
     // Log closure
     await logTicketEvent(
       guild,
-      "Ticket Closed",
-      `**Channel:** #${channel.name}\n**Closed by:** <@${interaction.user.id}>\n**Messages:** ${messages.size}`
+      MESSAGES.TICKETS.LOG_CLOSE_TITLE,
+      MESSAGES.TICKETS.LOG_CLOSE_DESC
+        .replace("%CHANNEL_NAME%", channel.name)
+        .replace("%USER_ID%", interaction.user.id)
+        .replace("%COUNT%", messages.size)
     );
 
     // Send transcript to ticket-logs
     const logsChannel = guild.channels.cache.find(
-      (ch) => ch.name === "ticket-logs" && ch.isTextBased()
+      (ch) => ch.name === CHANNELS.TICKET_LOGS && ch.isTextBased()
     );
     if (logsChannel) {
       const transcriptEmbed = new EmbedBuilder()
-        .setTitle(`📋 Ticket Transcript — #${channel.name}`)
+        .setTitle(MESSAGES.TICKETS.TRANSCRIPT_TITLE.replace("%CHANNEL_NAME%", channel.name))
         .setDescription(
           transcript.length > 4000
             ? transcript.substring(0, 4000) + "\n... (truncated)"
@@ -225,7 +221,7 @@ async function handleTicketClose(interaction) {
 
     // Notify and delete channel
     await interaction.reply({
-      content: "🔒 This ticket will be closed in 5 seconds...",
+      content: MESSAGES.TICKETS.CLOSING_NOTICE,
     });
 
     setTimeout(async () => {

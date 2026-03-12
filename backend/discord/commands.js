@@ -13,6 +13,7 @@ const axios = require("axios");
 const { handleTicketCommand } = require("./tickets");
 const { COLORS } = require("./logger");
 const { getFormattedKnowledge } = require("./knowledge");
+const { CONFIG, MESSAGES } = require("./config");
 
 // ═══════════════════════════════════════════
 // Command Definitions
@@ -94,7 +95,7 @@ async function handleStatusCommand(interaction) {
     if (!check.url) {
       results.push({
         name: check.name,
-        status: "⚪ Not configured",
+        status: MESSAGES.STATUS.NOT_CONFIGURED,
         latency: "—",
       });
       continue;
@@ -111,21 +112,21 @@ async function handleStatusCommand(interaction) {
       const isUp = response.status >= 200 && response.status < 400;
       results.push({
         name: check.name,
-        status: isUp ? "🟢 Online" : `🟡 HTTP ${response.status}`,
+        status: isUp ? MESSAGES.STATUS.ONLINE : `🟡 HTTP ${response.status}`,
         latency: `${latency}ms`,
       });
     } catch (error) {
       results.push({
         name: check.name,
-        status: "🔴 Offline",
+        status: MESSAGES.STATUS.OFFLINE,
         latency: error.code || error.message,
       });
     }
   }
 
   const embed = new EmbedBuilder()
-    .setTitle("📊 System Status")
-    .setDescription("Real-time status of all connected services")
+    .setTitle(MESSAGES.STATUS.TITLE)
+    .setDescription(MESSAGES.STATUS.DESC)
     .addFields(
       results.map((r) => ({
         name: r.name,
@@ -134,12 +135,12 @@ async function handleStatusCommand(interaction) {
       }))
     )
     .setColor(
-      results.every((r) => r.status.includes("Online"))
+      results.every((r) => r.status.includes(MESSAGES.STATUS.ONLINE))
         ? COLORS.SUCCESS
         : COLORS.WARNING
     )
     .setTimestamp()
-    .setFooter({ text: "WeddingWeb AI" });
+    .setFooter({ text: CONFIG.BOT_NAME });
 
   await interaction.editReply({ embeds: [embed] });
 }
@@ -167,21 +168,16 @@ async function handleAICommand(interaction) {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-3.5-turbo",
+        model: CONFIG.AI.MODEL,
         messages: [
           {
             role: "system",
-            content:
-              "You are a helpful Discord bot assistant for WeddingWeb. " +
-              "Use the following knowledge base to answer questions accurately. " +
-              "If the answer isn't in the knowledge base, answer generally as a WeddingWeb representative. " +
-              "Keep responses concise (under 2000 characters) and formatted for Discord.\n\n" +
-              getFormattedKnowledge(),
+            content: CONFIG.AI.SYSTEM_PROMPT + "\n\n" + getFormattedKnowledge(),
           },
           { role: "user", content: question },
         ],
-        max_tokens: 500,
-        temperature: 0.7,
+        max_tokens: CONFIG.AI.MAX_TOKENS,
+        temperature: CONFIG.AI.TEMPERATURE,
       },
       {
         headers: {

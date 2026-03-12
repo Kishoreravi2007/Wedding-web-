@@ -1,21 +1,6 @@
-/**
- * Discord Logger Module
- * Handles logging to Discord channels and console for GCP Cloud Logging.
- */
-
 const { EmbedBuilder } = require("discord.js");
+const { COLORS, CHANNELS, MESSAGES } = require("./config");
 
-// Color palette for embeds
-const COLORS = {
-  INFO: 0x3498db,
-  SUCCESS: 0x2ecc71,
-  WARNING: 0xf39c12,
-  ERROR: 0xe74c3c,
-  JOIN: 0x9b59b6,
-  LEAVE: 0x95a5a6,
-  TICKET: 0x1abc9c,
-  SYSTEM: 0x2c3e50,
-};
 
 /**
  * Send an embed message to a specific channel in a guild.
@@ -54,8 +39,8 @@ async function logToChannel(guild, channelName, embed) {
  */
 async function logMemberJoin(member) {
   const embed = new EmbedBuilder()
-    .setTitle("👋 Member Joined")
-    .setDescription(`${member.user.tag} joined the server.`)
+    .setTitle(MESSAGES.LOGS.JOIN_TITLE)
+    .setDescription(MESSAGES.LOGS.JOIN_DESC.replace("%TAG%", member.user.tag))
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
     .addFields(
       { name: "User", value: `<@${member.id}>`, inline: true },
@@ -66,7 +51,7 @@ async function logMemberJoin(member) {
     .setTimestamp();
 
   console.log(`👋 [Join] ${member.user.tag} joined ${member.guild.name}`);
-  await logToChannel(member.guild, "join-logs", embed);
+  await logToChannel(member.guild, CHANNELS.JOIN_LOGS, embed);
 }
 
 /**
@@ -74,8 +59,8 @@ async function logMemberJoin(member) {
  */
 async function logMemberLeave(member) {
   const embed = new EmbedBuilder()
-    .setTitle("🚪 Member Left")
-    .setDescription(`${member.user.tag} left the server.`)
+    .setTitle(MESSAGES.LOGS.LEAVE_TITLE)
+    .setDescription(MESSAGES.LOGS.LEAVE_DESC.replace("%TAG%", member.user.tag))
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
     .addFields(
       { name: "User", value: `<@${member.id}>`, inline: true },
@@ -85,7 +70,7 @@ async function logMemberLeave(member) {
     .setTimestamp();
 
   console.log(`🚪 [Leave] ${member.user.tag} left ${member.guild.name}`);
-  await logToChannel(member.guild, "join-logs", embed);
+  await logToChannel(member.guild, CHANNELS.JOIN_LOGS, embed);
 }
 
 /**
@@ -101,7 +86,7 @@ async function logError(guild, errorTitle, errorMessage) {
   console.error(`❌ [Error] ${errorTitle}: ${errorMessage}`);
 
   if (guild) {
-    await logToChannel(guild, "error-logs", embed);
+    await logToChannel(guild, CHANNELS.ERROR_LOGS, embed);
   }
 }
 
@@ -116,7 +101,7 @@ async function logServerEvent(guild, title, description) {
     .setTimestamp();
 
   console.log(`🔧 [Server] ${title}: ${description}`);
-  await logToChannel(guild, "server-logs", embed);
+  await logToChannel(guild, CHANNELS.SERVER_LOGS, embed);
 }
 
 /**
@@ -130,7 +115,7 @@ async function logTicketEvent(guild, title, description) {
     .setTimestamp();
 
   console.log(`🎫 [Ticket] ${title}: ${description}`);
-  await logToChannel(guild, "ticket-logs", embed);
+  await logToChannel(guild, CHANNELS.TICKET_LOGS, embed);
 }
 
 module.exports = {
@@ -142,3 +127,4 @@ module.exports = {
   logServerEvent,
   logTicketEvent,
 };
+

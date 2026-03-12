@@ -1,12 +1,7 @@
-/**
- * Discord Moderation Module
- * Detects foul language, applies a 2-strike system:
- *   Strike 1 → Warning + Message Deletion
- *   Strike 2+ → Permanent Ban + Message Deletion
- */
-
 const { EmbedBuilder, PermissionsBitField } = require("discord.js");
-const { logToChannel, COLORS } = require("./logger");
+const { COLORS, CHANNELS, MESSAGES } = require("./config");
+
+
 
 // ═══════════════════════════════════════════
 // Foul Language Word List
@@ -135,9 +130,9 @@ async function takeAction(guild, member, message, strikeCount, action) {
           .send({
             embeds: [
               new EmbedBuilder()
-                .setTitle("⚠️ Warning — Inappropriate Language")
+                .setTitle(MESSAGES.MODERATION.WARN_TITLE)
                 .setDescription(
-                  `Your message in **${guild.name}** was removed for containing inappropriate language.\n\n**Strike ${strikeCount}/2** — One more violation will result in a permanent ban.`
+                  MESSAGES.MODERATION.WARN_DESC.replace("%GUILD_NAME%", guild.name).replace("%STRIKE%", strikeCount)
                 )
                 .setColor(COLORS.WARNING)
                 .setTimestamp(),
@@ -150,7 +145,7 @@ async function takeAction(guild, member, message, strikeCount, action) {
           embeds: [
             new EmbedBuilder()
               .setDescription(
-                `<@${user.id}> — ⚠️ Watch your language! (Strike ${strikeCount}/2)`
+                MESSAGES.MODERATION.WARN_CHANNEL.replace("%USER_ID%", user.id).replace("%STRIKE%", strikeCount)
               )
               .setColor(COLORS.WARNING),
           ],
@@ -166,9 +161,9 @@ async function takeAction(guild, member, message, strikeCount, action) {
           .send({
             embeds: [
               new EmbedBuilder()
-                .setTitle("🔨 Banned — Repeated Violations")
+                .setTitle(MESSAGES.MODERATION.BAN_TITLE)
                 .setDescription(
-                  `You have been permanently banned from **${guild.name}** for repeated use of inappropriate language.\n\n**Strike ${strikeCount}** — This ban is permanent.`
+                  MESSAGES.MODERATION.BAN_DESC.replace("%GUILD_NAME%", guild.name).replace("%STRIKE%", strikeCount)
                 )
                 .setColor(COLORS.ERROR)
                 .setTimestamp(),
@@ -176,7 +171,7 @@ async function takeAction(guild, member, message, strikeCount, action) {
           })
           .catch(() => {});
         await member
-          .ban({ reason: "Foul language — Strike 2+", deleteMessageSeconds: 60 })
+          .ban({ reason: MESSAGES.MODERATION.BAN_REASON.replace("%STRIKE%", strikeCount), deleteMessageSeconds: 60 })
           .catch(() => {});
         break;
     }
@@ -186,17 +181,17 @@ async function takeAction(guild, member, message, strikeCount, action) {
 
   // Log to #server-logs
   const logEmbed = new EmbedBuilder()
-    .setTitle("🚨 Auto-Moderation")
+    .setTitle(MESSAGES.MODERATION.LOG_TITLE)
     .addFields(
       { name: "User", value: `${user.tag} (<@${user.id}>)`, inline: true },
-      { name: "Action", value: actionText, inline: true },
+      { name: "Action", value: action === "warn" ? MESSAGES.MODERATION.LOG_ACTION_WARN : MESSAGES.MODERATION.LOG_ACTION_BAN, inline: true },
       { name: "Strikes", value: `${strikeCount}`, inline: true },
       { name: "Channel", value: `#${message.channel.name}`, inline: true }
     )
     .setColor(actionColor)
     .setTimestamp();
 
-  await logToChannel(guild, "server-logs", logEmbed);
+  await logToChannel(guild, CHANNELS.SERVER_LOGS, logEmbed);
 }
 
 module.exports = { filterMessage, getStrikes, addStrike, BLOCKED_WORDS };

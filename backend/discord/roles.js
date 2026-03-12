@@ -1,20 +1,6 @@
-/**
- * Discord Roles Module
- * Creates server roles and auto-assigns "User" role on member join.
- */
-
 const { EmbedBuilder } = require("discord.js");
 const { logServerEvent } = require("./logger");
-
-// Roles to create (ordered by hierarchy — highest first)
-const ROLE_DEFINITIONS = [
-  { name: "Admin",     color: 0xe74c3c, hoist: true, permissions: ["Administrator"] },
-  { name: "Moderator", color: 0xe67e22, hoist: true, permissions: ["KickMembers", "BanMembers", "ManageMessages", "MuteMembers"] },
-  { name: "Developer", color: 0x3498db, hoist: true, permissions: ["ManageChannels", "ManageMessages"] },
-  { name: "Support",   color: 0x2ecc71, hoist: true, permissions: ["ManageMessages"] },
-  { name: "User",      color: 0x95a5a6, hoist: false, permissions: ["SendMessages", "ReadMessageHistory", "ViewChannel"] },
-  { name: "Bot",       color: 0x9b59b6, hoist: true, permissions: ["SendMessages", "ManageMessages", "EmbedLinks", "AttachFiles", "ReadMessageHistory", "ViewChannel"] },
-];
+const { ROLES: ROLE_DEFINITIONS } = require("./config");
 
 /**
  * Create all required roles in a guild. Skips if role already exists.

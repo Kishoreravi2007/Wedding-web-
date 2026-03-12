@@ -27,6 +27,7 @@ const { autoAssignUser } = require("./roles");
 const { logMemberJoin, logMemberLeave, logError, COLORS } = require("./logger");
 const { registerCommands, handleInteraction } = require("./commands");
 const { filterMessage } = require("./moderation");
+const { CONFIG, CHANNELS, MESSAGES } = require("./config");
 
 // ═══════════════════════════════════════════
 // Client Initialization
@@ -59,8 +60,8 @@ client.once("ready", async () => {
   client.user.setPresence({
     activities: [
       {
-        name: "your server | WeddingWeb AI",
-        type: ActivityType.Watching,
+        name: CONFIG.PRESENCE.ACTIVITY,
+        type: ActivityType[CONFIG.PRESENCE.TYPE],
       },
     ],
     status: "online",
@@ -74,7 +75,7 @@ client.once("ready", async () => {
     console.log(`🔄 [Boot] Verifying setup for existing guild: ${guild.name}`);
     // Only run setup if #server-logs doesn't exist (first time)
     const hasSetup = guild.channels.cache.find(
-      (ch) => ch.name === "server-logs"
+      (ch) => ch.name === CHANNELS.SERVER_LOGS
     );
     if (!hasSetup) {
       await runSetup(guild);
@@ -135,19 +136,25 @@ client.on("guildMemberAdd", async (member) => {
 
     if (generalChannel) {
       const welcomeEmbed = new EmbedBuilder()
-        .setTitle("🎉 Welcome to the Server!")
+        .setTitle(MESSAGES.WELCOME.TITLE)
         .setDescription(
-          `Hey <@${member.id}>, welcome to **${member.guild.name}**!\n\n` +
-          `We're glad to have you here. Here are some tips to get started:\n\n` +
-          `📢 Check out <#${member.guild.channels.cache.find((ch) => ch.name === "announcements")?.id || "announcements"}> for the latest news\n` +
-          `📜 Read the <#${member.guild.channels.cache.find((ch) => ch.name === "rules")?.id || "rules"}> to stay on track\n` +
-          `💬 Say hi in this channel!\n` +
-          `🎫 Need help? Use \`/ticket\` to open a support ticket`
+          MESSAGES.WELCOME.DESCRIPTION
+            .replace("%USER_ID%", member.id)
+            .replace("%GUILD_NAME%", member.guild.name) + "\n\n" +
+          MESSAGES.WELCOME.TIPS.map(tip => {
+            let t = tip;
+            if (t.includes("%ANN_ID%")) t = t.replace("%ANN_ID%", member.guild.channels.cache.find(ch => ch.name === CHANNELS.ANNOUNCEMENTS)?.id || CHANNELS.ANNOUNCEMENTS);
+            if (t.includes("%RULES_ID%")) t = t.replace("%RULES_ID%", member.guild.channels.cache.find(ch => ch.name === CHANNELS.RULES)?.id || CHANNELS.RULES);
+            return t;
+          }).join("\n")
         )
         .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
         .setColor(COLORS.SUCCESS)
         .setTimestamp()
-        .setFooter({ text: "WeddingWeb AI — Member #" + member.guild.memberCount });
+        .setFooter({ text: MESSAGES.WELCOME.FOOTER
+          .replace("%BOT_NAME%", CONFIG.BOT_NAME)
+          .replace("%COUNT%", member.guild.memberCount) 
+        });
 
       await generalChannel.send({ embeds: [welcomeEmbed] });
     }
