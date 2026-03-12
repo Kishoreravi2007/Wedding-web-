@@ -40,6 +40,9 @@ steps:
       - '512Mi'
       - '--update-env-vars'
       - 'NODE_ENV=production'
+      - '--no-cpu-throttling'
+      - '--min-instances'
+      - '1'
     waitFor: ['push-backend']
 
 images:
