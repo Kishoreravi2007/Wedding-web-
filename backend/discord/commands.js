@@ -76,83 +76,98 @@ async function registerCommands() {
 // ═══════════════════════════════════════════
 
 async function handleStatusCommand(interaction) {
-  await interaction.deferReply();
+  try {
+    await interaction.deferReply();
 
-  const checks = [
-    {
-      name: "🌐 Website",
-      url: process.env.WEBSITE_URL || process.env.FRONTEND_URL,
-    },
-    {
-      name: "⚙️ API",
-      url: process.env.BACKEND_URL
-        ? `${process.env.BACKEND_URL}/api/health`
-        : null,
-    },
-    {
-      name: "🔥 Firebase",
-      url: `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID || "default"}/databases/(default)/documents`,
-    },
-    {
-      name: "☁️ GCP",
-      url: "https://cloud.google.com",
-    },
-  ];
+    const checks = [
+      {
+        name: "🌐 Website",
+        url: process.env.WEBSITE_URL || process.env.FRONTEND_URL,
+      },
+      {
+        name: "⚙️ API",
+        url: process.env.BACKEND_URL
+          ? `${process.env.BACKEND_URL}/health`
+          : `http://localhost:${process.env.PORT || 5002}/health`,
+      },
+      {
+        name: "🔥 Firebase",
+        url: `https://firestore.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID || "kishore-75492"}/databases/(default)/documents`,
+      },
+      {
+        name: "☁️ GCP",
+        url: "https://cloud.google.com",
+      },
+    ];
 
-  const results = [];
+    const results = [];
 
-  for (const check of checks) {
-    if (!check.url) {
-      results.push({
-        name: check.name,
-        status: MESSAGES.STATUS.NOT_CONFIGURED,
-        latency: "—",
-      });
-      continue;
+    for (const check of checks) {
+      if (!check.url) {
+        results.push({
+          name: check.name,
+          status: MESSAGES.STATUS.NOT_CONFIGURED,
+          latency: "—",
+        });
+        continue;
+      }
+
+      try {
+        const start = Date.now();
+        const response = await axios.get(check.url, {
+          timeout: 10000,
+          validateStatus: () => true, // Accept any status code
+        });
+        const latency = Date.now() - start;
+
+        const isUp = response.status >= 200 && response.status < 400;
+        results.push({
+          name: check.name,
+          status: isUp ? MESSAGES.STATUS.ONLINE : `🟡 HTTP ${response.status}`,
+          latency: `${latency}ms`,
+        });
+      } catch (error) {
+        results.push({
+          name: check.name,
+          status: MESSAGES.STATUS.OFFLINE,
+          latency: error.code || error.message,
+        });
+      }
     }
 
-    try {
-      const start = Date.now();
-      const response = await axios.get(check.url, {
-        timeout: 10000,
-        validateStatus: () => true, // Accept any status code
-      });
-      const latency = Date.now() - start;
+    const embed = new EmbedBuilder()
+      .setTitle(MESSAGES.STATUS.TITLE)
+      .setDescription(MESSAGES.STATUS.DESC)
+      .addFields(
+        results.map((r) => ({
+          name: r.name,
+          value: `${r.status}\n⏱️ ${r.latency}`,
+          inline: true,
+        }))
+      )
+      .setColor(
+        results.every((r) => r.status.includes(MESSAGES.STATUS.ONLINE))
+          ? COLORS.SUCCESS
+          : COLORS.WARNING
+      )
+      .setTimestamp()
+      .setFooter({ text: CONFIG.BOT_NAME });
 
-      const isUp = response.status >= 200 && response.status < 400;
-      results.push({
-        name: check.name,
-        status: isUp ? MESSAGES.STATUS.ONLINE : `🟡 HTTP ${response.status}`,
-        latency: `${latency}ms`,
+    await interaction.editReply({ embeds: [embed] });
+  } catch (error) {
+    console.error("❌ [Status] Unhandled command error:", error);
+    if (interaction.deferred || interaction.replied) {
+      await interaction.editReply({
+        content: "❌ An error occurred while checking system status.",
+        embeds: [],
       });
-    } catch (error) {
-      results.push({
-        name: check.name,
-        status: MESSAGES.STATUS.OFFLINE,
-        latency: error.code || error.message,
+    } else {
+      await interaction.reply({
+        content: "❌ An error occurred while checking system status.",
+        ephemeral: true,
       });
     }
   }
-
-  const embed = new EmbedBuilder()
-    .setTitle(MESSAGES.STATUS.TITLE)
-    .setDescription(MESSAGES.STATUS.DESC)
-    .addFields(
-      results.map((r) => ({
-        name: r.name,
-        value: `${r.status}\n⏱️ ${r.latency}`,
-        inline: true,
-      }))
-    )
-    .setColor(
-      results.every((r) => r.status.includes(MESSAGES.STATUS.ONLINE))
-        ? COLORS.SUCCESS
-        : COLORS.WARNING
-    )
-    .setTimestamp()
-    .setFooter({ text: CONFIG.BOT_NAME });
-
-  await interaction.editReply({ embeds: [embed] });
 }
 
 // ═══════════════════════════════════════════

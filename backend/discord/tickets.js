@@ -151,7 +151,7 @@ async function handleTicketSelect(interaction) {
 
     // Reply to user
     await interaction.update({
-      content: MESSAGES.TICKETS.REPLY_CREATED.replace("%CHANNEL_ID%", ticketChannel.id),
+      content: MESSAGES.TICKETS.REPLY_CREATED.replace("%CHANNEL_ID%", ticketChannel),
       embeds: [],
       components: [],
     });
