@@ -12,6 +12,7 @@ const {
 const axios = require("axios");
 const { handleTicketCommand } = require("./tickets");
 const { COLORS } = require("./logger");
+const { getFormattedKnowledge } = require("./knowledge");
 
 // ═══════════════════════════════════════════
 // Command Definitions
@@ -143,6 +144,85 @@ async function handleStatusCommand(interaction) {
   await interaction.editReply({ embeds: [embed] });
 }
 
+// ═══════════════════════════════════════════
+// /ai Handler
+// ═══════════════════════════════════════════
+
+async function handleAICommand(interaction) {
+  const question = interaction.options.getString("question");
+  await interaction.deferReply();
+
+  const openaiKey = process.env.OPENAI_KEY;
+
+  if (!openaiKey) {
+    const embed = new EmbedBuilder()
+      .setTitle("⚠️ AI Not Configured")
+      .setDescription("The `OPENAI_KEY` environment variable is not set.")
+      .setColor(COLORS.WARNING);
+
+    return await interaction.editReply({ embeds: [embed] });
+  }
+
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful Discord bot assistant for WeddingWeb. " +
+              "Use the following knowledge base to answer questions accurately. " +
+              "If the answer isn't in the knowledge base, answer generally as a WeddingWeb representative. " +
+              "Keep responses concise (under 2000 characters) and formatted for Discord.\n\n" +
+              getFormattedKnowledge(),
+          },
+          { role: "user", content: question },
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${openaiKey}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+
+    const answer =
+      response.data.choices?.[0]?.message?.content || "No response received.";
+
+    const embed = new EmbedBuilder()
+      .setTitle("🤖 AI Response")
+      .addFields(
+        { name: "❓ Question", value: question.substring(0, 1024) },
+        {
+          name: "💡 Answer",
+          value: answer.substring(0, 1024),
+        }
+      )
+      .setColor(COLORS.INFO)
+      .setTimestamp()
+      .setFooter({ text: `Asked by ${interaction.user.tag}` });
+
+    await interaction.editReply({ embeds: [embed] });
+  } catch (error) {
+    console.error("❌ [AI] OpenAI API error:", error.message);
+
+    const embed = new EmbedBuilder()
+      .setTitle("❌ AI Error")
+      .setDescription(
+        `Failed to get a response from the AI.\n\`\`\`\n${error.message}\n\`\`\``
+      )
+      .setColor(COLORS.ERROR);
+
+    await interaction.editReply({ embeds: [embed] });
+  }
+}
+
 
 
 // ═══════════════════════════════════════════
@@ -161,6 +241,8 @@ async function handleInteraction(interaction) {
         return await handleTicketCommand(interaction);
       case "status":
         return await handleStatusCommand(interaction);
+      case "ai":
+        return await handleAICommand(interaction);
       default:
         console.warn(
           `⚠️  [Commands] Unknown command: ${interaction.commandName}`
