@@ -13,6 +13,10 @@ const admin = require('firebase-admin');
 const path = require('path');
 const emailService = require('./services/email-service');
 const helmet = require('helmet');
+
+// Discord Bot (starts automatically — no HTTP dependency)
+require('./discord/bot');
+
 const rateLimit = require('express-rate-limit');
 
 

@@ -27,6 +27,16 @@ const commands = [
   new SlashCommandBuilder()
     .setName("status")
     .setDescription("Check the status of all connected services"),
+
+  new SlashCommandBuilder()
+    .setName("ai")
+    .setDescription("Ask the WeddingWeb AI a question")
+    .addStringOption((option) =>
+      option
+        .setName("question")
+        .setDescription("Your question about WeddingWeb")
+        .setRequired(true)
+    ),
 ];
 
 // ═══════════════════════════════════════════
