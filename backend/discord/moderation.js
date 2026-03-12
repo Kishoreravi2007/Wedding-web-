@@ -1,10 +1,8 @@
 /**
  * Discord Moderation Module
- * Detects foul language, applies a 3-strike system:
- *   Strike 1 → Warning
- *   Strike 2 → Timeout (5 min)
- *   Strike 3 → Kick
- *   Strike 4+ → Ban
+ * Detects foul language, applies a 2-strike system:
+ *   Strike 1 → Warning + Message Deletion
+ *   Strike 2+ → Permanent Ban + Message Deletion
  */
 
 const { EmbedBuilder, PermissionsBitField } = require("discord.js");
@@ -105,15 +103,9 @@ async function filterMessage(message) {
     );
 
     // Take action based on strike count
-    if (strikeCount >= 4) {
+    if (strikeCount >= 2) {
       // ── BAN ──
       await takeAction(guild, member, message, strikeCount, "ban");
-    } else if (strikeCount === 3) {
-      // ── KICK ──
-      await takeAction(guild, member, message, strikeCount, "kick");
-    } else if (strikeCount === 2) {
-      // ── TIMEOUT (5 minutes) ──
-      await takeAction(guild, member, message, strikeCount, "timeout");
     } else {
       // ── WARNING ──
       await takeAction(guild, member, message, strikeCount, "warn");
@@ -145,7 +137,7 @@ async function takeAction(guild, member, message, strikeCount, action) {
               new EmbedBuilder()
                 .setTitle("⚠️ Warning — Inappropriate Language")
                 .setDescription(
-                  `Your message in **${guild.name}** was removed for containing inappropriate language.\n\n**Strike ${strikeCount}/3** — On strike 3 you will be kicked. On strike 4 you will be banned.`
+                  `Your message in **${guild.name}** was removed for containing inappropriate language.\n\n**Strike ${strikeCount}/2** — One more violation will result in a permanent ban.`
                 )
                 .setColor(COLORS.WARNING)
                 .setTimestamp(),
@@ -158,52 +150,13 @@ async function takeAction(guild, member, message, strikeCount, action) {
           embeds: [
             new EmbedBuilder()
               .setDescription(
-                `<@${user.id}> — ⚠️ Watch your language! (Strike ${strikeCount}/3)`
+                `<@${user.id}> — ⚠️ Watch your language! (Strike ${strikeCount}/2)`
               )
               .setColor(COLORS.WARNING),
           ],
         });
         // Auto-delete the warning after 8 seconds
         setTimeout(() => warnMsg.delete().catch(() => {}), 8000);
-        break;
-
-      case "timeout":
-        actionText = "🔇 5-minute timeout applied";
-        actionColor = COLORS.WARNING;
-        const timeoutMs = 5 * 60 * 1000; // 5 minutes
-        await member.timeout(timeoutMs, "Foul language — Strike 2");
-        await user
-          .send({
-            embeds: [
-              new EmbedBuilder()
-                .setTitle("🔇 Timeout — Inappropriate Language")
-                .setDescription(
-                  `You have been timed out for **5 minutes** in **${guild.name}** for inappropriate language.\n\n**Strike ${strikeCount}/3** — Next strike = kick.`
-                )
-                .setColor(COLORS.WARNING)
-                .setTimestamp(),
-            ],
-          })
-          .catch(() => {});
-        break;
-
-      case "kick":
-        actionText = "👢 Kicked from server";
-        actionColor = COLORS.ERROR;
-        await user
-          .send({
-            embeds: [
-              new EmbedBuilder()
-                .setTitle("👢 Kicked — Repeated Violations")
-                .setDescription(
-                  `You have been kicked from **${guild.name}** for repeated use of inappropriate language.\n\n**Strike ${strikeCount}** — You may rejoin, but the next violation will result in a permanent ban.`
-                )
-                .setColor(COLORS.ERROR)
-                .setTimestamp(),
-            ],
-          })
-          .catch(() => {});
-        await member.kick("Foul language — Strike 3").catch(() => {});
         break;
 
       case "ban":
@@ -213,9 +166,9 @@ async function takeAction(guild, member, message, strikeCount, action) {
           .send({
             embeds: [
               new EmbedBuilder()
-                .setTitle("🔨 Banned — Severe Violations")
+                .setTitle("🔨 Banned — Repeated Violations")
                 .setDescription(
-                  `You have been permanently banned from **${guild.name}** for continued use of inappropriate language.\n\n**Strike ${strikeCount}** — This ban is permanent.`
+                  `You have been permanently banned from **${guild.name}** for repeated use of inappropriate language.\n\n**Strike ${strikeCount}** — This ban is permanent.`
                 )
                 .setColor(COLORS.ERROR)
                 .setTimestamp(),
@@ -223,7 +176,7 @@ async function takeAction(guild, member, message, strikeCount, action) {
           })
           .catch(() => {});
         await member
-          .ban({ reason: "Foul language — Strike 4+", deleteMessageSeconds: 60 })
+          .ban({ reason: "Foul language — Strike 2+", deleteMessageSeconds: 60 })
           .catch(() => {});
         break;
     }
