@@ -147,6 +147,27 @@ const MESSAGES = {
     LEAVE_TITLE: "🚪 Member Left",
     LEAVE_DESC: "%TAG% left the server.",
     ERROR_FOOTER: "WeddingWeb AI Error Log"
+  },
+  COMMUNITY: {
+    RULES_TITLE: "📝 Server Rules & Guidelines",
+    RULES_DESC: "Welcome to the WeddingWeb Official Discord! Please follow these rules to ensure a helpful and friendly environment for everyone:",
+    RULES_LIST: [
+      "1️⃣ **Be Respectful**: Treat all members with kindness. No harassment, hate speech, or bullying.",
+      "2️⃣ **No Spam**: Avoid excessive tagging, cap-locks, or repetitive messages.",
+      "3️⃣ **Stay On Topic**: Use the correct channels for your discussions (e.g., #support-chat for help).",
+      "4️⃣ **No NSFW Content**: This is a professional and family-friendly community.",
+      "5️⃣ **Moderator/Admin Authority**: Follow the instructions of staff members at all times.",
+      "6️⃣ **Privacy First**: Do not share personal information or private wedding details in public channels."
+    ],
+    ANN_TITLE: "🚀 Welcome to WeddingWeb AI!",
+    ANN_DESC: "We are thrilled to launch our automated Discord community! This server is powered by **WeddingWeb AI** to help you plan your special day seamlessly.",
+    ANN_FEATURES: [
+      "✨ **AI Assistance**: Use `/ai` to ask questions about our platform.",
+      "🎫 **Smart Tickets**: Need support? Use `/ticket` for a private support session.",
+      "📊 **System Status**: Check our services anytime with `/status`.",
+      "🛡️ **Auto-Moderation**: A safe environment secured by our 2-strike policy."
+    ],
+    ANN_FOOTER: "Thank you for being part of the future of wedding planning! — The WeddingWeb Team"
   }
 };
 

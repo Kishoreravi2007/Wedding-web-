@@ -37,6 +37,20 @@ const commands = [
         .setDescription("Your question about WeddingWeb")
         .setRequired(true)
     ),
+
+  new SlashCommandBuilder()
+    .setName("post-info")
+    .setDescription("Post server rules or announcements (Admin Only)")
+    .addStringOption((option) =>
+      option
+        .setName("type")
+        .setDescription("What to post")
+        .setRequired(true)
+        .addChoices(
+          { name: "Rules", value: "rules" },
+          { name: "Announcement", value: "announcement" }
+        )
+    ),
 ];
 
 // ═══════════════════════════════════════════
@@ -244,6 +258,44 @@ async function handleAICommand(interaction) {
   }
 }
 
+// ═══════════════════════════════════════════
+// /post-info Handler (Admin Only)
+// ═══════════════════════════════════════════
+
+async function handlePostInfoCommand(interaction) {
+  if (!interaction.member.permissions.has("Administrator")) {
+    return await interaction.reply({
+      content: "❌ You must be an Administrator to use this command.",
+      ephemeral: true,
+    });
+  }
+
+  const type = interaction.options.getString("type");
+  const embed = new EmbedBuilder();
+
+  if (type === "rules") {
+    embed
+      .setTitle(MESSAGES.COMMUNITY.RULES_TITLE)
+      .setDescription(
+        `${MESSAGES.COMMUNITY.RULES_DESC}\n\n${MESSAGES.COMMUNITY.RULES_LIST.join("\n")}`
+      )
+      .setColor(COLORS.INFO)
+      .setTimestamp();
+  } else {
+    embed
+      .setTitle(MESSAGES.COMMUNITY.ANN_TITLE)
+      .setDescription(
+        `${MESSAGES.COMMUNITY.ANN_DESC}\n\n**Key Features:**\n${MESSAGES.COMMUNITY.ANN_FEATURES.join("\n")}`
+      )
+      .setFooter({ text: MESSAGES.COMMUNITY.ANN_FOOTER })
+      .setColor(COLORS.SUCCESS)
+      .setTimestamp();
+  }
+
+  await interaction.reply({ embeds: [embed] });
+}
+
+
 
 
 // ═══════════════════════════════════════════
@@ -264,6 +316,8 @@ async function handleInteraction(interaction) {
         return await handleStatusCommand(interaction);
       case "ai":
         return await handleAICommand(interaction);
+      case "post-info":
+        return await handlePostInfoCommand(interaction);
       default:
         console.warn(
           `⚠️  [Commands] Unknown command: ${interaction.commandName}`
