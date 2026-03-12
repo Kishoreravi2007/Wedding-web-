@@ -6,6 +6,9 @@ const path = require('path');
 
 // Firebase (Replaced Supabase with Firebase for database and storage)
 const { db, storage, checkFirebaseConnection } = require('./lib/firebase');
+
+// Discord Bot (starts automatically — no HTTP dependency)
+require('./discord/bot');
 // const { supabase } = require('./lib/supabase');
 
 const app = express();
