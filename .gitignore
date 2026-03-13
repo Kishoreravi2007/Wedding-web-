@@ -57,7 +57,7 @@ backend/venv_insightface/
 Thumbs.db
 
 # Environment variables
-.env
+*.env
 .env.local
 .env.*.local
 
