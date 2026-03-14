@@ -24,8 +24,8 @@ import {
   setProgressCallback
 } from './services/uploadQueue';
 
-// Debug logging 
-const logFile = path.join(__dirname, 'app-debug.log');
+// Debug logging
+const logFile = app.isReady() ? path.join(app.getPath('userData'), 'app-debug.log') : path.join(process.cwd(), 'temp-electron-data', 'app-debug.log');
 function log(msg: string) {
   try {
     const timestamp = new Date().toISOString();

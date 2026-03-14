@@ -1,7 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const logFile = path.join(__dirname, 'electron-debug.log');
+const { app } = require('electron');
 
+// Use userData path instead of __dirname, since __dirname is inside a read-only asar in production
+const userDataPath = app ? app.getPath('userData') : path.join(process.env.APPDATA || process.env.HOME || '.', 'WeddingWeb Desktop');
+if (!fs.existsSync(userDataPath)) {
+    fs.mkdirSync(userDataPath, { recursive: true });
+}
+
+const logFile = path.join(userDataPath, 'electron-debug.log');
 function log(msg) {
     const timestamp = new Date().toISOString();
     fs.appendFileSync(logFile, `[${timestamp}] ${msg}\n`);
