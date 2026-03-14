@@ -25,7 +25,7 @@ interface AppConfig {
 const getConfigFile = () => path.join(app.getPath('userData'), 'config.json');
 
 const DEFAULT_CONFIG: AppConfig = {
-  apiBaseUrl: 'https://backend-w8zt.onrender.com',
+  apiBaseUrl: 'https://wedding-backend-979970479540.asia-south1.run.app',
   compressImages: false,
   maxRetries: 3,
   cameraMode: 'hot-folder',

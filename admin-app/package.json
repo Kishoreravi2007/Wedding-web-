@@ -35,11 +35,7 @@
       "createStartMenuShortcut": true,
       "shortcutName": "WeddingWeb Admin",
       "runAfterFinish": true,
-      "deleteAppDataOnUninstall": true,
-      "license": "build/license.txt",
-      "installerHeaderIcon": "public/logo.png",
-      "installerSidebar": "build/installerSidebar.png",
-      "installerHeader": "build/installerHeader.png"
+      "deleteAppDataOnUninstall": true
     }
   },
   "dependencies": {
