@@ -15,6 +15,8 @@ import {
   X
 } from 'lucide-react';
 import { API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { PortalLayout } from './PortalLayout';
 import { showSuccess } from '@/utils/toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,7 +36,9 @@ interface PhotoManagerProps {
   weddingId?: string;
 }
 
-const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
+const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId: propWeddingId }) => {
+  const { currentUser } = useAuth();
+  const weddingId = propWeddingId || currentUser?.wedding_id;
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -315,128 +319,130 @@ const PhotoManager: React.FC<PhotoManagerProps> = ({ weddingId }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold">Photo Management</h1>
-            <p className="text-gray-600">View, download, and manage all wedding photos</p>
-          </div>
-          <Button onClick={loadPhotos} variant="outline" size="sm">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
-
-        {/* Search */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            placeholder="Search photos by filename..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
-      {/* Gallery */}
-      <div className="max-w-7xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Wedding Photos</span>
-              <Badge variant="outline">{filteredPhotos.length} photos</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {filteredPhotos.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>No photos found</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <AnimatePresence>
-                  {filteredPhotos.map(renderPhotoCard)}
-                </AnimatePresence>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Photo Viewer Modal */}
-      <AnimatePresence>
-        {selectedPhoto && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedPhoto(null)}
-          >
-            <Button
-              onClick={() => setSelectedPhoto(null)}
-              variant="ghost"
-              size="sm"
-              className="absolute top-4 right-4 text-white hover:bg-white/20"
-            >
-              <X className="w-6 h-6" />
+    <PortalLayout>
+      <div className="min-h-screen bg-gray-50 p-6">
+        {/* Header */}
+        <div className="max-w-7xl mx-auto mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold">Photo Management</h1>
+              <p className="text-gray-600">View, download, and manage all wedding photos</p>
+            </div>
+            <Button onClick={loadPhotos} variant="outline" size="sm">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
             </Button>
+          </div>
 
-            <motion.div
-              className="max-w-5xl max-h-[90vh]"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={selectedPhoto.url}
-                alt={selectedPhoto.filename}
-                className="max-w-full max-h-[80vh] object-contain rounded-lg"
-              />
-              <div className="bg-black/80 text-white p-4 mt-2 rounded-lg">
-                <h3 className="font-semibold mb-2">{selectedPhoto.filename}</h3>
-                <p className="text-sm text-gray-300">Size: {formatFileSize(selectedPhoto.size)}</p>
-                <p className="text-sm text-gray-300">Uploaded: {formatDate(selectedPhoto.uploadedAt)}</p>
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    onClick={() => window.open(selectedPhoto.url, '_blank')}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Open in New Tab
-                  </Button>
-                  <Button
-                    onClick={() => handleDownloadPhoto(selectedPhoto)}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      handleDeletePhoto(selectedPhoto);
-                      setSelectedPhoto(null);
-                    }}
-                    variant="destructive"
-                    size="sm"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
+          {/* Search */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search photos by filename..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Gallery */}
+        <div className="max-w-7xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Wedding Photos</span>
+                <Badge variant="outline">{filteredPhotos.length} photos</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {filteredPhotos.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p>No photos found</p>
                 </div>
-              </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <AnimatePresence>
+                    {filteredPhotos.map(renderPhotoCard)}
+                  </AnimatePresence>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Photo Viewer Modal */}
+        <AnimatePresence>
+          {selectedPhoto && (
+            <motion.div
+              className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedPhoto(null)}
+            >
+              <Button
+                onClick={() => setSelectedPhoto(null)}
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 right-4 text-white hover:bg-white/20"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
+              <motion.div
+                className="max-w-5xl max-h-[90vh]"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={selectedPhoto.url}
+                  alt={selectedPhoto.filename}
+                  className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                />
+                <div className="bg-black/80 text-white p-4 mt-2 rounded-lg">
+                  <h3 className="font-semibold mb-2">{selectedPhoto.filename}</h3>
+                  <p className="text-sm text-gray-300">Size: {formatFileSize(selectedPhoto.size)}</p>
+                  <p className="text-sm text-gray-300">Uploaded: {formatDate(selectedPhoto.uploadedAt)}</p>
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      onClick={() => window.open(selectedPhoto.url, '_blank')}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Open in New Tab
+                    </Button>
+                    <Button
+                      onClick={() => handleDownloadPhoto(selectedPhoto)}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        handleDeletePhoto(selectedPhoto);
+                        setSelectedPhoto(null);
+                      }}
+                      variant="destructive"
+                      size="sm"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </AnimatePresence>
+      </div>
+    </PortalLayout>
   );
 };
 

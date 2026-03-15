@@ -33,6 +33,8 @@ import PhotoGallery from "./pages/PhotoGallery";
 import SreedeviEngagementVideo from "./pages/sister-b/EngagementVideo";
 
 import PhotographerDashboard from "./pages/photographer/Dashboard";
+import LiveSyncDashboard from "./pages/photographer/LiveSyncDashboard";
+import PhotoManager from "./pages/photographer/PhotoManager";
 import PhotographerLogin from "./pages/photographer/Login";
 import CoupleDashboard from "./pages/couple/Dashboard";
 import CoupleLogin from "./pages/couple/Login";
@@ -298,6 +300,8 @@ const App = () => {
                 {/* Portal Routes */}
                 <Route path="/photographer-login" element={<PhotographerLogin />} />
                 <Route path="/photographer" element={<AuthGuard><PhotographerDashboard /></AuthGuard>} />
+                <Route path="/photographer/live" element={<AuthGuard><LiveSyncDashboard /></AuthGuard>} />
+                <Route path="/photographer/manage" element={<AuthGuard><PhotoManager /></AuthGuard>} />
                 <Route path="/couple-login" element={<CoupleLogin />} />
                 <Route path="/couple" element={<CoupleDashboard />} />
                 <Route path="/feedback" element={<Feedback />} />

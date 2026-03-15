@@ -9,6 +9,8 @@ export const PortalLayout = ({ children }: { children: React.ReactNode }) => {
     // Map navigation items to routes
     const navItems = [
         { label: "Dashboard", href: "/photographer", active: location.pathname === "/photographer" },
+        { label: "Manage Photos", href: "/photographer/manage", active: location.pathname === "/photographer/manage" },
+        { label: "Live Sync", href: "/photographer/live", active: location.pathname === "/photographer/live" },
     ];
 
     return (
