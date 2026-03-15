@@ -174,6 +174,7 @@ const PremiumCheckout = () => {
         currency: response.currency,
         name: "WeddingWeb",
         description: "Premium Website Builder",
+        image: "/logo.png",
         order_id: response.razorpayOrder.id,
         handler: async (payload: any) => {
           await confirmActivation(payload);

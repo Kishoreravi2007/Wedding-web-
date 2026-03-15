@@ -184,11 +184,19 @@ router.post('/social-sync', async (req, res) => {
     }
 
     // Verify token with Supabase
-    const { data: { user: sbUser }, error: sbError } = await supabase.auth.getUser(token);
+    const { data: sbData, error: sbError } = await supabase.auth.getUser(token);
+    const sbUser = sbData?.user;
 
     if (sbError || !sbUser) {
-      console.error('Supabase token verification failed:', sbError);
-      return res.status(401).json({ message: 'Invalid social login session' });
+      console.error('🛡️ Social Sync: Supabase token verification failed:', {
+        error: sbError?.message || sbError,
+        hasUser: !!sbUser,
+        tokenPrefix: token.substring(0, 10) + '...'
+      });
+      return res.status(401).json({ 
+        message: 'Invalid social login session',
+        error: sbError?.message || 'User not found in Supabase'
+      });
     }
 
     const email = sbUser.email.toLowerCase();

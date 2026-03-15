@@ -21,7 +21,7 @@ const Razorpay = require('razorpay');
     try {
         console.log('Attempting to create large order (5,75,253 INR)...');
         const order = await rzp.orders.create({
-            amount: 57525300,
+            amount: 10000,
             currency: 'INR',
             receipt: 'debug_large_test',
             notes: { desc: 'Debug Large Amount' }
