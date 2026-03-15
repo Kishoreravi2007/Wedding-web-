@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart, Search as SearchIcon } from 'lucide-react';
+import { Loader2, Music, Play, Pause, Volume2, MapPin, Heart, Search as SearchIcon, SkipBack, SkipForward } from 'lucide-react';
 import { WeddingTemplate } from '@/components/WeddingTemplate';
 import FaceSearch from '@/components/FaceSearch';
 import { API_BASE_URL } from '@/lib/api';
@@ -18,7 +18,20 @@ import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 
 const WeddingPage = () => {
     const { slug } = useParams();
-    const { setWeddingMusic, isPlaying, togglePlay, volume, setVolume, musicSource, playlistUrl, isLoaded } = useMusicPlayer();
+    const { 
+        setWeddingMusic, 
+        isPlaying, 
+        togglePlay, 
+        volume, 
+        setVolume, 
+        musicSource, 
+        playlistUrl, 
+        isLoaded,
+        goToNextTrack,
+        goToPrevTrack,
+        currentTrackIndex,
+        musicSources
+    } = useMusicPlayer();
     const [weddingData, setWeddingData] = useState<any>(null);
     const [timeline, setTimeline] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -244,20 +257,46 @@ const WeddingPage = () => {
             {/* Floating Music Controls */}
             {weddingData.musicEnabled && (
                 <div className="fixed bottom-4 left-4 z-50 animate-in slide-in-from-bottom-4 duration-500">
-                    {musicSource === 'upload' && weddingData.musicUrl && (
-                        <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-full p-2 pr-4 flex items-center gap-3 border border-rose-100 ring-1 ring-rose-500/10">
-                            <Button
-                                onClick={togglePlay}
-                                size="icon"
-                                className={`rounded-full shadow-md transition-all ${isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-slate-900 hover:bg-slate-800'} text-white w-10 h-10`}
-                            >
-                                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-                            </Button>
+                    {musicSource === 'upload' && musicSources.length > 0 && (
+                        <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-full p-2 pr-4 flex items-center gap-2 border border-rose-100 ring-1 ring-rose-500/10">
+                            <div className="flex items-center gap-1">
+                                {musicSources.length > 1 && (
+                                    <Button
+                                        onClick={goToPrevTrack}
+                                        size="icon"
+                                        variant="ghost"
+                                        className="rounded-full w-8 h-8 text-slate-600 hover:text-rose-500 hover:bg-rose-50"
+                                    >
+                                        <SkipBack className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                
+                                <Button
+                                    onClick={togglePlay}
+                                    size="icon"
+                                    className={`rounded-full shadow-md transition-all ${isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-slate-900 hover:bg-slate-800'} text-white w-10 h-10`}
+                                >
+                                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                                </Button>
+
+                                {musicSources.length > 1 && (
+                                    <Button
+                                        onClick={goToNextTrack}
+                                        size="icon"
+                                        variant="ghost"
+                                        className="rounded-full w-8 h-8 text-slate-600 hover:text-rose-500 hover:bg-rose-50"
+                                    >
+                                        <SkipForward className="w-4 h-4" />
+                                    </Button>
+                                )}
+                            </div>
 
                             <div className="flex flex-col min-w-[100px]">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Music className={`w-3 h-3 ${isPlaying ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`} />
-                                    <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">Our Song</span>
+                                    <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">
+                                        {musicSources[currentTrackIndex]?.title || 'Our Song'}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2 group relative">
                                     <Volume2 className="w-3 h-3 text-slate-400" />

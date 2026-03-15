@@ -278,7 +278,7 @@ export const MusicPlayerProvider: React.FC<MusicPlayerProviderProps> = ({ childr
   const handleError = useCallback(() => {
     setHasError(true);
     setIsLoaded(false);
-    console.log(`Music file not found for track ${currentTrackIndex + 1}. Please add the music files to the public folder.`);
+    console.log(`Music file not found for track ${currentTrackIndex + 1}.`);
   }, [currentTrackIndex]);
 
   const playTrack = useCallback((src: string) => { // Changed to accept src string
