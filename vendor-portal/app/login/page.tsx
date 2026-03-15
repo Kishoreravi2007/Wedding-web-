@@ -25,6 +25,7 @@ export default function LoginPage() {
 
       if (error) throw error;
       
+      router.refresh();
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Failed to login");
