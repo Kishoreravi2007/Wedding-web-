@@ -12,11 +12,17 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAdminModal, setShowAdminModal] = useState(false);
+    const [showVendorModal, setShowVendorModal] = useState(false);
     const [adminForm, setAdminForm] = useState({
         username: '',
         password: '',
         email: '',
         fullName: ''
+    });
+    const [vendorForm, setVendorForm] = useState({
+        fullName: '',
+        email: '',
+        password: ''
     });
 
     useEffect(() => {
@@ -35,6 +41,21 @@ export default function Sidebar() {
             setAdminForm({ username: '', password: '', email: '', fullName: '' });
         } catch (err: any) {
             alert(err.response?.data?.error || "Failed to generate admin");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleGenerateVendor = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsGenerating(true);
+        try {
+            const res = await premiumService.generateVendorCredentials(vendorForm);
+            alert(res.message || "Vendor created successfully!");
+            setShowVendorModal(false);
+            setVendorForm({ fullName: '', email: '', password: '' });
+        } catch (err: any) {
+            alert(err.response?.data?.error || "Failed to generate vendor");
         } finally {
             setIsGenerating(false);
         }
@@ -91,13 +112,22 @@ export default function Sidebar() {
 
             <div className="p-6 mt-auto space-y-4">
                 {(user?.email === 'kishorekailas1@gmail.com') && (
-                    <button
-                        onClick={() => setShowAdminModal(true)}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
-                    >
-                        <span className="material-symbols-outlined !text-sm">shield_person</span>
-                        Spawn Admin
-                    </button>
+                    <div className="flex flex-col gap-2">
+                        <button
+                            onClick={() => setShowAdminModal(true)}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all font-black text-[10px] uppercase tracking-widest"
+                        >
+                            <span className="material-symbols-outlined !text-sm">shield_person</span>
+                            Spawn Admin
+                        </button>
+                        <button
+                            onClick={() => setShowVendorModal(true)}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-secondary/20 text-secondary border border-secondary/30 hover:bg-secondary/30 transition-all font-black text-[10px] uppercase tracking-widest"
+                        >
+                            <span className="material-symbols-outlined !text-sm">storefront</span>
+                            Spawn Vendor
+                        </button>
+                    </div>
                 )}
 
                 <div className="glass-card p-4 rounded-3xl flex items-center gap-3 bg-white/50 dark:!bg-white/5 border border-slate-200 dark:border-transparent">
@@ -189,6 +219,67 @@ export default function Sidebar() {
                                 className="w-full bg-primary text-black font-black py-4 rounded-2xl shadow-neon-blue hover:scale-[1.02] active:scale-[0.98] transition-all text-xs uppercase tracking-[0.2em] transform mt-4 disabled:opacity-50"
                             >
                                 {isGenerating ? 'Compiling Protocol...' : 'Confirm Generation'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {/* Vendor Spawner Modal */}
+            {showVendorModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowVendorModal(false)}></div>
+                    <div className="relative glass-card border border-white/10 p-8 rounded-[2.5rem] w-full max-w-md animate-in zoom-in duration-300 !bg-slate-900 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 className="text-xl font-black text-white tracking-tight">Spawn New Vendor</h2>
+                                <p className="text-[10px] font-black text-secondary uppercase tracking-widest">Vendor Network Protocol</p>
+                            </div>
+                            <button onClick={() => setShowVendorModal(false)} className="size-8 rounded-full hover:bg-white/5 flex items-center justify-center text-slate-400">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleGenerateVendor} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Business/Full Name</label>
+                                <input
+                                    required
+                                    type="text"
+                                    placeholder="e.g. Royal Weddings"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-secondary/30"
+                                    value={vendorForm.fullName}
+                                    onChange={(e) => setVendorForm({ ...vendorForm, fullName: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Vendor Email ID</label>
+                                <input
+                                    required
+                                    type="email"
+                                    placeholder="vendor@example.com"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-secondary/30"
+                                    value={vendorForm.email}
+                                    onChange={(e) => setVendorForm({ ...vendorForm, email: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                                <input
+                                    required
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-sm font-bold text-white outline-none focus:ring-2 focus:ring-secondary/30"
+                                    value={vendorForm.password}
+                                    onChange={(e) => setVendorForm({ ...vendorForm, password: e.target.value })}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isGenerating}
+                                className="w-full bg-secondary text-white font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all text-xs uppercase tracking-[0.2em] transform mt-4 disabled:opacity-50"
+                            >
+                                {isGenerating ? 'Deploying Vendor Profile...' : 'Authorize Vendor'}
                             </button>
                         </form>
                     </div>

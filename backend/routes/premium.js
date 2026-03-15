@@ -581,6 +581,8 @@ router.get('/admins', authenticateToken, async (req, res) => {
   }
 });
 
+const { supabase } = require('../lib/supabase');
+
 /**
  * DELETE ADMIN
  * Restricted to Super Admin only
@@ -611,6 +613,52 @@ router.delete('/admins/:id', authenticateToken, async (req, res) => {
     res.json({ success: true, message: 'Admin deleted successfully' });
   } catch (error) {
     console.error('Error deleting admin:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/premium/generate-vendor-credentials
+ * Generate vendor credentials using Supabase Auth admin API
+ * Restricted to Super Admin only
+ */
+router.post('/generate-vendor-credentials', authenticateToken, async (req, res) => {
+  try {
+    // STRICT SUPER ADMIN ONLY CHECK
+    if (req.user.email !== 'kishorekailas1@gmail.com') {
+      return res.status(403).json({ success: false, error: 'Access denied. Super Admin only.' });
+    }
+
+    const { email, password, fullName } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Email and password are required' });
+    }
+
+    // Create user in Supabase Auth
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: email.toLowerCase(),
+      password: password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName || email.split('@')[0],
+        role: 'vendor'
+      }
+    });
+
+    if (error) {
+      console.error('Supabase Auth error:', error);
+      return res.status(400).json({ success: false, error: error.message });
+    }
+
+    // The DB trigger handle_new_vendor will automatically insert into public.vendors table
+    
+    res.json({
+      success: true,
+      message: `Vendor '${email}' credentials generated successfully.`,
+      user: data.user
+    });
+  } catch (error) {
+    console.error('Error generating vendor credentials:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
