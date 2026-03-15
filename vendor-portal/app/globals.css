@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1754cf;
+  --color-background-light: #f6f6f8;
+  --color-background-dark: #111621;
+  --font-display: "Manrope", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background-light);
+    color: #0f172a; /* text-slate-900 */
+    font-family: var(--font-display);
+    margin: 0;
+  }
+
+  .dark body {
+    background-color: var(--color-background-dark);
+    color: #f1f5f9; /* text-slate-100 */
+  }
+}

@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env*
+!.env.production
+Dockerfile
+README.md
+setup-db.js
+stitch_screens

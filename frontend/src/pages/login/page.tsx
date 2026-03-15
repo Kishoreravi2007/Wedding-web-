@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 
 const LoginPage = () => {
-  const [userType, setUserType] = useState<'couple' | 'photographer'>('couple');
+  const [userType, setUserType] = useState<'couple' | 'photographer' | 'vendor'>('couple');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +54,9 @@ const LoginPage = () => {
   };
 
 
-  const from = (location.state as any)?.from?.pathname || (userType === 'photographer' ? '/photographer' : '/company');
+  const from = (location.state as any)?.from?.pathname || 
+    (userType === 'photographer' ? '/photographer' : 
+     userType === 'vendor' ? '/vendor-portal/dashboard' : '/company');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +72,9 @@ const LoginPage = () => {
         navigate('/photographer');
       } else if (user.role === 'admin') {
         navigate('/admin/dashboard');
+      } else if (user.role === 'vendor' || userType === 'vendor') {
+        // Redirect to the new vendor portal
+        window.location.href = '/vendor-portal/dashboard';
       } else {
         // Default to company dashboard as requested
         navigate('/company');
@@ -142,21 +147,30 @@ const LoginPage = () => {
             <div className="flex p-1 bg-background-light dark:bg-slate-800/50 rounded-xl mb-8">
               <button
                 onClick={() => setUserType('couple')}
-                className={`flex-1 py-2.5 px-4 text-sm font-semibold rounded-lg transition-all duration-200 ${userType === 'couple'
+                className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition-all duration-200 ${userType === 'couple'
                   ? 'bg-white dark:bg-primary shadow-sm text-primary dark:text-white'
                   : 'text-[#636f88] dark:text-slate-400 hover:text-primary'
                   }`}
               >
-                Couple Login
+                Couple
               </button>
               <button
                 onClick={() => setUserType('photographer')}
-                className={`flex-1 py-2.5 px-4 text-sm font-semibold rounded-lg transition-all duration-200 ${userType === 'photographer'
+                className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition-all duration-200 ${userType === 'photographer'
                   ? 'bg-white dark:bg-primary shadow-sm text-primary dark:text-white'
                   : 'text-[#636f88] dark:text-slate-400 hover:text-primary'
                   }`}
               >
                 Photographer
+              </button>
+              <button
+                onClick={() => setUserType('vendor')}
+                className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition-all duration-200 ${userType === 'vendor'
+                  ? 'bg-white dark:bg-primary shadow-sm text-primary dark:text-white'
+                  : 'text-[#636f88] dark:text-slate-400 hover:text-primary'
+                  }`}
+              >
+                Vendor Partner
               </button>
             </div>
 
@@ -164,7 +178,8 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-[#111318] dark:text-slate-200 mb-2" htmlFor="email">
-                  {userType === 'photographer' ? 'Username or Email' : 'Email Address'}
+                  {userType === 'photographer' ? 'Username or Email' : 
+                   userType === 'vendor' ? 'Professional Email' : 'Email Address'}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -172,7 +187,10 @@ const LoginPage = () => {
                     id="email"
                     type="text"
                     className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
-                    placeholder={userType === 'photographer' ? "photographer_id" : "name@example.com"}
+                    placeholder={
+                      userType === 'photographer' ? "photographer_id" : 
+                      userType === 'vendor' ? "vendor@example.com" : "name@example.com"
+                    }
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

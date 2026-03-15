@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Wedding Web <span class="text-primary">Portal</span></h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="hidden md:flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden md:block mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold">Alex Rivers</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Senior Vendor</p>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="Professional profile headshot of a vendor administrator" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBl4o284PpV7iRoC1m6u7-1Cf4pKAD3LGu2A_zz-DdHKVfmyyt7jVde7aUEOIiQ-Vb_uG9jXhLI1UJaGNs-vDuLx0LJGrgaq3tjk8guQ9siTXcZ4Fvk_CTI8f53qsvaqWKcG9ilOB9bqKiLHcRRBxwpzkoqHWbn8B8ilvnc2xYRVmQXGxjSQuviRnEEfVXE1C72pWl7VzOG54rAcXvtvrm-ZB88V1jux_Bfxoa_v2UyGx3MrYdZe-O0PbmB20OPsvQ-05qrFAsfqw2d");'></div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center py-10 px-4">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 w-full max-w-2xl">
+<span class="material-symbols-outlined text-sm">home</span>
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Customers</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-100 font-medium">Add New Customer</span>
+</nav>
+<!-- Form Card -->
+<div class="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-xl shadow-primary/5 border border-slate-200 dark:border-slate-800 overflow-hidden">
+<!-- Card Header -->
+<div class="px-8 pt-8 pb-6 border-b border-slate-100 dark:border-slate-800 relative">
+<div class="absolute top-0 right-0 p-8 text-primary/10">
+<span class="material-symbols-outlined text-6xl">person_add</span>
+</div>
+<h1 class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Create Customer Profile</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Enter the client details to begin their wedding journey.</p>
+</div>
+<!-- Form Content -->
+<form class="p-8 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Full Name -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">person</span> Full Name
+                                </label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all placeholder:text-slate-400" placeholder="e.g. Sarah Johnson" type="text"/>
+</div>
+<!-- Phone Number -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">call</span> Phone Number
+                                </label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all placeholder:text-slate-400" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<!-- Email Address -->
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">mail</span> Email Address
+                                </label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all placeholder:text-slate-400" placeholder="sarah.johnson@example.com" type="email"/>
+</div>
+<!-- Wedding Date -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">calendar_today</span> Wedding Date
+                                </label>
+<div class="relative">
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all text-slate-600 dark:text-slate-400" type="date"/>
+</div>
+</div>
+<!-- Package Selection -->
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">inventory_2</span> Package Selection
+                                </label>
+<select class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all text-slate-600 dark:text-slate-400">
+<option disabled="" selected="" value="">Select a package</option>
+<option value="essential">Essential - Day Coordination</option>
+<option value="premium">Premium - Full Planning</option>
+<option value="luxury">Luxury - Ultimate Experience</option>
+<option value="custom">Custom Package</option>
+</select>
+</div>
+<!-- Notes -->
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">description</span> Additional Notes
+                                </label>
+<textarea class="w-full rounded-lg border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:border-primary focus:ring-primary/20 transition-all placeholder:text-slate-400" placeholder="Mention any specific requirements, venue preferences, or initial thoughts..." rows="4"></textarea>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="flex items-center justify-end gap-4 pt-4 border-t border-slate-100 dark:border-slate-800 mt-8">
+<button class="px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" type="button">
+                                Cancel
+                            </button>
+<button class="px-8 py-2.5 rounded-lg bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-base">save</span>
+                                Register Customer
+                            </button>
+</div>
+</form>
+</div>
+<!-- Footer Support -->
+<div class="mt-8 text-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">Need help? <a class="text-primary font-semibold hover:underline" href="#">Contact vendor support</a></p>
+</div>
+</main>
+</div>
+</div>
+</body></html>

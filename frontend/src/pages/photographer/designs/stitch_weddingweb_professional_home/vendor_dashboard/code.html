@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendor Dashboard | Wedding Web</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1754cf",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full overflow-hidden">
+<!-- Side Navigation -->
+<aside class="w-64 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
+<div class="p-6 flex flex-col h-full justify-between">
+<div class="flex flex-col gap-8">
+<!-- Brand Logo -->
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 rounded-xl p-2">
+<span class="material-symbols-outlined text-primary text-2xl">loyalty</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-lg font-bold leading-none">Wedding Web</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Vendor Portal</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white shadow-sm shadow-primary/20 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">person_add</span>
+<span class="text-sm font-medium">Add Customer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">link</span>
+<span class="text-sm font-medium">Referral Link</span>
+</a>
+<div class="my-4 border-t border-slate-100 dark:border-slate-800"></div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+<span class="text-sm font-medium">Profile</span>
+</a>
+</nav>
+</div>
+<!-- Logout -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- Top Header -->
+<header class="h-16 flex items-center justify-between px-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+<div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold">Dashboard</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:border-slate-700 mx-1"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold leading-none text-slate-900 dark:text-white">Alex Rivera</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Elite Vendor</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-slate-200 bg-cover bg-center border border-slate-100 dark:border-slate-700" data-alt="User profile avatar photo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC50UdZRNovbo6d6ABuhpxUgnYHYEZXXNGvbg9LO5d6khekJzFU9YqQew19Vv4-AGM2vg8IYb4rXkQaGuWeQKUF3us3Y54ET7mau6BdETi4akiYtwxS8UKci8WuiefHWdxMI5lcvT6mugw8hAskX1HIBYFdBI82dkAzk2SK-mXslnLyfBQzoPyMNb1fovzjMQfPWboX3gJaLKZVwKbxtrV3AnHJ5ZOEQQoj6jLHGnixJCGXralUz4YolYN5SY0NW7qeeOL2gP13abuP')"></div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 flex flex-col gap-8 max-w-7xl mx-auto w-full">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<span class="text-green-500 text-xs font-bold">+12%</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Customers</p>
+<h3 class="text-slate-900 dark:text-white text-3xl font-extrabold mt-1">128</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">monitoring</span>
+</div>
+<span class="text-slate-400 text-xs font-medium">Steady</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Customers</p>
+<h3 class="text-slate-900 dark:text-white text-3xl font-extrabold mt-1">45</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+<span class="material-symbols-outlined text-green-600 dark:text-green-400">task_alt</span>
+</div>
+<span class="text-green-500 text-xs font-bold">+5%</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Completed Websites</p>
+<h3 class="text-slate-900 dark:text-white text-3xl font-extrabold mt-1">82</h3>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+<span class="material-symbols-outlined text-amber-600 dark:text-amber-400">pending</span>
+</div>
+<span class="text-amber-500 text-xs font-bold">Priority</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pending Payments</p>
+<h3 class="text-slate-900 dark:text-white text-3xl font-extrabold mt-1">12</h3>
+</div>
+</div>
+<!-- Recent Customers Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h3 class="text-slate-900 dark:text-white font-bold text-lg">Recent Customers</h3>
+<button class="text-primary text-sm font-bold hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer Name</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Wedding Date</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Package</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">favorite</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">Sarah &amp; James</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Oct 12, 2024</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-bold text-right">Premium</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">favorite</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">Emily &amp; Michael</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Nov 05, 2024</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Pending</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-bold text-right">Standard</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">favorite</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">Jessica &amp; David</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Sep 20, 2024</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">Completed</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-bold text-right">Premium</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">favorite</span>
+</div>
+<span class="text-sm font-bold text-slate-900 dark:text-white">Chloe &amp; Ryan</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Dec 15, 2024</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-bold text-right">Basic</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Footer/Help Section -->
+<div class="bg-primary/5 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
+<div class="flex flex-col gap-1 text-center md:text-left">
+<h4 class="text-slate-900 dark:text-white font-bold">Need help with a project?</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Our support team is available 24/7 for premium vendors.</p>
+</div>
+<button class="px-6 py-3 bg-primary text-white font-bold rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+                        Contact Support
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
