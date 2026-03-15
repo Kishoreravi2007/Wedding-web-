@@ -44,6 +44,24 @@ export default function AddCustomerPage() {
 
       if (error) throw error;
 
+      // Send congratulatory email to the customer
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://wedding-backend-979970479540.asia-south1.run.app';
+      try {
+        await fetch(`${backendUrl}/api/premium/notify-customer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            customerName: formData.name,
+            vendorName: user.user_metadata?.full_name || 'Your Vendor',
+            packageName: formData.package
+          })
+        });
+      } catch (e) {
+        console.error("Failed to send welcome email to customer:", e);
+        // Non-blocking error, so we continue
+      }
+
       setMessage({ type: 'success', text: "Customer added successfully!" });
       setFormData({
         name: "",

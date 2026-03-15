@@ -651,7 +651,38 @@ router.post('/generate-vendor-credentials', authenticateToken, async (req, res) 
     }
 
     // The DB trigger handle_new_vendor will automatically insert into public.vendors table
-    
+
+    // Send congratulations email
+    try {
+      const emailService = require('../services/email-service');
+      const vendorName = fullName || email.split('@')[0];
+      await emailService.sendEmail({
+        to: email,
+        subject: 'Welcome to the WeddingWeb Professional Network! 🎉',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+            <h2>Congratulations, ${vendorName}!</h2>
+            <p>Your Vendor account for <strong>WeddingWeb</strong> has been successfully created.</p>
+            <p>You can now manage your studio, track customers, and access exclusive professional tools.</p>
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Your Login Credentials</h3>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Password:</strong> ${password}</p>
+              <p style="font-size: 12px; color: #666;">(Please keep this secure)</p>
+            </div>
+            <a href="${process.env.FRONTEND_URL || 'https://weddingweb.co.in'}/vendor" style="background-color: #1754cf; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+              Login to Vendor Portal
+            </a>
+            <p style="margin-top: 30px; font-size: 14px; color: #666;">
+              Best regards,<br/>The WeddingWeb Team
+            </p>
+          </div>
+        `
+      });
+    } catch (emailErr) {
+      console.error('Failed to send vendor welcome email:', emailErr);
+    }
+
     res.json({
       success: true,
       message: `Vendor '${email}' credentials generated successfully.`,
@@ -660,6 +691,49 @@ router.post('/generate-vendor-credentials', authenticateToken, async (req, res) 
   } catch (error) {
     console.error('Error generating vendor credentials:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/premium/notify-customer
+ * Used by Vendor Portal to send a congratulations email to a newly added customer.
+ */
+router.post('/notify-customer', async (req, res) => {
+  try {
+    const { email, customerName, vendorName, packageName } = req.body;
+    
+    if (!email || !customerName) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const emailService = require('../services/email-service');
+    const frontendUrl = process.env.FRONTEND_URL || 'https://weddingweb.co.in';
+    
+    await emailService.sendEmail({
+      to: email,
+      subject: 'Welcome to WeddingWeb! 🎉',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <h2>Congratulations, ${customerName}!</h2>
+          <p>Your wedding package (<strong>${packageName || 'Premium'}</strong>) has been successfully created by <strong>${vendorName || 'your vendor'}</strong>.</p>
+          <p>We are excited to help you manage your special day with WeddingWeb.</p>
+          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p>Your vendor will provide you with further details and access to your wedding dashboard.</p>
+            <a href="${frontendUrl}" style="background-color: #1754cf; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; margin-top: 10px;">
+              Visit WeddingWeb
+            </a>
+          </div>
+          <p style="margin-top: 30px; font-size: 14px; color: #666;">
+            Best regards,<br/>The WeddingWeb Team
+          </p>
+        </div>
+      `
+    });
+
+    res.json({ success: true, message: 'Notification sent successfully' });
+  } catch (error) {
+    console.error('Failed to send customer notification:', error);
+    res.status(500).json({ error: 'Failed to send notification' });
   }
 });
 
